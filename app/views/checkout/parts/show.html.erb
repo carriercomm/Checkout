@@ -1,0 +1,35 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <b>Kit:</b>
+  <%= @part.kit_id %>
+</p>
+
+<p>
+  <b>Model:</b>
+  <%= @part.model_id %>
+</p>
+
+<p>
+  <b>Serial number:</b>
+  <%= @part.serial_number %>
+</p>
+
+<p>
+  <b>Cost:</b>
+  <%= @part.cost %>
+</p>
+
+<p>
+  <b>Insured:</b>
+  <%= @part.insured %>
+</p>
+
+<p>
+  <b>Missing:</b>
+  <%= @part.missing %>
+</p>
+
+
+<%= link_to 'Edit', edit_part_path(@part) %> |
+<%= link_to 'Back', parts_path %>
