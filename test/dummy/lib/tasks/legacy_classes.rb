@@ -2,7 +2,7 @@ class LegacyEquipment < ActiveRecord::Base
   establish_connection :legacy
   set_table_name 'equipment'
 
-  def self.dedupe!
+  def self.dedupe_makers!
     connection.execute "UPDATE equipment SET eq_manufacturer='Adam Audio' WHERE eq_manufacturer='Adam'"
     connection.execute "UPDATE equipment SET eq_manufacturer='Apple' WHERE eq_manufacturer='APPLE COMPUTER' OR eq_manufacturer='APPLE COMPUTER CORP' OR eq_manufacturer='APPLE COMPUTER INC'"
     connection.execute "UPDATE equipment SET eq_manufacturer='Unknown' WHERE eq_manufacturer='Bad Tag' OR eq_manufacturer=''"
@@ -20,10 +20,21 @@ class LegacyEquipment < ActiveRecord::Base
     connection.execute "UPDATE equipment SET eq_manufacturer='Jet' where eq_manufacturer LIKE '%jet%'"
     connection.execute "UPDATE equipment SET eq_manufacturer='Kino Flo' where eq_manufacturer='Kinoflow'"
     connection.execute "UPDATE equipment SET eq_manufacturer='Lightspeed Design' where eq_manufacturer LIKE '%lightspeed%'"
+    connection.execute "UPDATE equipment SET eq_manufacturer='Matthews' where eq_manufacturer = 'MATTHEWS HOLLYWOOD'"
     connection.execute "UPDATE equipment SET eq_manufacturer='Penguin Computing' WHERE eq_manufacturer LIKE '%penguin%'"
     connection.execute "UPDATE equipment SET eq_manufacturer='Point Grey Research' WHERE eq_manufacturer = 'PT. GREY RESEARCH'"
     connection.execute "UPDATE equipment SET eq_manufacturer='ProMAX' WHERE eq_manufacturer LIKE '%promax%'"
     connection.execute "UPDATE equipment SET eq_manufacturer='SensAble Technologies' WHERE eq_manufacturer LIKE '%sensable%'"
   end
+
+  def self.normalize_special!
+    connection.execute "UPDATE equipment SET special='No' WHERE special IS NULL"
+  end
+
+end
+
+class LegacyCategories < ActiveRecord::Base
+  establish_connection :legacy
+  set_table_name 'eq_categories'
 
 end

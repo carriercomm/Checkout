@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120223013641) do
+ActiveRecord::Schema.define(:version => 20120228232029) do
 
   create_table "checkout_budgets", :force => true do |t|
     t.string   "number"
@@ -19,6 +19,22 @@ ActiveRecord::Schema.define(:version => 20120223013641) do
     t.datetime "created_at", :null => false
     t.datetime "updated_at", :null => false
   end
+
+  create_table "checkout_categories", :force => true do |t|
+    t.string   "name"
+    t.text     "description"
+    t.datetime "created_at",  :null => false
+    t.datetime "updated_at",  :null => false
+  end
+
+  add_index "checkout_categories", ["name"], :name => "index_checkout_categories_on_name"
+
+  create_table "checkout_categories_checkout_models", :id => false, :force => true do |t|
+    t.integer "checkout_categories_id"
+    t.integer "checkout_models_id"
+  end
+
+  add_index "checkout_categories_checkout_models", ["checkout_categories_id", "checkout_models_id"], :name => "categories_models_index"
 
   create_table "checkout_kits", :force => true do |t|
     t.integer  "location_id",                     :null => false
