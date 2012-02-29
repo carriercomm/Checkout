@@ -19,6 +19,7 @@ $ rake db:migrate
 ## dBx Data Migration
 
 Grab a SQL dump of dbx2 and restore it:
+
 ```bash
 $ mysql -u root -p dbx2 < dbx2_dumpfile.sql
 $ mysql -u root -p dbx2
@@ -27,6 +28,7 @@ mysql> flush privileges;
 ```
 
 Run the dbx2 rake task to copy the data over from the restored dbx2 database to the checkout database:
+
 ```bash
 $ cd checkout/test/dummy
 $ rake dbx2
