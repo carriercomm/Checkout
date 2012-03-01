@@ -1,0 +1,27 @@
+<h1>Model</h1>
+
+<p>
+  <b>Maker</b><br>
+  <%= @model.maker_id %>
+</p>
+
+<p>
+  <b>Name</b><br>
+  <%= @model.name %>
+</p>
+
+<p>
+  <b>Description</b><br>
+  <%= @model.description %>
+</p>
+
+<p>
+  <b>Training required</b><br>
+  <%= @model.training_required %>
+</p>
+
+<div class="form-actions">
+  <%= link_to 'Back', models_path, :class => 'btn'  %>
+  <%= link_to 'Edit', edit_model_path(@model), :class => 'btn' %>
+  <%= link_to 'Delete', model_path(@model), :method => 'delete', :confirm => 'Are you sure?', :class => 'btn btn-danger' %>
+</div>

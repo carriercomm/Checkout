@@ -1,0 +1,12 @@
+<h1>Brand</h1>
+
+<p>
+  <b>Name</b><br>
+  <%= @brand.name %>
+</p>
+
+<div class="form-actions">
+  <%= link_to 'Back', brands_path, :class => 'btn'  %>
+  <%= link_to 'Edit', edit_brand_path(@brand), :class => 'btn' %>
+  <%= link_to 'Delete', brand_path(@brand), :method => 'delete', :confirm => 'Are you sure?', :class => 'btn btn-danger' %>
+</div>

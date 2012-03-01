@@ -1,0 +1,28 @@
+common: &mysql
+  adapter: mysql2
+  encoding: utf8
+  pool: 5
+  username: webapp
+  password: webapp
+  socket: /tmp/mysql.sock
+
+development:
+  <<: *mysql
+  database: checkout
+
+# Warning: The database defined as "test" will be erased and
+# re-generated from your development database when you run "rake".
+# Do not set this db to the same as development or production.
+test:
+  <<: *mysql
+  database: checkout_test
+
+production:
+  <<: *mysql
+  database: checkout
+
+
+legacy:
+  <<: *mysql
+  reconnect: false
+  database: dbx2

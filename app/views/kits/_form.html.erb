@@ -1,0 +1,31 @@
+<%= form_for @kit, :html => { :class => 'form-horizontal' } do |f| %>
+  <fieldset>
+    <legend><%= controller.action_name.capitalize %> Kit</legend>
+
+    <div class="control-group">
+      <%= f.label :tombstoned, :class => 'control-label' %>
+      <div class="controls">
+        <%= f.check_box :tombstoned, :class => 'check_box' %>
+      </div>
+    </div>
+
+    <div class="control-group">
+      <%= f.label :checkoutable, :class => 'control-label' %>
+      <div class="controls">
+        <%= f.check_box :checkoutable, :class => 'check_box' %>
+      </div>
+    </div>
+
+    <div class="control-group">
+      <%= f.label :location_id, :class => 'control-label' %>
+      <div class="controls">
+        <%= f.number_field :location_id, :class => 'number_field' %>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <%= f.submit nil, :class => 'btn btn-primary' %>
+      <%= link_to 'Cancel', kits_path, :class => 'btn' %>
+    </div>
+  </fieldset>
+<% end %>
