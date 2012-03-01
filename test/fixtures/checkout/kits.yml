@@ -1,11 +1,11 @@
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
 
 one:
-  location_id: 1
   tombstoned: false
   checkoutable: false
+  location: 
 
 two:
-  location_id: 1
   tombstoned: false
   checkoutable: false
+  location: 

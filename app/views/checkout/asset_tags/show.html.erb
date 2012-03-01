@@ -1,0 +1,15 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <b>Uid:</b>
+  <%= @asset_tag.uid %>
+</p>
+
+<p>
+  <b>Part:</b>
+  <%= @asset_tag.part %>
+</p>
+
+
+<%= link_to 'Edit', edit_asset_tag_path(@asset_tag) %> |
+<%= link_to 'Back', asset_tags_path %>

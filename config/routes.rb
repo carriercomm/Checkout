@@ -1,7 +1,11 @@
 Checkout::Engine.routes.draw do
-  resources :categories
-
   resources :kits
+
+  resources :locations
+
+  resources :asset_tags
+
+  resources :categories
 
   resources :makers
 

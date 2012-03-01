@@ -1,6 +1,8 @@
 class LegacyEquipment < ActiveRecord::Base
   establish_connection :legacy
   set_table_name 'equipment'
+  
+  belongs_to :legacy_budget, :foreign_key => 'budget_id'
 
   def self.dedupe_makers!
     connection.execute "UPDATE equipment SET eq_manufacturer='Adam Audio' WHERE eq_manufacturer='Adam'"
@@ -38,3 +40,12 @@ class LegacyCategories < ActiveRecord::Base
   set_table_name 'eq_categories'
 
 end
+
+class LegacyBudget < ActiveRecord::Base
+  establish_connection :legacy
+  set_table_name 'budgets'
+  set_primary_key :budget_id
+  has_many :legacy_equipments, 
+
+end
+

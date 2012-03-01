@@ -30,7 +30,7 @@ mysql> flush privileges;
 Run the dbx2 rake task to copy the data over from the restored dbx2 database to the checkout database:
 
 ```bash
-$ cd checkout/test/dummy
+$ cd test/dummy
 $ rake dbx2
 ```
 Note: the migration is handled by the following 2 files:

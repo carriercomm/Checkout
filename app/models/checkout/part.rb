@@ -1,9 +1,10 @@
 module Checkout
   class Part < ActiveRecord::Base
 
-    has_many   :asset_tags
+    belongs_to :budget
     belongs_to :kit
     belongs_to :model
+    has_many   :asset_tags
 
   end
 end
