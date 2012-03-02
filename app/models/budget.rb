@@ -10,6 +10,10 @@ class Budget < ActiveRecord::Base
 
   before_validation :strip_fields
 
+  def self.options_map
+    order("date_start DESC, number ASC").all.map { |b| [b.to_s, b.id] }
+  end
+
   def display_date
     if !!date_start && !!date_end
       return "#{ date_start.year }-#{ date_end.year }"
@@ -19,7 +23,7 @@ class Budget < ActiveRecord::Base
   end
 
   def to_s
-    "#{ number } : #{ display_date } : #{ name }"
+    "#{ number } (#{ display_date.ljust(9) }) #{ name }"
   end
 
   protected

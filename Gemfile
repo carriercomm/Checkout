@@ -2,6 +2,8 @@ source 'https://rubygems.org'
 
 gem 'rails', '3.2.1'
 gem 'mysql2'
+gem 'jquery-rails'
+gem 'kaminari'          # pagination
 
 # Gems used only for assets and not required
 # in production environments by default.
@@ -16,7 +18,7 @@ group :assets do
   gem 'twitter-bootstrap-rails'
 end
 
-gem 'jquery-rails'
+
 
 # To use ActiveModel has_secure_password
 # gem 'bcrypt-ruby', '~> 3.0.0'

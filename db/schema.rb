@@ -47,13 +47,14 @@ ActiveRecord::Schema.define(:version => 20120301072123) do
   add_index "categories", ["name"], :name => "index_categories_on_name"
 
   create_table "categories_models", :id => false, :force => true do |t|
-    t.integer "categories_id"
-    t.integer "models_id"
+    t.integer "category_id"
+    t.integer "model_id"
   end
 
-  add_index "categories_models", ["categories_id", "models_id"], :name => "categories_models_index"
+  add_index "categories_models", ["category_id", "model_id"], :name => "index_categories_models_on_category_id_and_model_id"
 
   create_table "kits", :force => true do |t|
+    t.string   "name"
     t.boolean  "tombstoned"
     t.boolean  "checkoutable"
     t.integer  "location_id"

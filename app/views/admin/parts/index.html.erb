@@ -1,0 +1,33 @@
+<h1>Parts</h1>
+
+<%= link_to 'New', new_admin_part_path, :class => 'btn btn-primary' %>
+
+<%= paginate @parts %>
+
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>Asset Tag</th>
+      <th>Brand</th>
+      <th>Model</th>
+      <th>Serial number</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @parts.each do |part| %>
+      <tr>
+        <td><%= part.asset_tags.collect{ |at| at.uid }.join(", ")  %></td>
+        <td><%= part.model.brand %></td>
+        <td><%= part.model %></td>
+        <td><%= part.serial_number %></td>
+        <td>
+          <%= link_to 'Edit', edit_admin_part_path(part), :class => 'btn btn-mini' %>
+          <%= link_to 'Destroy', admin_part_path(part), :method => :delete, :confirm => 'Are you sure?', :class => 'btn btn-mini btn-danger' %>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<%= paginate @parts %>

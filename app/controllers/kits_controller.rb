@@ -2,7 +2,7 @@ class KitsController < ApplicationController
   # GET /kits
   # GET /kits.json
   def index
-    @kits = Kit.all
+    @kits = Kit.where(:tombstoned => false, :checkoutable => true).page(params[:page])
 
     respond_to do |format|
       format.html # index.html.erb

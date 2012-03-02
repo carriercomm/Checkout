@@ -1,18 +1,24 @@
 <h1>Models</h1>
 <table class="table table-striped">
+  <thead>
+    <tr>
+      <th>Brand</th>
+      <th>Model</th>
+      <th>Description</th>
+      <th>Count</th>
+    </tr>
+  </thead>
   <tbody>
     <% @models.each do |model| %>
       <tr>
-        <td><%= link_to model.brand.name, models_path(:brand => model.brand) %></td>
+        <td><%= link_to model.brand.name, brand_models_path(model.brand) %></td>
         <td><%= model.name %></td>
         <td><%= model.description %></td>
+        <td><%= model.parts.count %></td>
         <td>
-          <%= link_to 'Edit', edit_model_path(model), :class => 'btn btn-mini' %>
-          <%= link_to 'Delete', model_path(model), :method => :delete, :confirm => 'Are you sure?', :class => 'btn btn-mini btn-danger' %>
+          <%= link_to 'Reserve', '#', :class => 'btn btn-mini' %>
         </td>
       </tr>
     <% end %>
   </tbody>
 </table>
-
-<%= link_to 'New', new_model_path, :class => 'btn btn-primary' %>

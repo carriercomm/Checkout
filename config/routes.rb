@@ -18,11 +18,31 @@ Checkout::Application.routes.draw do
   resources :brands do
     resources :models
   end
-  resources :categories
+  resources :categories do
+    resources :models
+  end
   resources :kits
   resources :locations
   resources :models
   resources :parts
+
+  namespace :admin do
+    resources :asset_tags
+    resources :brands do
+      resources :models do
+        resources :parts
+      end
+    end
+    resources :categories do
+      resources :models
+    end
+    resources :kits
+    resources :locations
+    resources :models do
+      resources :parts
+    end
+    resources :parts
+  end
 
   # Sample resource route with options:
   #   resources :products do

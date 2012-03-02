@@ -1,0 +1,42 @@
+<h1>Part</h1>
+
+<p>
+  <b>Model</b><br>
+  <%= @part.model %>
+</p>
+
+<p>
+  <b>Serial number</b><br>
+  <%= @part.serial_number %>
+</p>
+
+<p>
+  <b>Cost</b><br>
+  <%= @part.cost %>
+</p>
+
+<p>
+  <b>Insured</b><br>
+  <%= @part.insured %>
+</p>
+
+<p>
+  <b>Missing</b><br>
+  <%= @part.missing %>
+</p>
+
+<p>
+  <b>Budget</b><br>
+  <%= @part.budget %>
+</p>
+
+<p>
+  <b>Kit</b><br>
+  <%= @part.kit_id %>
+</p>
+
+<div class="form-actions">
+  <%= link_to 'Back', admin_parts_path, :class => 'btn'  %>
+  <%= link_to 'Edit', edit_admin_part_path(@part), :class => 'btn' %>
+  <%= link_to 'Delete', admin_part_path(@part), :method => 'delete', :confirm => 'Are you sure?', :class => 'btn btn-danger' %>
+</div>

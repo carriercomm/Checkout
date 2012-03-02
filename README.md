@@ -2,17 +2,16 @@ This project is still in early alpha development stages. The instructions below 
 
 # Installation
 
-First, watch the [Railscast on mountable engines](http://railscasts.com/episodes/277-mountable-engines?autoplay=true).
+The app is no longer a mountable engine. It's pretty much ready to go
+as soon as you get the database set up.
 
 ## Setting Up
 
-Since this is a mountable engine, you need somewhere to mount it. You
-can either generate a new project or, for demo purposes, use the test
-project that ships with the git repo:
+Configure your config/database.yml file so it connects to your
+preferred database.
 
 ```bash
-$ cd test/dummy
-$ rake checkout:install:migrations
+$ rake db:setup
 $ rake db:migrate
 ```
 
@@ -22,7 +21,7 @@ Grab a SQL dump of dbx2 and restore it:
 
 ```bash
 $ mysql -u root -p dbx2 < dbx2_dumpfile.sql
-$ mysql -u root -p dbx2
+$ mysql -u root -p
 mysql> grant all privileges on dbx2.* to webapp@localhost identified by 'webapp';
 mysql> flush privileges;
 ```
@@ -30,9 +29,8 @@ mysql> flush privileges;
 Run the dbx2 rake task to copy the data over from the restored dbx2 database to the checkout database:
 
 ```bash
-$ cd test/dummy
 $ rake dbx2
 ```
 Note: the migration is handled by the following 2 files:
-    test/dummy/lib/tasks/legacy_classes.rb
-    test/dummy/lib/tasks/legacy_migration.rake
+    lib/tasks/legacy_classes.rb
+    lib/tasks/legacy_migration.rake

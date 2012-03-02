@@ -3,6 +3,8 @@ class LegacyEquipment < ActiveRecord::Base
   set_table_name 'equipment'
   
   belongs_to :legacy_budget, :foreign_key => 'budget_id'
+  belongs_to :legacy_category, :foreign_key => 'cat_id'
+  belongs_to :legacy_location, :foreign_key => 'loc_id'
 
   def self.dedupe_brands!
     connection.execute "UPDATE equipment SET eq_manufacturer='Adam Audio' WHERE eq_manufacturer='Adam'"
@@ -35,17 +37,23 @@ class LegacyEquipment < ActiveRecord::Base
 
 end
 
-class LegacyCategories < ActiveRecord::Base
+class LegacyCategory < ActiveRecord::Base
   establish_connection :legacy
   set_table_name 'eq_categories'
-
+  set_primary_key :cat_id
+  has_many :legacy_equipments
 end
 
 class LegacyBudget < ActiveRecord::Base
   establish_connection :legacy
   set_table_name 'budgets'
   set_primary_key :budget_id
-  has_many :legacy_equipments, 
-
+  has_many :legacy_equipments
 end
 
+class LegacyLocation <ActiveRecord::Base
+  establish_connection :legacy
+  set_table_name 'locations'
+  set_primary_key :loc_id
+  has_many :legacy_equipments
+end

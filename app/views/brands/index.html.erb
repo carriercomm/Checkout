@@ -11,12 +11,9 @@
       <tr>
         <td><%= link_to brand.name, brand_models_path(brand) %></td>
         <td>
-          <%= link_to 'Edit', edit_brand_path(brand), :class => 'btn btn-mini' %>
-          <%= link_to 'Destroy', brand_path(brand), :method => :delete, :confirm => 'Are you sure?', :class => 'btn btn-mini btn-danger' %>
+          <%= link_to 'Show Models',  brand_models_path(brand), :class => 'btn btn-mini' %>
         </td>
       </tr>
     <% end %>
   </tbody>
 </table>
-
-<%= link_to 'New', new_brand_path, :class => 'btn btn-primary' %>

@@ -1,0 +1,59 @@
+<%= form_for @part, :url => admin_part_path(@part), :html => { :class => 'form-horizontal' } do |f| %>
+  <fieldset>
+    <legend><%= controller.action_name.capitalize %> Part</legend>
+
+    <div class="control-group">
+      <%= f.label :model_id, :class => 'control-label' %>
+      <div class="controls">
+        <%= f.select :model_id, @part.model_options_map %>
+      </div>
+    </div>
+
+    <div class="control-group">
+      <%= f.label :serial_number, :class => 'control-label' %>
+      <div class="controls">
+        <%= f.text_field :serial_number, :class => 'text_field' %>
+      </div>
+    </div>
+
+    <div class="control-group">
+      <%= f.label :cost, :class => 'control-label' %>
+      <div class="controls">
+        <%= f.text_field :cost, :class => 'text_field' %>
+      </div>
+    </div>
+
+    <div class="control-group">
+      <%= f.label :budget_id, :class => 'control-label' %>
+      <div class="controls">
+        <%= f.select :budget_id, Budget.options_map %>
+      </div>
+    </div>
+    
+    <div class="control-group">
+      <%= f.label :insured, :class => 'control-label' %>
+      <div class="controls">
+        <%= f.check_box :insured, :class => 'check_box' %>
+      </div>
+    </div>
+
+    <div class="control-group">
+      <%= f.label :missing, :class => 'control-label' %>
+      <div class="controls">
+        <%= f.check_box :missing, :class => 'check_box' %>
+      </div>
+    </div>
+
+    <div class="control-group">
+      <%= f.label :kit_id, :class => 'control-label' %>
+      <div class="controls">
+        <%= f.number_field :kit_id, :class => 'number_field' %>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <%= f.submit nil, :class => 'btn btn-primary' %>
+      <%= link_to 'Cancel', admin_parts_path, :class => 'btn' %>
+    </div>
+  </fieldset>
+<% end %>

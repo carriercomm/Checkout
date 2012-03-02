@@ -2,9 +2,13 @@ desc 'migrate data from dbx2'
 task :dbx2 => :environment do
   require 'tasks/legacy_classes'
 
+  record_count = 0
+
   #
   # Migrate Brands
   #
+
+  puts "Migrating brands..."
 
   LegacyEquipment.dedupe_brands!
 
@@ -16,47 +20,57 @@ task :dbx2 => :environment do
       brand = Brand.find_or_initialize_by_name(le.eq_manufacturer)
       if brand.new_record?
         if brand.save
-          puts "Brand #{brand.id}:'#{ brand.name }' successfully created"
+          record_count += 1
         else
-          puts "error saving #{brand.id}:'#{ brand.name }'"
+          puts "\tError saving #{brand.id}:'#{ brand.name }'"
         end
       end
     rescue StandardError => e
-      puts "Error migrating #{le.id}: #{ e }"
+      puts "\tError migrating #{le.id}: #{ e }"
     end
   end
+
+  puts "Migrated #{ record_count } brands"
+  puts
 
   #
   # Migrate Categories
   #
 
-  LegacyCategories.all.each do |lc|
-    lc.category.strip!
+  puts "Migrating categories..."
+  record_count = 0
+
+  LegacyCategory.all.each do |lc|
+    category_name = (lc.category.nil?) ? "Unknown" : lc.category.strip
 
     begin
-      cat = Category.find_or_initialize_by_name(lc.category)
+      cat = Category.find_or_initialize_by_name(category_name)
       if cat.new_record?
         cat.description = lc.cat_notes
         if cat.save
-          puts "Category #{cat.id}:'#{ cat.name }' successfully created"
+          record_count += 1
         else
-          puts "Error saving #{cat.id}:'#{ cat.name }'"
+          puts "\tError saving #{cat.id}:'#{ cat.name }'"
         end
       end
     rescue StandardError => e
-      puts "Error migrating #{lc.category}: #{ e }"
-    end    
-
+      puts "\tError migrating #{lc.category}: #{ e }"
+    end
   end
+
+  puts "Migrated #{ record_count } categories"
+  puts
 
   #
   # Migrate Models
   #
 
+  puts "Migrating models..."
+  record_count = 0
+
   LegacyEquipment.normalize_special!
 
-  LegacyEquipment.select(['eq_manufacturer', 'eq_model', 'eq_description', 'special', 'category'])
-  .joins("LEFT OUTER JOIN eq_categories ON equipment.cat_id = eq_categories.cat_id")
+  LegacyEquipment.includes(:legacy_category)
   .group(['eq_manufacturer', 'eq_model'])
   .order(['eq_manufacturer', 'eq_model'])
   .each do |le|
@@ -84,21 +98,29 @@ task :dbx2 => :environment do
         end
         model_obj.training_required = training
 
+        category_name = (le.legacy_category.nil? || le.legacy_category.category.nil?) ? "Unknown" : le.legacy_category.category.strip
+        model_obj.categories = [Category.where(:name => category_name).first_or_create]
+
         if model_obj.save
-          puts "Model #{model_obj.id}:'#{ model_obj.name }' successfully created"
+          record_count += 1
         else
-          puts "Error saving #{model_obj.id}:'#{ model_obj.name }'"
+          puts "\tError saving #{model_obj.id}:'#{ model_obj.name }'"
         end
       end
     rescue StandardError => e
-      puts "Error migrating #{le.eq_model}: #{ e }"
-    end  
-
+      puts "\tError migrating #{le.eq_model}: #{ e }"
+    end
   end
+
+  puts "Migrated #{ record_count } models"
+  puts
 
   #
   # Migrate Budgets
   #
+
+  puts "Migrating budgets..."
+  record_count = 0
 
   LegacyEquipment.select(['budget_number', 'budget_name', 'eq_budget_biennium'])
   .uniq
@@ -131,24 +153,28 @@ task :dbx2 => :environment do
       
       if budget.new_record?
         if budget.save
-          puts "Budget #{budget.id}:    #{ budget.to_s } successfully created"
+          record_count += 1
         else
-          puts le.budget_number.ljust(30) + " | " + le.budget_name.ljust(30) + " | " + le.eq_budget_biennium
-          puts "Error saving #{budget.id}:  #{ budget.to_s } #{ budget.errors.inspect.to_s }"
+          puts "\tError saving #{budget.id}:  #{ budget.to_s } #{ budget.errors.inspect.to_s }"
         end
       end
     rescue StandardError => e
       puts le.budget_number.ljust(30) + " | " + le.budget_name.ljust(30) + " | " + le.eq_budget_biennium
-      puts "Error migrating #{le.budget_number}: #{ e }"
+      puts "\tError migrating #{le.budget_number}: #{ e }"
     end  
-
   end
-  
+
+  puts "Migrated #{ record_count } budgets"
+  puts
+
   #
   # Migrate Parts
   #
   
-  LegacyEquipment.includes(:legacy_budget).all.each do |le|
+  puts "Migrating asset tags, kits, and parts..."
+  record_count = 0
+
+  LegacyEquipment.includes(:legacy_budget, :legacy_location).all.each do |le|
 
     begin
       # look up the brand
@@ -182,40 +208,53 @@ task :dbx2 => :environment do
       # find or create a matching asset tag
       asset_tag = AssetTag.where(:uid => le.eq_uw_tag).includes(:part).first_or_initialize
 
-      # TODO: add kit/bundle
-
       if asset_tag.new_record? || asset_tag.part.nil?
         # start building up the part attrs
-        serial_number = (le.eq_serial_num.nil? || le.eq_serial_num.strip!.blank?) ? nil : le.eq_serial_num
-        cost          = (le.eq_cost == 0) ? nil : le.eq_cost
-        insured       = (le.eq_insured.strip.downcase == "on") ? true : false
-        missing       = (le.eq_removed.strip.downcase == "on") ? true : false
+        serial_number      = (le.eq_serial_num.nil? || le.eq_serial_num.strip.blank?) ? nil : le.eq_serial_num.strip
+        cost               = (le.eq_cost == 0) ? nil : le.eq_cost
+        insured            = (le.eq_insured.strip.downcase == "on")   ? true : false
+        missing            = (le.eq_removed.strip.downcase == "on")   ? true : false
+        checkoutable       = (le.checkoutable.strip.downcase == "on") ? true : false
 
-        part = Part.new
-        part.cost    = cost
-        part.insured = insured
-        part.missing = missing
-        part.model   = model_obj
-        part.budget  = budget
+        kit                = Kit.new
+        kit.name           = model_obj.name
+        kit.checkoutable   = true
+        kit.tombstoned     = missing
+        kit.location       = Location.find_or_create_by_name(le.legacy_location.loc_name)
+
+        part               = Part.new
+        part.serial_number = serial_number
+        part.cost          = cost
+        part.insured       = insured
+        part.missing       = missing
+        part.model         = model_obj
+        part.budget        = budget
+        part.kit           = kit
+        part.created_at    = le.eq_date_entered
         
-        asset_tag.part = part
+        asset_tag.part     = part
         
         if asset_tag.save
-          puts "Asset_Tag #{ asset_tag.id }:'#{ asset_tag.uid }' successfully created"
-          puts "Part #{ part.id }:'#{ part.serial_number }' successfully created"
+          record_count += 1
         else
-          puts "Error saving #{ asset_tag.id }:'#{ asset_tag.uid }'"
-          puts "Error saving #{ part.id }:'#{ part.serial_number }'"
+          puts "\tError saving #{ asset_tag.id }:'#{ asset_tag.uid }'\n #{ asset_tag.errors.inspect.to_s }"
         end
 
       end
     rescue StandardError => e
-      puts "Error migrating #{le.eq_uw_tag}: #{ e }"
+      puts "\tError migrating #{le.eq_uw_tag}: #{ e }"
     end  
   end
+
+  puts "Migrated #{ record_count } asset tags, kits, and parts"
+  puts
+
 end
 
 namespace :db do
   desc "drop, create, migrate"
   task :rebuild => ["db:drop", "db:create", "db:migrate"]
+
+  desc "drop, create, migrate, dbx2"
+  task :repop => ["db:rebuild", "dbx2"]
 end

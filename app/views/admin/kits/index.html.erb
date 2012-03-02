@@ -1,0 +1,26 @@
+<h1>Kits</h1>
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Tombstoned</th>
+      <th>Created at</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @kits.each do |kit| %>
+      <tr>
+        <td><%= kit.id %></td>
+        <td><%= link_to kit.tombstoned, kit_path(kit) %></td>
+        <td><%= kit.created_at %></td>
+        <td>
+          <%= link_to 'Edit', edit_kit_path(kit), :class => 'btn btn-mini' %>
+          <%= link_to 'Destroy', kit_path(kit), :method => :delete, :confirm => 'Are you sure?', :class => 'btn btn-mini btn-danger' %>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<%= link_to 'New', new_kit_path, :class => 'btn btn-primary' %>
