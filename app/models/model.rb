@@ -5,7 +5,7 @@ class Model < ActiveRecord::Base
   has_many   :kits, :through => :parts
 
   has_and_belongs_to_many :categories
-  
+
   def to_s
     name
   end

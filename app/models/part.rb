@@ -5,9 +5,7 @@ class Part < ActiveRecord::Base
   belongs_to :model
   has_many   :asset_tags
 
-  def model_options_map
-    model.brand.models.order(:name).all.map { |m| [m.name, m.id] }
-  end
+  accepts_nested_attributes_for :model
 
   def to_param
     if new_record?

@@ -2,7 +2,7 @@ class BrandsController < ApplicationController
   # GET /brands
   # GET /brands.json
   def index
-    @brands = Brand.order(:name).all
+    @brands = Brand.order(:name).page(params[:page]).all
 
     respond_to do |format|
       format.html # index.html.erb

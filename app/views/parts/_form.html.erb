@@ -2,6 +2,22 @@
   <fieldset>
     <legend><%= controller.action_name.capitalize %> Part</legend>
 
+    <%= f.fields_for :model do |builder| %>
+    <div class="control-group">
+      <%= builder.label :brand_id, :class => 'control-label' %>
+      <div class="controls">
+        <%= builder.collection_select :brand_id, Brand.order(:name), :id, :name, :include_blank => true %>
+      </div>
+    </div>
+    <% end %>
+
+    <div class="control-group">
+      <%= f.label :model_id, :class => 'control-label' %>
+      <div class="controls">
+        <%= f.grouped_collection_select :model_id, Brand.order(:name), :models, :name, :id, :name, :include_blank => true %>
+      </div>
+    </div>
+
     <div class="control-group">
       <%= f.label :serial_number, :class => 'control-label' %>
       <div class="controls">
@@ -17,6 +33,13 @@
     </div>
 
     <div class="control-group">
+      <%= f.label :budget_id, :class => 'control-label' %>
+      <div class="controls">
+        <%= f.select :budget_id, Budget.options_map %>
+      </div>
+    </div>
+    
+    <div class="control-group">
       <%= f.label :insured, :class => 'control-label' %>
       <div class="controls">
         <%= f.check_box :insured, :class => 'check_box' %>
@@ -31,23 +54,9 @@
     </div>
 
     <div class="control-group">
-      <%= f.label :budget_id, :class => 'control-label' %>
-      <div class="controls">
-        <%= f.number_field :budget_id, :class => 'number_field' %>
-      </div>
-    </div>
-
-    <div class="control-group">
       <%= f.label :kit_id, :class => 'control-label' %>
       <div class="controls">
         <%= f.number_field :kit_id, :class => 'number_field' %>
-      </div>
-    </div>
-
-    <div class="control-group">
-      <%= f.label :model_id, :class => 'control-label' %>
-      <div class="controls">
-        <%= f.number_field :model_id, :class => 'number_field' %>
       </div>
     </div>
 

@@ -1,6 +1,16 @@
 <h1>Part</h1>
 
 <p>
+  <b>Brand</b><br>
+  <%= @part.model.brand %>
+</p>
+
+<p>
+  <b>Model</b><br>
+  <%= @part.model %>
+</p>
+
+<p>
   <b>Serial number</b><br>
   <%= @part.serial_number %>
 </p>
@@ -22,17 +32,12 @@
 
 <p>
   <b>Budget</b><br>
-  <%= @part.budget_id %>
+  <%= @part.budget %>
 </p>
 
 <p>
   <b>Kit</b><br>
   <%= @part.kit_id %>
-</p>
-
-<p>
-  <b>Model</b><br>
-  <%= @part.model_id %>
 </p>
 
 <div class="form-actions">
