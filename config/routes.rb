@@ -1,5 +1,23 @@
 Checkout::Application.routes.draw do
 
+  devise_for :users
+
+  root :to => 'models#index'
+
+  resources :asset_tags
+  resources :brands do
+    resources :models do
+      resources :parts
+    end
+  end
+  resources :categories do
+    resources :models
+  end
+  resources :kits
+  resources :locations
+  resources :models
+  resources :parts
+
   # The priority is based upon order of creation:
   # first created -> highest priority.
 
@@ -13,23 +31,6 @@ Checkout::Application.routes.draw do
 
   # Sample resource route (maps HTTP verbs to controller actions automatically):
   #   resources :products
-
-  resources :asset_tags
-
-  resources :brands do
-    resources :models do
-      resources :parts
-    end
-  end
-
-  resources :categories do
-    resources :models
-  end
-
-  resources :kits
-  resources :locations
-  resources :models
-  resources :parts
 
   # Sample resource route with options:
   #   resources :products do
@@ -67,8 +68,6 @@ Checkout::Application.routes.draw do
   # You can have the root of your site routed with "root"
   # just remember to delete public/index.html.
   # root :to => 'welcome#index'
-
-  root :to => 'models#index'
 
   # See how all your routes lay out with "rake routes"
 
