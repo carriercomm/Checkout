@@ -99,8 +99,9 @@ ActiveRecord::Schema.define(:version => 20120305232456) do
   add_index "parts", ["model_id"], :name => "index_parts_on_model_id"
 
   create_table "users", :force => true do |t|
-    t.string   "email",                  :default => "", :null => false
-    t.string   "encrypted_password",     :default => "", :null => false
+    t.string   "username",                                  :null => false
+    t.string   "email",                                     :null => false
+    t.string   "encrypted_password",                        :null => false
     t.string   "reset_password_token"
     t.datetime "reset_password_sent_at"
     t.datetime "remember_created_at"
@@ -112,8 +113,13 @@ ActiveRecord::Schema.define(:version => 20120305232456) do
     t.integer  "failed_attempts",        :default => 0
     t.string   "unlock_token"
     t.datetime "locked_at"
-    t.datetime "created_at",                             :null => false
-    t.datetime "updated_at",                             :null => false
+    t.integer  "grace_count",            :default => 0
+    t.integer  "doghouse_count",         :default => 0
+    t.boolean  "doghoused",              :default => false
+    t.datetime "doghouse_expiry"
+    t.boolean  "disabled",               :default => false
+    t.datetime "created_at",                                :null => false
+    t.datetime "updated_at",                                :null => false
   end
 
   add_index "users", ["email"], :name => "index_users_on_email", :unique => true

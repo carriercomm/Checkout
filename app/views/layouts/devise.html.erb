@@ -46,7 +46,15 @@
               <%- if devise_mapping.registerable? && controller_name != 'registrations' %>
                 <li><%=  link_to "Sign up", new_registration_path(resource_name) %></li>
               <% end -%>
-                              <li class="divider"></li>
+
+              <%- if devise_mapping.omniauthable? %>
+                <%- resource_class.omniauth_providers.each do |provider| %>
+                  <li><%=  link_to "Sign in with #{provider.to_s.titleize}", omniauth_authorize_path(resource_name, provider) %></li>
+                <% end -%>
+              <% end -%>
+
+                <li class="divider"></li>
+
               <%- if devise_mapping.recoverable? && controller_name != 'passwords' %>
                 <li><%=  link_to "Forgot your password?", new_password_path(resource_name) %></li>
               <% end -%>
@@ -57,12 +65,6 @@
 
               <%- if devise_mapping.lockable? && resource_class.unlock_strategy_enabled?(:email) && controller_name != 'unlocks' %>
                 <li><%=  link_to "Didn't receive unlock instructions?", new_unlock_path(resource_name) %></li>
-              <% end -%>
-
-              <%- if devise_mapping.omniauthable? %>
-                <%- resource_class.omniauth_providers.each do |provider| %>
-                  <li><%=  link_to "Sign in with #{provider.to_s.titleize}", omniauth_authorize_path(resource_name, provider) %></li>
-                <% end -%>
               <% end -%>
               </ul>
             </li>
