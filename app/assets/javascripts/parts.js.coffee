@@ -15,6 +15,8 @@ jQuery ->
 
   if $('#part_model_attributes_brand_id :selected').text() == ""
     $('#part_model_id').parent().hide()
+  else
+    set_select()
 
   $('#part_model_attributes_brand_id').change ->
     set_select()

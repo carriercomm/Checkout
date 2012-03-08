@@ -1,0 +1,23 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
+
+one:
+  time_start: 2012-03-06 16:42:26
+  time_end: 2012-03-06 16:42:26
+  kit: 
+  client_id: 
+  approver_id: 
+  checkout_assistant_id: 
+  checkin_assistant_id: 
+  checked_in_at: 2012-03-06 16:42:26
+  late: false
+
+two:
+  time_start: 2012-03-06 16:42:26
+  time_end: 2012-03-06 16:42:26
+  kit: 
+  client_id: 
+  approver_id: 
+  checkout_assistant_id: 
+  checkin_assistant_id: 
+  checked_in_at: 2012-03-06 16:42:26
+  late: false

@@ -1,0 +1,13 @@
+<%= simple_form_for(@business_hour) do |f| %>
+  <%= f.error_notification %>
+
+  <div class="form-inputs">
+    <%= f.input :day %>
+    <%= f.input :open %>
+    <%= f.input :close %>
+  </div>
+
+  <div class="form-actions">
+    <%= f.button :submit %>
+  </div>
+<% end %>

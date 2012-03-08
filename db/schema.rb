@@ -11,7 +11,22 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120305232456) do
+ActiveRecord::Schema.define(:version => 20120307155717) do
+
+  create_table "active_admin_comments", :force => true do |t|
+    t.string   "resource_id",   :null => false
+    t.string   "resource_type", :null => false
+    t.integer  "author_id"
+    t.string   "author_type"
+    t.text     "body"
+    t.datetime "created_at",    :null => false
+    t.datetime "updated_at",    :null => false
+    t.string   "namespace"
+  end
+
+  add_index "active_admin_comments", ["author_type", "author_id"], :name => "index_active_admin_comments_on_author_type_and_author_id"
+  add_index "active_admin_comments", ["namespace"], :name => "index_active_admin_comments_on_namespace"
+  add_index "active_admin_comments", ["resource_type", "resource_id"], :name => "index_admin_notes_on_resource_type_and_resource_id"
 
   create_table "asset_tags", :force => true do |t|
     t.string   "uid"
@@ -33,6 +48,14 @@ ActiveRecord::Schema.define(:version => 20120305232456) do
     t.string   "name"
     t.date     "date_start"
     t.date     "date_end"
+    t.datetime "created_at", :null => false
+    t.datetime "updated_at", :null => false
+  end
+
+  create_table "business_hours", :force => true do |t|
+    t.string   "day"
+    t.time     "open"
+    t.time     "close"
     t.datetime "created_at", :null => false
     t.datetime "updated_at", :null => false
   end
@@ -98,6 +121,32 @@ ActiveRecord::Schema.define(:version => 20120305232456) do
   add_index "parts", ["kit_id"], :name => "index_parts_on_kit_id"
   add_index "parts", ["model_id"], :name => "index_parts_on_model_id"
 
+  create_table "reservations", :force => true do |t|
+    t.integer  "kit_id"
+    t.datetime "start_at"
+    t.datetime "end_at"
+    t.datetime "out_at"
+    t.datetime "in_at"
+    t.boolean  "late"
+    t.integer  "client_id"
+    t.text     "request_note"
+    t.integer  "approver_id"
+    t.text     "approval_note"
+    t.integer  "out_assistant_id"
+    t.integer  "in_assistant_id"
+    t.datetime "created_at",       :null => false
+    t.datetime "updated_at",       :null => false
+  end
+
+  add_index "reservations", ["approver_id"], :name => "index_reservations_on_approver_id"
+  add_index "reservations", ["client_id"], :name => "index_reservations_on_client_id"
+  add_index "reservations", ["end_at", "in_at", "late"], :name => "index_reservations_on_end_at_and_in_at_and_late"
+  add_index "reservations", ["end_at"], :name => "index_reservations_on_end_at"
+  add_index "reservations", ["in_assistant_id"], :name => "index_reservations_on_in_assistant_id"
+  add_index "reservations", ["kit_id"], :name => "index_reservations_on_kit_id"
+  add_index "reservations", ["out_assistant_id"], :name => "index_reservations_on_out_assistant_id"
+  add_index "reservations", ["start_at", "out_at"], :name => "index_reservations_on_start_at_and_out_at"
+
   create_table "users", :force => true do |t|
     t.string   "username",                                  :null => false
     t.string   "email",                                     :null => false
@@ -113,10 +162,8 @@ ActiveRecord::Schema.define(:version => 20120305232456) do
     t.integer  "failed_attempts",        :default => 0
     t.string   "unlock_token"
     t.datetime "locked_at"
-    t.integer  "grace_count",            :default => 0
-    t.integer  "doghouse_count",         :default => 0
-    t.boolean  "doghoused",              :default => false
-    t.datetime "doghouse_expiry"
+    t.integer  "suspension_count",       :default => 0
+    t.datetime "suspended_until"
     t.boolean  "disabled",               :default => false
     t.datetime "created_at",                                :null => false
     t.datetime "updated_at",                                :null => false
@@ -125,5 +172,6 @@ ActiveRecord::Schema.define(:version => 20120305232456) do
   add_index "users", ["email"], :name => "index_users_on_email", :unique => true
   add_index "users", ["reset_password_token"], :name => "index_users_on_reset_password_token", :unique => true
   add_index "users", ["unlock_token"], :name => "index_users_on_unlock_token", :unique => true
+  add_index "users", ["username"], :name => "index_users_on_username", :unique => true
 
 end

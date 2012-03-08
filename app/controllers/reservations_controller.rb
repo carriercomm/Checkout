@@ -1,0 +1,105 @@
+class ReservationsController < ApplicationController
+  # GET /reservations
+  # GET /reservations.json
+  def index
+    @reservations = Reservation.all
+
+    respond_to do |format|
+      format.html # index.html.erb
+      format.json { render json: @reservations }
+    end
+  end
+
+  # GET /reservations/1
+  # GET /reservations/1.json
+  def show
+    @reservation = Reservation.find(params[:id])
+
+    respond_to do |format|
+      format.html # show.html.erb
+      format.json { render json: @reservation }
+    end
+  end
+
+  # GET /reservations/new
+  # GET /reservations/new.json
+  def new
+    if params[:user_id].present? && params[:kit_id].present?
+      @reservation = User.find(params[:user_id]).reservations.build(:kit_id =>params[:kit_id])
+    else
+      flash[:error] = "No kit was specified, start by finding something to check out"
+      redirect_to root
+    end
+
+    set_open_days
+
+    respond_to do |format|
+      format.html # new.html.erb
+      format.json { render json: @reservation }
+    end
+  end
+
+  # GET /reservations/1/edit
+  def edit
+    @reservation = Reservation.find(params[:id])
+    set_open_days
+  end
+
+  # POST /reservations
+  # POST /reservations.json
+  def create
+    @reservation = Reservation.new(params[:reservation])
+
+    respond_to do |format|
+      if @reservation.save
+        format.html { redirect_to @reservation, notice: 'Reservation was successfully created.' }
+        format.json { render json: @reservation, status: :created, location: @reservation }
+      else
+        set_open_days
+
+        format.html { render action: "new" }
+        format.json { render json: @reservation.errors, status: :unprocessable_entity }
+      end
+    end
+  end
+
+  # PUT /reservations/1
+  # PUT /reservations/1.json
+  def update
+    @reservation = Reservation.find(params[:id])
+
+    respond_to do |format|
+      if @reservation.update_attributes(params[:reservation])
+        format.html { redirect_to @reservation, notice: 'Reservation was successfully updated.' }
+        format.json { head :no_content }
+      else
+        set_open_days
+        format.html { render action: "edit" }
+        format.json { render json: @reservation.errors, status: :unprocessable_entity }
+      end
+    end
+  end
+
+  # DELETE /reservations/1
+  # DELETE /reservations/1.json
+  def destroy
+    @reservation = Reservation.find(params[:id])
+    @reservation.destroy
+
+    respond_to do |format|
+      format.html { redirect_to reservations_url }
+      format.json { head :no_content }
+    end
+  end
+
+  protected
+
+  def set_open_days
+    schedule =  IceCube::Schedule.new
+    schedule.add_recurrence_rule IceCube::Rule.weekly.day(:monday).day(:wednesday).day(:friday)
+    @notice = "Checkout hours are:<br />" + schedule.to_s
+    days_open = schedule.occurrences_between(Time.now, (Time.now + 90.days)).collect { |d| [d.month, d.day]}
+    gon.days_open = days_open
+  end
+
+end

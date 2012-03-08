@@ -3,22 +3,14 @@ class ApplicationController < ActionController::Base
 
   before_filter :ensure_signed_in
 
-  layout :layout_by_resource
+  # NOTE: layout for Devise is setup in config/application.rb
 
   protected
 
   def ensure_signed_in
-    unless devise_controller? || user_signed_in?
+    unless user_signed_in? || devise_controller?
       redirect_to new_user_session_path
     end    
-  end
-
-  def layout_by_resource
-    if devise_controller?
-      "devise"
-    else
-      "application"
-    end
   end
 
 end

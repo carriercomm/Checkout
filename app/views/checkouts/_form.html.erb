@@ -1,0 +1,14 @@
+<%= simple_form_for @reservation, :html => { :class => 'form-horizontal' } do |f| %>
+  <fieldset>
+    <legend><%= controller.action_name.capitalize %> Reservation</legend>
+
+    <%= f.association :kit %>
+    <%= f.input :start_at, :as => :string, :input_html => { :class => 'datepicker' }, :hint =>"Date format: yyyy-mm-dd" %>
+    <%= f.input :end_at,   :as => :string, :input_html => { :class => 'datepicker' }, :hint =>"Date format: yyyy-mm-dd" %>
+
+    <div class="form-actions">
+      <%= f.submit nil, :class => 'btn btn-primary' %>
+      <%= link_to 'Cancel', reservations_path, :class => 'btn' %>
+    </div>
+  </fieldset>
+<% end %>

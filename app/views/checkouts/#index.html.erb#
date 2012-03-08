@@ -1,0 +1,32 @@
+<h1>Reservations</h1>
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>Client</th>
+      <th>Kit</th>
+      <th>Start Date</th>
+      <th>End Date</th>
+      <th>Out Date</th>
+      <th>In Date</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @reservations.each do |reservation| %>
+      <tr>
+        <td><%= link_to reservation.kit, kit_path(reservation.kit) %></td>
+        <td><%= reservation.start_at %></td>
+        <td><%= reservation.end_at %></td>
+        <td><%= reservation.out_at %></td>
+        <td><%= reservation.in_at %></td>
+        <td><%= reservation.created_at %></td>
+        <td>
+          <%= link_to 'Edit', edit_reservation_path(reservation), :class => 'btn btn-mini' %>
+          <%= link_to 'Destroy', reservation_path(reservation), :method => :delete, :confirm => 'Are you sure?', :class => 'btn btn-mini btn-danger' %>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<%= link_to 'New', new_reservation_path, :class => 'btn btn-primary' %>

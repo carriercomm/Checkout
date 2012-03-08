@@ -1,6 +1,22 @@
 Checkout::Application.routes.draw do
 
+  ActiveAdmin.routes(self)
+
+  devise_for :users, ActiveAdmin::Devise.config
   devise_for :users
+  resources :business_hours
+
+  # devise_for :user, skip: :registrations do
+  #   # remove the route for the registration#destroy action
+  #   resource :registration,
+  #   only: [:new, :create, :edit, :update],
+  #   path: 'user',
+  #   path_names: { new: 'sign_up' },
+  #   controller: 'devise/registrations',
+  #   as: :user_registration do
+  #     get :cancel
+  #   end
+  # end
 
   root :to => 'models#index'
 
@@ -13,10 +29,16 @@ Checkout::Application.routes.draw do
   resources :categories do
     resources :models
   end
-  resources :kits
+  resources :kits do
+    resources :reservations, :only => [:index]
+  end
   resources :locations
   resources :models
   resources :parts
+  resources :reservations
+  resource :users do
+    resources :reservations
+  end
 
   # The priority is based upon order of creation:
   # first created -> highest priority.

@@ -14,7 +14,8 @@
       <tr>
         <td><%= kit.name %></td>
         <td>
-          <%= link_to 'Reserve', '#', :class => 'btn btn-mini' %>
+          <%= link_to 'Reserve', new_reservation_path(:kit_id => kit, :user_id => current_user), :class => 'btn btn-mini' %>
+          <%= link_to 'Reservations', kit_reservations_path(kit), :class => 'btn btn-mini' %>
         </td>
       </tr>
     <% end %>

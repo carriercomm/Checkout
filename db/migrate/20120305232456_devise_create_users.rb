@@ -38,15 +38,14 @@ class DeviseCreateUsers < ActiveRecord::Migration
       ## Token authenticatable
       # t.string :authentication_token
 
-      t.integer  :grace_count, :default => 0
-      t.integer  :doghouse_count, :default => 0
-      t.boolean  :doghoused, :default => false
-      t.datetime :doghouse_expiry
+      t.integer  :suspension_count, :default => 0
+      t.datetime :suspended_until
       t.boolean  :disabled, :default => false
 
       t.timestamps
     end
 
+    add_index :users, :username,             :unique => true
     add_index :users, :email,                :unique => true
     add_index :users, :reset_password_token, :unique => true
     # add_index :users, :confirmation_token,   :unique => true

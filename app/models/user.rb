@@ -5,6 +5,11 @@ class User < ActiveRecord::Base
          :recoverable, :rememberable, :timeoutable, :trackable,
          :validatable)
 
+  has_many :reservations, :foreign_key => "client_id"
+  has_many :approvals,    :foreign_key => "approver_id",      :class_name => 'Reservation'
+  has_many :out_assists,  :foreign_key => "out_assistant_id", :class_name => 'Reservation'
+  has_many :in_assists,   :foreign_key => "in_assistant_id",  :class_name => 'Reservation'
+
   # Virtual attribute for authenticating by either username or email
   # This is in addition to a real persisted field like 'username'
   attr_accessor :login
@@ -17,6 +22,10 @@ class User < ActiveRecord::Base
     conditions = warden_conditions.dup
     login = conditions.delete(:login)
     where(conditions).where(["lower(username) = :value OR lower(email) = :value", { :value => login.strip.downcase }]).first
+  end
+
+  def to_s
+    username
   end
 
 end
