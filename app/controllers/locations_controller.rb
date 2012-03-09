@@ -1,4 +1,5 @@
 class LocationsController < ApplicationController
+
   # GET /locations
   # GET /locations.json
   def index
@@ -25,6 +26,7 @@ class LocationsController < ApplicationController
   # GET /locations/new.json
   def new
     @location = Location.new
+    @location.business_hours.build
 
     respond_to do |format|
       format.html # new.html.erb
@@ -34,7 +36,7 @@ class LocationsController < ApplicationController
 
   # GET /locations/1/edit
   def edit
-    @location = Location.find(params[:id])
+    @location = Location.includes(:business_hours).find(params[:id])
   end
 
   # POST /locations
@@ -63,6 +65,7 @@ class LocationsController < ApplicationController
         format.html { redirect_to @location, notice: 'Location was successfully updated.' }
         format.json { head :no_content }
       else
+        logger.debug "------" + @location.errors.inspect
         format.html { render action: "edit" }
         format.json { render json: @location.errors, status: :unprocessable_entity }
       end
@@ -80,4 +83,5 @@ class LocationsController < ApplicationController
       format.json { head :no_content }
     end
   end
+
 end

@@ -53,12 +53,15 @@ ActiveRecord::Schema.define(:version => 20120307155717) do
   end
 
   create_table "business_hours", :force => true do |t|
-    t.string   "day"
-    t.time     "open"
-    t.time     "close"
-    t.datetime "created_at", :null => false
-    t.datetime "updated_at", :null => false
+    t.integer  "location_id", :null => false
+    t.string   "day",         :null => false
+    t.string   "open"
+    t.string   "close"
+    t.datetime "created_at",  :null => false
+    t.datetime "updated_at",  :null => false
   end
+
+  add_index "business_hours", ["location_id"], :name => "index_business_hours_on_location_id"
 
   create_table "categories", :force => true do |t|
     t.string   "name"
@@ -89,7 +92,6 @@ ActiveRecord::Schema.define(:version => 20120307155717) do
 
   create_table "locations", :force => true do |t|
     t.string   "name"
-    t.string   "room"
     t.datetime "created_at", :null => false
     t.datetime "updated_at", :null => false
   end

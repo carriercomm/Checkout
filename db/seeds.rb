@@ -5,3 +5,10 @@
 #
 #   cities = City.create([{ name: 'Chicago' }, { name: 'Copenhagen' }])
 #   Mayor.create(name: 'Emanuel', city: cities.first)
+
+Location.all.each do |l|
+  IceCube::TimeUtil::DAYS.each do |k,v|
+    bh = BusinessHour.where(:location_id => l.id, :day => k, :day_index => v).first_or_initialize
+    bh.save if bh.new_record?
+  end
+end

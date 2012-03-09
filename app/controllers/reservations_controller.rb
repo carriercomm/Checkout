@@ -95,11 +95,7 @@ class ReservationsController < ApplicationController
   protected
 
   def set_open_days
-    schedule =  IceCube::Schedule.new
-    schedule.add_recurrence_rule IceCube::Rule.weekly.day(:monday).day(:wednesday).day(:friday)
-    @notice = "Checkout hours are:<br />" + schedule.to_s
-    days_open = schedule.occurrences_between(Time.now, (Time.now + 90.days)).collect { |d| [d.month, d.day]}
-    gon.days_open = days_open
+    gon.days_open = @reservation.kit.location.open_days
   end
 
 end

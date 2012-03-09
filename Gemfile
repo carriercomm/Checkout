@@ -7,6 +7,7 @@ gem 'ice_cube'          # date/time recurrences
 gem 'jquery-rails'
 gem 'kaminari'          # pagination
 gem 'mysql2'
+gem 'nested_form', :git => "git://github.com/ryanb/nested_form.git"       # dynamic nested form helper
 gem 'rails', '3.2.1'
 gem 'simple_form'       # form builder
 

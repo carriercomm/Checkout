@@ -1,0 +1,6 @@
+<fieldset class="well">
+  <%= f.input :day, :collection => BusinessHour.days_for_select %>
+  <%= f.input :open, :collection => BusinessHour.times_for_select %>
+  <%= f.input :close, :collection => BusinessHour.times_for_select %>
+  <%= f.link_to_remove "Remove" %>
+</fieldset>

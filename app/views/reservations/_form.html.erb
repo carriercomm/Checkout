@@ -2,8 +2,6 @@
   <fieldset>
     <legend><%= controller.action_name.capitalize %> Reservation</legend>
 
-    <p><strong><%= @notice.html_safe %></strong></p>
-    
     <%= f.association :client, :as => :hidden %>
     <%= f.association :client, :disabled => true %>
     <%= f.association :kit, :as => :hidden %>

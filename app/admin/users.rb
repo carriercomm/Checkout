@@ -5,9 +5,8 @@ ActiveAdmin.register User do
     column :email
     column :failed_attempts
     column :locked_at    
-    column "Is Suspended", :doghoused
-    column "Suspended Until",:doghouse_expiry
-    column "Suspended Count", :doghouse_count
+    column :suspended_until
+    column :suspension_count
     column :disabled
   end
 

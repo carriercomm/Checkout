@@ -1,20 +1,10 @@
-<%= form_for @location, :html => { :class => 'form-horizontal' } do |f| %>
+<%= simple_nested_form_for @location, :html => { :class => 'form-horizontal' } do |f| %>
   <fieldset>
     <legend><%= controller.action_name.capitalize %> Location</legend>
+    <%= f.input :name %>
 
-    <div class="control-group">
-      <%= f.label :name, :class => 'control-label' %>
-      <div class="controls">
-        <%= f.text_field :name, :class => 'text_field' %>
-      </div>
-    </div>
-
-    <div class="control-group">
-      <%= f.label :room, :class => 'control-label' %>
-      <div class="controls">
-        <%= f.text_field :room, :class => 'text_field' %>
-      </div>
-    </div>
+    <%= f.simple_fields_for :business_hours %>
+    <p><%= f.link_to_add "Add Hours", :business_hours %></p>
 
     <div class="form-actions">
       <%= f.submit nil, :class => 'btn btn-primary' %>
