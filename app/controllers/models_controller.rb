@@ -3,11 +3,15 @@ class ModelsController < ApplicationController
   # GET /models.json
   def index
     if params["brand_id"].present?
-      @models = Brand.find(params["brand_id"].to_i).models.order("name ASC").page(params[:page])
+      @models = Model.brand(params["brand_id"]).page(params[:page])
     elsif params["category_id"].present?
-      @models = Category.find(params["category_id"].to_i).models.order("name ASC").page(params[:page])
+      @models = Model.category(params["category_id"]).page(params[:page])
     else
-      @models = Model.includes(:brand).order("brands.name ASC, models.name ASC").page(params[:page])
+      @models = Model.page(params[:page])
+    end
+
+    unless params["show_all"].present?
+      @models = @models.checkoutable
     end
 
     respond_to do |format|

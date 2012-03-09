@@ -16,7 +16,6 @@
 //= require jquery_nested_form
 //= require twitter/bootstrap
 //= require bootstrap
-//= require locations
 //= require parts
 //= require reservations
 //= require user

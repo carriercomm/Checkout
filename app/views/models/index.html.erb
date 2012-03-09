@@ -1,4 +1,7 @@
 <h1>Models</h1>
+
+<%= paginate @models %>
+
 <table class="table table-striped">
   <thead>
     <tr>
@@ -16,9 +19,11 @@
         <td><%= model.description %></td>
         <td><%= model.parts.count %></td>
         <td>
-          <%= link_to 'Reserve', '#', :class => 'btn btn-mini' %>
+          <%= link_to 'Reserve', '#', :class => 'btn btn-mini' if model.checkoutable? %>
         </td>
       </tr>
     <% end %>
   </tbody>
 </table>
+
+<%= paginate @models %>

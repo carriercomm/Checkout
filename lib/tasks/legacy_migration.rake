@@ -92,7 +92,7 @@ task :dbx2 => :environment do
         model_obj.description = le.eq_description
 
         # parse the training requirement
-        training = false
+        traniing = false
         if !!le.special && le.special.downcase == 'yes'
           training = true
         end
@@ -214,11 +214,11 @@ task :dbx2 => :environment do
         cost               = (le.eq_cost == 0) ? nil : le.eq_cost
         insured            = (le.eq_insured.strip.downcase == "on")   ? true : false
         missing            = (le.eq_removed.strip.downcase == "on")   ? true : false
-        checkoutable       = (le.checkoutable.strip.downcase == "on") ? true : false
+        checkoutable       = (le.checkoutable.strip.downcase == "yes") ? true : false
 
         kit                = Kit.new
         kit.name           = model_obj.name
-        kit.checkoutable   = true
+        kit.checkoutable   = checkoutable
         kit.tombstoned     = missing
         kit.location       = Location.find_or_create_by_name(le.legacy_location.loc_name)
 

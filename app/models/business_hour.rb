@@ -2,7 +2,6 @@ class BusinessHour < ActiveRecord::Base
 
   belongs_to :location
 
-  # TODO: validate correct ordering of hours
   # TODO: validate with overlap detection for business hours
 
   # validates :day, :uniqueness => {
@@ -14,6 +13,8 @@ class BusinessHour < ActiveRecord::Base
   validates :open,      :presence => true
   validates :close,     :presence => true
 
+  validate :validate_hours_in_order
+
   # TODO: cleanup this cruft?
   # validate :day_must_map_to_day_index
 
@@ -23,6 +24,17 @@ class BusinessHour < ActiveRecord::Base
   #     errors.add(:day, "must match day_index")
   #   end
   # end
+
+  def validate_hours_in_order
+    unless hours_in_order?
+      errors.add(:open, "must come before close")
+      errors.add(:close, "must come after open")
+    end
+  end
+
+  def hours_in_order?
+    Time.parse(open) < Time.parse(close)
+  end
 
   def self.days_for_select
     IceCube::TimeUtil::DAYS.collect {|k,v| [k.to_s.titleize, k] }

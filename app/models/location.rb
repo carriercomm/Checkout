@@ -8,6 +8,10 @@ class Location < ActiveRecord::Base
 
   # TODO: enforce some referential integrity so you can't delete a location and orphan all its kits
 
+  def open_on?(date)
+    
+  end
+
   def open_days(days_out = 90)
     days = []
     business_hours.each { |x| days.concat(x.open_occurrences(days_out)) }

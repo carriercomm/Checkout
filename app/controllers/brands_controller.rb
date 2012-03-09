@@ -2,7 +2,15 @@ class BrandsController < ApplicationController
   # GET /brands
   # GET /brands.json
   def index
-    @brands = Brand.order(:name).page(params[:page]).all
+    if params["show_all"].present?
+      @brands = Brand.page(params[:page])
+    elsif params["tombstoned"].present?
+      @brands = Brand.tombstoned.page(params[:page])
+    elsif params["not_checkoutable"].present?
+      @brands = Brand.not_checkoutable.page(params[:page])
+    else
+      @brands = Brand.checkoutable.page(params[:page])
+    end
 
     respond_to do |format|
       format.html # index.html.erb
