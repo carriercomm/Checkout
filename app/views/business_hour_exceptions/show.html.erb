@@ -1,0 +1,15 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <b>Location:</b>
+  <%= @business_hour_exception.location %>
+</p>
+
+<p>
+  <b>Date closed:</b>
+  <%= @business_hour_exception.date_closed %>
+</p>
+
+
+<%= link_to 'Edit', edit_business_hour_exception_path(@business_hour_exception) %> |
+<%= link_to 'Back', business_hour_exceptions_path %>

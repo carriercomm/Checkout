@@ -1,0 +1,25 @@
+<h1>Listing business_hour_exceptions</h1>
+
+<table>
+  <tr>
+    <th>Location</th>
+    <th>Date closed</th>
+    <th></th>
+    <th></th>
+    <th></th>
+  </tr>
+
+<% @business_hour_exceptions.each do |business_hour_exception| %>
+  <tr>
+    <td><%= business_hour_exception.location %></td>
+    <td><%= business_hour_exception.date_closed %></td>
+    <td><%= link_to 'Show', business_hour_exception %></td>
+    <td><%= link_to 'Edit', edit_business_hour_exception_path(business_hour_exception) %></td>
+    <td><%= link_to 'Destroy', business_hour_exception, confirm: 'Are you sure?', method: :delete %></td>
+  </tr>
+<% end %>
+</table>
+
+<br />
+
+<%= link_to 'New Business hour exception', new_business_hour_exception_path %>

@@ -9,9 +9,8 @@ class BusinessHour < ActiveRecord::Base
   #   :message => "should happen once per year"
   # }
 
-  validates :day,       :presence => true
-  validates :open,      :presence => true
-  validates :close,     :presence => true
+  validates :open_at,   :presence => true
+  validates :closed_at, :presence => true
 
   validate :validate_hours_in_order
 
@@ -25,16 +24,9 @@ class BusinessHour < ActiveRecord::Base
   #   end
   # end
 
-  def validate_hours_in_order
-    unless hours_in_order?
-      errors.add(:open, "must come before close")
-      errors.add(:close, "must come after open")
-    end
-  end
-
-  def hours_in_order?
-    Time.parse(open) < Time.parse(close)
-  end
+  attr_accessible :location_id, :open_at, :closed_at
+  
+  default_scope joins(:location).order("locations.name ASC, business_hours.open_at ASC")
 
   def self.days_for_select
     IceCube::TimeUtil::DAYS.collect {|k,v| [k.to_s.titleize, k] }
@@ -59,12 +51,58 @@ class BusinessHour < ActiveRecord::Base
     times.flatten!
   end
 
+  def validate_hours_in_order
+    unless hours_in_order?
+      errors.add(:open_at, "must come before close")
+      errors.add(:closed_at, "must come after open")
+    end
+  end
+
+  def hours_in_order?
+    open_at < closed_at
+  end
+
+  def day
+    open_at.try(:strftime, '%A')
+  end
+
+  def day_sym
+    day.downcase.to_sym
+  end
+
+  def open_hour
+    open_at.strftime('%k').to_i
+  end
+
+  def open_minute
+    open_at.strftime('%M').to_i
+  end
+
+  def open_at_to_s
+    open_at.try(:strftime, '%l:%M%P').try(:strip)
+  end
+
+  def closed_at_to_s
+    closed_at.try(:strftime, '%l:%M%P').try(:strip)
+  end
+
+  def closed_hour
+    closed_at.strftime('%k').to_i
+  end
+
+  def closed_minute
+    closed_at.strftime('%M').to_i
+  end
+
+  def to_s
+    "#{ day } #{ open_at_to_s }-#{ closed_at_to_s }"
+  end
+
   def open_occurrences(days_out = 90)
     schedule =  IceCube::Schedule.new
-    schedule.add_recurrence_rule IceCube::Rule.weekly.day(self.day.to_sym)
+    schedule.add_recurrence_rule IceCube::Rule.weekly.day(day_sym)
     open_days = schedule.occurrences_between(Time.now, (Time.now + days_out.days)).collect { |d| [d.month, d.day]}
     return open_days
   end
-
 
 end

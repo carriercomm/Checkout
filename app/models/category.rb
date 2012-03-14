@@ -3,4 +3,6 @@ class Category < ActiveRecord::Base
 
   default_scope order("categories.name ASC")
 
+  attr_accessible :name, :description
+
 end

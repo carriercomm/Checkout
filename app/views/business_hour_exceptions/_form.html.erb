@@ -1,0 +1,12 @@
+<%= simple_form_for(@business_hour_exception) do |f| %>
+  <%= f.error_notification %>
+
+  <div class="form-inputs">
+    <%= f.association :location %>
+    <%= f.input :date_closed %>
+  </div>
+
+  <div class="form-actions">
+    <%= f.button :submit %>
+  </div>
+<% end %>

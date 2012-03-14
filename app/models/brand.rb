@@ -1,6 +1,8 @@
 class Brand < ActiveRecord::Base
   has_many :models
 
+  attr_accessible :name
+
   default_scope order("brands.name ASC")
 
   def self.tombstoned

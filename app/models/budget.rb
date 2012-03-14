@@ -12,6 +12,8 @@ class Budget < ActiveRecord::Base
 
   before_validation :strip_fields
 
+  attr_accessible :name, :number, :date_start, :date_end
+
   def self.options_map
     order("date_start DESC, number ASC").all.map { |b| [b.to_s, b.id] }
   end

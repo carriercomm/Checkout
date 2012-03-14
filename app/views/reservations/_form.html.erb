@@ -6,8 +6,8 @@
     <%= f.association :client, :disabled => true %>
     <%= f.association :kit, :as => :hidden %>
     <%= f.association :kit, :disabled => true %>
-    <%= f.input :start_at, :as => :string, :input_html => { :class => 'datepicker' } %>
-    <%= f.input :end_at,   :as => :string, :input_html => { :class => 'datepicker' } %>
+    <%= f.input :start_at, :as => :date_picker, :input_html => { :value => f.object.new_record? ? nil : localize(f.object.start_at, :format => "%Y-%m-%d") }  %>
+    <%= f.input :end_at,   :as => :date_picker, :input_html => { :value => f.object.new_record? ? nil : localize(f.object.end_at, :format => "%Y-%m-%d") } %>
 
     <div class="form-actions">
       <%= f.submit nil, :class => 'btn btn-primary' %>

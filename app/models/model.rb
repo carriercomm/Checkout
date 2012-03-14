@@ -5,7 +5,7 @@ class Model < ActiveRecord::Base
   has_many   :kits, :through => :parts
   has_and_belongs_to_many :categories
 
-  default_scope eager_load(:brand).order("brands.name ASC, models.name ASC")
+  default_scope eager_load(:brand, :kits).order("brands.name ASC, models.name ASC")
 
   def self.tombstoned
     joins(:parts => :kit).where("kits.tombstoned = ?", true).uniq
@@ -19,7 +19,10 @@ class Model < ActiveRecord::Base
     joins(:parts => :kit ).where("kits.tombstoned = ? AND kits.checkoutable = ?", false, true).uniq
   end
 
-  # TODO: implement self.reservable
+  # TODO: implement this
+  def self.reservable(from_date, to_date)
+    
+  end
 
   def self.brand(brand_id)
     joins(:brand).where('brands.id = ?', brand_id.to_i)

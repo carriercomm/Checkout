@@ -1,38 +1,43 @@
 <h1>Reservation</h1>
 
 <p>
-  <b>Kit</b><br>
-  <%= @reservation.kit_id %>
+  <b>Client</b><br>
+  <%= @reservation.client.username %>
 </p>
 
 <p>
-  <b>Start at</b><br>
+  <b>Check Out Location</b><br>
+  <%= @reservation.kit.location %>
+</p>
+
+<p>
+  <b>Kit</b><br>
+  <%= @reservation.kit %>
+</p>
+
+<p>
+  <b>Check Out Day</b><br>
   <%= @reservation.start_at %>
 </p>
 
 <p>
-  <b>End at</b><br>
+  <b>Check In Day</b><br>
   <%= @reservation.end_at %>
 </p>
 
 <p>
-  <b>Out at</b><br>
-  <%= @reservation.out_at %>
+  <b>Checked Out At</b><br>
+  <%= @reservation.out_at ||= 'Not checked out yet' %>
 </p>
 
 <p>
-  <b>In at</b><br>
-  <%= @reservation.in_at %>
+  <b>Checked In At</b><br>
+  <%= @reservation.in_at ||= 'Not checked in yet' %>
 </p>
 
 <p>
   <b>Late</b><br>
-  <%= @reservation.late %>
-</p>
-
-<p>
-  <b>Client</b><br>
-  <%= @reservation.client_id %>
+  <%= @reservation.late ||= false.to_s %>
 </p>
 
 <p>
@@ -41,12 +46,12 @@
 </p>
 
 <p>
-  <b>Out assistant</b><br>
+  <b>Checked Out By</b><br>
   <%= @reservation.out_assistant_id %>
 </p>
 
 <p>
-  <b>In assistant</b><br>
+  <b>Checked In By</b><br>
   <%= @reservation.in_assistant_id %>
 </p>
 

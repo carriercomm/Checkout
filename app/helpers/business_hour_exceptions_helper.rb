@@ -1,0 +1,2 @@
+module BusinessHourExceptionsHelper
+end

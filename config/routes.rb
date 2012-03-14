@@ -1,5 +1,7 @@
 Checkout::Application.routes.draw do
 
+  resources :business_hour_exceptions
+
   root :to => 'models#index'
 
   # devise_for :users, ActiveAdmin::Devise.config
@@ -23,9 +25,7 @@ Checkout::Application.routes.draw do
   
   resources :asset_tags
   resources :brands do
-    resources :models do
-      resources :parts
-    end
+    resources :models
   end
   resources :categories do
     resources :models
@@ -34,7 +34,10 @@ Checkout::Application.routes.draw do
     resources :reservations, :only => [:index]
   end
   resources :locations
-  resources :models
+  resources :models do
+    resources :parts
+    resources :reservations
+  end
   resources :parts
   resources :reservations
   resource :users do

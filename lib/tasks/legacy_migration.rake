@@ -256,5 +256,47 @@ namespace :db do
   task :rebuild => ["db:drop", "db:create", "db:migrate"]
 
   desc "drop, create, migrate, dbx2"
-  task :repop => ["db:rebuild", "dbx2"]
+  task :repop => ["db:rebuild", "dbx2", "db:seed_dev"]
+
+  desc "loads some fake data, helpful for development"
+  task :seed_dev => :environment do
+
+    User.create!(:username => 'admin', :email => 'admin@example.com', :password => 'password', :password_confirmation => 'password')
+
+    utc_offset = (Time.now.utc_offset / 60 / 60).to_s
+
+    Location.all.each_with_index do |l,idx|
+      if idx % 2  == 0
+        # M, W, F
+        [1, 3, 5].each do |day|
+          # 9:00am
+          open  = DateTime.commercial(1969, 1, day, 9, 0, 0, utc_offset)
+          # 5:00pm
+          close = DateTime.commercial(1969, 1, day, 17, 0, 0, utc_offset)
+          l.business_hours << BusinessHour.new(:open_at => open, :closed_at => close)
+        end
+      else
+        # T, Th
+        [2, 4].each do |day|
+          # 11:00am
+          open  = DateTime.commercial(1969, 1, day, 11, 0, 0, utc_offset)
+          # 3:00pm
+          close = DateTime.commercial(1969, 1, day, 15, 0, 0, utc_offset)
+          l.business_hours << BusinessHour.new(:open_at => open, :closed_at => close)
+        end
+      end
+      l.save
+    end
+
+    BusinessHour.all.each do |x|
+      open_days = x.open_occurrences
+      open_days.each_with_index do |y, idx|
+        if idx % 5 == 0
+          BusinessHourException.create!(:location => x.location, :date_closed => Date.new(Time.now.year, y.first, y.last))
+        end
+      end
+    end
+    
+  end
+
 end

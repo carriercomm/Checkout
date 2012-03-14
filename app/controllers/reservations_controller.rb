@@ -1,4 +1,5 @@
 class ReservationsController < ApplicationController
+
   # GET /reservations
   # GET /reservations.json
   def index
@@ -24,14 +25,26 @@ class ReservationsController < ApplicationController
   # GET /reservations/new
   # GET /reservations/new.json
   def new
-    if params[:user_id].present? && params[:kit_id].present?
-      @reservation = User.find(params[:user_id]).reservations.build(:kit_id =>params[:kit_id])
+    @user = (params[:user_id]) ? User.find(params[:user_id]) : current_user
+    
+    if params[:kit_id].present?
+      # we have a specific kit to check out
+      @reservation = @user.reservations.build(:kit_id => params[:kit_id])
+
+      # gather the available checkout days for the kit
+      gon.days_open = @reservation.kit.location.open_days
+
+    # do we have a general model to check out?
+    elsif params[:model_id].present?
+      @reservation = @user.reservations.build
+      @model       = Model.find(params[:model_id])
+#      @reservation = Model.find(params[:model_id].)
+
     else
-      flash[:error] = "No kit was specified, start by finding something to check out"
-      redirect_to root
+      flash[:error] = "Start by finding something to check out!"
+      redirect_to models_path and return
     end
 
-    set_open_days
 
     respond_to do |format|
       format.html # new.html.erb
@@ -42,7 +55,9 @@ class ReservationsController < ApplicationController
   # GET /reservations/1/edit
   def edit
     @reservation = Reservation.find(params[:id])
-    set_open_days
+
+    gon.days_open = @reservation.kit.location.open_days
+
   end
 
   # POST /reservations
@@ -55,7 +70,8 @@ class ReservationsController < ApplicationController
         format.html { redirect_to @reservation, notice: 'Reservation was successfully created.' }
         format.json { render json: @reservation, status: :created, location: @reservation }
       else
-        set_open_days
+        logger.debug "----" + @reservation.errors.inspect
+        # FIXME: set_open_days
 
         format.html { render action: "new" }
         format.json { render json: @reservation.errors, status: :unprocessable_entity }
@@ -90,12 +106,6 @@ class ReservationsController < ApplicationController
       format.html { redirect_to reservations_url }
       format.json { head :no_content }
     end
-  end
-
-  protected
-
-  def set_open_days
-    gon.days_open = @reservation.kit.location.open_days
   end
 
 end

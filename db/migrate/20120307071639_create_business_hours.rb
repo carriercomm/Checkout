@@ -2,9 +2,8 @@ class CreateBusinessHours < ActiveRecord::Migration
   def change
     create_table :business_hours do |t|
       t.references :location, :null => false
-      t.string  :day, :null => false
-      t.string  :open
-      t.string  :close
+      t.datetime  :open_at, :null => false
+      t.datetime  :closed_at, :null => false
 
       t.timestamps
     end

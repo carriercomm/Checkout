@@ -1,0 +1,9 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
+
+one:
+  location: 
+  date_closed: 2012-03-12
+
+two:
+  location: 
+  date_closed: 2012-03-12
