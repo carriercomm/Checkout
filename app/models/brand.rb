@@ -3,18 +3,19 @@ class Brand < ActiveRecord::Base
 
   attr_accessible :name
 
-  default_scope order("brands.name ASC")
+  validates :name, :presence   => true
+  validates :name, :uniqueness => true
 
-  def self.tombstoned
-    joins(:models => {:parts => :kit }).where("kits.tombstoned = ?", true).uniq
+  def self.having_tombstoned_kits
+    joins(:models => :kits).where("kits.tombstoned = ?", true).uniq
   end
 
-  def self.not_checkoutable
-    joins(:models => {:parts => :kit }).where("kits.checkoutable = ?", false).uniq
+  def self.not_having_checkoutable_kits
+    joins(:models => :kits).where("kits.checkoutable = ?", false).uniq
   end
 
-  def self.checkoutable
-    joins(:models => {:parts => :kit }).where("kits.tombstoned = ? AND kits.checkoutable = ?", false, true).uniq
+  def self.having_checkoutable_kits
+    joins(:models => :kits).where("kits.tombstoned = ? AND kits.checkoutable = ?", false, true).uniq
   end
 
   def to_s

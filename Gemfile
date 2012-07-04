@@ -7,7 +7,7 @@ gem 'ice_cube'          # date/time recurrences
 gem 'jquery-rails'
 gem 'kaminari'          # pagination
 gem 'mysql2'
-gem 'nested_form', :git => "git://github.com/ryanb/nested_form.git"       # dynamic nested form helper
+gem 'nested_form'       # dynamic nested form helper
 gem 'rails', '3.2.1'
 gem 'simple_form'       # form builder
 
@@ -19,4 +19,17 @@ group :assets do
   gem 'sass-rails',   '~> 3.2.3'
   gem 'twitter-bootstrap-rails'
   gem 'uglifier', '>= 1.0.3'
+end
+
+group :development do
+  gem 'pry-rails'
+  gem 'awesome_print'
+end
+
+gem "rspec-rails", :group => [:test, :development]
+
+group :test do
+  gem "factory_girl_rails"
+  gem "capybara"
+  gem "guard-rspec"
 end

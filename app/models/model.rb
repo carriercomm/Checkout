@@ -1,27 +1,27 @@
 class Model < ActiveRecord::Base
 
   belongs_to :brand
-  has_many   :parts
-  has_many   :kits, :through => :parts
+  has_many   :kits
   has_and_belongs_to_many :categories
 
-  default_scope eager_load(:brand, :kits).order("brands.name ASC, models.name ASC")
+  validates :name,     :presence => true
+  validates :brand_id, :presence => true
 
   def self.tombstoned
-    joins(:parts => :kit).where("kits.tombstoned = ?", true).uniq
+    joins(:kits).where("kits.tombstoned = ?", true).uniq
   end
 
   def self.not_checkoutable
-    joins(:parts => :kit ).where("kits.checkoutable = ?", false).uniq
+    joins(:kits).where("kits.checkoutable = ?", false).uniq
   end
 
   def self.checkoutable
-    joins(:parts => :kit ).where("kits.tombstoned = ? AND kits.checkoutable = ?", false, true).uniq
+    joins(:kits).where("kits.tombstoned = ? AND kits.checkoutable = ?", false, true).uniq
   end
 
   # TODO: implement this
   def self.reservable(from_date, to_date)
-    
+
   end
 
   def self.brand(brand_id)

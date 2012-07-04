@@ -1,7 +1,5 @@
 class Budget < ActiveRecord::Base
 
-  default_scope { order('date_start DESC') }
-
   validates :number, :format     => { :with => /\d{2}-\d{4}/, :message => "Must follow format XX-XXXX" }
   validates :number, :presence   => true
   validates :number, :uniqueness => { :scope => :date_start }

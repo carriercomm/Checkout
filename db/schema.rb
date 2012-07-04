@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120312235755) do
+ActiveRecord::Schema.define(:version => 20120629224726) do
 
   create_table "active_admin_comments", :force => true do |t|
     t.string   "resource_id",   :null => false
@@ -30,12 +30,12 @@ ActiveRecord::Schema.define(:version => 20120312235755) do
 
   create_table "asset_tags", :force => true do |t|
     t.string   "uid"
-    t.integer  "part_id"
-    t.datetime "created_at", :null => false
-    t.datetime "updated_at", :null => false
+    t.integer  "component_id"
+    t.datetime "created_at",   :null => false
+    t.datetime "updated_at",   :null => false
   end
 
-  add_index "asset_tags", ["part_id"], :name => "index_asset_tags_on_part_id"
+  add_index "asset_tags", ["component_id"], :name => "index_asset_tags_on_part_id"
 
   create_table "brands", :force => true do |t|
     t.string   "name"
@@ -87,13 +87,27 @@ ActiveRecord::Schema.define(:version => 20120312235755) do
 
   add_index "categories_models", ["category_id", "model_id"], :name => "index_categories_models_on_category_id_and_model_id"
 
+  create_table "components", :force => true do |t|
+    t.string   "serial_number"
+    t.boolean  "missing",       :default => false
+    t.integer  "kit_id"
+    t.datetime "created_at",                       :null => false
+    t.datetime "updated_at",                       :null => false
+    t.text     "description"
+  end
+
+  add_index "components", ["kit_id"], :name => "index_parts_on_kit_id"
+
   create_table "kits", :force => true do |t|
-    t.string   "name"
     t.boolean  "tombstoned"
-    t.boolean  "checkoutable"
+    t.boolean  "checkoutable",                                :default => false
     t.integer  "location_id"
-    t.datetime "created_at",   :null => false
-    t.datetime "updated_at",   :null => false
+    t.datetime "created_at",                                                     :null => false
+    t.datetime "updated_at",                                                     :null => false
+    t.integer  "model_id"
+    t.integer  "budget_id"
+    t.decimal  "cost",         :precision => 10, :scale => 0
+    t.boolean  "insured",                                     :default => false
   end
 
   add_index "kits", ["location_id"], :name => "index_kits_on_location_id"
@@ -114,22 +128,6 @@ ActiveRecord::Schema.define(:version => 20120312235755) do
   end
 
   add_index "models", ["brand_id"], :name => "index_models_on_brand_id"
-
-  create_table "parts", :force => true do |t|
-    t.string   "serial_number"
-    t.decimal  "cost",          :precision => 8, :scale => 2
-    t.boolean  "insured",                                     :default => false
-    t.boolean  "missing",                                     :default => false
-    t.integer  "budget_id",                                                      :null => false
-    t.integer  "kit_id"
-    t.integer  "model_id",                                                       :null => false
-    t.datetime "created_at",                                                     :null => false
-    t.datetime "updated_at",                                                     :null => false
-  end
-
-  add_index "parts", ["budget_id"], :name => "index_parts_on_budget_id"
-  add_index "parts", ["kit_id"], :name => "index_parts_on_kit_id"
-  add_index "parts", ["model_id"], :name => "index_parts_on_model_id"
 
   create_table "reservations", :force => true do |t|
     t.integer  "kit_id"

@@ -41,6 +41,8 @@
                 <li><%= link_to "Categories", categories_path  %></li>
                 <li><%= link_to "Brands", brands_path %></li>
                 <li><%= link_to "Models", models_path %></li>
+                <li class="divider-vertical"></li>
+                <li><%= link_to "Admin", admin_dashboard_path %></li>
             </ul>
             <div class="pull-right">
               <form class="navbar-search" action="javascript:alert('not implemented!!')">
@@ -68,20 +70,20 @@
 
     <div class="container-fluid">
 
-     <!-- <header class="jumbotron subhead" id="overview"> -->
-     <!--    <h1>Scaffolding</h1> -->
-     <!--    <p class="lead">Bootstrap is built on a responsive 12-column grid. We've also included fixed- and fluid-width layouts based on that system.</p> -->
-     <!--    <div class="subnav subnav-fixed"> -->
-     <!--      <ul class="nav nav-pills"> -->
-     <!--        <li class="active"><a href="#global">Global styles</a></li> -->
-     <!--        <li class=""><a href="#gridSystem">Grid system</a></li> -->
-     <!--        <li class=""><a href="#fluidGridSystem">Fluid grid system</a></li> -->
-     <!--        <li class=""><a href="#gridCustomization">Customizing</a></li> -->
-     <!--        <li class=""><a href="#layouts">Layouts</a></li> -->
-     <!--        <li class=""><a href="#responsive">Responsive design</a></li> -->
-     <!--      </ul> -->
-     <!--    </div> -->
-     <!--  </header> -->
+      <!-- <header class="jumbotron subhead" id="overview"> -->
+      <!--   <h1>Scaffolding</h1> -->
+      <!--   <p class="lead">Bootstrap is built on a responsive 12-column grid. We've also included fixed- and fluid-width layouts based on that system.</p> -->
+      <!--   <div class="subnav"> -->
+      <!--     <ul class="nav nav-pills"> -->
+      <!--       <li class="active"><a href="#global">Global styles</a></li> -->
+      <!--       <li class=""><a href="#gridSystem">Grid system</a></li> -->
+      <!--       <li class=""><a href="#fluidGridSystem">Fluid grid system</a></li> -->
+      <!--       <li class=""><a href="#gridCustomization">Customizing</a></li> -->
+      <!--       <li class=""><a href="#layouts">Layouts</a></li> -->
+      <!--       <li class=""><a href="#responsive">Responsive design</a></li> -->
+      <!--     </ul> -->
+      <!--   </div> -->
+      <!-- </header> -->
 
       <% flash.each do |name, msg| %>
         <div class="alert alert-<%= name == :notice ? "success" : "error" %>">

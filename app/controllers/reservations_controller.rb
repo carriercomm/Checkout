@@ -26,19 +26,30 @@ class ReservationsController < ApplicationController
   # GET /reservations/new.json
   def new
     @user = (params[:user_id]) ? User.find(params[:user_id]) : current_user
-    
+
+    # do we have a specific kit to check out?
     if params[:kit_id].present?
-      # we have a specific kit to check out
-      @reservation = @user.reservations.build(:kit_id => params[:kit_id])
+      kit_id = params[:kit_id]
+      @reservation = @user.reservations.build(:kit_id => kit_id)
+      @location    = @reservation.kit.location
+      @locations   = [@reservation.kit.location, Location.find(2)]
 
       # gather the available checkout days for the kit
-      gon.days_open = @reservation.kit.location.open_days
+      # TODO: subtract days that the kit is checked out
+      gon.locations = {
+        @reservation.kit.location.id => {
+          'kits' => [{
+                       'kit_id' => @reservation.kit.id,
+                       'days_reservable' => @reservation.kit.days_reservable
+                     }]
+        }
+      }
 
     # do we have a general model to check out?
     elsif params[:model_id].present?
       @reservation = @user.reservations.build
       @model       = Model.find(params[:model_id])
-#      @reservation = Model.find(params[:model_id].)
+
 
     else
       flash[:error] = "Start by finding something to check out!"

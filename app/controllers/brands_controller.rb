@@ -5,11 +5,11 @@ class BrandsController < ApplicationController
     if params["show_all"].present?
       @brands = Brand.page(params[:page])
     elsif params["tombstoned"].present?
-      @brands = Brand.tombstoned.page(params[:page])
+      @brands = Brand.having_tombstoned_kits.page(params[:page])
     elsif params["not_checkoutable"].present?
-      @brands = Brand.not_checkoutable.page(params[:page])
+      @brands = Brand.not_having_checkoutable_kits.page(params[:page])
     else
-      @brands = Brand.checkoutable.page(params[:page])
+      @brands = Brand.having_checkoutable_kits.page(params[:page])
     end
 
     respond_to do |format|

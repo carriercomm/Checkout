@@ -1,12 +1,10 @@
 Checkout::Application.routes.draw do
 
-  resources :business_hour_exceptions
 
   root :to => 'models#index'
 
   # devise_for :users, ActiveAdmin::Devise.config
   # devise_for :users
-  resources :business_hours
 
   devise_for :user, skip: :registrations
   devise_scope :user do
@@ -22,23 +20,25 @@ Checkout::Application.routes.draw do
   end
 
   ActiveAdmin.routes(self)
-  
+
   resources :asset_tags
   resources :brands do
     resources :models
   end
+  resources :business_hours
+  resources :business_hour_exceptions
   resources :categories do
     resources :models
   end
+  resources :components
   resources :kits do
-    resources :reservations, :only => [:index]
+    resources :reservations, :only => [:index, :new]
   end
   resources :locations
   resources :models do
     resources :parts
-    resources :reservations
+    resources :reservations, :only => [:new]
   end
-  resources :parts
   resources :reservations
   resource :users do
     resources :reservations

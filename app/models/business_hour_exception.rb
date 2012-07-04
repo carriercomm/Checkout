@@ -4,8 +4,6 @@ class BusinessHourException < ActiveRecord::Base
   validates :location_id, :presence => true
   validates :date_closed, :presence => true
 
-  default_scope order("location_id ASC, date_closed ASC")
-
   def day
     date_closed.strftime('%e')
   end

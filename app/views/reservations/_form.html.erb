@@ -2,12 +2,35 @@
   <fieldset>
     <legend><%= controller.action_name.capitalize %> Reservation</legend>
 
-    <%= f.association :client, :as => :hidden %>
-    <%= f.association :client, :disabled => true %>
-    <%= f.association :kit, :as => :hidden %>
-    <%= f.association :kit, :disabled => true %>
-    <%= f.input :start_at, :as => :date_picker, :input_html => { :value => f.object.new_record? ? nil : localize(f.object.start_at, :format => "%Y-%m-%d") }  %>
-    <%= f.input :end_at,   :as => :date_picker, :input_html => { :value => f.object.new_record? ? nil : localize(f.object.end_at, :format => "%Y-%m-%d") } %>
+    <%= f.association :client,   :as => :hidden %>
+    <%= f.association :client,   :disabled => true %>
+
+    <% unless @model.nil? %>
+      <% f.simple_fields_for @model do |mf| %>
+        <%= mf.input :id,   :as => :hidden %>
+        <%= mf.input :name, :disabled => true %>
+      <% end %>
+    <% end %>
+
+    <%= f.input :location,  :collection => @locations, :prompt => "Select a checkout location", :selected => @location %>
+
+    <%= f.association :kit, :as => :hidden    unless @reservation.kit.nil? %>
+    <%= f.association :kit, :disabled => true unless @reservation.kit.nil? %>
+
+    <%= f.input :start_at, :as => :date_picker,
+        :label => 'Pick Up Date',
+        :input_html => {
+          :class => 'start_date',
+          :value => f.object.new_record? ? nil :
+          localize(f.object.start_at, :format => "%Y-%m-%d")
+        }  %>
+    <%= f.input :end_at, :as => :date_picker,
+        :label => 'Return Date',
+        :input_html => {
+          :class => 'end_date',
+          :value => f.object.new_record? ? nil :
+          localize(f.object.end_at, :format => "%Y-%m-%d")
+        } %>
 
     <div class="form-actions">
       <%= f.submit nil, :class => 'btn btn-primary' %>

@@ -74,7 +74,7 @@ task :dbx2 => :environment do
   .group(['eq_manufacturer', 'eq_model'])
   .order(['eq_manufacturer', 'eq_model'])
   .each do |le|
-    
+
     # puts le.eq_manufacturer.ljust(30) + " | " + le.eq_model.ljust(30) + " | " + (le.category.blank? ? "" : le.category)
 
     begin
@@ -86,7 +86,7 @@ task :dbx2 => :environment do
 
       # look up the model
       model_obj = brand.models.find_or_initialize_by_name(model_name)
-      
+
       if model_obj.new_record?
         # set the description
         model_obj.description = le.eq_description
@@ -127,14 +127,14 @@ task :dbx2 => :environment do
   .joins("INNER JOIN budgets ON equipment.budget_id = budgets.budget_id")
   .order(['eq_budget_biennium', 'budget_number'])
   .each do |le|
-    
+
 
 
     begin
       le.budget_number.strip!       unless le.budget_number.nil?
       le.budget_name.strip!         unless le.budget_name.nil?
       le.eq_budget_biennium.strip!  unless le.eq_budget_biennium.nil?
-      
+
       number = le.budget_number
       nom    = (!le.budget_name.blank? && le.budget_name.downcase != "unknown") ? le.budget_name : nil
       bienn  = (!le.eq_budget_biennium.blank? && le.eq_budget_biennium.downcase != "unknown") ? le.eq_budget_biennium : nil
@@ -150,7 +150,7 @@ task :dbx2 => :environment do
       end
 
       budget = Budget.where(:number => number, :name => nom, :date_start => date_start, :date_end => date_end).first_or_initialize
-      
+
       if budget.new_record?
         if budget.save
           record_count += 1
@@ -161,17 +161,17 @@ task :dbx2 => :environment do
     rescue StandardError => e
       puts le.budget_number.ljust(30) + " | " + le.budget_name.ljust(30) + " | " + le.eq_budget_biennium
       puts "\tError migrating #{le.budget_number}: #{ e }"
-    end  
+    end
   end
 
   puts "Migrated #{ record_count } budgets"
   puts
 
   #
-  # Migrate Parts
+  # Migrate Components
   #
-  
-  puts "Migrating asset tags, kits, and parts..."
+
+  puts "Migrating asset tags, kits, and components..."
   record_count = 0
 
   LegacyEquipment.includes(:legacy_budget, :legacy_location).all.each do |le|
@@ -183,12 +183,12 @@ task :dbx2 => :environment do
       # look up the model
       model_name = le.eq_model.blank? ? "Unknown" : le.eq_model.strip
       model_obj = brand.models.find_by_name(model_name)
-      
+
       # look up the budget
       le.legacy_budget.budget_number.strip!       unless le.legacy_budget.budget_number.nil?
       le.legacy_budget.budget_name.strip!         unless le.legacy_budget.budget_name.nil?
       le.eq_budget_biennium.strip!  unless le.eq_budget_biennium.nil?
-      
+
       number = le.legacy_budget.budget_number
       nom    = (!le.legacy_budget.budget_name.blank? && le.legacy_budget.budget_name.downcase != "unknown") ? le.legacy_budget.budget_name : nil
       bienn  = (!le.eq_budget_biennium.blank? && le.eq_budget_biennium.downcase != "unknown") ? le.eq_budget_biennium : nil
@@ -202,14 +202,14 @@ task :dbx2 => :environment do
           date_end   = Date.new(de.to_i, 6, 30).to_s
         end
       end
-      
+
       budget = Budget.where(:number => number, :name => nom, :date_start => date_start, :date_end => date_end).first
 
       # find or create a matching asset tag
-      asset_tag = AssetTag.where(:uid => le.eq_uw_tag).includes(:part).first_or_initialize
+      asset_tag = AssetTag.where(:uid => le.eq_uw_tag).includes(:component).first_or_initialize
 
-      if asset_tag.new_record? || asset_tag.part.nil?
-        # start building up the part attrs
+      if asset_tag.new_record? || asset_tag.component.nil?
+        # start building up the component's attrs
         serial_number      = (le.eq_serial_num.nil? || le.eq_serial_num.strip.blank?) ? nil : le.eq_serial_num.strip
         cost               = (le.eq_cost == 0) ? nil : le.eq_cost
         insured            = (le.eq_insured.strip.downcase == "on")   ? true : false
@@ -217,23 +217,22 @@ task :dbx2 => :environment do
         checkoutable       = (le.checkoutable.strip.downcase == "yes") ? true : false
 
         kit                = Kit.new
-        kit.name           = model_obj.name
+        kit.budget         = budget
         kit.checkoutable   = checkoutable
-        kit.tombstoned     = missing
+        kit.cost           = cost
+        kit.insured        = insured
         kit.location       = Location.find_or_create_by_name(le.legacy_location.loc_name)
+        kit.model          = model_obj
+        kit.tombstoned     = missing
 
-        part               = Part.new
-        part.serial_number = serial_number
-        part.cost          = cost
-        part.insured       = insured
-        part.missing       = missing
-        part.model         = model_obj
-        part.budget        = budget
-        part.kit           = kit
-        part.created_at    = le.eq_date_entered
-        
-        asset_tag.part     = part
-        
+        component               = Component.new
+        component.kit           = kit
+        component.missing       = missing
+        component.serial_number = serial_number
+        component.created_at    = le.eq_date_entered
+
+        asset_tag.component     = component
+
         if asset_tag.save
           record_count += 1
         else
@@ -243,10 +242,10 @@ task :dbx2 => :environment do
       end
     rescue StandardError => e
       puts "\tError migrating #{le.eq_uw_tag}: #{ e }"
-    end  
+    end
   end
 
-  puts "Migrated #{ record_count } asset tags, kits, and parts"
+  puts "Migrated #{ record_count } asset tags, kits, and components"
   puts
 
 end
@@ -296,7 +295,7 @@ namespace :db do
         end
       end
     end
-    
+
   end
 
 end

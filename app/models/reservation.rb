@@ -10,11 +10,14 @@ class Reservation < ActiveRecord::Base
   validates :kit_id,    :presence => true
   validates :start_at,  :presence => true
   validates :end_at,    :presence => true
+  validate  :validate_open_on_end_at
+  validate  :validate_open_on_start_at
 
   attr_accessible :client_id, :kit_id, :start_at, :end_at
+  attr_writer :model
 
-  before_validation :adjust_start_at
-  before_validation :adjust_end_at
+  before_save :adjust_start_at
+  before_save :adjust_end_at
 
   def adjust_start_at
     set_to_location_open_at!
@@ -24,28 +27,38 @@ class Reservation < ActiveRecord::Base
     set_to_location_close_at!
   end
 
-  # TODO: deal with UTC parsing problems
+  def location
+    self.try(:kit).try(:location)
+  end
+
+  def open_on_end_at?
+    return kit.location.open_on?(self.end_at)
+  end
+
+  def open_on_start_at?
+    return kit.location.open_on?(self.start_at)
+  end
+
+  # set the start_at datetime to the time the location opens
   def set_to_location_open_at!
     # get the first opening time on the day
-    opens_at = kit.location.opens_at(self.start_at)
-
-    # figure out what the opening time's offset is from midnight
-    offset = opens_at.seconds_since_midnight
-
-    # set start_at to the same offset
-    self.start_at = self.start_at.beginning_of_day + offset
+    self.start_at = kit.location.opens_at(self.start_at)
   end
 
+  # set the end_at datetime to the time the location closes
   def set_to_location_close_at!
-    # get the last closing time on the day
-    closes_at = kit.location.closes_at(self.end_at)
-
-    # figure out what the closing time's offset is from midnight
-    offset = closes_at.seconds_since_midnight
-
-    # set end_at to the same offset
-    self.end_at = self.end_at.beginning_of_day + offset
+    self.end_at = kit.location.closes_at(self.end_at)
   end
 
+  def validate_open_on_end_at
+    unless open_on_end_at?
+      errors.add(:end_at, "must be on a day with valid checkout hours")
+    end
+  end
 
+  def validate_open_on_start_at
+    unless open_on_start_at?
+      errors.add(:start_at, "must be on a day with valid checkout hours")
+    end
+  end
 end

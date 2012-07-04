@@ -25,8 +25,6 @@ class BusinessHour < ActiveRecord::Base
   # end
 
   attr_accessible :location_id, :open_at, :closed_at
-  
-  default_scope joins(:location).order("locations.name ASC, business_hours.open_at ASC")
 
   def self.days_for_select
     IceCube::TimeUtil::DAYS.collect {|k,v| [k.to_s.titleize, k] }
