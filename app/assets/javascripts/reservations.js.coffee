@@ -1,7 +1,8 @@
 jQuery ->
   $(document).ready ->
     # store the ID of the current active location (if there is one)
-    window.gon.active_location = parseInt($("#reservation_location option:selected").val())
+  $("#reservation_location option:selected").each (i) ->
+    window.gon.active_location = parseInt(i)
 
     # update the ID of the current active location when the location
     # select box changes

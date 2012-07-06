@@ -1,19 +1,39 @@
-<h1>Kit</h1>
+<h1><%= @brand %> <%= @model %></h1>
 
-<p>
-  <b>Tombstoned</b><br>
-  <%= @kit.tombstoned %>
-</p>
+<table class="table table-bordered table-striped">
+  <tbody>
+    <tr>
+      <th>Brand</th>
+      <td><%= link_to @brand, brand_path(@brand) %></td>
+    </tr>
+    <tr>
+      <th>Model</th>
+      <td><%= link_to @model, model_path(@model) %></td>
+    </tr>
+    <tr>
+      <th>Asset Tags</th>
+      <td>
+        <%= @asset_tags.join("<br>") %>
+      </td>
+    </tr>
+    <tr>
+      <th>Location</th>
+      <td><%= @kit.location %></td>
+    </tr>
+    <tr>
+      <th>Checkoutable</th>
+      <td><%= @kit.checkoutable %></td>
+    </tr>
+    <tr>
+      <th>Tombstoned</th>
+      <td><%= @kit.tombstoned %></td>
+    </tr>
+  </tbody>
+</table>
 
-<p>
-  <b>Checkoutable</b><br>
-  <%= @kit.checkoutable %>
-</p>
 
-<p>
-  <b>Location</b><br>
-  <%= @kit.location_id %>
-</p>
+
+
 
 <div class="form-actions">
   <%= link_to 'Back', kits_path, :class => 'btn'  %>

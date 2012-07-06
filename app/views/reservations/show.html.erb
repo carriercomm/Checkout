@@ -2,27 +2,27 @@
 
 <p>
   <b>Client</b><br>
-  <%= @reservation.client.username %>
+  <%= @client %>
 </p>
 
 <p>
   <b>Check Out Location</b><br>
-  <%= @reservation.kit.location %>
+  <%= @location %>
 </p>
 
 <p>
   <b>Kit</b><br>
-  <%= @reservation.kit %>
+  <%= link_to @kit, kit_path(@kit) %>
 </p>
 
 <p>
   <b>Check Out Day</b><br>
-  <%= @reservation.start_at %>
+  <%= @reservation.start_at.to_formatted_s(:verbose) %>
 </p>
 
 <p>
   <b>Check In Day</b><br>
-  <%= @reservation.end_at %>
+  <%= @reservation.end_at.to_formatted_s(:verbose) %>
 </p>
 
 <p>

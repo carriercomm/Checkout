@@ -8,15 +8,15 @@ gem 'jquery-rails'
 gem 'kaminari'          # pagination
 gem 'mysql2'
 gem 'nested_form'       # dynamic nested form helper
-gem 'rails', '3.2.1'
+gem 'rails', '3.2.6'
 gem 'simple_form'       # form builder
 
 # Gems used only for assets and not required
 # in production environments by default.
 group :assets do
-  gem 'coffee-rails', '~> 3.2.1'
+  gem 'coffee-rails'
   gem 'jquery-ui-rails'
-  gem 'sass-rails',   '~> 3.2.3'
+  gem 'sass-rails'
   gem 'twitter-bootstrap-rails'
   gem 'uglifier', '>= 1.0.3'
 end
@@ -24,6 +24,7 @@ end
 group :development do
   gem 'pry-rails'
   gem 'awesome_print'
+  gem 'thin'
 end
 
 gem "rspec-rails", :group => [:test, :development]

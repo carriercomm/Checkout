@@ -31,13 +31,13 @@ class Location < ActiveRecord::Base
 
     # sort them
     hours_on_day.sort_by! { |x| x.closed_at }
-    
+
     # construct a new datetime with the right hours on the day of inquiry
     # FIXME: I'm sure this calculation of base_datetime is buggy in some time zone
     base_datetime = (date.to_datetime + 1.day).in_time_zone.at_beginning_of_day
     hour_offset   = hours_on_day.first.closed_hour.hours
     minute_offset = hours_on_day.first.closed_minute.minutes
-    
+
     return base_datetime + hour_offset + minute_offset
   end
 
@@ -69,13 +69,13 @@ class Location < ActiveRecord::Base
 
     # sort them
     hours_on_day.sort_by! { |x| x.open_at }
-    
+
     # construct a new datetime with the right hours on the day of inquiry
     # FIXME: I'm sure this calculation of base_datetime is buggy in some time zone
     base_datetime = (date.to_datetime + 1.day).in_time_zone.at_beginning_of_day
     hour_offset   = hours_on_day.first.open_hour.hours
     minute_offset = hours_on_day.first.open_minute.minutes
-    
+
     return base_datetime + hour_offset + minute_offset
   end
 
@@ -91,6 +91,10 @@ class Location < ActiveRecord::Base
     days = []
     business_hours.each { |x| days.concat(x.open_occurrences(days_out)) }
     return days - exception_days
+  end
+
+  def to_param
+    "#{ id } #{ name }".parameterize
   end
 
   def to_s

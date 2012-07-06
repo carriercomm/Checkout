@@ -7,7 +7,6 @@ class ReservationsController < ApplicationController
 
     respond_to do |format|
       format.html # index.html.erb
-      format.json { render json: @reservations }
     end
   end
 
@@ -15,51 +14,50 @@ class ReservationsController < ApplicationController
   # GET /reservations/1.json
   def show
     @reservation = Reservation.find(params[:id])
+    @client      = @reservation.client
+    @kit         = @reservation.kit
+    @location    = @kit.location
 
     respond_to do |format|
       format.html # show.html.erb
-      format.json { render json: @reservation }
     end
   end
 
   # GET /reservations/new
   # GET /reservations/new.json
   def new
-    @user = (params[:user_id]) ? User.find(params[:user_id]) : current_user
+    @client = (params[:user_id]) ? User.find(params[:user_id]) : current_user
 
     # do we have a specific kit to check out?
     if params[:kit_id].present?
-      kit_id = params[:kit_id]
-      @reservation = @user.reservations.build(:kit_id => kit_id)
-      @location    = @reservation.kit.location
-      @locations   = [@reservation.kit.location, Location.find(2)]
+      kit          = Kit.joins(:location, :model => :brand).find(params[:kit_id])
+      @reservation = @client.reservations.build(:kit_id => kit.id)
+      @location    = kit.location
+      @locations   = [kit.location]
 
       # gather the available checkout days for the kit
       # TODO: subtract days that the kit is checked out
       gon.locations = {
-        @reservation.kit.location.id => {
+        @location.id => {
           'kits' => [{
-                       'kit_id' => @reservation.kit.id,
-                       'days_reservable' => @reservation.kit.days_reservable
+                       'kit_id' => kit.id,
+                       'days_reservable' => kit.days_reservable
                      }]
         }
       }
 
     # do we have a general model to check out?
     elsif params[:model_id].present?
-      @reservation = @user.reservations.build
+      @reservation = @client.reservations.build
       @model       = Model.find(params[:model_id])
-
 
     else
       flash[:error] = "Start by finding something to check out!"
       redirect_to models_path and return
     end
 
-
     respond_to do |format|
       format.html # new.html.erb
-      format.json { render json: @reservation }
     end
   end
 
@@ -79,13 +77,8 @@ class ReservationsController < ApplicationController
     respond_to do |format|
       if @reservation.save
         format.html { redirect_to @reservation, notice: 'Reservation was successfully created.' }
-        format.json { render json: @reservation, status: :created, location: @reservation }
       else
-        logger.debug "----" + @reservation.errors.inspect
-        # FIXME: set_open_days
-
         format.html { render action: "new" }
-        format.json { render json: @reservation.errors, status: :unprocessable_entity }
       end
     end
   end
@@ -98,11 +91,9 @@ class ReservationsController < ApplicationController
     respond_to do |format|
       if @reservation.update_attributes(params[:reservation])
         format.html { redirect_to @reservation, notice: 'Reservation was successfully updated.' }
-        format.json { head :no_content }
       else
         set_open_days
         format.html { render action: "edit" }
-        format.json { render json: @reservation.errors, status: :unprocessable_entity }
       end
     end
   end

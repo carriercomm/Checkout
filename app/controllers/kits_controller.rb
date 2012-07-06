@@ -17,7 +17,10 @@ class KitsController < ApplicationController
   # GET /kits/1
   # GET /kits/1.json
   def show
-    @kit = Kit.find(params[:id])
+    @kit = Kit.joins(:location, :components => :asset_tags, :model => :brand).find(params[:id])
+    @model = @kit.model
+    @brand = @model.brand
+    @asset_tags = @kit.asset_tags
 
     respond_to do |format|
       format.html # show.html.erb

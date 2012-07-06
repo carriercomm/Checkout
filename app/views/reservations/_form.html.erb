@@ -2,8 +2,8 @@
   <fieldset>
     <legend><%= controller.action_name.capitalize %> Reservation</legend>
 
-    <%= f.association :client,   :as => :hidden %>
-    <%= f.association :client,   :disabled => true %>
+    <%= f.association :client, :as => :hidden %>
+    <%= f.input       :client, :readonly => true, :disabled => true %>
 
     <% unless @model.nil? %>
       <% f.simple_fields_for @model do |mf| %>
@@ -12,10 +12,14 @@
       <% end %>
     <% end %>
 
-    <%= f.input :location,  :collection => @locations, :prompt => "Select a checkout location", :selected => @location %>
+    <% if @location.nil? %>
+      <%= f.input :location, :collection => @locations, :prompt => "Select a checkout location", :selected => @location %>
+    <% else %>
+      <%= f.input :location, :collection => @locations, :selected => @location, :disabled => true %>
+    <% end %>
 
     <%= f.association :kit, :as => :hidden    unless @reservation.kit.nil? %>
-    <%= f.association :kit, :disabled => true unless @reservation.kit.nil? %>
+    <%= f.input       :kit, :readonly => true, :disabled => true unless @reservation.kit.nil? %>
 
     <%= f.input :start_at, :as => :date_picker,
         :label => 'Pick Up Date',

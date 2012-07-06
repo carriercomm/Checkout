@@ -18,6 +18,10 @@ class Brand < ActiveRecord::Base
     joins(:models => :kits).where("kits.tombstoned = ? AND kits.checkoutable = ?", false, true).uniq
   end
 
+  def to_param
+    "#{ id } #{ name }".parameterize
+  end
+
   def to_s
     name
   end
