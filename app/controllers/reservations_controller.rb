@@ -3,7 +3,13 @@ class ReservationsController < ApplicationController
   # GET /reservations
   # GET /reservations.json
   def index
-    @reservations = Reservation.all
+    if params[:user_id].present?
+      @reservations = User.find(params[:user_id]).reservations.order("reservations.start_at DESC").page(params[:page])
+    elsif params[:kit_id].present?
+      @reservations = Kit.find(params[:kit_id]).reservations.order("reservations.start_at DESC").page(params[:page])
+    else
+      @reservations = Reservation.order("reservations.start_at DESC").page(params[:page])
+    end
 
     respond_to do |format|
       format.html # index.html.erb
@@ -30,21 +36,11 @@ class ReservationsController < ApplicationController
 
     # do we have a specific kit to check out?
     if params[:kit_id].present?
-      kit          = Kit.joins(:location, :model => :brand).find(params[:kit_id])
-      @reservation = @client.reservations.build(:kit_id => kit.id)
-      @location    = kit.location
-      @locations   = [kit.location]
+      @kit         = Kit.joins(:location, :model => :brand).find(params[:kit_id])
+      @reservation = @client.reservations.build(:kit_id => @kit.id)
 
-      # gather the available checkout days for the kit
-      # TODO: subtract days that the kit is checked out
-      gon.locations = {
-        @location.id => {
-          'kits' => [{
-                       'kit_id' => kit.id,
-                       'days_reservable' => kit.days_reservable
-                     }]
-        }
-      }
+      # setup javascript data structures to make the date picker work
+      setup_kit_checkout_days(@kit)
 
     # do we have a general model to check out?
     elsif params[:model_id].present?
@@ -64,9 +60,8 @@ class ReservationsController < ApplicationController
   # GET /reservations/1/edit
   def edit
     @reservation = Reservation.find(params[:id])
-
-    gon.days_open = @reservation.kit.location.open_days
-
+    @kit         = @reservation.kit
+    setup_kit_checkout_days(@kit)
   end
 
   # POST /reservations
@@ -108,6 +103,21 @@ class ReservationsController < ApplicationController
       format.html { redirect_to reservations_url }
       format.json { head :no_content }
     end
+  end
+
+  private
+
+  # gather the available checkout days for the kit and format for
+  # datepicker consumption
+  def setup_kit_checkout_days(kit)
+      gon.locations = {
+        kit.location.id => {
+          'kits' => [{
+                       'kit_id' => kit.id,
+                       'days_reservable' => kit.days_reservable
+                     }]
+        }
+      }
   end
 
 end

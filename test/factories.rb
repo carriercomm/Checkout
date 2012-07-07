@@ -23,9 +23,13 @@ FactoryGirl.define do
     end
 
     # 11:00am
-    open_at { DateTime.commercial(1969, 1, day, 11, 0, 0, utc_offset) }
+    open_at { DateTime.commercial(1969, 1, day, 9, 0, 0, utc_offset) }
     # 3:00pm
-    closed_at { DateTime.commercial(1969, 1, day, 15, 0, 0, utc_offset) }
+    closed_at { DateTime.commercial(1969, 1, day, 17, 0, 0, utc_offset) }
+  end
+
+  factory :business_hour_exception do
+    date_closed { Date.new(2012, 12, 25) }
   end
 
   factory :component do

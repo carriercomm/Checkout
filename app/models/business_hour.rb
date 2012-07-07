@@ -11,18 +11,7 @@ class BusinessHour < ActiveRecord::Base
 
   validates :open_at,   :presence => true
   validates :closed_at, :presence => true
-
-  validate :validate_hours_in_order
-
-  # TODO: cleanup this cruft?
-  # validate :day_must_map_to_day_index
-
-  # def day_must_map_to_day_index
-  #   return if day.blank?
-  #   if IceCube::TimeUtil::DAYS[day] != day_index
-  #     errors.add(:day, "must match day_index")
-  #   end
-  # end
+  validate  :validate_hours_in_order
 
   attr_accessible :location_id, :open_at, :closed_at
 

@@ -16,13 +16,38 @@
       <tr>
         <td><%= link_to reservation.client, users_reservations_path(reservation.client) unless reservation.client.nil? %>
         <td><%= link_to reservation.kit, kit_path(reservation.kit) unless reservation.kit.nil? %></td>
-        <td><%= reservation.start_at %></td>
-        <td><%= reservation.end_at %></td>
-        <td><%= reservation.out_at %></td>
-        <td><%= reservation.in_at %></td>
+        <td><%= reservation.start_at.to_s(:tabular) %></td>
+        <td><%= reservation.end_at.to_s(:tabular) %></td>
+        <td><%= reservation.out_at.try(:to_s, :tabular) %></td>
+        <td><%= reservation.in_at.try(:to_s, :tabular) %></td>
         <td>
-          <%= link_to 'Edit', edit_reservation_path(reservation), :class => 'btn btn-mini' %>
-          <%= link_to 'Destroy', reservation_path(reservation), :method => :delete, :confirm => 'Are you sure?', :class => 'btn btn-mini btn-danger' %>
+          <div class="btn-group">
+            <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+              <i class="icon-cog"></i>
+              <span class="caret"></span>
+            </a>
+            <ul class="dropdown-menu">
+              <li>
+                <%= link_to reservation_path(reservation) do %>
+                  <i class="icon-info-sign"></i>
+                  Show
+                <% end %>
+              </li>
+              <li>
+                <%= link_to edit_reservation_path(reservation)  do %>
+                  <i class="icon-pencil"></i>
+                  Edit
+                <% end %>
+              </li>
+              <li class="divider"></li>
+              <li>
+                <%= link_to reservation_path(reservation), :method => :delete, :confirm => 'Are you sure?' do %>
+                  <i class="icon-trash"></i>
+                  Delete
+                <% end %>
+              </li>
+            </ul>
+          </div>
         </td>
       </tr>
     <% end %>

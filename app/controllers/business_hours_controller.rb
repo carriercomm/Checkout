@@ -6,7 +6,6 @@ class BusinessHoursController < ApplicationController
 
     respond_to do |format|
       format.html # index.html.erb
-      format.json { render json: @business_hours }
     end
   end
 
@@ -17,7 +16,6 @@ class BusinessHoursController < ApplicationController
 
     respond_to do |format|
       format.html # show.html.erb
-      format.json { render json: @business_hour }
     end
   end
 
@@ -28,7 +26,6 @@ class BusinessHoursController < ApplicationController
 
     respond_to do |format|
       format.html # new.html.erb
-      format.json { render json: @business_hour }
     end
   end
 
@@ -44,11 +41,9 @@ class BusinessHoursController < ApplicationController
 
     respond_to do |format|
       if @business_hour.save
-        format.html { redirect_to @business_hour, notice: 'Business hour was successfully created.' }
-        format.json { render json: @business_hour, status: :created, location: @business_hour }
+        format.html { redirect_to @business_hour, :notice => 'Business hour was successfully created.' }
       else
-        format.html { render action: "new" }
-        format.json { render json: @business_hour.errors, status: :unprocessable_entity }
+        format.html { render :action => "new" }
       end
     end
   end
@@ -60,11 +55,9 @@ class BusinessHoursController < ApplicationController
 
     respond_to do |format|
       if @business_hour.update_attributes(params[:business_hour])
-        format.html { redirect_to @business_hour, notice: 'Business hour was successfully updated.' }
-        format.json { head :no_content }
+        format.html { redirect_to @business_hour, :notice => 'Business hour was successfully updated.' }
       else
-        format.html { render action: "edit" }
-        format.json { render json: @business_hour.errors, status: :unprocessable_entity }
+        format.html { render :action => "edit" }
       end
     end
   end
@@ -77,7 +70,6 @@ class BusinessHoursController < ApplicationController
 
     respond_to do |format|
       format.html { redirect_to business_hours_url }
-      format.json { head :no_content }
     end
   end
 end

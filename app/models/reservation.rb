@@ -16,8 +16,12 @@ class Reservation < ActiveRecord::Base
   attr_accessible :client_id, :kit_id, :start_at, :end_at
   attr_writer :model
 
-  before_save :adjust_start_at
-  before_save :adjust_end_at
+  #
+  # FIXME: these before filters are setting the days to the wrong day
+  #
+
+  # before_save :adjust_start_at
+  # before_save :adjust_end_at
 
   def adjust_start_at
     set_to_location_open_at!

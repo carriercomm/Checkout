@@ -27,10 +27,14 @@ group :development do
   gem 'thin'
 end
 
-gem "rspec-rails", :group => [:test, :development]
+# gem "rspec-rails", :group => [:test, :development]
 
 group :test do
-  gem "factory_girl_rails"
-  gem "capybara"
-  gem "guard-rspec"
+  # gem "guard-rspec"
+  gem 'capybara'
+  gem 'database_cleaner'
+  gem 'factory_girl_rails'
+  gem 'guard-minitest'
+  gem 'minitest'
+  gem 'turn'
 end

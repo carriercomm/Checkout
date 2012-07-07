@@ -17,7 +17,7 @@ ActiveAdmin.register BusinessHour do
     column "Hours" do |h|
       h.to_s
     end
-    default_actions    
+    default_actions
   end
 
   show do |bh|
@@ -44,9 +44,8 @@ ActiveAdmin.register BusinessHour do
 
     protected
 
+    # TODO: move most of this into the model
     def munge_params
-      
-
       # delete the junk in formtastic's weird ass format
       params['business_hour'].delete('open_at(1i)')
       params['business_hour'].delete('open_at(2i)')
@@ -58,6 +57,9 @@ ActiveAdmin.register BusinessHour do
       # reconstruct the times in OUR weird ass format
       utc_offset = (Time.now.utc_offset / 60 / 60).to_s
 
+      # Note: according to DAYS_INTO_WEEK, monday equals zero, so we
+      #       have to map to the right day offset for
+      #       DateTime.commercial
       day           = params['business_hour'].delete('day')
       day           = Date::DAYS_INTO_WEEK[day.to_sym] + 1
 
@@ -67,8 +69,8 @@ ActiveAdmin.register BusinessHour do
       closed_hour   = params['business_hour'].delete('closed_at(4i)').to_i
       closed_minute = params['business_hour'].delete('closed_at(5i)').to_i
 
-      logger.debug "---- open #{ day.inspect } #{ open_hour.inspect} #{ open_minute.inspect}"
-      logger.debug "---- closed #{ day.inspect } #{ closed_hour.inspect} #{ closed_minute.inspect}"
+      # logger.debug "---- open #{ day.inspect } #{ open_hour.inspect} #{ open_minute.inspect}"
+      # logger.debug "---- closed #{ day.inspect } #{ closed_hour.inspect} #{ closed_minute.inspect}"
 
       params['business_hour']['open_at']   = DateTime.commercial(1969, 1, day, open_hour, open_minute, 0, utc_offset)
       params['business_hour']['closed_at'] = DateTime.commercial(1969, 1, day, closed_hour, closed_minute, 0, utc_offset)

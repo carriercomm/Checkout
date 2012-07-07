@@ -12,14 +12,14 @@
       <% end %>
     <% end %>
 
-    <% if @location.nil? %>
-      <%= f.input :location, :collection => @locations, :prompt => "Select a checkout location", :selected => @location %>
+    <% if @kit.nil? %>
+      <%= f.input :location, :collection => @locations, :prompt => "Select a checkout location" %>
     <% else %>
-      <%= f.input :location, :collection => @locations, :selected => @location, :disabled => true %>
+      <%= f.input :location, :collection => [@kit.location], :selected => @kit.location, :disabled => true %>
     <% end %>
 
-    <%= f.association :kit, :as => :hidden    unless @reservation.kit.nil? %>
-    <%= f.input       :kit, :readonly => true, :disabled => true unless @reservation.kit.nil? %>
+    <%= f.association :kit, :as => :hidden    unless @kit.nil? %>
+    <%= f.input       :kit, :readonly => true, :disabled => true unless @kit.nil? %>
 
     <%= f.input :start_at, :as => :date_picker,
         :label => 'Pick Up Date',
