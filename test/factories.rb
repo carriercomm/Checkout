@@ -17,15 +17,17 @@ FactoryGirl.define do
   end
 
   factory :business_hour do
-    ignore do
-      day 1
-      utc_offset { (Time.now.utc_offset / 60 / 60).to_s }
-    end
+    location
 
-    # 11:00am
-    open_at { DateTime.commercial(1969, 1, day, 9, 0, 0, utc_offset) }
-    # 3:00pm
-    closed_at { DateTime.commercial(1969, 1, day, 17, 0, 0, utc_offset) }
+    # Monday 11:00am
+    open_day "monday"
+    open_hour 11
+    open_minute 0
+
+    # Monday 3:00pm
+    close_day "monday"
+    close_hour 15
+    close_minute 0
   end
 
   factory :business_hour_exception do

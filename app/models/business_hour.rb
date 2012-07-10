@@ -4,19 +4,41 @@ class BusinessHour < ActiveRecord::Base
 
   # TODO: validate with overlap detection for business hours
 
-  # validates :day, :uniqueness => {
-  #   :scope => [:location_id, :day_index],
-  #   :message => "should happen once per year"
-  # }
+  validates :location_id,  :presence => true
+  validates :open_day,     :presence => true
+  validates :open_day,     :inclusion    => { :in => %w(monday tuesday wednesday thursday friday saturday sunday),
+                                              :message => "should be a valid day of the week" }
+  validates :open_hour,    :presence => true
+  validates :open_hour,    :numericality => { :only_integer => true,
+                                              :greater_than_or_equal_to => 0,
+                                              :less_than => 24 }
+  validates :open_minute,  :presence => true
+  validates :open_minute,  :numericality => { :only_integer => true,
+                                              :greater_than_or_equal_to => 0,
+                                              :less_than => 60 }
+  validates :close_day,    :presence => true
+  validates :close_day,    :inclusion    => { :in => %w(monday tuesday wednesday thursday friday saturday sunday),
+                                              :message => "should be a valid day of the week" }
+  validates :close_hour,   :presence => true
+  validates :close_hour,   :numericality => { :only_integer => true,
+                                              :greater_than_or_equal_to => 0,
+                                              :less_than => 24 }
+  validates :close_minute, :presence => true  
+  validates :close_minute, :numericality => { :only_integer => true,
+                                              :greater_than_or_equal_to => 0,
+                                              :less_than => 60 }
+  validate  :validate_hours_in_order, :unless => Proc.new { |rec| rec.required_attrs_blank? }
 
-  validates :open_at,   :presence => true
-  validates :closed_at, :presence => true
-  validate  :validate_hours_in_order
-
-  attr_accessible :location_id, :open_at, :closed_at
+  attr_accessible(:location_id,
+                  :open_day,    
+                  :open_hour,   
+                  :open_minute, 
+                  :close_day,  
+                  :close_hour, 
+                  :close_minute)
 
   def self.days_for_select
-    IceCube::TimeUtil::DAYS.collect {|k,v| [k.to_s.titleize, k] }
+    IceCube::TimeUtil::DAYS.collect {|k,v| [k.to_s.titleize, k.to_s] }
   end
 
   def self.hours_for_select
@@ -40,56 +62,86 @@ class BusinessHour < ActiveRecord::Base
 
   def validate_hours_in_order
     unless hours_in_order?
-      errors.add(:open_at, "must come before close")
-      errors.add(:closed_at, "must come after open")
+      errors[:base] << "Open time must come before close time"
     end
   end
 
+  # converts the open and close times to dates to compare
   def hours_in_order?
-    open_at < closed_at
+    base_time = Time.zone.now
+    utc_offset = base_time.to_datetime.offset
+
+    year = base_time.year
+    week = base_time.strftime("%U").to_i
+
+    # lots of things will make this blow up (e.g. malformed hours)
+    begin
+      oday = Date::DAYS_INTO_WEEK[open_day.strip.downcase.to_sym] + 1
+      cday = Date::DAYS_INTO_WEEK[close_day.strip.downcase.to_sym] + 1
+
+      open_date  = DateTime.commercial(year, week, oday, open_hour, open_minute, 0, utc_offset)
+      close_date = DateTime.commercial(year, week, cday, close_hour, close_minute, 0, utc_offset)
+    rescue
+      return false
+    end
+
+    open_date < close_date
   end
 
-  def day
-    open_at.try(:strftime, '%A')
+  def open_time_s
+    return time_to_s(open_hour, open_minute)
   end
 
-  def day_sym
-    day.downcase.to_sym
-  end
-
-  def open_hour
-    open_at.strftime('%k').to_i
-  end
-
-  def open_minute
-    open_at.strftime('%M').to_i
-  end
-
-  def open_at_to_s
-    open_at.try(:strftime, '%l:%M%P').try(:strip)
-  end
-
-  def closed_at_to_s
-    closed_at.try(:strftime, '%l:%M%P').try(:strip)
-  end
-
-  def closed_hour
-    closed_at.strftime('%k').to_i
-  end
-
-  def closed_minute
-    closed_at.strftime('%M').to_i
+  def close_time_s
+    return time_to_s(close_hour, close_minute)
   end
 
   def to_s
-    "#{ day } #{ open_at_to_s }-#{ closed_at_to_s }"
+    "#{ open_day.titleize } #{ open_time_s }-#{ close_time_s }"
   end
 
+  # returns an array of [month, day] tuples representing the days with
+  # open business hours between now and days_out
   def open_occurrences(days_out = 90)
+    date_start = Time.zone.now
+    date_end   = date_start + days_out.days 
     schedule =  IceCube::Schedule.new
-    schedule.add_recurrence_rule IceCube::Rule.weekly.day(day_sym)
-    open_days = schedule.occurrences_between(Time.now, (Time.now + days_out.days)).collect { |d| [d.month, d.day]}
+
+    schedule.add_recurrence_rule IceCube::Rule.weekly.day(open_day.downcase.to_sym)
+
+    occurrences = schedule.occurrences_between(date_start, date_end)
+    open_days   = occurrences.collect { |d| [d.month, d.day]}
+
     return open_days
   end
 
+  def required_attrs_blank?
+    return (open_day.blank? || open_hour.blank? || open_minute.blank? ||
+            close_day.blank? || close_hour.blank? || close_minute.blank?)
+  end
+
+  private
+
+  def time_to_s(hour, minute)
+    h = String.new
+    m = minute.to_s
+    meridiem = "am"
+
+    if hour == 0
+      h = 12.to_s
+    elsif hour == 12
+      h = hour.to_s
+      meridiem = "pm"
+    elsif hour < 12
+      h = hour.to_s
+    else
+      h = (hour % 12).to_s
+      meridiem = "pm"
+    end
+
+    return "#{ h }:#{ m }#{ meridiem }"
+
+  end
+
 end
+ 

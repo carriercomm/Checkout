@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120629224726) do
+ActiveRecord::Schema.define(:version => 20120709220913) do
 
   create_table "active_admin_comments", :force => true do |t|
     t.string   "resource_id",   :null => false
@@ -62,11 +62,15 @@ ActiveRecord::Schema.define(:version => 20120629224726) do
   add_index "business_hour_exceptions", ["location_id"], :name => "index_business_hour_exceptions_on_location_id"
 
   create_table "business_hours", :force => true do |t|
-    t.integer  "location_id", :null => false
-    t.datetime "open_at",     :null => false
-    t.datetime "closed_at",   :null => false
-    t.datetime "created_at",  :null => false
-    t.datetime "updated_at",  :null => false
+    t.integer  "location_id",  :null => false
+    t.datetime "created_at",   :null => false
+    t.datetime "updated_at",   :null => false
+    t.string   "open_day",     :null => false
+    t.string   "open_hour",    :null => false
+    t.string   "open_minute",  :null => false
+    t.string   "close_day",    :null => false
+    t.string   "close_hour",   :null => false
+    t.string   "close_minute", :null => false
   end
 
   add_index "business_hours", ["location_id"], :name => "index_business_hours_on_location_id"

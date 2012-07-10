@@ -17,7 +17,13 @@ class Location < ActiveRecord::Base
   # returns an array of [month, day] pairs for each
   # business_hour_exception at this location
   def exception_days(days_out = 90)
-    dates = business_hour_exceptions.where("date_closed >= ? AND date_closed <= ?", Time.now.to_date, Time.now.to_date + days_out.days)
+    start_date = Time.now.to_date
+    end_date   = start_date + days_out.days
+
+    # find any exceptions that fall on or between these days
+    dates = business_hour_exceptions.where("date_closed >= ? AND date_closed <= ?", start_date, end_date)
+
+    # convert them to an array
     dates.collect { |d| d.to_a }
   end
 
@@ -28,26 +34,11 @@ class Location < ActiveRecord::Base
       return nil
     end
 
-    # figure out our target day of the week
-    day_offset = date.days_to_week_start
+    # convert the date to a day of the week
+    day_of_week = day_of_week(date)
 
-    hours_on_day = Array.new
-    business_hours.each do |bh|
-      if bh.open_at.days_to_week_start == day_offset
-        hours_on_day << bh
-      end
-    end
-
-    return nil if hours_on_day.empty?
-
-    # sort them
-    hours_on_day.sort_by! { |x| x.open_at }
-
-    # get offset from midnight
-    seconds_since_midnight = hours_on_day.first.open_at.seconds_since_midnight
-
-    # add the offset to the requested day to get the opening time on that day
-    return date.at_beginning_of_day + seconds_since_midnight.seconds
+    # get the first set of business hours on this day
+    return business_hours.where(:open_day => day_of_week).order("business_hours.open_day ASC").first
   end
 
   # returns the last closing time for the given date
@@ -57,30 +48,15 @@ class Location < ActiveRecord::Base
       return nil
     end
 
-    # figure out our target day of the week
-    day_offset = date.days_to_week_start
+    # convert the date to a day of the week
+    day_of_week = day_of_week(date)
 
-    hours_on_day = Array.new
-    business_hours.each do |bh|
-      if bh.closed_at.days_to_week_start == day_offset
-        hours_on_day << bh
-      end
-    end
-
-    return nil if hours_on_day.empty?
-
-    # sort them
-    hours_on_day.sort_by! { |x| x.closed_at }
-
-    # get offset from midnight
-    seconds_since_midnight = hours_on_day.last.closed_at.seconds_since_midnight
-
-    # add the offset to the requested day to get the opening time on that day
-    return date.at_beginning_of_day + seconds_since_midnight.seconds
+    # get the last set of business hours on this day
+    return business_hours.where(:open_day => day_of_week).order("business_hours.open_day DESC").first
   end
 
   def open_on?(date)
-    return first_opening_time_on_date(date) ? true : false
+    return !first_opening_time_on_date(date).nil?
   end
 
   def open_days(days_out = 90)
@@ -95,6 +71,22 @@ class Location < ActiveRecord::Base
 
   def to_s
     name
+  end
+
+  private
+
+  def day_of_week(date)
+    wday = nil
+
+    if date.kind_of? DateTime
+      wday = date.to_time.wday
+    elsif ((date.kind_of? Time) || (date.kind_of? Date))
+      wday = date.wday
+    else
+      raise "Expected an instance of Time, Date, or DateTime"
+    end
+
+    return Date::DAYNAMES[wday].downcase
   end
 
 end
