@@ -1,14 +1,4 @@
-<h1>Model</h1>
-
-<p>
-  <b>Maker</b><br>
-  <%= @model.maker_id %>
-</p>
-
-<p>
-  <b>Name</b><br>
-  <%= @model.name %>
-</p>
+<h1><%= @model.brand %> <%= @model %></h1>
 
 <p>
   <b>Description</b><br>
@@ -19,6 +9,33 @@
   <b>Training required</b><br>
   <%= @model.training_required %>
 </p>
+
+<h2>Kits</h2>
+  <% if @model.kit_asset_tags.empty? %>
+    No asset tags for this model
+  <% else %>
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>Asset Tag</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @model.kit_asset_tags.each do |asset_tag, kit| %>
+          <tr>
+            <td><%= link_to(asset_tag, kit_path(kit)) %></td>
+            <td>
+              <% if kit.checkoutable? %>
+              <%= link_to 'Reserve', new_reservation_path(:kit_id => kit, :user_id => current_user), :class => 'btn btn-mini' %>
+              <%= link_to 'Reservations', kit_reservations_path(kit), :class => 'btn btn-mini' %>
+              <% end %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  <% end %>
 
 <div class="form-actions">
   <%= link_to 'Back', models_path, :class => 'btn'  %>

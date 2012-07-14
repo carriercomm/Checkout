@@ -1,19 +1,48 @@
 class Component < ActiveRecord::Base
 
-  belongs_to :kit
-  has_many   :asset_tags
+  acts_as_list
 
-  validates :kit_id, :presence => true
-  validates :serial_number, :uniqueness => true
 
-  # accepts_nested_attributes_for :model
+  #
+  # Callbacks
+  #
 
-  # def to_param
-  #   if new_record?
-  #     return id
-  #   else
-  #     "#{ id } #{ model.brand.name } #{ model.name }".parameterize
-  #   end
-  # end
+  before_validation :upcase_serial_number
+
+
+  #
+  # Associations
+  #
+
+  belongs_to :model, :inverse_of => :components
+  belongs_to :kit,   :inverse_of => :components
+
+
+  #
+  # Validations
+  #
+  
+  validates_presence_of :model
+  validates_presence_of :kit
+  validates :asset_tag,     :uniqueness => true, :allow_nil => true
+  validates :serial_number, :uniqueness => true, :allow_nil => true
+  
+
+  #
+  # Mass-assignable attributes
+  #
+
+  attr_accessible(:asset_tag,
+                  :kit_id,
+                  :missing,
+                  :model_id,
+                  :position,
+                  :serial_number)
+
+  private
+
+  def upcase_serial_number
+    serial_number.upcase! unless serial_number.nil?
+  end
 
 end

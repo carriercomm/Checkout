@@ -1,24 +1,17 @@
 FactoryGirl.define do
 
-  factory :asset_tag do
-    sequence(:uid) { |n| "867-5309-#{n}" }
-    component
-  end
-
   factory :brand do
     name "Sandwich R Us"
   end
 
   factory :budget do
-    number "11-2222"
+    sequence(:number) {|n| "11-2222-#{n}" }
     name "Slush Fund"
     date_start { Date.today - 30.days }
     date_end { Date.today - 30.days + 2.years }
   end
 
   factory :business_hour do
-    location
-
     # Monday 11:00am
     open_day "monday"
     open_hour 11
@@ -36,7 +29,12 @@ FactoryGirl.define do
 
   factory :component do
     sequence(:serial_number) { |n| "THX1138-#{n}" }
-    kit
+    sequence(:asset_tag) { |n| "867-5309-#{n}" }
+
+    factory :component_with_model do
+      association :model, :factory => :model_with_brand
+    end
+
   end
 
   factory :kit do
@@ -44,8 +42,6 @@ FactoryGirl.define do
     checkoutable false
     cost 47
     insured false
-    location
-    model
     tombstoned false
 
     trait :tombstoned do
@@ -59,6 +55,11 @@ FactoryGirl.define do
     trait :insured do
       insured true
     end
+
+    factory :kit_with_location do
+      location
+    end
+
   end
 
   factory :location do
@@ -68,7 +69,21 @@ FactoryGirl.define do
   factory :model do
     name "Fluffernutter"
     description "Oh so tasty and crunchy! Takes AA batteries."
-    brand
+
+    factory :model_with_brand do
+      brand
+    end
+
+    # factory :model_with_component_and_kit do
+    #   kits { |kits| [kits.association(:kit_with_location)]}
+    # end
+
+    # factory :model_with_component_and_kit do
+    #   after_build do |model|
+    #     model.components << FactoryGirl.build(:component_with_kit, :model => model)
+    #   end
+    # end
+
   end
 
   factory :user do

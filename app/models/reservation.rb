@@ -1,27 +1,47 @@
 class Reservation < ActiveRecord::Base
 
-  belongs_to :kit
-  belongs_to :client,        :class_name => "User"
-  belongs_to :approver,      :class_name => "User"
-  belongs_to :out_assistant, :class_name => "User"
-  belongs_to :in_assistant,  :class_name => "User"
+  #
+  # Callbacks
+  #
 
-  validates :client_id, :presence => true
-  validates :kit_id,    :presence => true
+  # FIXME: these before filters are setting the days to the wrong day
+  # before_save :adjust_start_at
+  # before_save :adjust_end_at
+
+
+  #
+  # Associations
+  #
+
+  belongs_to :kit            :inverse_of => :reservations
+  belongs_to :client,        :inverse_of => :reservations, :class_name => "User"
+  belongs_to :approver,      :inverse_of => :approvals,    :class_name => "User"
+  belongs_to :out_assistant, :inverse_of => :out_assists,  :class_name => "User"
+  belongs_to :in_assistant,  :inverse_of => :in_assists,   :class_name => "User"
+
+
+  #
+  # Validations
+  #
+
+  validates_presence_of :client
+  validates_presence_of :kit
   validates :start_at,  :presence => true
   validates :end_at,    :presence => true
   validate  :validate_open_on_end_at
   validate  :validate_open_on_start_at
 
-  attr_accessible :client_id, :kit_id, :start_at, :end_at
+
+  #
+  # Virtual Attributes
+  #
+
   attr_writer :model
 
-  #
-  # FIXME: these before filters are setting the days to the wrong day
-  #
 
-  # before_save :adjust_start_at
-  # before_save :adjust_end_at
+  #
+  # Instance Methods
+  #
 
   def adjust_start_at
     set_to_location_open_at!

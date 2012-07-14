@@ -1,14 +1,34 @@
 class Location < ActiveRecord::Base
 
-  has_many :kits
-  has_many :business_hours
-  has_many :business_hour_exceptions
+  #
+  # Associations
+  #
 
-  validates :name, :uniqueness => true
+  # TODO: enforce some referential integrity so you can't delete a location and orphan all its kits
+  has_many :business_hours,           :inverse_of => :location
+  has_many :business_hour_exceptions, :inverse_of => :location
+  has_many :kits,                     :inverse_of => :location
 
   accepts_nested_attributes_for :business_hours, :reject_if => :all_blank, :allow_destroy=> true
 
-  # TODO: enforce some referential integrity so you can't delete a location and orphan all its kits
+
+  #
+  # Validations
+  #
+
+  validates :name, :uniqueness => true
+
+
+  #
+  # Mass-assignable attributes
+  #
+
+  attr_accessible :name
+
+
+  #
+  # Instance Methods
+  #
 
   def closed_on?(date)
     return !open_on?(date)

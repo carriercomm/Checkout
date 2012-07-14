@@ -2,7 +2,16 @@ desc 'migrate data from dbx2'
 task :dbx2 => :environment do
   require 'tasks/legacy_classes'
 
-  record_count = 0
+  #
+  # Clean up the database a bit
+  #
+
+  LegacyEquipment.dedupe_brands!
+  LegacyEquipment.dedupe_serial_numbers!
+  LegacyEquipment.convert_special_to_boolean!
+  LegacyEquipment.convert_checkoutable_to_boolean!
+  LegacyEquipment.convert_insured_to_boolean!
+  LegacyEquipment.convert_eq_removed_to_boolean!
 
   #
   # Migrate Brands
@@ -10,7 +19,8 @@ task :dbx2 => :environment do
 
   puts "Migrating brands..."
 
-  LegacyEquipment.dedupe_brands!
+  success_count = 0
+  error_count   = 0
 
   LegacyEquipment.all.each do |le|
     next if le.eq_manufacturer.nil?
@@ -20,17 +30,20 @@ task :dbx2 => :environment do
       brand = Brand.find_or_initialize_by_name(le.eq_manufacturer)
       if brand.new_record?
         if brand.save
-          record_count += 1
+          success_count += 1
         else
+          error_count += 1
           puts "\tError saving #{brand.id}:'#{ brand.name }'"
         end
       end
     rescue StandardError => e
+      error_count += 1
       puts "\tError migrating #{le.id}: #{ e }"
     end
   end
 
-  puts "Migrated #{ record_count } brands"
+  puts "Successfully migrated #{ success_count } brands"
+  puts "#{ error_count } errors"
   puts
 
   #
@@ -38,7 +51,9 @@ task :dbx2 => :environment do
   #
 
   puts "Migrating categories..."
-  record_count = 0
+
+  success_count = 0
+  error_count   = 0
 
   LegacyCategory.all.each do |lc|
     category_name = (lc.category.nil?) ? "Unknown" : lc.category.strip
@@ -48,17 +63,20 @@ task :dbx2 => :environment do
       if cat.new_record?
         cat.description = lc.cat_notes
         if cat.save
-          record_count += 1
+          success_count += 1
         else
+          error_count += 1
           puts "\tError saving #{cat.id}:'#{ cat.name }'"
         end
       end
     rescue StandardError => e
+      error_count += 1
       puts "\tError migrating #{lc.category}: #{ e }"
     end
   end
 
-  puts "Migrated #{ record_count } categories"
+  puts "Successfully migrated #{ success_count } brands"
+  puts "#{ error_count } errors"
   puts
 
   #
@@ -66,9 +84,10 @@ task :dbx2 => :environment do
   #
 
   puts "Migrating models..."
-  record_count = 0
 
-  LegacyEquipment.normalize_special!
+  success_count = 0
+  error_count   = 0
+
 
   LegacyEquipment.includes(:legacy_category)
   .group(['eq_manufacturer', 'eq_model'])
@@ -92,27 +111,26 @@ task :dbx2 => :environment do
         model_obj.description = le.eq_description
 
         # parse the training requirement
-        traniing = false
-        if !!le.special && le.special.downcase == 'yes'
-          training = true
-        end
-        model_obj.training_required = training
+        model_obj.training_required = le.special
 
         category_name = (le.legacy_category.nil? || le.legacy_category.category.nil?) ? "Unknown" : le.legacy_category.category.strip
         model_obj.categories = [Category.where(:name => category_name).first_or_create]
 
         if model_obj.save
-          record_count += 1
+          success_count += 1
         else
+          error_count += 1
           puts "\tError saving #{model_obj.id}:'#{ model_obj.name }'"
         end
       end
     rescue StandardError => e
+      error_count += 1
       puts "\tError migrating #{le.eq_model}: #{ e }"
     end
   end
 
-  puts "Migrated #{ record_count } models"
+  puts "Successfully migrated #{ success_count } models"
+  puts "#{ error_count } errors"
   puts
 
   #
@@ -120,15 +138,14 @@ task :dbx2 => :environment do
   #
 
   puts "Migrating budgets..."
-  record_count = 0
+  success_count = 0
+  error_count   = 0
 
   LegacyEquipment.select(['budget_number', 'budget_name', 'eq_budget_biennium'])
   .uniq
   .joins("INNER JOIN budgets ON equipment.budget_id = budgets.budget_id")
   .order(['eq_budget_biennium', 'budget_number'])
   .each do |le|
-
-
 
     begin
       le.budget_number.strip!       unless le.budget_number.nil?
@@ -153,18 +170,21 @@ task :dbx2 => :environment do
 
       if budget.new_record?
         if budget.save
-          record_count += 1
+          success_count += 1
         else
+          error_count += 1
           puts "\tError saving #{budget.id}:  #{ budget.to_s } #{ budget.errors.inspect.to_s }"
         end
       end
     rescue StandardError => e
+      error_count += 1
       puts le.budget_number.ljust(30) + " | " + le.budget_name.ljust(30) + " | " + le.eq_budget_biennium
       puts "\tError migrating #{le.budget_number}: #{ e }"
     end
   end
 
-  puts "Migrated #{ record_count } budgets"
+  puts "Successfully migrated #{ success_count } budgets"
+  puts "#{ error_count } errors"
   puts
 
   #
@@ -172,7 +192,8 @@ task :dbx2 => :environment do
   #
 
   puts "Migrating asset tags, kits, and components..."
-  record_count = 0
+  success_count = 0
+  error_count = 0
 
   LegacyEquipment.includes(:legacy_budget, :legacy_location).all.each do |le|
 
@@ -185,9 +206,9 @@ task :dbx2 => :environment do
       model_obj = brand.models.find_by_name(model_name)
 
       # look up the budget
-      le.legacy_budget.budget_number.strip!       unless le.legacy_budget.budget_number.nil?
-      le.legacy_budget.budget_name.strip!         unless le.legacy_budget.budget_name.nil?
-      le.eq_budget_biennium.strip!  unless le.eq_budget_biennium.nil?
+      le.legacy_budget.budget_number.strip! unless le.legacy_budget.budget_number.nil?
+      le.legacy_budget.budget_name.strip!   unless le.legacy_budget.budget_name.nil?
+      le.eq_budget_biennium.strip!          unless le.eq_budget_biennium.nil?
 
       number = le.legacy_budget.budget_number
       nom    = (!le.legacy_budget.budget_name.blank? && le.legacy_budget.budget_name.downcase != "unknown") ? le.legacy_budget.budget_name : nil
@@ -206,15 +227,20 @@ task :dbx2 => :environment do
       budget = Budget.where(:number => number, :name => nom, :date_start => date_start, :date_end => date_end).first
 
       # find or create a matching asset tag
-      asset_tag = AssetTag.where(:uid => le.eq_uw_tag).includes(:component).first_or_initialize
+      component = Component.where(:asset_tag => le.eq_uw_tag).first_or_initialize
 
-      if asset_tag.new_record? || asset_tag.component.nil?
+      if component.new_record?
         # start building up the component's attrs
-        serial_number      = (le.eq_serial_num.nil? || le.eq_serial_num.strip.blank?) ? nil : le.eq_serial_num.strip
+        serial_number      = le.eq_serial_num.try(:strip)
         cost               = (le.eq_cost == 0) ? nil : le.eq_cost
-        insured            = (le.eq_insured.strip.downcase == "on")   ? true : false
-        missing            = (le.eq_removed.strip.downcase == "on")   ? true : false
-        checkoutable       = (le.checkoutable.strip.downcase == "yes") ? true : false
+        insured            = le.eq_insured
+        missing            = le.eq_removed
+        checkoutable       = le.checkoutable
+
+        component.model         = model_obj
+        component.missing       = missing
+        component.serial_number = serial_number
+        component.created_at    = le.eq_date_entered
 
         kit                = Kit.new
         kit.budget         = budget
@@ -222,30 +248,31 @@ task :dbx2 => :environment do
         kit.cost           = cost
         kit.insured        = insured
         kit.location       = Location.find_or_create_by_name(le.legacy_location.loc_name)
-        kit.model          = model_obj
         kit.tombstoned     = missing
 
-        component               = Component.new
-        component.kit           = kit
-        component.missing       = missing
-        component.serial_number = serial_number
-        component.created_at    = le.eq_date_entered
+        kit.components << component
 
-        asset_tag.component     = component
-
-        if asset_tag.save
-          record_count += 1
+        if kit.save
+          success_count += 1
         else
-          puts "\tError saving #{ asset_tag.id }:'#{ asset_tag.uid }'\n #{ asset_tag.errors.inspect.to_s }"
+          error_count += 1
+          puts "Error saving #{ le.eq_uw_tag }:"
+          puts component.errors.inspect
+          puts
+          puts kit.errors.inspect
+          puts "----"
         end
 
       end
     rescue StandardError => e
+      error_count += 1
       puts "\tError migrating #{le.eq_uw_tag}: #{ e }"
+      puts e.backtrace
     end
   end
 
-  puts "Migrated #{ record_count } asset tags, kits, and components"
+  puts "Successfully migrated #{ success_count } asset tags, kits, and components"
+  puts "#{ error_count } errors"
   puts
 
 end
@@ -266,22 +293,37 @@ namespace :db do
 
     Location.all.each_with_index do |l,idx|
       if idx % 2  == 0
-        # M, W, F
-        [1, 3, 5].each do |day|
-          # 9:00am
-          open  = DateTime.commercial(1969, 1, day, 9, 0, 0, utc_offset)
-          # 5:00pm
-          close = DateTime.commercial(1969, 1, day, 17, 0, 0, utc_offset)
-          l.business_hours << BusinessHour.new(:open_at => open, :closed_at => close)
+        ["monday", "wednesday", "friday"].each do |open_day|
+          # morning hours
+          attrs = {
+            :open_day    => open_day,
+            :open_hour   => 9,
+            :open_minute => 30,
+            :close_day   => open_day,
+            :close_hour  => 12,
+            :close_minute => 15
+          }
+          l.business_hours.create(attrs)
+
+          # afternoon hours
+          attrs[:open_hour]    = 13
+          attrs[:open_minute]  = 00
+          attrs[:close_hour]   = 17
+          attrs[:close_minute] = 00
+          l.business_hours.create(attrs)
         end
       else
-        # T, Th
-        [2, 4].each do |day|
-          # 11:00am
-          open  = DateTime.commercial(1969, 1, day, 11, 0, 0, utc_offset)
-          # 3:00pm
-          close = DateTime.commercial(1969, 1, day, 15, 0, 0, utc_offset)
-          l.business_hours << BusinessHour.new(:open_at => open, :closed_at => close)
+        ["tuesday", "thursday"].each do |open_day|
+          # hours
+          attrs = {
+            :open_day    => open_day,
+            :open_hour   => 10,
+            :open_minute => 00,
+            :close_day   => open_day,
+            :close_hour  => 2,
+            :close_minute => 0
+          }
+          l.business_hours.create(attrs)
         end
       end
       l.save

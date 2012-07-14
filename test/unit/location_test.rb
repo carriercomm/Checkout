@@ -1,6 +1,7 @@
 require 'test_helper'
 
 describe Location do
+
   it "includes name in to_param" do
     location = FactoryGirl.build_stubbed(:location, :name => "Republic of Vanuatu")
     location.to_param.must_equal "#{location.id}-republic-of-vanuatu"
@@ -66,7 +67,6 @@ describe Location do
     query_time = base_time + 23.hours + 59.minutes + 59.seconds
     # location.first_opening_time_on_date(query_time).must_equal(opens_at)
     # location.last_closing_time_on_date(query_time).must_equal(closes_at)
-
     location.open_on?(query_time).must_equal(true)
     location.closed_on?(query_time).must_equal(false)
 
@@ -78,7 +78,7 @@ describe Location do
     location.closed_on?(query_time).must_equal(true)
 
     # test a business hour exception
-    query_time = base_time + 50.hours
+    query_time = date_closed + 12.hours
     # location.first_opening_time_on_date(query_time).must_be_nil
     # location.last_closing_time_on_date(query_time).must_be_nil
     location.open_on?(query_time).must_equal(false)

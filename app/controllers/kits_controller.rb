@@ -2,11 +2,8 @@ class KitsController < ApplicationController
   # GET /kits
   # GET /kits.json
   def index
-    if params["show_all"].present?
-      @kits = Kit.page(params[:page])
-    else
-      @kits = Kit.where(:tombstoned => false, :checkoutable => true).page(params[:page])
-    end
+    @kits = Kit
+    apply_scopes_and_pagination
 
     respond_to do |format|
       format.html # index.html.erb
@@ -14,17 +11,44 @@ class KitsController < ApplicationController
     end
   end
 
+  def checkoutable
+    @kits = Kit.checkoutable
+    apply_scopes_and_pagination
+
+    respond_to do |format|
+      format.html { render :action => 'index' }
+    end
+  end
+
+  def not_checkoutable
+    @models = Kit.not_checkoutable
+    apply_scopes_and_pagination
+
+    respond_to do |format|
+      format.html { render :action => 'index' }
+    end
+  end
+
+  def tombstoned
+    @models = Kit.tombstoned
+    apply_scopes_and_pagination
+
+    respond_to do |format|
+      format.html { render :action => 'index' }
+    end
+  end
+
   # GET /kits/1
   # GET /kits/1.json
   def show
-    @kit = Kit.joins(:location, :components => :asset_tags, :model => :brand).find(params[:id])
-    @model = @kit.model
-    @brand = @model.brand
+    @kit        = Kit.joins(:location, :components, :models => :brand).find(params[:id])
+    @model      = @kit.primary_model
+    @brand      = @model.brand
     @asset_tags = @kit.asset_tags
 
     respond_to do |format|
       format.html # show.html.erb
-      format.json { render json: @kit }
+      # format.json { render json: @kit }
     end
   end
 
@@ -35,7 +59,7 @@ class KitsController < ApplicationController
 
     respond_to do |format|
       format.html # new.html.erb
-      format.json { render json: @kit }
+      # format.json { render json: @kit }
     end
   end
 
@@ -52,10 +76,10 @@ class KitsController < ApplicationController
     respond_to do |format|
       if @kit.save
         format.html { redirect_to @kit, notice: 'Kit was successfully created.' }
-        format.json { render json: @kit, status: :created, location: @kit }
+        # format.json { render json: @kit, status: :created, location: @kit }
       else
         format.html { render action: "new" }
-        format.json { render json: @kit.errors, status: :unprocessable_entity }
+        # format.json { render json: @kit.errors, status: :unprocessable_entity }
       end
     end
   end
@@ -68,10 +92,10 @@ class KitsController < ApplicationController
     respond_to do |format|
       if @kit.update_attributes(params[:kit])
         format.html { redirect_to @kit, notice: 'Kit was successfully updated.' }
-        format.json { head :no_content }
+        # format.json { head :no_content }
       else
         format.html { render action: "edit" }
-        format.json { render json: @kit.errors, status: :unprocessable_entity }
+        # format.json { render json: @kit.errors, status: :unprocessable_entity }
       end
     end
   end
@@ -84,7 +108,23 @@ class KitsController < ApplicationController
 
     respond_to do |format|
       format.html { redirect_to kits_url }
-      format.json { head :no_content }
+      # format.json { head :no_content }
     end
+  end
+
+  private
+
+  def apply_scopes_and_pagination
+    scope_by_brand
+    scope_by_category
+    @kits = @kits.joins(:models => :brand).order("brands.name, models.name").page(params[:page])
+  end
+
+  def scope_by_brand
+    @kits = @kits.brand(params["brand_id"]) if params["brand_id"].present?
+  end
+
+  def scope_by_category
+    @kits = @kits.category(params["category_id"]) if params["category_id"].present?
   end
 end

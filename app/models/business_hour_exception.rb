@@ -1,8 +1,30 @@
 class BusinessHourException < ActiveRecord::Base
-  belongs_to :location
 
-  validates :location_id, :presence => true
+  #
+  # Associations
+  #
+
+  belongs_to :location, :inverse_of => :business_hour_exceptions
+
+
+  #
+  # Validations
+  #
+
+  validates_presence_of :location
   validates :date_closed, :presence => true
+
+
+  #
+  # Mass-assignable attributes
+  #
+
+  attr_accessible(:location_id, :location, :date_closed)
+
+
+  #
+  # Instance Methods
+  #
 
   def day
     date_closed.strftime('%e')

@@ -5,14 +5,18 @@
 <table class="table table-striped">
   <thead>
     <tr>
-      <th>Name</th>
+      <th>Asset Tag</th>
+      <th>Brand</th>
+      <th>Model</th>
       <th>Actions</th>
     </tr>
   </thead>
   <tbody>
     <% @kits.each do |kit| %>
       <tr>
-        <td><%= kit.name %></td>
+        <td><%= link_to(kit.primary_component.asset_tag, kit_path(kit)) %></td>
+        <td><%= link_to(kit.primary_model.brand, brand_models_path(kit.primary_model.brand)) %></td>
+        <td><%= link_to(kit.primary_model, model_path(kit.primary_model)) %></td>
         <td>
           <%= link_to 'Reserve', new_reservation_path(:kit_id => kit, :user_id => current_user), :class => 'btn btn-mini' %>
           <%= link_to 'Reservations', kit_reservations_path(kit), :class => 'btn btn-mini' %>

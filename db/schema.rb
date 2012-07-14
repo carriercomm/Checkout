@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120709220913) do
+ActiveRecord::Schema.define(:version => 20120713204235) do
 
   create_table "active_admin_comments", :force => true do |t|
     t.string   "resource_id",   :null => false
@@ -27,15 +27,6 @@ ActiveRecord::Schema.define(:version => 20120709220913) do
   add_index "active_admin_comments", ["author_type", "author_id"], :name => "index_active_admin_comments_on_author_type_and_author_id"
   add_index "active_admin_comments", ["namespace"], :name => "index_active_admin_comments_on_namespace"
   add_index "active_admin_comments", ["resource_type", "resource_id"], :name => "index_admin_notes_on_resource_type_and_resource_id"
-
-  create_table "asset_tags", :force => true do |t|
-    t.string   "uid"
-    t.integer  "component_id"
-    t.datetime "created_at",   :null => false
-    t.datetime "updated_at",   :null => false
-  end
-
-  add_index "asset_tags", ["component_id"], :name => "index_asset_tags_on_part_id"
 
   create_table "brands", :force => true do |t|
     t.string   "name"
@@ -97,7 +88,9 @@ ActiveRecord::Schema.define(:version => 20120709220913) do
     t.integer  "kit_id"
     t.datetime "created_at",                       :null => false
     t.datetime "updated_at",                       :null => false
-    t.text     "description"
+    t.string   "asset_tag"
+    t.integer  "model_id"
+    t.integer  "position"
   end
 
   add_index "components", ["kit_id"], :name => "index_parts_on_kit_id"
@@ -108,7 +101,6 @@ ActiveRecord::Schema.define(:version => 20120709220913) do
     t.integer  "location_id"
     t.datetime "created_at",                                                     :null => false
     t.datetime "updated_at",                                                     :null => false
-    t.integer  "model_id"
     t.integer  "budget_id"
     t.decimal  "cost",         :precision => 10, :scale => 0
     t.boolean  "insured",                                     :default => false

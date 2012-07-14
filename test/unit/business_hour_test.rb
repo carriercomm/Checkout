@@ -16,7 +16,7 @@ describe BusinessHour do
 
     bh.open_time_s.must_equal "11:30am"
     bh.close_time_s.must_equal "3:20pm"
-    
+
     bh.to_s.must_equal "Monday 11:30am-3:20pm"
 
     # test edge cases
@@ -28,13 +28,16 @@ describe BusinessHour do
   end
 
   it "should be valid with in-order hours" do
+    location = FactoryGirl.build_stubbed(:location)
+
     params = {
       :open_day     => "monday",
       :open_hour    => 11,
       :open_minute  => 0,
       :close_day    => "monday",
       :close_hour   => 15,
-      :close_minute => 0
+      :close_minute => 0,
+      :location     => location
     }
 
     bh = FactoryGirl.build_stubbed(:business_hour, params)

@@ -1,6 +1,15 @@
 class BusinessHour < ActiveRecord::Base
 
-  belongs_to :location
+  #
+  # Associations
+  #
+
+  belongs_to :location, :inverse_of => :business_hours
+
+
+  #
+  # Validations
+  #
 
   # TODO: validate with overlap detection for business hours
 
@@ -29,6 +38,11 @@ class BusinessHour < ActiveRecord::Base
                                               :less_than => 60 }
   validate  :validate_hours_in_order, :unless => Proc.new { |rec| rec.required_attrs_blank? }
 
+
+  #
+  # Mass-assignable attributes
+  #
+
   attr_accessible(:location_id,
                   :open_day,    
                   :open_hour,   
@@ -36,6 +50,11 @@ class BusinessHour < ActiveRecord::Base
                   :close_day,  
                   :close_hour, 
                   :close_minute)
+
+
+  #
+  # Static methods
+  #
 
   def self.days_for_select
     IceCube::TimeUtil::DAYS.collect {|k,v| [k.to_s.titleize, k.to_s] }
@@ -60,10 +79,13 @@ class BusinessHour < ActiveRecord::Base
     times.flatten!
   end
 
-  def validate_hours_in_order
-    unless hours_in_order?
-      errors[:base] << "Open time must come before close time"
-    end
+
+  #
+  # Instance methods
+  #
+
+  def close_time_s
+    return time_to_s(close_hour, close_minute)
   end
 
   # converts the open and close times to dates to compare
@@ -88,18 +110,6 @@ class BusinessHour < ActiveRecord::Base
     open_date < close_date
   end
 
-  def open_time_s
-    return time_to_s(open_hour, open_minute)
-  end
-
-  def close_time_s
-    return time_to_s(close_hour, close_minute)
-  end
-
-  def to_s
-    "#{ open_day.titleize } #{ open_time_s }-#{ close_time_s }"
-  end
-
   # returns an array of [month, day] tuples representing the days with
   # open business hours between now and days_out
   def open_occurrences(days_out = 90)
@@ -115,9 +125,23 @@ class BusinessHour < ActiveRecord::Base
     return open_days
   end
 
+  def open_time_s
+    return time_to_s(open_hour, open_minute)
+  end
+
   def required_attrs_blank?
     return (open_day.blank? || open_hour.blank? || open_minute.blank? ||
             close_day.blank? || close_hour.blank? || close_minute.blank?)
+  end
+
+  def to_s
+    "#{ open_day.titleize } #{ open_time_s }-#{ close_time_s }"
+  end
+
+  def validate_hours_in_order
+    unless hours_in_order?
+      errors[:base] << "Open time must come before close time"
+    end
   end
 
   private

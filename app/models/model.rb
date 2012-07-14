@@ -1,28 +1,47 @@
 class Model < ActiveRecord::Base
 
-  belongs_to :brand
-  has_many   :kits
+  #
+  # Associations
+  #
+
+  belongs_to :brand,      :inverse_of => :models
+  has_many   :components, :inverse_of => :model
+  has_many   :kits, :through => :components
   has_and_belongs_to_many :categories
 
-  validates :name,     :presence => true
-  validates :brand_id, :presence => true
 
-  def self.tombstoned
-    joins(:kits).where("kits.tombstoned = ?", true).uniq
-  end
+  #
+  # Validations
+  #
 
-  def self.not_checkoutable
-    joins(:kits).where("kits.checkoutable = ?", false).uniq
-  end
+  validates :name, :presence => true
+  validates_presence_of :brand
+
+
+  #
+  # Mass-assignable attributes
+  #
+
+  attr_accessible(:brand_id,
+                  :description,
+                  :name,
+                  :training_required)
+
+  # moved these over to kit, since they return somewhat confusing results here
+  # def self.tombstoned
+  #   joins(:kits).where("kits.tombstoned = ?", true).uniq
+  # end
+  # def self.not_checkoutable
+  #   joins(:kits).where("kits.checkoutable = ?", false).uniq
+  # end
 
   def self.checkoutable
     joins(:kits).where("kits.tombstoned = ? AND kits.checkoutable = ?", false, true).uniq
   end
 
   # TODO: implement this
-  def self.reservable(from_date, to_date)
-
-  end
+  # def self.reservable(from_date, to_date)
+  # end
 
   def self.brand(brand_id)
     joins(:brand).where('brands.id = ?', brand_id.to_i)
@@ -32,8 +51,13 @@ class Model < ActiveRecord::Base
     joins(:categories).where('categories.id = ?', category_id.to_i)
   end
 
+  def kit_asset_tags
+    ats = components.collect { |c| [c.asset_tag, c.kit] }
+    ats.sort_by! { |a| a.first }
+  end
+
   def checkoutable?
-    kits.where(:tombstoned => false, :checkoutable => true).count > 0
+    kits.checkoutable.count > 0
   end
 
   # TODO: implement reservable?
@@ -47,10 +71,3 @@ class Model < ActiveRecord::Base
   end
 
 end
-
-=begin
-m1 = Category.find(1).models
-m2 = Model.category(1)
-
-m1.reject { |x| m2.include? x }
-=end

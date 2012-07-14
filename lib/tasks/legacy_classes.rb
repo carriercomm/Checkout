@@ -6,6 +6,26 @@ class LegacyEquipment < ActiveRecord::Base
   belongs_to :legacy_category, :foreign_key => 'cat_id'
   belongs_to :legacy_location, :foreign_key => 'loc_id'
 
+  def self.convert_special_to_boolean!
+    connection.execute "UPDATE equipment SET special = 0 WHERE LCASE(special) = 'no' OR special IS NULL OR TRIM(special) = ''"
+    connection.execute "UPDATE equipment SET special = 1 WHERE LCASE(special) = 'yes'"
+  end
+
+  def self.convert_checkoutable_to_boolean!
+    connection.execute "UPDATE equipment SET checkoutable = 0 WHERE LCASE(checkoutable) = 'no' OR checkoutable IS NULL OR TRIM(checkoutable) = ''"
+    connection.execute "UPDATE equipment SET checkoutable = 1 WHERE LCASE(checkoutable) = 'yes'"
+  end
+
+  def self.convert_insured_to_boolean!
+    connection.execute "UPDATE equipment SET eq_insured = 0 WHERE LCASE(eq_insured) = 'off' OR eq_insured IS NULL OR TRIM(eq_insured) = ''"
+    connection.execute "UPDATE equipment SET eq_insured = 1 WHERE LCASE(eq_insured) = 'on'"
+  end
+
+  def self.convert_eq_removed_to_boolean!
+    connection.execute "UPDATE equipment SET eq_removed = 0 WHERE LCASE(eq_removed) = 'off' OR eq_removed IS NULL OR TRIM(eq_removed) = '' OR LCASE(eq_removed) = 'no'"
+    connection.execute "UPDATE equipment SET eq_removed = 1 WHERE LCASE(eq_removed) = 'on'"
+  end
+
   def self.dedupe_brands!
     connection.execute "UPDATE equipment SET eq_manufacturer='Adam Audio' WHERE eq_manufacturer='Adam'"
     connection.execute "UPDATE equipment SET eq_manufacturer='Apple' WHERE eq_manufacturer='APPLE COMPUTER' OR eq_manufacturer='APPLE COMPUTER CORP' OR eq_manufacturer='APPLE COMPUTER INC'"
@@ -31,8 +51,17 @@ class LegacyEquipment < ActiveRecord::Base
     connection.execute "UPDATE equipment SET eq_manufacturer='SensAble Technologies' WHERE eq_manufacturer LIKE '%sensable%'"
   end
 
-  def self.normalize_special!
-    connection.execute "UPDATE equipment SET special='No' WHERE special IS NULL"
+  def self.dedupe_serial_numbers!
+    sql_statement = <<-END_SQL
+    update equipment
+	inner join (select eq_serial_num
+    	from equipment
+        group by eq_serial_num
+        having count(eq_serial_num) > 1) as duplicates ON equipment.eq_serial_num = duplicates.eq_serial_num
+    set equipment.eq_serial_num = NULL    
+    END_SQL
+
+    connection.execute sql_statement
   end
 
 end

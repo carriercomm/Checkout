@@ -1,7 +1,18 @@
 Checkout::Application.routes.draw do
 
+  # extra collection routes used on 'models' resource
+  models_collection_routes = Proc.new do
+    get 'checkoutable'
+  end
 
-  root :to => 'models#index'
+  # extra collection routes used on 'models' resource
+  kits_collection_routes = Proc.new do
+    get 'checkoutable'
+    get 'not_checkoutable'
+    get 'tombstoned'
+  end
+
+  root :to => 'models#checkoutable'
 
   # devise_for :users, ActiveAdmin::Devise.config
   # devise_for :users
@@ -23,19 +34,25 @@ Checkout::Application.routes.draw do
 
   resources :asset_tags
   resources :brands do
-    resources :models
+    resources :models do
+      collection &models_collection_routes
+    end
   end
   resources :business_hours
   resources :business_hour_exceptions
   resources :categories do
-    resources :models
+    resources :models do
+      collection &models_collection_routes
+    end
   end
   resources :components
   resources :kits do
+    collection &kits_collection_routes
     resources :reservations, :only => [:index, :new]
   end
   resources :locations
   resources :models do
+    collection &models_collection_routes
     resources :parts
     resources :reservations, :only => [:new]
   end
