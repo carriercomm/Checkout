@@ -6,3 +6,13 @@
 #   cities = City.create([{ name: 'Chicago' }, { name: 'Copenhagen' }])
 #   Mayor.create(name: 'Emanuel', city: cities.first)
 
+BusinessDay.create!(:index => 0, :name => 'Sunday')
+BusinessDay.create!(:index => 1, :name => 'Monday')
+BusinessDay.create!(:index => 2, :name => 'Tuesday')
+BusinessDay.create!(:index => 3, :name => 'Wednesday')
+BusinessDay.create!(:index => 4, :name => 'Thursday')
+BusinessDay.create!(:index => 5, :name => 'Friday')
+BusinessDay.create!(:index => 6, :name => 'Saturday')
+
+User.create!(:username => 'admin', :email => 'admin@example.com', :password => 'password', :password_confirmation => 'password')
+

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120713204235) do
+ActiveRecord::Schema.define(:version => 20120718224009) do
 
   create_table "active_admin_comments", :force => true do |t|
     t.string   "resource_id",   :null => false
@@ -43,6 +43,21 @@ ActiveRecord::Schema.define(:version => 20120713204235) do
     t.datetime "updated_at", :null => false
   end
 
+  create_table "business_days", :force => true do |t|
+    t.integer  "index",      :null => false
+    t.string   "name",       :null => false
+    t.datetime "created_at", :null => false
+    t.datetime "updated_at", :null => false
+  end
+
+  create_table "business_days_business_hours", :force => true do |t|
+    t.integer "business_day_id"
+    t.integer "business_hour_id"
+  end
+
+  add_index "business_days_business_hours", ["business_day_id"], :name => "business_days_business_hours_business_day_id_fk"
+  add_index "business_days_business_hours", ["business_hour_id"], :name => "business_days_business_hours_business_hour_id_fk"
+
   create_table "business_hour_exceptions", :force => true do |t|
     t.integer  "location_id", :null => false
     t.date     "date_closed", :null => false
@@ -54,17 +69,15 @@ ActiveRecord::Schema.define(:version => 20120713204235) do
 
   create_table "business_hours", :force => true do |t|
     t.integer  "location_id",  :null => false
+    t.integer  "open_hour",    :null => false
+    t.integer  "open_minute",  :null => false
+    t.integer  "close_hour",   :null => false
+    t.integer  "close_minute", :null => false
     t.datetime "created_at",   :null => false
     t.datetime "updated_at",   :null => false
-    t.string   "open_day",     :null => false
-    t.string   "open_hour",    :null => false
-    t.string   "open_minute",  :null => false
-    t.string   "close_day",    :null => false
-    t.string   "close_hour",   :null => false
-    t.string   "close_minute", :null => false
   end
 
-  add_index "business_hours", ["location_id"], :name => "index_business_hours_on_location_id"
+  add_index "business_hours", ["location_id"], :name => "business_hours_location_id_fk"
 
   create_table "categories", :force => true do |t|
     t.string   "name"
@@ -81,6 +94,7 @@ ActiveRecord::Schema.define(:version => 20120713204235) do
   end
 
   add_index "categories_models", ["category_id", "model_id"], :name => "index_categories_models_on_category_id_and_model_id"
+  add_index "categories_models", ["model_id"], :name => "categories_models_model_id_fk"
 
   create_table "components", :force => true do |t|
     t.string   "serial_number"
@@ -94,6 +108,7 @@ ActiveRecord::Schema.define(:version => 20120713204235) do
   end
 
   add_index "components", ["kit_id"], :name => "index_parts_on_kit_id"
+  add_index "components", ["model_id"], :name => "components_model_id_fk"
 
   create_table "kits", :force => true do |t|
     t.boolean  "tombstoned"
@@ -106,6 +121,7 @@ ActiveRecord::Schema.define(:version => 20120713204235) do
     t.boolean  "insured",                                     :default => false
   end
 
+  add_index "kits", ["budget_id"], :name => "kits_budget_id_fk"
   add_index "kits", ["location_id"], :name => "index_kits_on_location_id"
 
   create_table "locations", :force => true do |t|
@@ -177,5 +193,29 @@ ActiveRecord::Schema.define(:version => 20120713204235) do
   add_index "users", ["reset_password_token"], :name => "index_users_on_reset_password_token", :unique => true
   add_index "users", ["unlock_token"], :name => "index_users_on_unlock_token", :unique => true
   add_index "users", ["username"], :name => "index_users_on_username", :unique => true
+
+  add_foreign_key "business_days_business_hours", "business_days", :name => "business_days_business_hours_business_day_id_fk"
+  add_foreign_key "business_days_business_hours", "business_hours", :name => "business_days_business_hours_business_hour_id_fk"
+
+  add_foreign_key "business_hour_exceptions", "locations", :name => "business_hour_exceptions_location_id_fk"
+
+  add_foreign_key "business_hours", "locations", :name => "business_hours_location_id_fk"
+
+  add_foreign_key "categories_models", "categories", :name => "categories_models_category_id_fk"
+  add_foreign_key "categories_models", "models", :name => "categories_models_model_id_fk"
+
+  add_foreign_key "components", "kits", :name => "components_kit_id_fk"
+  add_foreign_key "components", "models", :name => "components_model_id_fk"
+
+  add_foreign_key "kits", "budgets", :name => "kits_budget_id_fk"
+  add_foreign_key "kits", "locations", :name => "kits_location_id_fk"
+
+  add_foreign_key "models", "brands", :name => "models_brand_id_fk"
+
+  add_foreign_key "reservations", "kits", :name => "reservations_kit_id_fk"
+  add_foreign_key "reservations", "users", :name => "reservations_approver_id_fk", :column => "approver_id"
+  add_foreign_key "reservations", "users", :name => "reservations_client_id_fk", :column => "client_id"
+  add_foreign_key "reservations", "users", :name => "reservations_in_assistant_id_fk", :column => "in_assistant_id"
+  add_foreign_key "reservations", "users", :name => "reservations_out_assistant_id_fk", :column => "out_assistant_id"
 
 end

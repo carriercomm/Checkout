@@ -279,7 +279,7 @@ end
 
 namespace :db do
   desc "drop, create, migrate"
-  task :rebuild => ["db:drop", "db:create", "db:migrate"]
+  task :rebuild => ["db:drop", "db:create", "db:migrate", "db:seed"]
 
   desc "drop, create, migrate, dbx2"
   task :repop => ["db:rebuild", "dbx2", "db:seed_dev"]
@@ -287,44 +287,36 @@ namespace :db do
   desc "loads some fake data, helpful for development"
   task :seed_dev => :environment do
 
-    User.create!(:username => 'admin', :email => 'admin@example.com', :password => 'password', :password_confirmation => 'password')
-
-    utc_offset = (Time.now.utc_offset / 60 / 60).to_s
+    bd = BusinessDay.order("business_days.index").all.collect { |bd| bd.id }
 
     Location.all.each_with_index do |l,idx|
       if idx % 2  == 0
-        ["monday", "wednesday", "friday"].each do |open_day|
-          # morning hours
-          attrs = {
-            :open_day    => open_day,
-            :open_hour   => 9,
-            :open_minute => 30,
-            :close_day   => open_day,
-            :close_hour  => 12,
-            :close_minute => 15
-          }
-          l.business_hours.create(attrs)
+        # morning hours
+        attrs = {
+          :business_day_ids => [bd[1], bd[3], bd[5]],
+          :open_hour   => 9,
+          :open_minute => 30,
+          :close_hour  => 12,
+          :close_minute => 15
+        }
+        l.business_hours.create(attrs)
 
-          # afternoon hours
-          attrs[:open_hour]    = 13
-          attrs[:open_minute]  = 00
-          attrs[:close_hour]   = 17
-          attrs[:close_minute] = 00
-          l.business_hours.create(attrs)
-        end
+        # afternoon hours
+        attrs[:open_hour]    = 13
+        attrs[:open_minute]  = 00
+        attrs[:close_hour]   = 17
+        attrs[:close_minute] = 00
+        l.business_hours.create(attrs)
+
       else
-        ["tuesday", "thursday"].each do |open_day|
-          # hours
-          attrs = {
-            :open_day    => open_day,
-            :open_hour   => 10,
-            :open_minute => 00,
-            :close_day   => open_day,
-            :close_hour  => 2,
-            :close_minute => 0
-          }
-          l.business_hours.create(attrs)
-        end
+        attrs = {
+          :business_day_ids => [bd[2], bd[4]],
+          :open_hour   => 10,
+          :open_minute => 00,
+          :close_hour  => 2,
+          :close_minute => 0
+        }
+        l.business_hours.create(attrs)
       end
       l.save
     end

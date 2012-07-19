@@ -2,18 +2,16 @@
 <table class="table table-striped">
   <thead>
     <tr>
-      <th>ID</th>
       <th>Name</th>
-      <th>Created at</th>
+      <th>Business Hours</th>
       <th>Actions</th>
     </tr>
   </thead>
   <tbody>
     <% @locations.each do |location| %>
       <tr>
-        <td><%= location.id %></td>
         <td><%= link_to location.name, location_path(location) %></td>
-        <td><%= location.created_at %></td>
+        <td><%= raw(location.hours_to_s.join("<br>")) %></td>
         <td>
           <%= link_to 'Edit', edit_location_path(location), :class => 'btn btn-mini' %>
           <%= link_to 'Destroy', location_path(location), :method => :delete, :confirm => 'Are you sure?', :class => 'btn btn-mini btn-danger' %>

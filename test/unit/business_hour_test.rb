@@ -3,78 +3,70 @@ require 'test_helper'
 describe BusinessHour do
 
   it "should display correct open and close times" do
-    params = {
-      :open_day      => "monday",
-      :open_hour     => 11,
-      :open_minute   => 30,
-      :close_day    => "monday",
-      :close_hour   => 15,
-      :close_minute => 20
-    }
+    monday = FactoryGirl.build_stubbed(:business_day)
+    bh = FactoryGirl.build_stubbed(:business_hour, business_days: [monday])
 
-    bh = FactoryGirl.build_stubbed(:business_hour, params)
+    I18n.locale = :en
+    bh.localized_open_time.must_equal "11:30am"
+    bh.localized_close_time.must_equal "3:20pm"
+    bh.to_s.must_equal "Mon 11:30am-3:20pm"
 
-    bh.open_time_s.must_equal "11:30am"
-    bh.close_time_s.must_equal "3:20pm"
+    I18n.locale = :fr
+    bh.localized_open_time.must_equal "11:30"
+    bh.localized_close_time.must_equal "15:20"
+    bh.to_s.must_equal "Lun 11:30-15:20"
 
-    bh.to_s.must_equal "Monday 11:30am-3:20pm"
+    wednesday = FactoryGirl.build_stubbed(:business_day, index: 3, name: "Wednesday")
+    bh = FactoryGirl.build_stubbed(:business_hour, business_days: [monday, wednesday])
+    bh.to_s.must_equal "Lun, Mer 11:30-15:20"
+
+    I18n.locale = :en
+    friday = FactoryGirl.build_stubbed(:business_day, index: 5, name: "Friday")
+    bh = FactoryGirl.build_stubbed(:business_hour, business_days: [monday, wednesday, friday])
+    bh.to_s.must_equal "Mon, Wed, Fri 11:30am-3:20pm"
+
+    # test occurrences
+    d = Time.parse("Sun, 15 Jul 2012 00:00:00 -0700")
+    occurrences = bh.open_occurrences(11, d)
+    occurrences.must_equal [[7, 18], [7, 20], [7, 23], [7, 25]]
 
     # test edge cases
     bh.open_hour  = 0
-    bh.open_time_s.must_equal "12:30am"
-
+    bh.localized_open_time.must_equal "12:30am"
     bh.close_hour = 12
-    bh.close_time_s.must_equal "12:20pm"
-  end
+    bh.localized_close_time.must_equal "12:20pm"
 
-  it "should be valid with in-order hours" do
-    location = FactoryGirl.build_stubbed(:location)
-
-    params = {
-      :open_day     => "monday",
-      :open_hour    => 11,
-      :open_minute  => 0,
-      :close_day    => "monday",
-      :close_hour   => 15,
-      :close_minute => 0,
-      :location     => location
-    }
-
-    bh = FactoryGirl.build_stubbed(:business_hour, params)
-    bh.must_be :valid?
-  end
-
-  it "should not be valid with out-of-order hours" do
-    params = {
-      :open_day     => "monday",
-      :open_hour    => 15,
-      :open_minute  => 0,
-      :close_day    => "monday",
-      :close_hour   => 11,
-      :close_minute => 0
-    }
-
-    bh = FactoryGirl.build_stubbed(:business_hour, params)
-    bh.wont_be :valid?
-
-    bh.open_day = "tuesday"
-    bh.open_hour = 2
-    bh.wont_be :valid?
+    I18n.locale = :fr
+    bh.open_hour  = 0
+    bh.localized_open_time.must_equal "0:30"
+    bh.close_hour = 12
+    bh.localized_close_time.must_equal "12:20"
   end
 
   it "should not be valid with missing or malformed fields" do
     params = {
-      :open_day     => "monday",
       :open_hour    => 0,
       :open_minute  => 0,
-      :close_day    => "monday",
-      :close_hour   => 24,
+      :close_hour   => 23,
       :close_minute => 0
     }
 
-    bh = FactoryGirl.build_stubbed(:business_hour, params)
+    # missing location
+    monday = FactoryGirl.build_stubbed(:business_day)
+    bh = FactoryGirl.build_stubbed(:business_hour, params.merge(:business_days => [monday]))
     bh.wont_be :valid?
 
+    bh = FactoryGirl.build_stubbed(:business_hour_with_location, params)
+    bh.wont_be :valid?
+
+    # should have everything
+    params[:business_days] = [monday]
+    bh = FactoryGirl.build_stubbed(:business_hour_with_location, params)
+    bh.must_be :valid?    
+
+    bh.close_hour = 24
+    bh.wont_be :valid?
+    
     bh.open_hour = -1
     bh.close_hour = 23
     bh.wont_be :valid?
@@ -87,8 +79,7 @@ describe BusinessHour do
     bh.wont_be :valid?
 
     bh.open_minute = 0
-    bh.open_day = "pound cake"
-    bh.wont_be :valid?
+    bh.must_be :valid?
   end
 
 end

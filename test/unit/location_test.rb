@@ -22,29 +22,15 @@ describe Location do
     end
     base_time = date_open.at_beginning_of_day
 
-    location = FactoryGirl.build_stubbed(:location, :name => "Republic of Vanuatu") do |loc|
-      # add business hours on two non-consecutive days, with a lunch break in the middle
-      ["monday", "wednesday"].each do |open_day|
-        # morning hours
-        attrs = {
-          :open_day   => open_day,
-          :open_hour  => 9,
-          :close_day  => open_day,
-          :close_hour => 12
-        }
-        loc.business_hours.create(FactoryGirl.attributes_for(:business_hour, attrs))
+    monday    = FactoryGirl.build(:business_day)
+    wednesday = FactoryGirl.build(:business_day, index: 3, name: "Wednesday")
+    morning   = FactoryGirl.build(:business_hour, open_hour: 9, close_hour: 12, business_days: [monday, wednesday])
+    afternoon = FactoryGirl.build(:business_hour, open_hour: 13, close_hour: 17, business_days: [monday, wednesday])
+    exception = FactoryGirl.build(:business_hour_exception, :date_closed => date_closed)
+    location  = FactoryGirl.create(:location, name: "Republic of Vanuatu", business_hours: [morning, afternoon], business_hour_exceptions: [exception])
 
-        # afternoon hours
-        attrs[:open_hour]  = 13
-        attrs[:close_hour] = 17
-        loc.business_hours.create(FactoryGirl.attributes_for(:business_hour, attrs))
-      end
-
-      loc.business_hour_exceptions.create(FactoryGirl.attributes_for(:business_hour_exception, :date_closed => date_closed))
-    end
-
-    location.business_hours.count.must_equal(4)
-    location.business_hour_exceptions.count.must_equal(1)
+    location.business_hours.length.must_equal(2)
+    location.business_hour_exceptions.length.must_equal(1)
 
     # test an hour which falls within the first set of business hours
     query_time = base_time + 12.hours
@@ -74,6 +60,15 @@ describe Location do
     query_time = base_time + 36.hours
     # location.first_opening_time_on_date(query_time).must_be_nil
     # location.last_closing_time_on_date(query_time).must_be_nil
+    puts
+    puts "open:   " + date_open.to_s
+    puts "closed: " + date_closed.to_s
+    puts "base:   " + base_time.to_s
+    puts "query:  " + query_time.to_s
+    puts
+    puts location.hours_on(query_time).inspect
+    puts
+
     location.open_on?(query_time).must_equal(false)
     location.closed_on?(query_time).must_equal(true)
 

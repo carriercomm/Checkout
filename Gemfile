@@ -3,8 +3,10 @@ source 'https://rubygems.org'
 gem 'activeadmin'               # admin pages scaffolding
 gem 'acts_as_list'              # plugin for creating sortable lists
 gem 'devise'                    # authentication
+gem 'foreigner'                 # foreign key constraints
 gem 'gon'                       # javascript data passing
 gem 'ice_cube'                  # date/time recurrences
+gem 'immigrant'                 # migration generator for foreign keys
 gem 'jquery-rails'              # jQuery javascript integration
 gem 'kaminari'                  # pagination
 gem 'mysql2'                    # database driver
@@ -33,9 +35,9 @@ group :test do
   gem 'database_cleaner'        # for creating a clean test database before each test
   gem 'factory_girl_rails'      # factories - instead of fixtures
   gem 'guard-minitest'          # framework for autorunning mintest tests
-  gem 'guard-spork'             # speed up autorunning tests by preloading some stuff
+#  gem 'guard-spork'             # speed up autorunning tests by preloading some stuff
   gem 'minitest'                # test framework
   gem 'ruby-debug19'            # debug support
-  gem 'spork-minitest'          # speed up autorunning tests by preloading some stuff
+#  gem 'spork-minitest'          # speed up autorunning tests by preloading some stuff
   gem 'turn'                    # test results output formatter
 end

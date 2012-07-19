@@ -11,16 +11,23 @@ FactoryGirl.define do
     date_end { Date.today - 30.days + 2.years }
   end
 
-  factory :business_hour do
-    # Monday 11:00am
-    open_day "monday"
-    open_hour 11
-    open_minute 0
+  factory :business_day do
+    index 1
+    name "Monday"
+  end
 
-    # Monday 3:00pm
-    close_day "monday"
+  factory :business_hour do
+    # Monday 11:30am
+    open_hour 11
+    open_minute 30
+
+    # Monday 3:20pm
     close_hour 15
-    close_minute 0
+    close_minute 20
+
+    factory :business_hour_with_location do
+      location
+    end
   end
 
   factory :business_hour_exception do

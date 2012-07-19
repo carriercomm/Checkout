@@ -1,11 +1,16 @@
 Checkout::Application.routes.draw do
 
+  # extra collection routes used on 'brands' resource
+  brands_collection_routes = Proc.new do
+    get 'checkoutable'
+  end
+
   # extra collection routes used on 'models' resource
   models_collection_routes = Proc.new do
     get 'checkoutable'
   end
 
-  # extra collection routes used on 'models' resource
+  # extra collection routes used on 'kits' resource
   kits_collection_routes = Proc.new do
     get 'checkoutable'
     get 'not_checkoutable'
@@ -34,6 +39,7 @@ Checkout::Application.routes.draw do
 
   resources :asset_tags
   resources :brands do
+    collection &brands_collection_routes
     resources :models do
       collection &models_collection_routes
     end

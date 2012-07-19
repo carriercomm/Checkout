@@ -5,7 +5,7 @@ class Location < ActiveRecord::Base
   #
 
   # TODO: enforce some referential integrity so you can't delete a location and orphan all its kits
-  has_many :business_hours,           :inverse_of => :location
+  has_many :business_hours,           :inverse_of => :location, :dependent => :destroy
   has_many :business_hour_exceptions, :inverse_of => :location
   has_many :kits,                     :inverse_of => :location
 
@@ -23,7 +23,7 @@ class Location < ActiveRecord::Base
   # Mass-assignable attributes
   #
 
-  attr_accessible :name
+  attr_accessible :name, :business_hours_attributes
 
 
   #
@@ -47,36 +47,24 @@ class Location < ActiveRecord::Base
     dates.collect { |d| d.to_a }
   end
 
-  # returns the first opening time for the given date
-  def first_opening_time_on_date(date)
+  def hours_on(date)
     # return nothing if we're closed on this day
     if !business_hour_exceptions.where("date_closed = ?", date.to_date).empty?
-      return nil
+      return []
     end
 
-    # convert the date to a day of the week
-    day_of_week = day_of_week(date)
+    day   = date.wday
+    hours = business_hours.joins(:business_days).where("`business_days`.`index` = ?", day).order("business_hours.open_hour ASC")
 
-    # get the first set of business hours on this day
-    return business_hours.where(:open_day => day_of_week).order("business_hours.open_day ASC").first
+    return hours.all
   end
 
-  # returns the last closing time for the given date
-  def last_closing_time_on_date(date)
-    # return nothing if we're closed on this day
-    if !business_hour_exceptions.where("date_closed = ?", date.to_date).empty?
-      return nil
-    end
-
-    # convert the date to a day of the week
-    day_of_week = day_of_week(date)
-
-    # get the last set of business hours on this day
-    return business_hours.where(:open_day => day_of_week).order("business_hours.open_day DESC").first
+  def hours_to_s
+    business_hours.collect { |bh| bh.to_s }
   end
 
   def open_on?(date)
-    return !first_opening_time_on_date(date).nil?
+    return !hours_on(date).empty?
   end
 
   def open_days(days_out = 90)
@@ -92,21 +80,5 @@ class Location < ActiveRecord::Base
   def to_s
     name
   end
-
-  private
-
-  def day_of_week(date)
-    wday = nil
-
-    if date.kind_of? DateTime
-      wday = date.to_time.wday
-    elsif ((date.kind_of? Time) || (date.kind_of? Date))
-      wday = date.wday
-    else
-      raise "Expected an instance of Time, Date, or DateTime"
-    end
-
-    return Date::DAYNAMES[wday].downcase
-  end
-
+  
 end

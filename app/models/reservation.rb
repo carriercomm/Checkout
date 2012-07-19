@@ -13,7 +13,7 @@ class Reservation < ActiveRecord::Base
   # Associations
   #
 
-  belongs_to :kit            :inverse_of => :reservations
+  belongs_to :kit,           :inverse_of => :reservations
   belongs_to :client,        :inverse_of => :reservations, :class_name => "User"
   belongs_to :approver,      :inverse_of => :approvals,    :class_name => "User"
   belongs_to :out_assistant, :inverse_of => :out_assists,  :class_name => "User"

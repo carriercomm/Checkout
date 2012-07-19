@@ -1,8 +1,8 @@
-<h1>Location</h1>
+<h1><%= @location.name %></h1>
 
 <p>
-  <b>Name</b><br>
-  <%= @location.name %>
+  <b>Business Hours</b><br>
+  <%= raw(@location.hours_to_s.join("<br>")) %>
 </p>
 
 <div class="form-actions">
