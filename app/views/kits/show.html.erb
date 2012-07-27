@@ -1,43 +1,49 @@
-<h1><%= @brand %> <%= @model %></h1>
+<div class="page-header">
+  <h1>Kit <%= @kit.id.to_s %> <small><%= @kit.components_description %></small></h1>
+</div>
 
-<table class="table table-bordered table-striped">
+<dl class="dl-horizontal">
+  <dt>Location</dt>
+  <dd><%= @kit.location %></dd>
+  <dt>Training Required</dt>
+  <dd><%= @kit.training_required? %></dd>
+  <dt>Checkoutable</dt>
+  <dd><%= @kit.checkoutable %></dd>
+  <dt>Tombstoned</dt>
+  <dd><%= @kit.tombstoned %></dd>
+  <dt>Budget</dt>
+  <dd><%= @kit.budget %></dd>
+  <dt>Cost</dt>
+  <dd><%= @kit.cost || "Undefined" %></dd>
+  <dt>Insured</dt>
+  <dd><%= @kit.insured %></dd>
+</dl>
+
+<h3>Components</h3>
+<table class="table table-striped">
   <tbody>
     <tr>
-      <th>Brand</th>
-      <td><%= link_to @brand, brand_path(@brand) %></td>
+      <th width="span3">Model</th>
+      <th width="span3">Asset Tag</th>
+      <th width="span3">Serial Number</th>
+      <th width="span3">Missing</th>
     </tr>
+<% @kit.components.each do |c| %>
     <tr>
-      <th>Model</th>
-      <td><%= link_to @model, model_path(@model) %></td>
+      <td><%= c.model.branded_name %></td>
+      <td><%= c.asset_tag %></td>
+      <td><%= c.serial_number %></td>
+      <td><%= c.missing %></td>
     </tr>
-    <tr>
-      <th>Asset Tags</th>
-      <td>
-        <%= @asset_tags.join(", ") %>
-      </td>
-    </tr>
-    <tr>
-      <th>Location</th>
-      <td><%= @kit.location %></td>
-    </tr>
-    <tr>
-      <th>Training Required</th>
-      <td><%= @model.training_required %></td>
-    </tr>
-    <tr>
-      <th>Checkoutable</th>
-      <td><%= @kit.checkoutable %></td>
-    </tr>
-    <tr>
-      <th>Tombstoned</th>
-      <td><%= @kit.tombstoned %></td>
-    </tr>
+<% end %>
   </tbody>
 </table>
 
+<div><%= link_to 'Show Reservations', kit_reservations_path(@kit) if @kit.reservable? %></div>
 
 <div class="form-actions">
   <%= link_to 'Back', kits_path, :class => 'btn'  %>
   <%= link_to 'Edit', edit_kit_path(@kit), :class => 'btn' %>
   <%= link_to 'Delete', kit_path(@kit), :method => 'delete', :confirm => 'Are you sure?', :class => 'btn btn-danger' %>
+  <%= link_to 'Reserve', new_kit_reservation_path(@kit), :class => 'btn' if @kit.reservable? %>
 </div>

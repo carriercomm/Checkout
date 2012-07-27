@@ -13,6 +13,7 @@ gem 'mysql2'                    # database driver
 gem 'nested_form'               # dynamic nested form helper
 gem 'rails', '3.2.6'            # rails
 gem 'simple_form'               # form builder
+gem 'strip_attributes'          # strips model attributes, and converts blanks to nil
 
 # Gems used only for assets and not required
 # in production environments by default.

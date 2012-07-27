@@ -1,0 +1,17 @@
+<div class="well components">
+  <%= content_tag :div, f.error(:base), :class=>"alert alert-error" if f.error(:base) %>
+  <% if f.object.model_id %>
+  <%= f.association :model, :as => :hidden %>
+  <%= f.input       :model, :readonly => true, :disabled => true %>
+  <% else %>
+  <%= f.input :model_id, :label => "Model", :required => true, :input_html => {
+        :class => 'select2-json-autocomplete',
+        :hidden => true
+      } %>
+  <% end %>
+  <%= f.input :asset_tag %>
+  <%= f.input :serial_number %>
+  <%= f.input :missing %>
+  <%= f.link_to_remove "Remove this component", :class => 'btn btn-danger pull-right' %>
+  <br style="clear:both">
+</div>

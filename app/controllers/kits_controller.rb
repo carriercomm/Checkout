@@ -41,10 +41,10 @@ class KitsController < ApplicationController
   # GET /kits/1
   # GET /kits/1.json
   def show
-    @kit        = Kit.joins(:location, :components, :models => :brand).find(params[:id])
-    @model      = @kit.primary_model
-    @brand      = @model.brand
-    @asset_tags = @kit.asset_tags
+    @kit = Kit.joins(:location, :budget, :components, :models => :brand)
+              .includes(:location, :budget, :components, :models => :brand)
+              .order("`components`.`position` ASC")
+              .find(params[:id])
 
     respond_to do |format|
       format.html # show.html.erb
@@ -56,7 +56,8 @@ class KitsController < ApplicationController
   # GET /kits/new.json
   def new
     @kit = Kit.new
-
+    @kit.components.build
+      
     respond_to do |format|
       format.html # new.html.erb
       # format.json { render json: @kit }
@@ -74,7 +75,13 @@ class KitsController < ApplicationController
     @kit = Kit.new(params[:kit])
 
     respond_to do |format|
-      if @kit.save
+      kit_saved = @kit.save
+
+      if @kit.forced_not_checkoutable
+        flash[:warning] = "Kit cannot be tombstoned and checkoutable, so it was forced to be non-checkoutable."
+      end
+
+      if kit_saved
         format.html { redirect_to @kit, notice: 'Kit was successfully created.' }
         # format.json { render json: @kit, status: :created, location: @kit }
       else
@@ -90,7 +97,13 @@ class KitsController < ApplicationController
     @kit = Kit.find(params[:id])
 
     respond_to do |format|
-      if @kit.update_attributes(params[:kit])
+      kit_updated = @kit.update_attributes(params[:kit])
+
+      if @kit.forced_not_checkoutable
+        flash[:warning] = "Kit cannot be tombstoned and checkoutable, so it was forced to be non-checkoutable."
+      end
+
+      if kit_updated
         format.html { redirect_to @kit, notice: 'Kit was successfully updated.' }
         # format.json { head :no_content }
       else

@@ -1,6 +1,13 @@
 class Location < ActiveRecord::Base
 
   #
+  # Macros
+  #
+  
+  strip_attributes
+  
+
+  #
   # Associations
   #
 

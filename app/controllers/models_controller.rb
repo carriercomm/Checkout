@@ -3,10 +3,13 @@ class ModelsController < ApplicationController
   # GET /models.json
   def index
     @models = Model
-    apply_scopes_and_pagination
+    apply_scopes
+    @total  = @models.count
+    apply_pagination
 
     respond_to do |format|
       format.html
+      format.json { render json: { models: @models, total: @total} }
     end
   end
 
@@ -90,11 +93,20 @@ class ModelsController < ApplicationController
 
   private
 
-  def apply_scopes_and_pagination
+  def apply_scopes
+    @models = @models.joins(:brand).includes(:brand).order("brands.name, models.name")
     scope_by_brand
     scope_by_category
+    scope_by_search_params
+  end
 
-    @models = @models.joins(:brand).order("brands.name, models.name").page(params[:page])
+  def apply_pagination
+    @models = @models.page(params[:page]).per(params[:page_limit])
+  end
+
+  def apply_scopes_and_pagination
+    apply_scopes
+    apply_pagination
   end
 
   def scope_by_brand
@@ -103,6 +115,13 @@ class ModelsController < ApplicationController
 
   def scope_by_category
     @models = @models.category(params["category_id"]) if params["category_id"].present?
+  end
+
+  def scope_by_search_params
+    if params["q"].present?
+      query = "%#{params["q"]}%"
+      @models = @models.where("models.name LIKE ? OR brands.name LIKE ?", query, query)
+    end
   end
 end
 

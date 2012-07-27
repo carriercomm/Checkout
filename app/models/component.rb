@@ -1,5 +1,10 @@
 class Component < ActiveRecord::Base
 
+  #
+  # Macros
+  #
+  
+  strip_attributes
   acts_as_list
 
 
@@ -38,6 +43,17 @@ class Component < ActiveRecord::Base
                   :model_id,
                   :position,
                   :serial_number)
+
+
+  #
+  # Virtual attributes
+  #
+
+  attr_reader :model_name
+
+  def training_required?
+    model.training_required?
+  end
 
   private
 

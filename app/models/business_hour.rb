@@ -84,7 +84,7 @@ class BusinessHour < ActiveRecord::Base
 
   # returns an array of [month, day] tuples representing the days with
   # open business hours between now and days_out
-  def open_occurrences(days_out = 90, date_start = Date.today)
+  def open_occurrences(days_out = 90, date_start = Time.zone.now)
     date_end = date_start + days_out.days 
     schedule =  IceCube::Schedule.new
 

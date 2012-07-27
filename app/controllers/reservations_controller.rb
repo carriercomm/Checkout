@@ -36,16 +36,20 @@ class ReservationsController < ApplicationController
 
     # do we have a specific kit to check out?
     if params[:kit_id].present?
-      @kit         = Kit.joins(:location, :model => :brand).find(params[:kit_id])
+      @kit         = Kit.includes(:location, :model => :brand).find(params[:kit_id])
       @reservation = @client.reservations.build(:kit_id => @kit.id)
+      @locations   = [@kit.location]
 
       # setup javascript data structures to make the date picker work
+      # TODO: move this to a model method on kit (same as implemented for Model)
       setup_kit_checkout_days(@kit)
 
     # do we have a general model to check out?
     elsif params[:model_id].present?
       @reservation = @client.reservations.build
-      @model       = Model.find(params[:model_id])
+      @model       = Model.checkoutable.includes(:kits => :location).find(params[:model_id])
+      @locations   = (@model.kits.collect { |k| k.location }).uniq
+      gon.locations = @model.checkout_days_json
 
     else
       flash[:error] = "Start by finding something to check out!"
@@ -110,14 +114,14 @@ class ReservationsController < ApplicationController
   # gather the available checkout days for the kit and format for
   # datepicker consumption
   def setup_kit_checkout_days(kit)
-      gon.locations = {
-        kit.location.id => {
-          'kits' => [{
-                       'kit_id' => kit.id,
-                       'days_reservable' => kit.days_reservable
-                     }]
-        }
+    gon.locations = {
+      kit.location.id => {
+        'kits' => [{
+                     'kit_id' => kit.id,
+                     'days_reservable' => kit.days_reservable
+                   }]
       }
+    }
   end
 
 end

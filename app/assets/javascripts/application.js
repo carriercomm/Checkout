@@ -11,27 +11,13 @@
 // GO AFTER THE REQUIRES BELOW.
 //
 //= require jquery
-//= require jquery_ujs
+//= require bootstrap
 //= require jquery.ui.datepicker
 //= require jquery_nested_form
-//= require twitter/bootstrap
-//= require bootstrap
+//= require jquery_ujs
+//= require kits
 //= require parts
 //= require reservations
+//= require select2
+//= require twitter/bootstrap
 //= require user
-
-$(document).scroll(function(){
-    // If has not activated (has no attribute "data-top"
-    if (!$('.subnav').attr('data-top')) {
-        // If already fixed, then do nothing
-        if ($('.subnav').hasClass('subnav-fixed')) return;
-        // Remember top position
-        var offset = $('.subnav').offset()
-        $('.subnav').attr('data-top', offset.top);
-    }
-
-    if ($('.subnav').attr('data-top') - $('.subnav').outerHeight() <= $(this).scrollTop())
-        $('.subnav').addClass('subnav-fixed');
-    else
-        $('.subnav').removeClass('subnav-fixed');
-});

@@ -1,31 +1,21 @@
-<%= form_for @kit, :html => { :class => 'form-horizontal' } do |f| %>
+<div class="page-header">
+  <h2><%= controller.action_name.capitalize %> Kit</h2>
+</div>
+
+<%= simple_nested_form_for @kit, :html => { :class => 'form-horizontal' } do |f| %>
+  <%= f.association :location, :prompt => 'Select location' %>
+  <%= f.input :checkoutable, :hint => "'True' if you want the kit to be available in the reservation system." %>
+  <%= f.association :budget, :collection => Budget.active, :label_method => :to_s, :prompt => 'Select budget' %>  
+  <%= f.input :insured %>
+  <%= f.input :tombstoned, :hint => "'True' if this kit is missing/stolen/destroyed and never coming back."  %>
   <fieldset>
-    <legend><%= controller.action_name.capitalize %> Kit</legend>
-
-    <div class="control-group">
-      <%= f.label :tombstoned, :class => 'control-label' %>
-      <div class="controls">
-        <%= f.check_box :tombstoned, :class => 'check_box' %>
-      </div>
-    </div>
-
-    <div class="control-group">
-      <%= f.label :checkoutable, :class => 'control-label' %>
-      <div class="controls">
-        <%= f.check_box :checkoutable, :class => 'check_box' %>
-      </div>
-    </div>
-
-    <div class="control-group">
-      <%= f.label :location_id, :class => 'control-label' %>
-      <div class="controls">
-        <%= f.number_field :location_id, :class => 'number_field' %>
-      </div>
-    </div>
-
-    <div class="form-actions">
-      <%= f.submit nil, :class => 'btn btn-primary' %>
-      <%= link_to 'Cancel', kits_path, :class => 'btn' %>
-    </div>
+    <legend>Components</legend>
+    <%= f.simple_fields_for :components %>
+    <%= f.link_to_add "Add Component", :components, :class => 'btn' %>
   </fieldset>
+
+  <div class="form-actions">
+    <%= f.submit nil, :class => 'btn btn-primary' %>
+    <%= link_to 'Cancel', kits_path, :class => 'btn' %>
+  </div>
 <% end %>

@@ -1,7 +1,7 @@
 FactoryGirl.define do
 
   factory :brand do
-    name "Sandwich R Us"
+    sequence(:name) { |n| "Sandwich R Us ##{n}" }
   end
 
   factory :budget do
@@ -37,11 +37,6 @@ FactoryGirl.define do
   factory :component do
     sequence(:serial_number) { |n| "THX1138-#{n}" }
     sequence(:asset_tag) { |n| "867-5309-#{n}" }
-
-    factory :component_with_model do
-      association :model, :factory => :model_with_brand
-    end
-
   end
 
   factory :kit do
@@ -63,6 +58,11 @@ FactoryGirl.define do
       insured true
     end
 
+    factory :checkoutable_kit, :traits => [:checkoutable]
+    factory :checkoutable_kit_with_location, :traits => [:checkoutable] do
+      location
+    end
+
     factory :kit_with_location do
       location
     end
@@ -74,8 +74,9 @@ FactoryGirl.define do
   end
 
   factory :model do
-    name "Fluffernutter"
+    sequence(:name) { |n| "Fluffernutter ##{n}" }
     description "Oh so tasty and crunchy! Takes AA batteries."
+    training_required false
 
     factory :model_with_brand do
       brand

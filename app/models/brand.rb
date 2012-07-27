@@ -1,6 +1,13 @@
 class Brand < ActiveRecord::Base
 
   #
+  # Macros
+  #
+  
+  strip_attributes
+
+  
+  #
   # Associations
   #
   

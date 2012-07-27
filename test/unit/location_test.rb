@@ -60,14 +60,14 @@ describe Location do
     query_time = base_time + 36.hours
     # location.first_opening_time_on_date(query_time).must_be_nil
     # location.last_closing_time_on_date(query_time).must_be_nil
-    puts
-    puts "open:   " + date_open.to_s
-    puts "closed: " + date_closed.to_s
-    puts "base:   " + base_time.to_s
-    puts "query:  " + query_time.to_s
-    puts
-    puts location.hours_on(query_time).inspect
-    puts
+    # puts
+    # puts "open:   " + date_open.to_s
+    # puts "closed: " + date_closed.to_s
+    # puts "base:   " + base_time.to_s
+    # puts "query:  " + query_time.to_s
+    # puts
+    # puts location.hours_on(query_time).inspect
+    # puts
 
     location.open_on?(query_time).must_equal(false)
     location.closed_on?(query_time).must_equal(true)

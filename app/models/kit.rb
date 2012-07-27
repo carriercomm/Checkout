@@ -1,6 +1,12 @@
 class Kit < ActiveRecord::Base
 
   #
+  # Macros
+  #
+  
+  strip_attributes
+
+  #
   # Callbacks
   #
 
@@ -16,8 +22,10 @@ class Kit < ActiveRecord::Base
   has_many   :components,   :inverse_of => :kit
   belongs_to :location,     :inverse_of => :kits
   has_many   :models,       :through => :components
-  has_many   :reservations, :inverse_of => :kits
+  has_many   :reservations, :inverse_of => :kit
   # has_and_belongs_to_many :groups
+
+  accepts_nested_attributes_for :components, :reject_if => proc { |attributes| attributes['model_id'].blank? }, :allow_destroy=> true
 
 
   #
@@ -35,11 +43,17 @@ class Kit < ActiveRecord::Base
 
   attr_accessible(:budget_id,
                   :checkoutable,
+                  :components_attributes,
                   :cost,
                   :insured,
                   :location_id,
                   :tombstoned)
 
+  #
+  # Virtual Attributes
+  #
+
+  attr_reader :forced_not_checkoutable
 
   #
   # Named scopes
@@ -54,8 +68,20 @@ class Kit < ActiveRecord::Base
   # Instance Methods
   #
 
+  # returns an array of asset tags from components
   def asset_tags
-    components.collect { |c| c.asset_tag }
+    at = components.collect { |c| (c.asset_tag.blank?) ? nil : c.asset_tag }
+    return at.compact
+  end
+
+  def checkoutable?
+    return checkoutable && !tombstoned
+  end
+
+  # returns a string of comma delimited model names
+  def components_description
+    model_names = components.order("`components`.`position` ASC").collect { |c| c.model.to_s }
+    model_names.join(", ")
   end
 
   # equal to location.open_days minus days_reserved returns in format
@@ -85,7 +111,10 @@ class Kit < ActiveRecord::Base
   # before_validation callback:
   # ensure that anything tombstoned is not checkoutable
   def handle_tombstoned
-    self.checkoutable = false if tombstoned
+    if tombstoned && checkoutable
+      self.checkoutable = false
+      @forced_not_checkoutable = true
+    end
     return true
   end
 
@@ -97,6 +126,12 @@ class Kit < ActiveRecord::Base
   # by convention, we use this as the kit descriptor
   def primary_model
     primary_component.model
+  end
+
+  # TODO: add check for permissions
+  # TODO: add check for 'hold'
+  def reservable?
+    checkoutable
   end
 
   # TODO: enforce the should_have_at_least_one_component at all times
@@ -112,6 +147,11 @@ class Kit < ActiveRecord::Base
   #   end
   #   saved
   # end
+
+  # TODO: test this
+  def training_required?
+    @training_required ||= uncached_training_required?
+  end
 
   # custom validator
   def should_have_at_least_one_component
@@ -133,6 +173,13 @@ class Kit < ActiveRecord::Base
     if tombstoned && checkoutable
       errors[:base] << "Kit cannot be tombstoned AND checkoutable"
     end
+  end
+
+  def uncached_training_required?
+    components.each do |c|
+      return true if c.training_required?
+    end
+    return false
   end
 
 end

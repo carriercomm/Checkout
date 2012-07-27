@@ -1,6 +1,13 @@
 class Budget < ActiveRecord::Base
 
   #
+  # Macros
+  #
+  
+  strip_attributes
+  
+
+  #
   # Callbacks
   #
 
@@ -41,6 +48,10 @@ class Budget < ActiveRecord::Base
   # Static Methods
   #
 
+  def self.active
+    where("? BETWEEN `budgets`.`date_start` AND `budgets`.`date_end`", Time.zone.now).order("`budgets`.`number`")
+  end
+
   def self.options_map
     order("date_start DESC, number ASC").all.map { |b| [b.to_s, b.id] }
   end
@@ -59,7 +70,7 @@ class Budget < ActiveRecord::Base
   end
 
   def to_s
-    "#{ number } (#{ display_date.ljust(9) }) #{ name }"
+    "#{ number } #{ name } (#{ display_date.rjust(9) })"
   end
 
   protected

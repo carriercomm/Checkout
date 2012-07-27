@@ -36,7 +36,7 @@ class Reservation < ActiveRecord::Base
   # Virtual Attributes
   #
 
-  attr_writer :model
+  attr_writer :model, :location
 
 
   #
@@ -52,7 +52,7 @@ class Reservation < ActiveRecord::Base
   end
 
   def location
-    self.try(:kit).try(:location)
+    @location ||= self.try(:kit).try(:location)
   end
 
   def open_on_end_at?
