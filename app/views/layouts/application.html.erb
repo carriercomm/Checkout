@@ -43,10 +43,15 @@
                 <%= dropdown_for "Brands" do %>
                   <li><%= link_to "All", brands_path %></li>
                   <li><%= link_to "Checkoutable", checkoutable_brands_path %></li>
+                  <li><%= link_to "New", new_brand_path %></li>
                 <% end %>
                 <%= dropdown_for "Models" do %>
                   <li><%= link_to "All", models_path %></li>
                   <li><%= link_to "Checkoutable", checkoutable_models_path %></li>
+                  <li><%= link_to "New", new_model_path %></li>
+                <% end %>
+                <%= dropdown_for "Kits" do %>
+                  <li><%= link_to "New", new_kit_path %></li>
                 <% end %>
                 <li><%= link_to "Locations", locations_path %></li>
                 <li class="divider-vertical"></li>
