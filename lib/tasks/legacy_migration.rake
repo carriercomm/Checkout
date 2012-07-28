@@ -27,7 +27,8 @@ task :dbx2 => :environment do
     le.eq_manufacturer.strip!
     next if le.eq_manufacturer.nil? || le.eq_manufacturer.empty?
     begin
-      brand = Brand.find_or_initialize_by_name(le.eq_manufacturer)
+      brand = Brand.where("UPPER(name) = ?", le.eq_manufacturer.upcase).first
+      brand = Brand.new(name: le.eq_manufacturer) if brand.nil?
       if brand.new_record?
         if brand.save
           success_count += 1
@@ -98,13 +99,15 @@ task :dbx2 => :environment do
 
     begin
       # look up the brand
-      brand = Brand.find_by_name(le.eq_manufacturer)
+      brand = Brand.where("UPPER(name) = ?", le.eq_manufacturer.upcase).first
+      brand = Brand.new(name: le.eq_manufacturer) if brand.nil?
 
       # normalize the model name
       model_name = le.eq_model.blank? ? "Unknown" : le.eq_model.strip
 
       # look up the model
-      model_obj = brand.models.find_or_initialize_by_name(model_name)
+      model_obj = brand.models.where("UPPER(models.name) = ?", model_name.upcase).first
+      model_obj = brand.models.build(name: model_name)
 
       if model_obj.new_record?
         # set the description
@@ -195,15 +198,15 @@ task :dbx2 => :environment do
   success_count = 0
   error_count = 0
 
-  LegacyEquipment.includes(:legacy_budget, :legacy_location).all.each do |le|
+ LegacyEquipment.includes(:legacy_budget, :legacy_location).all.each do |le|
 
     begin
       # look up the brand
-      brand = Brand.find_by_name(le.eq_manufacturer)
+      brand = Brand.where("UPPER(name) = ?", le.eq_manufacturer.upcase).first
 
       # look up the model
       model_name = le.eq_model.blank? ? "Unknown" : le.eq_model.strip
-      model_obj = brand.models.find_by_name(model_name)
+      model_obj = brand.models.where("UPPER(models.name) = ?", model_name.upcase).first
 
       # look up the budget
       le.legacy_budget.budget_number.strip! unless le.legacy_budget.budget_number.nil?
@@ -227,7 +230,7 @@ task :dbx2 => :environment do
       budget = Budget.where(:number => number, :name => nom, :date_start => date_start, :date_end => date_end).first
 
       # find or create a matching asset tag
-      component = Component.where(:asset_tag => le.eq_uw_tag).first_or_initialize
+      component = Component.where(:asset_tag => le.eq_uw_tag.to_s).first_or_initialize
 
       if component.new_record?
         # start building up the component's attrs
@@ -257,6 +260,9 @@ task :dbx2 => :environment do
         else
           error_count += 1
           puts "Error saving #{ le.eq_uw_tag }:"
+          puts model_name.inspect
+          puts model_obj.inspect
+          puts
           puts component.errors.inspect
           puts
           puts kit.errors.inspect

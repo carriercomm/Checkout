@@ -80,7 +80,7 @@ class Kit < ActiveRecord::Base
 
   # returns a string of comma delimited model names
   def components_description
-    model_names = components.order("`components`.`position` ASC").collect { |c| c.model.to_s }
+    model_names = components.order("components.position ASC").collect { |c| c.model.to_s }
     model_names.join(", ")
   end
 

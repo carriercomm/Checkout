@@ -29,7 +29,7 @@
             <td><%= kit.components_description %></td>
             <td>
               <% if kit.checkoutable? %>
-              <%= link_to 'Reserve', new_reservation_path(:kit_id => kit, :user_id => current_user), :class => 'btn btn-mini' %>
+              <%= link_to 'Reserve', new_kit_reservation_path(kit, :user_id => current_user), :class => 'btn btn-mini' %>
               <%= link_to 'Reservations', kit_reservations_path(kit), :class => 'btn btn-mini' %>
               <% end %>
             </td>

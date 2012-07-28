@@ -2,11 +2,17 @@ class BrandsController < ApplicationController
   # GET /brands
   # GET /brands.json
   def index
-    @brands = Brand.order("brands.name ASC").page(params[:page])
+    @brands = Brand
+    apply_scopes
+
+    # get a total (used by the select2 widget) before we apply pagination
+    @total  = @brands.count
+
+    apply_pagination
 
     respond_to do |format|
       format.html # index.html.erb
-      # format.json { render json: @brands }
+      format.json { render json: { items: @brands, total: @total} }
     end
   end
 
@@ -92,11 +98,20 @@ class BrandsController < ApplicationController
 
   private
 
-  def apply_scopes_and_pagination
+  def apply_scopes
+    @brands = @brands.order("brands.name ASC")
     scope_by_brand
     scope_by_category
+    scope_by_search_params
+  end
 
-    @brands = @brands.joins(:brand).order("brands.name, models.name").page(params[:page])
+  def apply_pagination
+    @brands = @brands.page(params[:page]).per(params[:page_limit])
+  end
+
+  def apply_scopes_and_pagination
+    apply_scopes
+    apply_pagination
   end
 
   def scope_by_brand
@@ -105,6 +120,13 @@ class BrandsController < ApplicationController
 
   def scope_by_category
     @brands = @brands.category(params["category_id"]) if params["category_id"].present?
+  end
+
+  def scope_by_search_params
+    if params["q"].present?
+      query = "%#{params["q"]}%"
+      @brands = @brands.where("brands.name ILIKE ?", query)
+    end
   end
 
 end

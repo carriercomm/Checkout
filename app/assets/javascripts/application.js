@@ -15,9 +15,9 @@
 //= require jquery.ui.datepicker
 //= require jquery_nested_form
 //= require jquery_ujs
-//= require kits
 //= require parts
 //= require reservations
 //= require select2
+//= require select2_ajax
 //= require twitter/bootstrap
 //= require user

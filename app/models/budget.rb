@@ -49,7 +49,7 @@ class Budget < ActiveRecord::Base
   #
 
   def self.active
-    where("? BETWEEN `budgets`.`date_start` AND `budgets`.`date_end`", Time.zone.now).order("`budgets`.`number`")
+    where("? BETWEEN budgets.date_start AND budgets.date_end", Time.zone.now).order("budgets.number")
   end
 
   def self.options_map

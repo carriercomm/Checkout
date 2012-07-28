@@ -4,12 +4,15 @@ class ModelsController < ApplicationController
   def index
     @models = Model
     apply_scopes
+
+    # get a total (used by the select2 widget) before we apply pagination
     @total  = @models.count
+
     apply_pagination
 
     respond_to do |format|
       format.html
-      format.json { render json: { models: @models, total: @total} }
+      format.json { render json: { items: @models, total: @total} }
     end
   end
 
@@ -120,7 +123,7 @@ class ModelsController < ApplicationController
   def scope_by_search_params
     if params["q"].present?
       query = "%#{params["q"]}%"
-      @models = @models.where("models.name LIKE ? OR brands.name LIKE ?", query, query)
+      @models = @models.where("models.name ILIKE ? OR brands.name ILIKE ?", query, query)
     end
   end
 end

@@ -55,9 +55,6 @@ ActiveRecord::Schema.define(:version => 20120718224009) do
     t.integer "business_hour_id"
   end
 
-  add_index "business_days_business_hours", ["business_day_id"], :name => "business_days_business_hours_business_day_id_fk"
-  add_index "business_days_business_hours", ["business_hour_id"], :name => "business_days_business_hours_business_hour_id_fk"
-
   create_table "business_hour_exceptions", :force => true do |t|
     t.integer  "location_id", :null => false
     t.date     "date_closed", :null => false
@@ -77,8 +74,6 @@ ActiveRecord::Schema.define(:version => 20120718224009) do
     t.datetime "updated_at",   :null => false
   end
 
-  add_index "business_hours", ["location_id"], :name => "business_hours_location_id_fk"
-
   create_table "categories", :force => true do |t|
     t.string   "name"
     t.text     "description"
@@ -94,7 +89,6 @@ ActiveRecord::Schema.define(:version => 20120718224009) do
   end
 
   add_index "categories_models", ["category_id", "model_id"], :name => "index_categories_models_on_category_id_and_model_id"
-  add_index "categories_models", ["model_id"], :name => "categories_models_model_id_fk"
 
   create_table "components", :force => true do |t|
     t.string   "serial_number"
@@ -108,20 +102,18 @@ ActiveRecord::Schema.define(:version => 20120718224009) do
   end
 
   add_index "components", ["kit_id"], :name => "index_parts_on_kit_id"
-  add_index "components", ["model_id"], :name => "components_model_id_fk"
 
   create_table "kits", :force => true do |t|
     t.boolean  "tombstoned"
-    t.boolean  "checkoutable",                                :default => false
+    t.boolean  "checkoutable", :default => false
     t.integer  "location_id"
-    t.datetime "created_at",                                                     :null => false
-    t.datetime "updated_at",                                                     :null => false
+    t.datetime "created_at",                      :null => false
+    t.datetime "updated_at",                      :null => false
     t.integer  "budget_id"
-    t.decimal  "cost",         :precision => 10, :scale => 0
-    t.boolean  "insured",                                     :default => false
+    t.decimal  "cost"
+    t.boolean  "insured",      :default => false
   end
 
-  add_index "kits", ["budget_id"], :name => "kits_budget_id_fk"
   add_index "kits", ["location_id"], :name => "index_kits_on_location_id"
 
   create_table "locations", :force => true do |t|

@@ -9,7 +9,8 @@ gem 'ice_cube'                  # date/time recurrences
 gem 'immigrant'                 # migration generator for foreign keys
 gem 'jquery-rails'              # jQuery javascript integration
 gem 'kaminari'                  # pagination
-gem 'mysql2'                    # database driver
+gem 'pg'                        # postgres db driver
+gem 'mysql2'                    # mysql db driver
 gem 'nested_form'               # dynamic nested form helper
 gem 'rails', '3.2.6'            # rails
 gem 'simple_form'               # form builder

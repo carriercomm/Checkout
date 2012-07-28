@@ -12,11 +12,7 @@
       <% end %>
     <% end %>
 
-    <% if @reservation.location.nil? %>
-      <%= f.input :location, :collection => @locations, :prompt => "Select a checkout location" %>
-    <% else %>
-      <%= f.input :location, :collection => @locations, :disabled => true %>
-    <% end %>
+    <%= f.input :location, :collection => @locations, :prompt => "Select a checkout location" %>
 
     <%= f.association :kit, :as => :hidden    unless @kit.nil? %>
     <%= f.input       :kit, :readonly => true, :disabled => true unless @kit.nil? %>

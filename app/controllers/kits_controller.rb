@@ -43,7 +43,7 @@ class KitsController < ApplicationController
   def show
     @kit = Kit.joins(:location, :budget, :components, :models => :brand)
               .includes(:location, :budget, :components, :models => :brand)
-              .order("`components`.`position` ASC")
+              .order("components.position ASC")
               .find(params[:id])
 
     respond_to do |format|

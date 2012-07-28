@@ -28,7 +28,7 @@ class LegacyEquipment < ActiveRecord::Base
 
   def self.dedupe_brands!
     connection.execute "UPDATE equipment SET eq_manufacturer='Adam Audio' WHERE eq_manufacturer='Adam'"
-    connection.execute "UPDATE equipment SET eq_manufacturer='Apple' WHERE eq_manufacturer='APPLE COMPUTER' OR eq_manufacturer='APPLE COMPUTER CORP' OR eq_manufacturer='APPLE COMPUTER INC'"
+    connection.execute "UPDATE equipment SET eq_manufacturer='Apple' WHERE eq_manufacturer='APPLE COMPUTER' OR eq_manufacturer='APPLE COMPUTER CORP' OR eq_manufacturer='APPLE COMPUTER INC' OR eq_manufacturer='APPLE'"
     connection.execute "UPDATE equipment SET eq_manufacturer='Unknown' WHERE eq_manufacturer='Bad Tag' OR eq_manufacturer=''"
     connection.execute "UPDATE equipment SET eq_manufacturer='Bi-System' WHERE eq_manufacturer='Bi-Systems'"
     connection.execute "UPDATE equipment SET eq_manufacturer='Blackmagic Design' WHERE eq_manufacturer='BlackMagicDesign'"

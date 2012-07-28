@@ -36,7 +36,7 @@ class ReservationsController < ApplicationController
 
     # do we have a specific kit to check out?
     if params[:kit_id].present?
-      @kit         = Kit.includes(:location, :model => :brand).find(params[:kit_id])
+      @kit         = Kit.includes(:location, :models => :brand).find(params[:kit_id])
       @reservation = @client.reservations.build(:kit_id => @kit.id)
       @locations   = [@kit.location]
 

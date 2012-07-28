@@ -50,6 +50,13 @@ class Brand < ActiveRecord::Base
   # Instance Methods
   #
 
+  def as_json(options={})
+    {
+      id: id,
+      text: name
+    }
+  end
+
   def to_param
     "#{ id } #{ name }".parameterize
   end

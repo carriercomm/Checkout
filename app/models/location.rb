@@ -61,7 +61,7 @@ class Location < ActiveRecord::Base
     end
 
     day   = date.wday
-    hours = business_hours.joins(:business_days).where("`business_days`.`index` = ?", day).order("business_hours.open_hour ASC")
+    hours = business_hours.joins(:business_days).where("business_days.index = ?", day).order("business_hours.open_hour ASC")
 
     return hours.all
   end

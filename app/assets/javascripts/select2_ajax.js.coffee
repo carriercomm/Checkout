@@ -1,12 +1,13 @@
+# my implementation of the select2 ajax select box widget
 jQuery ->
-  modelFormatResult = (model) ->
-    markup = "<table class='model-result'><tr>"
-    markup += "<td class='model-info'><div class='model-name'>" + model.text + "</div>"
+  formatAjaxResult = (item) ->
+    markup = "<table class='item-result'><tr>"
+    markup += "<td class='item-info'><div class='item-name'>" + item.text + "</div>"
     markup += "</td></tr></table>"
     return markup
 
-  modelFormatSelection = (model) ->
-    return model.text
+  formatAjaxSelection = (item) ->
+    return item.text
 
   select2Config =
     placeholder:
@@ -17,7 +18,6 @@ jQuery ->
     width:'220px'
     ajax:
       crossDomain: false
-      url: "/models.json"
       dataType: 'json'
       data: (term, page) ->
         rtn_val =
@@ -30,17 +30,27 @@ jQuery ->
         more = (page * 10) < data.total;
         # since we are using custom formatting functions we do not need to alter remote JSON data
         results =
-          results: data.models
+          results: data.items
           more: more
         return results
-    formatResult: modelFormatResult
-    formatSelection: modelFormatSelection
+    formatResult: formatAjaxResult
+    formatSelection: formatAjaxSelection
 
   # make sure the select2 widget binds to any new nested components added to the form
   $('form').bind 'nested:fieldAdded', ->
-    # FIXME: ARRRgghhh!! This is awful.
-    $('input.select2-json-autocomplete').not('#kit_components_attributes_new_components_model_id').not('.select2-bound').addClass('select2-bound').select2(select2Config)
+    $('input.select2-json-autocomplete')
+      .filter ->
+        return !this.id.match(/[a-z_]+_attributes_new_[a-z]+/);
+      .not('.select2-bound')
+      .addClass('select2-bound')
+      .select2(select2Config)
 
   # bind the select2 widget to existing nested components in the form
-  $('input.select2-json-autocomplete').not('#kit_components_attributes_new_components_model_id').not('.select2-bound').addClass('select2-bound').select2(select2Config)
+  $('input.select2-json-autocomplete')
+    .filter ->
+      return !this.id.match(/[a-z_]+_attributes_new_[a-z]+/);
+    .not('.select2-bound')
+    .addClass('select2-bound')
+    .select2(select2Config)
+
   

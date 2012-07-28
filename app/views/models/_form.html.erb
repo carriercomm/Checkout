@@ -1,38 +1,41 @@
-<%= form_for @model, :html => { :class => 'form-horizontal' } do |f| %>
-  <fieldset>
-    <legend><%= controller.action_name.capitalize %> Model</legend>
+<div class="page-header">
+  <h1><%= controller.action_name.capitalize %> Model</h1>
+</div>
 
-    <div class="control-group">
-      <%= f.label :maker_id, :class => 'control-label' %>
-      <div class="controls">
-        <%= f.number_field :maker_id, :class => 'number_field' %>
+<div class="row-fluid">
+  <div class="span6" style="min-width:375px">
+    <%= simple_form_for @model, :html => { :class => 'form-horizontal' } do |f| %>
+      <%= f.input :brand, :input_html => {
+            :class => 'select2-json-autocomplete',
+            :hidden => true,
+            "data-ajax-url" => brands_path(:format => :json),
+            "data-text" => f.object.try(:brand).try(:name)
+          } %>
+      <%= f.input :name %>
+      <%= f.input :description %>
+      <%= f.input :training_required %>
+      <div class="form-actions">
+        <%= f.submit nil, :class => 'btn btn-primary' %>
+        <%= link_to 'Cancel', models_path, :class => 'btn' %>
       </div>
-    </div>
-
-    <div class="control-group">
-      <%= f.label :name, :class => 'control-label' %>
-      <div class="controls">
-        <%= f.text_field :name, :class => 'text_field' %>
-      </div>
-    </div>
-
-    <div class="control-group">
-      <%= f.label :description, :class => 'control-label' %>
-      <div class="controls">
-        <%= f.text_area :description, :class => 'text_area' %>
-      </div>
-    </div>
-
-    <div class="control-group">
-      <%= f.label :training_required, :class => 'control-label' %>
-      <div class="controls">
-        <%= f.check_box :training_required, :class => 'check_box' %>
-      </div>
-    </div>
-
-    <div class="form-actions">
-      <%= f.submit nil, :class => 'btn btn-primary' %>
-      <%= link_to 'Cancel', models_path, :class => 'btn' %>
-    </div>
-  </fieldset>
-<% end %>
+    <% end %>
+  </div>
+  <div class="span6">
+    <strong>Good names</strong> should include specs, revisions, and model
+    numbers. Examples of <em>bad</em> names:
+      <ul>
+        <li>Mac Mini</li>
+        <li>iPad</li>
+        <li>Tripod</li>
+        <li>VistaBeam</li>
+      </ul>
+      Examples of <em>good</em> names:
+      <ul>
+        <li>Mac Mini, 2.3GHz dual-core i5, 2GB RAM, 500GB HD</li>
+        <li>iPad 2 16GB</li>
+        <li>294 Aluminum 3-Section Tripod W/QR Ballhead</li>
+        <li>VistaBeam 600 DMX One Light Kit</li>
+      </ul>      
+      If in doubt, cut and paste the name from an ecommerce site.
+  </div>
+</div>

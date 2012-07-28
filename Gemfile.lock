@@ -151,6 +151,7 @@ GEM
     nested_form (0.2.2)
     nokogiri (1.5.5)
     orm_adapter (0.4.0)
+    pg (0.14.0)
     polyamorous (0.5.0)
       activerecord (~> 3.0)
     polyglot (0.3.3)
@@ -273,6 +274,7 @@ DEPENDENCIES
   minitest
   mysql2
   nested_form
+  pg
   pry-rails
   rails (= 3.2.6)
   ruby-debug19
