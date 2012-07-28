@@ -15,6 +15,7 @@ gem 'nested_form'               # dynamic nested form helper
 gem 'rails', '3.2.6'            # rails
 gem 'simple_form'               # form builder
 gem 'strip_attributes'          # strips model attributes, and converts blanks to nil
+gem 'thin'                      # web server
 
 # Gems used only for assets and not required
 # in production environments by default.
@@ -29,7 +30,6 @@ end
 group :development do
   gem 'pry-rails'               # rails console on steroids
   gem 'awesome_print'           # pretty object printer
-  gem 'thin'                    # web server
 end
 
 group :test do
