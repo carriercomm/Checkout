@@ -51,6 +51,10 @@ module Checkout
     # parameters by using an attr_accessible or attr_protected declaration.
     # config.active_record.whitelist_attributes = true
 
+    # don't try to initialize the app when precompiling
+    # this makes heroku sad
+    config.assets.initialize_on_precompile = false
+
     # Enable the asset pipeline
     config.assets.enabled = true
 
