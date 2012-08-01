@@ -60,10 +60,10 @@ class BrandsController < ApplicationController
     respond_to do |format|
       if @brand.save
         format.html { redirect_to @brand, notice: 'Brand was successfully created.' }
-        # format.json { render json: @brand, status: :created, location: @brand }
+        format.json { render json: @brand, status: :created, location: @brand }
       else
         format.html { render action: "new" }
-        # format.json { render json: @brand.errors, status: :unprocessable_entity }
+        format.json { render json: @brand.errors, status: :unprocessable_entity }
       end
     end
   end

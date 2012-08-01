@@ -1,5 +1,9 @@
-# my implementation of the select2 ajax select box widget
 jQuery ->
+
+  #
+  # AJAX widget
+  #
+
   formatAjaxResult = (item) ->
     markup = "<table class='item-result'><tr>"
     markup += "<td class='item-info'><div class='item-name'>" + item.text + "</div>"
@@ -9,10 +13,7 @@ jQuery ->
   formatAjaxSelection = (item) ->
     return item.text
 
-  select2Config =
-    placeholder:
-      title: "Search for a model"
-      id: ""
+  ajaxConfig =
     minimumInputLength: 1
     # TODO: figure out how to move this width to a stylesheet
     width:'220px'
@@ -35,6 +36,10 @@ jQuery ->
         return results
     formatResult: formatAjaxResult
     formatSelection: formatAjaxSelection
+    initSelection: (element) ->
+      id = element.val()
+      text = element.data('text');
+      return {id: id, text: text}
 
   # make sure the select2 widget binds to any new nested components added to the form
   $('form').bind 'nested:fieldAdded', ->
@@ -43,7 +48,7 @@ jQuery ->
         return !this.id.match(/[a-z_]+_attributes_new_[a-z]+/);
       .not('.select2-bound')
       .addClass('select2-bound')
-      .select2(select2Config)
+      .select2(ajaxConfig)
 
   # bind the select2 widget to existing nested components in the form
   $('input.select2-json-autocomplete')
@@ -51,6 +56,11 @@ jQuery ->
       return !this.id.match(/[a-z_]+_attributes_new_[a-z]+/);
     .not('.select2-bound')
     .addClass('select2-bound')
-    .select2(select2Config)
+    .select2(ajaxConfig)
 
-  
+
+  #
+  # Select box to tags widget
+  #
+
+  $('.select2-tagged-field').select2();

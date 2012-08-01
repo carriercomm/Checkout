@@ -2,7 +2,7 @@ class CategoriesController < ApplicationController
   # GET /categories
   # GET /categories.json
   def index
-    @categories = Category.order("name ASC").all
+    @categories = Category.order("LOWER(name) ASC").all
 
     respond_to do |format|
       format.html # index.html.erb
@@ -17,7 +17,7 @@ class CategoriesController < ApplicationController
 
     respond_to do |format|
       format.html # show.html.erb
-      format.json { render json: @category }
+      # format.json { render json: @category }
     end
   end
 
@@ -28,7 +28,7 @@ class CategoriesController < ApplicationController
 
     respond_to do |format|
       format.html # new.html.erb
-      format.json { render json: @category }
+      # format.json { render json: @category }
     end
   end
 
@@ -61,10 +61,10 @@ class CategoriesController < ApplicationController
     respond_to do |format|
       if @category.update_attributes(params[:category])
         format.html { redirect_to @category, notice: 'Category was successfully updated.' }
-        format.json { head :no_content }
+        # format.json { head :no_content }
       else
         format.html { render action: "edit" }
-        format.json { render json: @category.errors, status: :unprocessable_entity }
+        # format.json { render json: @category.errors, status: :unprocessable_entity }
       end
     end
   end
@@ -77,7 +77,7 @@ class CategoriesController < ApplicationController
 
     respond_to do |format|
       format.html { redirect_to categories_url }
-      format.json { head :no_content }
+      # format.json { head :no_content }
     end
   end
 end

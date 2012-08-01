@@ -3,9 +3,9 @@ class Model < ActiveRecord::Base
   #
   # Macros
   #
-  
+
   strip_attributes
-  
+
 
   #
   # Associations
@@ -22,6 +22,7 @@ class Model < ActiveRecord::Base
   #
 
   validates :name, :presence => true
+  validates :name, :uniqueness => true
   validates_presence_of :brand
 
 
@@ -30,6 +31,7 @@ class Model < ActiveRecord::Base
   #
 
   attr_accessible(:brand_id,
+                  :category_ids,
                   :description,
                   :name,
                   :training_required)
@@ -79,7 +81,7 @@ class Model < ActiveRecord::Base
   def checkoutable_kits
     kits.where("kits.tombstoned = ? AND kits.checkoutable = ?", false, true).uniq
   end
-  
+
   # TODO: test this
   # returns a JSON object with the available checkout days for each
   # kit, grouped by location. Consumed by the javascript date picker
@@ -103,7 +105,7 @@ class Model < ActiveRecord::Base
     ats = components.collect { |c| [c.asset_tag, c.kit] }
     ats.sort_by! { |a| a.first }
   end
-  
+
   def training_required?
     training_required
   end

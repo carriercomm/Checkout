@@ -1,6 +1,6 @@
 ﻿/*
  Copyright 2012 Igor Vaynberg
- 
+
  Version: 2.1 Timestamp: Tue Jun 12 19:50:25 PDT 2012
 
  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this work except in
@@ -986,14 +986,6 @@
                     var selected = element.find(":selected");
                     // a single select box always has a value, no need to null check 'selected'
                     return {id: selected.attr("value"), text: selected.text()};
-                };
-            } else if (opts.element.get(0).tagName.toLowerCase() === "input"
-                       && opts.element.attr("hidden") == "hidden"
-                       && opts.initSelection == undefined
-                       && opts.element.data("text")) {
-                // install the selection initializer
-                opts.initSelection = function (element,callback) {
-                    return {id: element.val(), text: element.data("text")};
                 };
             }
 
