@@ -2,21 +2,25 @@
   <h1>Kit <%= @kit.id.to_s %> <small><%= @kit.components_description %></small></h1>
 </div>
 
+<div class="pull-right">
+  <img src="https://chart.googleapis.com/chart?chs=150x150&cht=qr&chl=<%= u(kit_url(@kit)) %>&choe=UTF-8" alt="QR code" class="qrcode">
+</div>
+
 <dl class="dl-horizontal">
   <dt>Location</dt>
-  <dd><%= @kit.location %></dd>
+  <dd><%= something(@kit.location) %></dd>
   <dt>Training Required</dt>
-  <dd><%= @kit.training_required? %></dd>
+  <dd><%= something(@kit.training_required?) %></dd>
   <dt>Checkoutable</dt>
-  <dd><%= @kit.checkoutable %></dd>
+  <dd><%= something(@kit.checkoutable) %></dd>
   <dt>Tombstoned</dt>
-  <dd><%= @kit.tombstoned %></dd>
+  <dd><%= something(@kit.tombstoned) %></dd>
   <dt>Budget</dt>
-  <dd><%= @kit.budget %></dd>
+  <dd><%= something(@kit.budget) %></dd>
   <dt>Cost</dt>
-  <dd><%= @kit.cost || "Undefined" %></dd>
+  <dd><%= something(@kit.cost) %></dd>
   <dt>Insured</dt>
-  <dd><%= @kit.insured %></dd>
+  <dd><%= something(@kit.insured) %></dd>
 </dl>
 
 <h3>Components</h3>

@@ -44,6 +44,7 @@ Checkout::Application.routes.draw do
       collection &models_collection_routes
     end
   end
+  resources :budgets
   resources :business_hours
   resources :business_hour_exceptions
   resources :categories do

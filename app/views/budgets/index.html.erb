@@ -2,18 +2,18 @@
 <table class="table table-striped">
   <thead>
     <tr>
-      <th>ID</th>
       <th>Number</th>
-      <th>Created at</th>
+      <th>Name</th>
+      <th>Dates</th>
       <th>Actions</th>
     </tr>
   </thead>
   <tbody>
     <% @budgets.each do |budget| %>
       <tr>
-        <td><%= budget.id %></td>
         <td><%= link_to budget.number, budget_path(budget) %></td>
-        <td><%= budget.created_at %></td>
+        <td><%= budget.name %></td>
+        <td><%= budget.display_date %></td>
         <td>
           <%= link_to 'Edit', edit_budget_path(budget), :class => 'btn btn-mini' %>
           <%= link_to 'Destroy', budget_path(budget), :method => :delete, :confirm => 'Are you sure?', :class => 'btn btn-mini btn-danger' %>

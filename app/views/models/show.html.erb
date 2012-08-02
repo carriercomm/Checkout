@@ -2,11 +2,11 @@
 
 <dl class="dl-horizontal">
   <dt>Description</dt>
-  <dd><%= @model.description ||= raw("&nbsp;") %></dd>
+  <dd><%= something(@model.description) %></dd>
   <dt>Training required</dt>
-  <dd><%= @model.training_required %></dd>
+  <dd><%= something(@model.training_required) %></dd>
   <dt>Categories</dt>
-  <dd><%= raw((@model.categories.collect { |c| link_to(c.to_s, category_path(c)) }).join(", ")) %></dd>
+  <dd><%= category_links(@model.categories) %></dd>
 </dl>
 
 <h2>Kits</h2>

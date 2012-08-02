@@ -5,13 +5,6 @@ class Budget < ActiveRecord::Base
   #
   
   strip_attributes
-  
-
-  #
-  # Callbacks
-  #
-
-  before_validation :strip_fields
 
 
   #
@@ -71,13 +64,6 @@ class Budget < ActiveRecord::Base
 
   def to_s
     "#{ number } #{ name } (#{ display_date.rjust(9) })"
-  end
-
-  protected
-
-  def strip_fields
-    number.strip! unless number.blank?
-    name.strip!   unless name.blank?
   end
 
 end

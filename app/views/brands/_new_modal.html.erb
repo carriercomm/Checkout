@@ -1,0 +1,22 @@
+<div class="modal fade hide" id="brand_modal">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal">×</button>
+    <h3>New Brand</h3>
+  </div>
+  <div class="modal-body">
+    <div class="hide alert alert-error">
+      <a class="close" data-dismiss="alert">×</a>
+      <span class="error-message"></span>
+    </div>
+    <%= simple_form_for Brand.new,
+        :remote => true,
+        :format => :json,
+        :html => { :class => 'form-horizontal new-brand modal-form' } do |f| %>
+      <%= f.input :name %>
+      <div class="modal-footer">
+        <%= link_to 'Cancel', '#', :class => 'btn', "data-dismiss" => "modal" %>
+        <%= f.submit nil, :class => 'btn btn-primary modal-submit' %>
+      </div>
+    <% end %>
+  </div>
+</div>

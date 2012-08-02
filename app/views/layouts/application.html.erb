@@ -43,15 +43,15 @@
               <%= dropdown_for "Brands" do %>
               <li><%= link_to "All", brands_path %></li>
               <li><%= link_to "Checkoutable", checkoutable_brands_path %></li>
-              <li><%= link_to "New", new_brand_path %></li>
+              <li><%= link_to "Create", new_brand_path %></li>
               <% end %>
               <%= dropdown_for "Models" do %>
               <li><%= link_to "All", models_path %></li>
               <li><%= link_to "Checkoutable", checkoutable_models_path %></li>
-              <li><%= link_to "New", new_model_path %></li>
+              <li><%= link_to "Create", new_model_path %></li>
               <% end %>
               <%= dropdown_for "Kits" do %>
-              <li><%= link_to "New", new_kit_path %></li>
+              <li><%= link_to "Create", new_kit_path %></li>
               <% end %>
               <li><%= link_to "Locations", locations_path %></li>
               <li class="divider-vertical"></li>
@@ -60,26 +60,20 @@
             <div class="pull-right">
               <ul class="nav">
                 <li class="divider-vertical"></li>
-                <li class="dropdown">
-                  <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                    <i class="icon-user icon-white"></i>
-                    Account
-                    <b class="caret"></b>
-                  </a>
-                  <ul class="dropdown-menu">
-                    <li><%= link_to "Sign out", destroy_user_session_path, :method => :delete %></li>
-                    <li><%= link_to "Edit", edit_user_registration_path %></li>
-                  </ul>
-                </ul>
-              </div>
-            </div><!--/.nav-collapse -->
-          </div>
+                <%= dropdown_for "Account", "icon-user icon-white" do %>
+                  <li><%= link_to "Sign out", destroy_user_session_path, :method => :delete %></li>
+                  <li><%= link_to "Edit", edit_user_registration_path %></li>
+                <% end %>
+              </ul>
+            </div>
+          </div><!--/.nav-collapse -->
         </div>
-        <div class="container-fluid" style="background-color:#f2f2f2;padding:0.5em 20px;height:2.2em">
-          <form action="javascript:alert('not implemented!!')">
-            <input type="text" class="search-query span12" placeholder="Search" />
-          </form>
-        </div>
+      </div>
+      <div class="container-fluid" style="background-color:#f2f2f2;padding:0.5em 20px;height:2.2em">
+        <form action="javascript:alert('not implemented!!')">
+          <input type="text" class="search-query span12" placeholder="Search" />
+        </form>
+      </div>
     </div>
 
     <div class="container-fluid">

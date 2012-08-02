@@ -1,24 +1,18 @@
 <h1>Budget</h1>
 
-<p>
-  <b>Number</b><br>
-  <%= @budget.number %>
-</p>
+<dl class="dl-horizontal">
+  <dt>Number</dt>
+  <dd><%= something(@budget.number) %></dd>
 
-<p>
-  <b>Name</b><br>
-  <%= @budget.name %>
-</p>
+  <dt>Name</dt>
+  <dd><%= something(@budget.name) %></dd>
 
-<p>
-  <b>Date start</b><br>
-  <%= @budget.date_start %>
-</p>
+  <dt>Date start</dt>
+  <dd><%= something(@budget.date_start) %></dd>
 
-<p>
-  <b>Date end</b><br>
-  <%= @budget.date_end %>
-</p>
+  <dt>Date end</dt>
+  <dd><%= something(@budget.date_end) %></dd>
+</dl>
 
 <div class="form-actions">
   <%= link_to 'Back', budgets_path, :class => 'btn'  %>

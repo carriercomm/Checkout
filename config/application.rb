@@ -69,5 +69,12 @@ module Checkout
       Devise::PasswordsController.layout "devise"        
     end
 
+    config.generators do |g|
+      g.stylesheets false
+      g.helper false
+      g.test_framework :mini_test, :spec => true, :fixture => false
+      g.fixture_replacement :factory_girl
+    end
+
   end
 end

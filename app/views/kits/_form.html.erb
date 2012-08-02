@@ -3,15 +3,26 @@
 </div>
 
 <%= simple_nested_form_for @kit, :html => { :class => 'form-horizontal' } do |f| %>
-  <%= f.association :location, :prompt => 'Select location' %>
+  <%= f.association :location, :prompt => 'Select location', :input_html => { :class  => 'location-select' } %>
+  <div class="controls control-action">
+    <!-- displays the location/new_modal partial -->
+    <a data-toggle="modal" href="#location_modal">New Location</a>
+  </div>
   <%= f.input :checkoutable, :hint => "'True' if you want the kit to be available in the reservation system." %>
   <%= f.association :budget, :collection => Budget.active, :label_method => :to_s, :prompt => 'Select budget' %>  
+  <div class="controls control-action">
+    <!-- displays the budget/new_modal partial -->
+    <a data-toggle="modal" href="#budget_modal">New Budget</a>
+  </div>
   <%= f.input :insured %>
   <%= f.input :tombstoned, :hint => "'True' if this kit is missing/stolen/destroyed and never coming back."  %>
   <fieldset>
     <legend>Components</legend>
     <%= f.simple_fields_for :components %>
-    <%= f.link_to_add "Add Component", :components, :class => 'btn' %>
+    <div>
+      <i class="icon-plus-sign"></i>
+      <%= f.link_to_add "Add Another Component", :components %>
+    </div>
   </fieldset>
 
   <div class="form-actions">
@@ -19,3 +30,6 @@
     <%= link_to 'Cancel', kits_path, :class => 'btn' %>
   </div>
 <% end %>
+
+<%= render :partial => 'locations/new_modal' %>
+<%= render :partial => 'budgets/new_modal' %>

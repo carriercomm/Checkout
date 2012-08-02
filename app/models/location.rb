@@ -77,6 +77,7 @@ class Location < ActiveRecord::Base
   def open_days(days_out = 90)
     days = []
     business_hours.each { |x| days.concat(x.open_occurrences(days_out)) }
+    days.uniq!
     return days - exception_days
   end
 

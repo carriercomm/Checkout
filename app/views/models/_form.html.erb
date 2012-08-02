@@ -33,78 +33,32 @@
 </div>
 
 <%= simple_form_for @model, :html => { :class => 'form-horizontal' } do |f| %>
-<%= f.input :brand_id, :label => "Brand", :required => true, :input_html => {
-      :class          => 'select2-json-autocomplete',
-      :hidden         => true,
-      "data-ajax-url" => brands_path(:format => :json),
-      "data-text"     => f.object.try(:brand).try(:name)
-    } %>
-<div class="controls control-action">
-  <a data-toggle="modal" href="#brand_modal">New Brand</a>
-</div>
-<%= f.input :name %>
-<%= f.input :description %>
-<%= f.input :training_required %>
-<%= f.association :categories, :input_html => {
-      :multiple => true,
-      :class    => 'select2-tagged-field categories-select'
-    } %>
-<div class="controls control-action">
-  <a data-toggle="modal" href="#category_modal">New Category</a>
-</div>
-<div class="form-actions">
-  <%= f.submit nil, :class => 'btn btn-primary' %>
-  <%= link_to 'Cancel', models_path, :class => 'btn' %>
-</div>
+  <%= f.input :brand_id, :label => "Brand", :required => true, :input_html => {
+        :class          => 'select2-json-autocomplete',
+        :hidden         => true,
+        "data-ajax-url" => brands_path(:format => :json),
+        "data-text"     => f.object.try(:brand).try(:name)
+      } %>
+  <div class="controls control-action">
+    <!-- displays the brands/new_modal partial -->
+    <a data-toggle="modal" href="#brand_modal">New Brand</a>
+  </div>
+  <%= f.input :name %>
+  <%= f.input :description, :input_html => { :rows => "10" } %>
+  <%= f.input :training_required %>
+  <%= f.association :categories, :input_html => {
+        :multiple => true,
+        :class    => 'select2-tagged-field categories-select'
+      } %>
+  <div class="controls control-action">
+    <!-- displays the categories/new_modal partial -->
+    <a data-toggle="modal" href="#category_modal">New Category</a>
+  </div>
+  <div class="form-actions">
+    <%= f.submit nil, :class => 'btn btn-primary' %>
+    <%= link_to 'Cancel', models_path, :class => 'btn' %>
+  </div>
 <% end %>
 
-
-<%#-- New Brand Modal Dialogue --#%>
-<div class="modal fade hide" id="brand_modal">
-  <div class="modal-header">
-    <button type="button" class="close" data-dismiss="modal">×</button>
-    <h3>New Brand</h3>
-  </div>
-  <div class="modal-body">
-    <div class="hide alert alert-error">
-      <a class="close" data-dismiss="alert">×</a>
-      <span class="error-message"></span>
-    </div>
-    <%= simple_form_for Brand.new,
-        :remote => true,
-        :format => :json,
-        :html => { :class => 'form-horizontal new-brand modal-form' } do |f| %>
-      <%= f.input :name %>
-      <div class="modal-footer">
-        <%= link_to 'Cancel', '#', :class => 'btn', "data-dismiss" => "modal" %>
-        <%= f.submit nil, :class => 'btn btn-primary modal-submit' %>
-      </div>
-    <% end %>
-  </div>
-</div>
-
-
-<%#-- New Category Modal Dialogue --#%>
-<div class="modal fade hide" id="category_modal">
-  <div class="modal-header">
-    <button type="button" class="close" data-dismiss="modal">×</button>
-    <h3>New Category</h3>
-  </div>
-  <div class="modal-body">
-    <div class="hide alert alert-error">
-      <a class="close" data-dismiss="alert">×</a>
-      <span class="error-message"></span>
-    </div>
-    <%= simple_form_for Category.new,
-        :remote => true,
-        :format => :json,
-        :html => { :class => 'form-horizontal new-category modal-form' } do |f| %>
-      <%= f.input :name %>
-      <%= f.input :description, :input_html => {:rows => 4} %>
-      <div class="modal-footer">
-        <%= link_to 'Cancel', '#', :class => 'btn', "data-dismiss" => "modal" %>
-        <%= f.submit nil, :class => 'btn btn-primary modal-submit' %>
-      </div>
-    <% end %>
-  </div>
-</div>
+<%= render :partial => 'brands/new_modal' %>
+<%= render :partial => 'categories/new_modal' %>

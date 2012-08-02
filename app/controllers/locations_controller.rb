@@ -7,7 +7,7 @@ class LocationsController < ApplicationController
 
     respond_to do |format|
       format.html # index.html.erb
-      format.json { render json: @locations }
+      # format.json { render json: @locations }
     end
   end
 
@@ -18,7 +18,7 @@ class LocationsController < ApplicationController
 
     respond_to do |format|
       format.html # show.html.erb
-      format.json { render json: @location }
+      # format.json { render json: @location }
     end
   end
 
@@ -30,7 +30,7 @@ class LocationsController < ApplicationController
 
     respond_to do |format|
       format.html # new.html.erb
-      format.json { render json: @location }
+      # format.json { render json: @location }
     end
   end
 
@@ -63,11 +63,10 @@ class LocationsController < ApplicationController
     respond_to do |format|
       if @location.update_attributes(params[:location])
         format.html { redirect_to @location, notice: 'Location was successfully updated.' }
-        format.json { head :no_content }
+        # format.json { head :no_content }
       else
-        logger.debug "------" + @location.errors.inspect
         format.html { render action: "edit" }
-        format.json { render json: @location.errors, status: :unprocessable_entity }
+        # format.json { render json: @location.errors, status: :unprocessable_entity }
       end
     end
   end
@@ -80,7 +79,7 @@ class LocationsController < ApplicationController
 
     respond_to do |format|
       format.html { redirect_to locations_url }
-      format.json { head :no_content }
+      # format.json { head :no_content }
     end
   end
 

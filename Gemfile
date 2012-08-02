@@ -33,13 +33,10 @@ group :development do
 end
 
 group :test do
-  gem 'capybara'                # integration testing
   gem 'database_cleaner'        # for creating a clean test database before each test
   gem 'factory_girl_rails'      # factories - instead of fixtures
   gem 'guard-minitest'          # framework for autorunning mintest tests
-#  gem 'guard-spork'             # speed up autorunning tests by preloading some stuff
   gem 'minitest'                # test framework
-  gem 'ruby-debug19'            # debug support
-#  gem 'spork-minitest'          # speed up autorunning tests by preloading some stuff
+  gem 'minitest-rails-capybara' # test framework
   gem 'turn'                    # test results output formatter
 end

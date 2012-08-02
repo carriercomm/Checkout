@@ -1,4 +1,4 @@
-require 'test_helper'
+require 'minitest_helper'
 
 describe BusinessHour do
 
@@ -25,11 +25,19 @@ describe BusinessHour do
     bh = FactoryGirl.build_stubbed(:business_hour, business_days: [monday, wednesday, friday])
     bh.to_s.must_equal "Mon, Wed, Fri 11:30am-3:20pm"
 
-    # test occurrences
-    d = Time.parse("Sun, 15 Jul 2012 00:00:00 -0700")
-    occurrences = bh.open_occurrences(11, d)
-    occurrences.must_equal [[7, 18], [7, 20], [7, 23], [7, 25]]
+    # == test occurrences ==
+    # day in the past
+    d = Time.parse("Sun, 15 Jul 2000 00:00:00 -0700")
+    occurrences = bh.open_occurrences(10, d)
+    occurrences.length.must_equal 0
 
+    # starting next week
+    d = (Time.zone.now + 7.days).at_beginning_of_week(:sunday)
+    occurrences = bh.open_occurrences(10, d)
+    occurrences.length.must_equal 4
+    # TODO: figure out how to test something like this
+    # occurrences.must_equal [[7, 18], [7, 20], [7, 23], [7, 25]]
+    
     # test edge cases
     bh.open_hour  = 0
     bh.localized_open_time.must_equal "12:30am"
