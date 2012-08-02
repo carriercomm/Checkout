@@ -55,17 +55,11 @@
               <% end %>
               <li><%= link_to "Locations", locations_path %></li>
               <li class="divider-vertical"></li>
-              <li><%= link_to "Admin", admin_dashboard_path %></li>
+              <%= dropdown_for "Account", "icon-user icon-white" do %>
+              <li><%= link_to "Sign out", destroy_user_session_path, :method => :delete %></li>
+              <li><%= link_to "Edit", edit_user_registration_path %></li>
+              <% end %>
             </ul>
-            <div class="pull-right">
-              <ul class="nav">
-                <li class="divider-vertical"></li>
-                <%= dropdown_for "Account", "icon-user icon-white" do %>
-                  <li><%= link_to "Sign out", destroy_user_session_path, :method => :delete %></li>
-                  <li><%= link_to "Edit", edit_user_registration_path %></li>
-                <% end %>
-              </ul>
-            </div>
           </div><!--/.nav-collapse -->
         </div>
       </div>

@@ -1,12 +1,9 @@
 source 'https://rubygems.org'
 
-gem 'activeadmin'               # admin pages scaffolding
 gem 'acts_as_list'              # plugin for creating sortable lists
 gem 'devise'                    # authentication
-gem 'foreigner'                 # foreign key constraints
 gem 'gon'                       # javascript data passing
 gem 'ice_cube'                  # date/time recurrences
-gem 'immigrant'                 # migration generator for foreign keys
 gem 'jquery-rails'              # jQuery javascript integration
 gem 'kaminari'                  # pagination
 gem 'pg'                        # postgres db driver
@@ -28,8 +25,10 @@ group :assets do
 end
 
 group :development do
-  gem 'pry-rails'               # rails console on steroids
   gem 'awesome_print'           # pretty object printer
+  gem 'foreigner'               # foreign key constraints
+  gem 'immigrant'               # migration generator for foreign keys
+  gem 'pry-rails'               # rails console on steroids
 end
 
 group :test do

@@ -19,9 +19,6 @@ Checkout::Application.routes.draw do
 
   root :to => 'models#checkoutable'
 
-  # devise_for :users, ActiveAdmin::Devise.config
-  # devise_for :users
-
   devise_for :user, skip: :registrations
   devise_scope :user do
     # remove the route for the registration#destroy action
@@ -34,8 +31,6 @@ Checkout::Application.routes.draw do
       get :cancel
     end
   end
-
-  ActiveAdmin.routes(self)
 
   resources :asset_tags
   resources :brands do
