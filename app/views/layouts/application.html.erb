@@ -39,25 +39,37 @@
           <a class="brand" href="#">Checkout</a>
           <div class="container-fluid nav-collapse">
             <ul class="nav">
-              <li><%= link_to "Categories", categories_path  %></li>
               <%= dropdown_for "Brands" do %>
-              <li><%= link_to "All", brands_path %></li>
-              <li><%= link_to "Checkoutable", checkoutable_brands_path %></li>
-              <li><%= link_to "Create", new_brand_path %></li>
+                <li><%= link_to "All", brands_path %></li>
+                <li><%= link_to "Checkoutable", checkoutable_brands_path %></li>
+                <li class="divider"></li>
+                <li><%= link_to "Create", new_brand_path %></li>
               <% end %>
-              <%= dropdown_for "Models" do %>
-              <li><%= link_to "All", models_path %></li>
-              <li><%= link_to "Checkoutable", checkoutable_models_path %></li>
-              <li><%= link_to "Create", new_model_path %></li>
+              <%= dropdown_for "Budgets" do %>
+                <li><%= link_to "All", budgets_path  %></li>
+                <li class="divider"></li>
+                <li><%= link_to "Create", new_budget_path %></li>
+              <% end %>
+              <%= dropdown_for "Categories" do %>
+                <li><%= link_to "All", categories_path  %></li>
+                <li class="divider"></li>
+                <li><%= link_to "Create", new_category_path %></li>
               <% end %>
               <%= dropdown_for "Kits" do %>
-              <li><%= link_to "Create", new_kit_path %></li>
+                <li class="divider"></li>
+                <li><%= link_to "Create", new_kit_path %></li>
               <% end %>
               <li><%= link_to "Locations", locations_path %></li>
+              <%= dropdown_for "Models" do %>
+                <li><%= link_to "All", models_path %></li>
+                <li><%= link_to "Checkoutable", checkoutable_models_path %></li>
+                <li class="divider"></li>
+                <li><%= link_to "Create", new_model_path %></li>
+              <% end %>
               <li class="divider-vertical"></li>
               <%= dropdown_for "Account", "icon-user icon-white" do %>
-              <li><%= link_to "Sign out", destroy_user_session_path, :method => :delete %></li>
-              <li><%= link_to "Edit", edit_user_registration_path %></li>
+                <li><%= link_to "Sign out", destroy_user_session_path, :method => :delete %></li>
+                <li><%= link_to "Edit", edit_user_registration_path %></li>
               <% end %>
             </ul>
           </div><!--/.nav-collapse -->

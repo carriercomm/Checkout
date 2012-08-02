@@ -9,7 +9,7 @@ gem 'kaminari'                  # pagination
 gem 'pg'                        # postgres db driver
 gem 'mysql2'                    # mysql db driver
 gem 'nested_form'               # dynamic nested form helper
-gem 'rails', '3.2.6'            # rails
+gem 'rails', '3.2.7'            # rails
 gem 'simple_form'               # form builder
 gem 'strip_attributes'          # strips model attributes, and converts blanks to nil
 gem 'thin'                      # web server

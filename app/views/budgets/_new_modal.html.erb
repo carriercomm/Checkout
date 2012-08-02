@@ -1,19 +1,21 @@
-<div class="modal fade hide" id="category_modal">
+<div class="modal fade hide" id="budget_modal">
   <div class="modal-header">
     <button type="button" class="close" data-dismiss="modal">×</button>
-    <h3>New Category</h3>
+    <h3>New Budget</h3>
   </div>
   <div class="modal-body">
     <div class="hide alert alert-error">
       <a class="close" data-dismiss="alert">×</a>
       <span class="error-message"></span>
     </div>
-    <%= simple_form_for Category.new,
+    <%= simple_form_for Budget.new,
         :remote => true,
         :format => :json,
-        :html => { :class => 'form-horizontal new-category modal-form' } do |f| %>
+        :html => { :class => 'form-horizontal new-budget modal-form' } do |f| %>
+      <%= f.input :number %>
       <%= f.input :name %>
-      <%= f.input :description %>
+      <%= f.input :date_start, :include_blank => true %>
+      <%= f.input :date_end,   :include_blank => true %>
       <div class="modal-footer">
         <%= link_to 'Cancel', '#', :class => 'btn', "data-dismiss" => "modal" %>
         <%= f.submit nil, :class => 'btn btn-primary modal-submit' %>

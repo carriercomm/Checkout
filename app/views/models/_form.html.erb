@@ -44,7 +44,7 @@
     <a data-toggle="modal" href="#brand_modal">New Brand</a>
   </div>
   <%= f.input :name %>
-  <%= f.input :description, :input_html => { :rows => "10" } %>
+  <%= f.input :description %>
   <%= f.input :training_required %>
   <%= f.association :categories, :input_html => {
         :multiple => true,
