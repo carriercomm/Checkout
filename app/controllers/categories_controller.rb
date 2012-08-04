@@ -10,6 +10,14 @@ class CategoriesController < ApplicationController
     end
   end
 
+  def suggestions
+    @categories = Category.suggest(params[:category_ids])
+
+    respond_to do |format|
+      format.json { render json: @categories }
+    end
+  end
+
   # GET /categories/1
   # GET /categories/1.json
   def show

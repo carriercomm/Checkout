@@ -46,6 +46,7 @@
   <%= f.input :name %>
   <%= f.input :description %>
   <%= f.input :training_required %>
+  <div id="suggestion_popover" class="popover-anchor"></div>
   <%= f.association :categories, :input_html => {
         :multiple => true,
         :class    => 'select2-tagged-field categories-select'

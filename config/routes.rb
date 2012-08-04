@@ -43,6 +43,9 @@ Checkout::Application.routes.draw do
   resources :business_hours
   resources :business_hour_exceptions
   resources :categories do
+    collection do
+      get 'suggestions'
+    end
     resources :models do
       collection &models_collection_routes
     end
