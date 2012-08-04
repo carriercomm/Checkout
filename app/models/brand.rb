@@ -1,9 +1,10 @@
 class Brand < ActiveRecord::Base
 
   #
-  # Macros
+  # Mixins
   #
   
+  include Autocomplete
   strip_attributes
 
   

@@ -123,6 +123,7 @@ class ModelsController < ApplicationController
   def scope_by_search_params
     if params["q"].present?
       query = "%#{params["q"]}%"
+      # TODO: update me since we now have autocomplete
       @models = @models.where("models.name ILIKE ? OR brands.name ILIKE ?", query, query)
     end
   end

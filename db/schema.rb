@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120718224009) do
+ActiveRecord::Schema.define(:version => 20120804025643) do
 
   create_table "active_admin_comments", :force => true do |t|
     t.string   "resource_id",   :null => false
@@ -30,8 +30,9 @@ ActiveRecord::Schema.define(:version => 20120718224009) do
 
   create_table "brands", :force => true do |t|
     t.string   "name"
-    t.datetime "created_at", :null => false
-    t.datetime "updated_at", :null => false
+    t.datetime "created_at",   :null => false
+    t.datetime "updated_at",   :null => false
+    t.string   "autocomplete", :null => false
   end
 
   create_table "budgets", :force => true do |t|
@@ -77,8 +78,9 @@ ActiveRecord::Schema.define(:version => 20120718224009) do
   create_table "categories", :force => true do |t|
     t.string   "name"
     t.text     "description"
-    t.datetime "created_at",  :null => false
-    t.datetime "updated_at",  :null => false
+    t.datetime "created_at",   :null => false
+    t.datetime "updated_at",   :null => false
+    t.string   "autocomplete", :null => false
   end
 
   add_index "categories", ["name"], :name => "index_categories_on_name"
@@ -129,6 +131,7 @@ ActiveRecord::Schema.define(:version => 20120718224009) do
     t.integer  "brand_id",                             :null => false
     t.datetime "created_at",                           :null => false
     t.datetime "updated_at",                           :null => false
+    t.string   "autocomplete",                         :null => false
   end
 
   add_index "models", ["brand_id"], :name => "index_models_on_brand_id"

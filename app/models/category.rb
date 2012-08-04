@@ -1,5 +1,7 @@
 class Category < ActiveRecord::Base
 
+  include Autocomplete
+
   #
   # Associations
   #

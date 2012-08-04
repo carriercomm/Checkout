@@ -1,10 +1,11 @@
 class Model < ActiveRecord::Base
 
   #
-  # Macros
+  # Mixins
   #
 
   strip_attributes
+  include Autocomplete
 
 
   #
