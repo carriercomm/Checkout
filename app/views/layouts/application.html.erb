@@ -36,7 +36,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </a>
-          <a class="brand" href="#">Checkout</a>
+          <a class="brand" href="/">Checkout</a>
           <div class="container-fluid nav-collapse">
             <ul class="nav">
               <%= dropdown_for "Brands" do %>
@@ -66,6 +66,11 @@
                 <li class="divider"></li>
                 <li><%= link_to "Create", new_model_path %></li>
               <% end %>
+            </ul>
+            <form class="navbar-search pull-left" action="">
+              <input id="q" name="q" placeholder="Search" type="text" class="search-query span3 ui-autocomplete-input" autocomplete="off"></input>
+            </form>
+            <ul class="nav pull-right">
               <li class="divider-vertical"></li>
               <%= dropdown_for "Account", "icon-user icon-white" do %>
                 <li><%= link_to "Sign out", destroy_user_session_path, :method => :delete %></li>
@@ -76,7 +81,7 @@
         </div>
       </div>
       <div class="container-fluid" style="background-color:#f2f2f2;padding:0.5em 20px;height:2.2em">
-        <input id="q" name="q" placeholder="Search" type="text" class="ui-autocomplete-input span12" autocomplete="off">
+
       </div>
     </div>
 
@@ -104,17 +109,17 @@
         </div>
       <% end %>
       <div class="row-fluid">
-        <div class="span3">
-          <div class="well sidebar-nav">
-            <ul class="nav nav-list">
-              <li class="nav-header">Sidebar</li>
-                <li><%= link_to "Link1", "/path1"  %></li>
-                <li><%= link_to "Link2", "/path2"  %></li>
-                <li><%= link_to "Link3", "/path3"  %></li>
-            </ul>
-          </div><!--/.well -->
-        </div><!--/span-->
-        <div class="span9">
+        <!-- <div class="span3"> -->
+        <!--   <div class="well sidebar-nav"> -->
+        <!--     <ul class="nav nav-list"> -->
+        <!--       <li class="nav-header">Sidebar</li> -->
+        <!--         <li><%= link_to "Link1", "/path1"  %></li> -->
+        <!--         <li><%= link_to "Link2", "/path2"  %></li> -->
+        <!--         <li><%= link_to "Link3", "/path3"  %></li> -->
+        <!--     </ul> -->
+        <!--   </div><\!--/.well -\-> -->
+        <!--</div><\!--/span -\-> -->
+        <div>
           <%= yield %>
         </div>
       </div><!--/row-->
