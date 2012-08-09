@@ -10,7 +10,7 @@ module Autocomplete
     # you'll have to customize this
     s = self.name
     s = s.truncate(45, omission: "", separator: " ") if s.length > 45
-    self.autocomplete = Autocomplete.normalize(s)
+    self.autocomplete = self.class.normalize(s)
   end
 
   module ClassMethods
