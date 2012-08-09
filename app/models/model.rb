@@ -101,6 +101,14 @@ class Model < ActiveRecord::Base
     return locations
   end
 
+  # callback to populate :autocomplete
+  def generate_autocomplete
+    # you'll have to customize this
+    s = self.branded_name
+    s = s.truncate(45, omission: "", separator: " ") if s.length > 45
+    self.autocomplete = Model.normalize(s)
+  end
+
   # helper for generating asset tags with links to their kits
   def kit_asset_tags
     ats = components.collect { |c| [c.asset_tag, c.kit] }

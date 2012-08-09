@@ -65,6 +65,17 @@ class Kit < ActiveRecord::Base
 
 
   #
+  # Class Methods
+  #
+
+  def self.asset_tag_search(query, limit=10)
+    includes(:components).joins(:components)
+      .where("components.asset_tag LIKE ?", "%#{ query }%")
+      .order("components.asset_tag ASC").limit(limit)
+  end
+
+
+  #
   # Instance Methods
   #
 
@@ -81,6 +92,11 @@ class Kit < ActiveRecord::Base
   # returns a string of comma delimited model names
   def components_description
     model_names = components.order("components.position ASC").collect { |c| c.model.to_s }
+    model_names.join(", ")
+  end
+
+  def branded_components_description
+    model_names = components.order("components.position ASC").collect { |c| c.model.branded_name }
     model_names.join(", ")
   end
 

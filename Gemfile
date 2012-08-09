@@ -2,6 +2,7 @@ source 'https://rubygems.org'
 
 gem 'acts_as_list'              # plugin for creating sortable lists
 gem 'devise'                    # authentication
+gem 'draper'                    # model/view decorators (presenters)
 gem 'gon'                       # javascript data passing
 gem 'ice_cube'                  # date/time recurrences
 gem 'jquery-rails'              # jQuery javascript integration

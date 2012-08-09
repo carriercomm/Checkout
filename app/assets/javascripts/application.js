@@ -13,12 +13,14 @@
 //= require jquery
 //= require bootstrap
 //= require jquery.ui.datepicker
+//= require jquery-ui
 //= require jquery_nested_form
 //= require jquery_ujs
 //= require modal_forms
 //= require models
 //= require parts
 //= require reservations
+//= require search
 //= require select2
 //= require select2_widgets
 //= require titleCaps

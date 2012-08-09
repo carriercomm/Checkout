@@ -62,6 +62,7 @@ Checkout::Application.routes.draw do
     resources :reservations, :only => [:new]
   end
   resources :reservations
+  resources :search, :only => [:index]
   resource :users do
     resources :reservations
   end

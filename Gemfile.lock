@@ -60,6 +60,9 @@ GEM
       orm_adapter (~> 0.1)
       railties (~> 3.1)
       warden (~> 1.2.1)
+    draper (0.15.0)
+      actionpack (~> 3.2)
+      activesupport (~> 3.2)
     erubis (2.7.0)
     eventmachine (0.12.10)
     execjs (1.4.0)
@@ -228,6 +231,7 @@ DEPENDENCIES
   coffee-rails
   database_cleaner
   devise
+  draper
   factory_girl_rails
   foreigner
   gon
