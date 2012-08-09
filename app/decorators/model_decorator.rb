@@ -1,7 +1,7 @@
 class ModelDecorator < Draper::Base
   decorates :model
 
-  def as_json(options={})
+  def autocomplete_json(options={})
     {
       :label => branded_name,
       :value => h.url_for(model)

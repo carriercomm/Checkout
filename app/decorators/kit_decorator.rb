@@ -1,7 +1,7 @@
 class KitDecorator < Draper::Base
   decorates :kit
 
-  def as_json(options={})
+  def autocomplete_json(options={})
     q     = options.delete(:q)
     raise self.inspect if q.nil?
     regexp = Regexp.quote(q)
