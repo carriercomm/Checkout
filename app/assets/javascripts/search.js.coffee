@@ -15,6 +15,8 @@ jQuery ->
       $.getJSON("/search", { q: request.term }, (result) ->
         response(result)
       )
+    focus: (event, ui) ->
+      false
     select: (event, ui) ->
       window.location = ui.item.value
       false
