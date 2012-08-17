@@ -34,6 +34,7 @@ class User < ActiveRecord::Base
   # to a real persisted field like 'username'
   attr_accessor :login
 
+  before_save :downcase_username
 
   ## Static Methods ##
 
@@ -43,8 +44,17 @@ class User < ActiveRecord::Base
     where(conditions).where(["lower(username) = :value OR lower(email) = :value", { :value => login.strip.downcase }]).first
   end
 
+  def self.username_search(query, limit=10)
+      self.where("users.username LIKE ?", "%#{ query }%")
+      .order("users.username ASC").limit(limit)
+  end
+
 
   ## Instance Methods ##
+
+  def downcase_username
+    username.downcase!
+  end
 
   def to_s
     username

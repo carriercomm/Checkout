@@ -94,10 +94,18 @@ FactoryGirl.define do
 
   end
 
+  factory :role do
+    name "roley-role"
+  end
+
   factory :user do
     sequence(:username) { |u| "user#{n}" }
     email { "#{username}@example.com".downcase }
-    password "secret"
+    password "super-mega-ultre-secret"
+
+    factory :user_with_role do
+      role
+    end
   end
 
 end

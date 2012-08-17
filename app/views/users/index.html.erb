@@ -12,36 +12,22 @@
 <table class="table table-striped">
   <thead>
     <tr>
-      <th><%= t 'user.username' %></th>
-      <th><%= t 'user.email' %></th>
-      <th><%= t 'user.suspension_count' %></th>
-      <th><%= t 'user.suspended_until' %></th>
-      <th><%= t 'user.sign_in_count' %></th>
-      <th><%= t 'user.current_sign_in_at' %></th>
-      <th><%= t 'user.last_sign_in_at' %></th>
-      <th><%= t 'user.failed_attempts' %></th>
-      <th><%= t 'user.locked_at' %></th>
-      <th><%= t 'user.disabled' %></th>
-      <th><%= t 'user.created_at' %></th>
-      <th><%= t 'user.updated_at' %></th>
+      <th><%= sortable('username', t('user.username')) %></th>
+      <th><%= sortable('email', t('user.email')) %></th>
+      <th><%= sortable('suspension_count', t('user.suspension_count')) %></th>
+      <th><%= sortable('suspended_until', t('user.suspended_until')) %></th>
+      <th><%= sortable('disabled', t('user.disabled')) %></th>
       <th><%=t '.actions', :default => t("helpers.actions") %></th>
     </tr>
   </thead>
   <tbody>
     <% @users.each do |user| %>
       <tr>
-        <td><%= user.username %></td>
+        <td><%= link_to user.username, user_path(user) %></td>
         <td><%= user.email %></td>
         <td><%= user.suspension_count %></td>
         <td><%= user.suspended_until %></td>
-        <td><%= user.sign_in_count %></td>
-        <td><%= user.current_sign_in_at %></td>
-        <td><%= user.last_sign_in_at %></td>
-        <td><%= user.failed_attempts %></td>
-        <td><%= user.locked_at %></td>
         <td><%= user.disabled %></td>
-        <td><%= user.created_at %></td>
-        <td><%= user.updated_at %></td>
         <td>
           <%= link_to t('.edit', :default => t("helpers.links.edit")),
                       edit_user_path(user), :class => 'btn btn-mini' %>

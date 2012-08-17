@@ -13,6 +13,13 @@ class UserDecorator < ApplicationDecorator
          :suspension_count,
          :username)
 
+  def autocomplete_json(options={})
+    {
+      :label => username,
+      :value => h.url_for(model)
+    }
+  end
+
   def disabled
     to_yes_no(model.disabled)
   end
@@ -39,5 +46,9 @@ class UserDecorator < ApplicationDecorator
 
   def updated_at
     localize_unless_nil(model.updated_at, :format => :db)
+  end
+
+  def roles
+    model.roles.map(&:name).join(", ")
   end
 end

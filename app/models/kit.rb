@@ -3,7 +3,7 @@ class Kit < ActiveRecord::Base
   #
   # Macros
   #
-  
+
   strip_attributes
 
   #

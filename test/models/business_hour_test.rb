@@ -37,7 +37,7 @@ describe BusinessHour do
     occurrences.length.must_equal 4
     # TODO: figure out how to test something like this
     # occurrences.must_equal [[7, 18], [7, 20], [7, 23], [7, 25]]
-    
+
     # test edge cases
     bh.open_hour  = 0
     bh.localized_open_time.must_equal "12:30am"
@@ -70,11 +70,11 @@ describe BusinessHour do
     # should have everything
     params[:business_days] = [monday]
     bh = FactoryGirl.build_stubbed(:business_hour_with_location, params)
-    bh.must_be :valid?    
+    bh.must_be :valid?
 
     bh.close_hour = 24
     bh.wont_be :valid?
-    
+
     bh.open_hour = -1
     bh.close_hour = 23
     bh.wont_be :valid?

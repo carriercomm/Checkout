@@ -20,10 +20,6 @@ en:
  #  #<Proc:0x007fa7eccd5e10@/Users/james/.rvm/gems/ruby-1.9.2-p290@checkout/gems/activesupport-3.2.7/lib/active_support/core_ext/time/conversions.rb:13 (lambda)>,
  # :verbose=>"%A, %B %d, %Y %l:%M%p",
  # :tabular=>"%a %Y-%m-%d"}
-  user:
-    disabled:
-      true: *YES
-      false: *NO
   simple_form:
     labels:
       user:

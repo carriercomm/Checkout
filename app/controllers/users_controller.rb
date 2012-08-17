@@ -1,10 +1,16 @@
 class UsersController < ApplicationController
   authorize_resource
+  helper_method :sort_column, :sort_direction
 
   # GET /users
   # GET /users.json
   def index
-    @users = UserDecorator.decorate(User.includes(:roles).page(params[:page]).per(params[:page_limit]))
+    @users  = User.includes(:roles)
+      .order(sort_column + " " + sort_direction)
+      .page(params[:page])
+      .per(params[:page_limit])
+
+    @users = UserDecorator.decorate(@users)
 
     respond_to do |format|
       format.html # index.html.erb
@@ -15,7 +21,7 @@ class UsersController < ApplicationController
   # GET /users/1
   # GET /users/1.json
   def show
-    @user = UserDecorator.includes(:roles).find(params[:id])
+    @user = UserDecorator.decorate(User.includes(:roles).find(params[:id]))
 
     respond_to do |format|
       format.html # show.html.erb
@@ -83,6 +89,16 @@ class UsersController < ApplicationController
         # format.json { render json: @user.errors, status: :unprocessable_entity }
       end
     end
+  end
+
+  private
+
+  def sort_column
+    User.column_names.include?(params[:sort]) ? params[:sort] : "username"
+  end
+
+  def sort_direction
+    %w[asc desc].include?(params[:direction]) ? params[:direction] : "asc"
   end
 
 end

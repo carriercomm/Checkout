@@ -21,6 +21,7 @@ Checkout::Application.routes.draw do
 
   devise_for :user
 
+  # TODO: is this being used? mebbe nuke this and its controller
   resources :asset_tags
   resources :brands do
     collection &brands_collection_routes
