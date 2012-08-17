@@ -2,6 +2,36 @@
 # See https://github.com/svenfuchs/rails-i18n/tree/master/rails%2Flocale for starting points.
 
 en:
+  yes: &YES 'Yes'
+  no: &NO 'No'
   time:
     formats:
       business_hour: "%-l:%M%P"
+      compact_date: "%Y-%m-%d"
+      tabular: "%a %Y-%m-%d"
+      db: "%Y-%m-%d %H:%M:%S"
+ # :number=>"%Y%m%d%H%M%S",
+ # :time=>"%H:%M",
+ # :short=>"%d %b %H:%M",
+ # :long=>"%B %d, %Y %H:%M",
+ # :long_ordinal=>
+ #  #<Proc:0x007fa7eccd5eb0@/Users/james/.rvm/gems/ruby-1.9.2-p290@checkout/gems/activesupport-3.2.7/lib/active_support/core_ext/time/conversions.rb:12 (lambda)>,
+ # :rfc822=>
+ #  #<Proc:0x007fa7eccd5e10@/Users/james/.rvm/gems/ruby-1.9.2-p290@checkout/gems/activesupport-3.2.7/lib/active_support/core_ext/time/conversions.rb:13 (lambda)>,
+ # :verbose=>"%A, %B %d, %Y %l:%M%p",
+ # :tabular=>"%a %Y-%m-%d"}
+  user:
+    disabled:
+      true: *YES
+      false: *NO
+  simple_form:
+    labels:
+      user:
+        username: 'Username'
+        password: 'Password'
+        password_confirmation: 'Password Confirmation'
+        suspended_until: 'Suspended Until'
+    hints:
+      user:
+        disabled: "Prevent this client from logging in"
+        suspended_until: "Suspend this client's checkout privileges until a specified date"

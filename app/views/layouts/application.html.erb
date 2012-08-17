@@ -66,6 +66,7 @@
                 <li class="divider"></li>
                 <li><%= link_to "Create", new_model_path %></li>
               <% end %>
+              <li><%= link_to("Users", users_path) if can? :manage, User %></li>
             </ul>
             <form class="navbar-search pull-left" action="">
               <input id="q" name="q" placeholder="Search" type="text" class="search-query span3 ui-autocomplete-input" autocomplete="off"></input>

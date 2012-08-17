@@ -10,7 +10,11 @@ class ApplicationController < ActionController::Base
   def ensure_signed_in
     unless user_signed_in? || devise_controller?
       redirect_to new_user_session_path
-    end    
+    end
+  end
+
+  rescue_from CanCan::AccessDenied do |exception|
+    redirect_to root_path, :alert => exception.message
   end
 
 end

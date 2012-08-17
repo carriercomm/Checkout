@@ -28,7 +28,7 @@ class ModelsController < ApplicationController
   # GET /models/1
   # GET /models/1.json
   def show
-    @model = Model.includes(:kits).find(params[:id])
+    @model = Model.includes(:kits => :location).find(params[:id])
 
     respond_to do |format|
       format.html

@@ -48,7 +48,8 @@ class ReservationsController < ApplicationController
     elsif params[:model_id].present?
       @reservation = @client.reservations.build
       @model       = Model.checkoutable.includes(:kits => :location).find(params[:model_id])
-      @locations   = (@model.kits.collect { |k| k.location }).uniq
+      @locations   = @model.checkout_locations
+      @reservation.location = @locations.first if @locations.size == 1
       gon.locations = @model.checkout_days_json
 
     else

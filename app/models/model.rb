@@ -1,35 +1,33 @@
 class Model < ActiveRecord::Base
 
-  #
-  # Mixins
-  #
+  ## Mixins ##
 
-  strip_attributes
+  # search can autocomplete on this model
   include Autocomplete
 
+  # apply authorization roles to this model
+  resourcify
 
-  #
-  # Associations
-  #
+  # convert empty string attributes to null
+  strip_attributes
+
+
+  ## Associations ##
 
   belongs_to :brand,      :inverse_of => :models
   has_many   :components, :inverse_of => :model
-  has_many   :kits, :through => :components
+  has_many   :kits, :through => :components, :dependent => :destroy
   has_and_belongs_to_many :categories
 
 
-  #
-  # Validations
-  #
+  ## Validations ##
 
   validates :name, :presence => true
   validates :name, :uniqueness => true
   validates_presence_of :brand
 
 
-  #
-  # Mass-assignable attributes
-  #
+  ## Mass-assignable attributes ##
 
   attr_accessible(:brand_id,
                   :category_ids,
@@ -37,13 +35,7 @@ class Model < ActiveRecord::Base
                   :name,
                   :training_required)
 
-  # moved these over to kit, since they return somewhat confusing results here
-  # def self.tombstoned
-  #   joins(:kits).where("kits.tombstoned = ?", true).uniq
-  # end
-  # def self.not_checkoutable
-  #   joins(:kits).where("kits.checkoutable = ?", false).uniq
-  # end
+  ## Class Methods ##
 
   def self.checkoutable
     joins(:kits).where("kits.tombstoned = ? AND kits.checkoutable = ?", false, true).uniq
@@ -62,6 +54,9 @@ class Model < ActiveRecord::Base
     joins(:categories).where('categories.id = ?', category_id.to_i)
   end
 
+
+  ## Instance Methods ##
+
   # this is specific to the select2 widget used in the kit form view
   # TODO: move this to a decorator?
   def as_json(options={})
@@ -73,6 +68,13 @@ class Model < ActiveRecord::Base
 
   def branded_name
     return "#{ brand } #{ name }"
+  end
+
+  # returns a list of checkout locations which have business hours
+  def checkout_locations
+    locations = kits.collect { |k| k.location }
+    locations.uniq!
+    locations.select { |l| l.business_hours.count > 0 }
   end
 
   def checkoutable?

@@ -1,0 +1,14 @@
+<%= simple_form_for @user, :html => { :class => 'form-horizontal' } do |f| %>
+  <%= f.input :username %>
+  <%= f.input :email %>
+  <%= f.input :suspended_until, :as => :date_picker,
+    :input_html => {
+      :class => 'generic_datepicker'
+    } %>
+  <%= f.input :disabled %>
+  <div class="form-actions">
+    <%= f.button :submit, :class => 'btn-primary' %>
+    <%= link_to t('.cancel', :default => t("helpers.links.cancel")),
+                users_path, :class => 'btn' %>
+  </div>
+<% end %>

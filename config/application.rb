@@ -65,15 +65,15 @@ module Checkout
       Devise::SessionsController.layout "devise"
       Devise::RegistrationsController.layout proc{ |controller| user_signed_in? ? "application" : "devise" }
       Devise::ConfirmationsController.layout "devise"
-      Devise::UnlocksController.layout "devise"            
-      Devise::PasswordsController.layout "devise"        
+      Devise::UnlocksController.layout "devise"
+      Devise::PasswordsController.layout "devise"
     end
 
     config.generators do |g|
       g.stylesheets false
+      g.fixture false
       g.helper false
       g.test_framework :mini_test, :spec => true, :fixture => false
-      g.fixture_replacement :factory_girl
     end
 
   end

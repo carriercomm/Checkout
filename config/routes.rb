@@ -19,18 +19,7 @@ Checkout::Application.routes.draw do
 
   root :to => 'models#checkoutable'
 
-  devise_for :user, skip: :registrations
-  devise_scope :user do
-    # remove the route for the registration#destroy action
-    resource :registration,
-    only: [:new, :create, :edit, :update],
-    path: 'user',
-    path_names: { new: 'sign_up' },
-    controller: 'devise/registrations',
-    as: :user_registration do
-      get :cancel
-    end
-  end
+  devise_for :user
 
   resources :asset_tags
   resources :brands do
@@ -63,7 +52,7 @@ Checkout::Application.routes.draw do
   end
   resources :reservations
   resources :search, :only => [:index]
-  resource :users do
+  resources :users, :except => [:destroy] do
     resources :reservations
   end
 
