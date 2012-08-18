@@ -1,4 +1,7 @@
 class KitsController < ApplicationController
+
+  authorize_resource
+
   # GET /kits
   # GET /kits.json
   def index

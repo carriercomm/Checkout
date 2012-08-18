@@ -1,4 +1,7 @@
 class BrandsController < ApplicationController
+
+  authorize_resource
+
   # GET /brands
   # GET /brands.json
   def index
@@ -28,7 +31,7 @@ class BrandsController < ApplicationController
   # GET /brands/1
   # GET /brands/1.json
   def show
-    @brand = Brand.find(params[:id])
+    @brand = Brand.includes(:models).find(params[:id])
 
     respond_to do |format|
       format.html # show.html.erb
@@ -99,7 +102,7 @@ class BrandsController < ApplicationController
   private
 
   def apply_scopes
-    @brands = @brands.order("brands.name ASC")
+    @brands = @brands.includes(:models).order("brands.name ASC")
     scope_by_brand
     scope_by_category
     scope_by_search_params

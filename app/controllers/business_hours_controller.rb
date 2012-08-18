@@ -1,4 +1,7 @@
 class BusinessHoursController < ApplicationController
+
+  authorize_resource
+
   # GET /business_hours
   # GET /business_hours.json
   def index

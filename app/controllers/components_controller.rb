@@ -1,5 +1,6 @@
 class ComponentsController < ApplicationController
 
+  authorize_resource
   before_filter :strip_brand, :only => [:create, :update, :destroy]
 
   # GET /components

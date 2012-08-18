@@ -1,5 +1,7 @@
 class BudgetsController < ApplicationController
 
+  authorize_resource
+
   # GET /budgets
   # GET /budgets.json
   def index
@@ -72,14 +74,14 @@ class BudgetsController < ApplicationController
 
   # DELETE /budgets/1
   # DELETE /budgets/1.json
-  def destroy
-    @budget = Budget.find(params[:id])
-    @budget.destroy
+  # def destroy
+  #   @budget = Budget.find(params[:id])
+  #   @budget.destroy
 
-    respond_to do |format|
-      format.html { redirect_to budgets_url }
-      # format.json { head :no_content }
-    end
-  end
+  #   respond_to do |format|
+  #     format.html { redirect_to budgets_url }
+  #     # format.json { head :no_content }
+  #   end
+  # end
 
 end

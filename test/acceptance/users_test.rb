@@ -7,9 +7,11 @@ describe "Client Browsing Users Acceptance Test" do
   it "should deny access to user management" do
     as_user(user) do
       visit users_path
+      assert current_path != users_path
       assert page.has_content? "You are not authorized to access this page."
 
       visit new_user_path
+      assert current_path != users_path
       assert page.has_content? "You are not authorized to access this page."
     end
   end

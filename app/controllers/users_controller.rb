@@ -1,4 +1,5 @@
 class UsersController < ApplicationController
+
   authorize_resource
   helper_method :sort_column, :sort_direction
 

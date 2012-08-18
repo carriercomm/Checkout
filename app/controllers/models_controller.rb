@@ -1,4 +1,8 @@
 class ModelsController < ApplicationController
+
+  # the resource must be explicit here so it works with root_path redirects
+  authorize_resource Model
+
   # GET /models
   # GET /models.json
   def index

@@ -1,3 +1,8 @@
+<%= link_to(t('.new',
+            :default => raw("<i class='icon-plus-sign'></i> #{ t('helpers.links.new') }")),
+            new_brand_path,
+            :class => 'btn btn-primary pull-right btn-new-brand') if can? :manage, Brand %>
+
 <h1>Brands</h1>
 
 <%= paginate @brands %>
@@ -6,15 +11,21 @@
   <thead>
     <tr>
       <th>Name</th>
+      <th>Model Count</th>
       <th>Actions</th>
     </tr>
   </thead>
   <tbody>
     <% @brands.each do |brand| %>
       <tr>
-        <td><%= link_to brand.name, brand_models_path(brand) %></td>
+        <td><%= link_to brand.name, brand_path(brand) %></td>
+        <td><%= brand.models.count %></td>
         <td>
           <%= link_to 'Show Models',  brand_models_path(brand), :class => 'btn btn-mini' %>
+          <%= link_to t('.edit',
+                        :default => t("helpers.links.edit")),
+                        edit_brand_path(brand),
+                        :class => 'btn btn-mini btn-edit-brand' if can? :manage, Brand %>
         </td>
       </tr>
     <% end %>

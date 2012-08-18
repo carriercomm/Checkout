@@ -1,4 +1,12 @@
+<%= link_to(t('.new',
+            :default => raw("<i class='icon-plus-sign'></i> #{ t('helpers.links.new') }")),
+            new_budget_path,
+            :class => 'btn btn-primary pull-right btn-new-budget') if can? :manage, Budget %>
+
 <h1>Budgets</h1>
+
+<%= paginate @budgets %>
+
 <table class="table table-striped">
   <thead>
     <tr>
@@ -16,11 +24,10 @@
         <td><%= budget.display_date %></td>
         <td>
           <%= link_to 'Edit', edit_budget_path(budget), :class => 'btn btn-mini' %>
-          <%= link_to 'Destroy', budget_path(budget), :method => :delete, :confirm => 'Are you sure?', :class => 'btn btn-mini btn-danger' %>
         </td>
       </tr>
     <% end %>
   </tbody>
 </table>
 
-<%= link_to 'New', new_budget_path, :class => 'btn btn-primary' %>
+<%= paginate @budgets %>

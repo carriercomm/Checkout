@@ -1,5 +1,7 @@
 class ReservationsController < ApplicationController
 
+  authorize_resource
+
   # GET /reservations
   # GET /reservations.json
   def index

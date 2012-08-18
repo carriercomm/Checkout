@@ -5,9 +5,16 @@ class Ability
     if user.has_role? :admin
       can :manage, :all
     else
+      can :read, Brand
       can :read, Model
-#      can :manage, Reservation { |rez| rez.try(:client) == user }
-
+      can :read, Budget
+      can :read, BusinessHour
+      can :read, Category
+      can :read, Component
+      can :read, Kit
+      can :read, Location
+      can :read, Reservation
+#      can :manage, Reservation { |r| r.try(:client) == user }
     end
   end
 

@@ -22,14 +22,13 @@ Checkout::Application.routes.draw do
   devise_for :user
 
   # TODO: is this being used? mebbe nuke this and its controller
-  resources :asset_tags
   resources :brands do
     collection &brands_collection_routes
     resources :models do
       collection &models_collection_routes
     end
   end
-  resources :budgets
+  resources :budgets, :except => [:destroy]
   resources :business_hours
   resources :business_hour_exceptions
   resources :categories do

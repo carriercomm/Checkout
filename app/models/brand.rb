@@ -3,15 +3,16 @@ class Brand < ActiveRecord::Base
   #
   # Mixins
   #
-  
+
   include Autocomplete
+  rolify
   strip_attributes
 
-  
+
   #
   # Associations
   #
-  
+
   has_many :models
 
 
@@ -51,6 +52,7 @@ class Brand < ActiveRecord::Base
   # Instance Methods
   #
 
+  # TODO: move this to a decorator. something specific to select2
   def as_json(options={})
     {
       id: id,
