@@ -1,15 +1,13 @@
 class Location < ActiveRecord::Base
 
-  #
-  # Macros
-  #
-  
-  strip_attributes
-  
 
-  #
-  # Associations
-  #
+  ## Macros ##
+
+  resourcify
+  strip_attributes
+
+
+  ## Associations ##
 
   # TODO: enforce some referential integrity so you can't delete a location and orphan all its kits
   has_many :business_hours,           :inverse_of => :location, :dependent => :destroy
@@ -19,23 +17,17 @@ class Location < ActiveRecord::Base
   accepts_nested_attributes_for :business_hours, :reject_if => :all_blank, :allow_destroy=> true
 
 
-  #
-  # Validations
-  #
+  ## Validations ##
 
   validates :name, :uniqueness => true
 
 
-  #
-  # Mass-assignable attributes
-  #
+  ## Mass-assignable attributes ##
 
   attr_accessible :name, :business_hours_attributes
 
 
-  #
-  # Instance Methods
-  #
+  ## Instance Methods ##
 
   def closed_on?(date)
     return !open_on?(date)

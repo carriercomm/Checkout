@@ -1,26 +1,26 @@
 class Category < ActiveRecord::Base
 
-  include Autocomplete
+  ## Macros ##
 
-  #
-  # Associations
-  #
+  include Autocomplete
+  resourcify
+
+  ## Associations ##
 
   has_and_belongs_to_many :models
 
-  #
-  # Mass-assignable Attributes
-  #
+
+  ## Validations ##
 
   validates :name, :presence => true
   validates :name, :uniqueness => true
 
 
-  #
-  # Mass-assignable Attributes
-  #
+  ## Mass-assignable Attributes ##
 
   attr_accessible :name, :description
+
+  ## Class methods ##
 
   def self.suggest(category_ids)
     raise "catgory_ids must be an Array" unless category_ids.is_a? Array
@@ -34,6 +34,9 @@ class Category < ActiveRecord::Base
     suggestions.flatten.uniq.sort - current_categories
   end
 
+  ## Instance methods ##
+
+  # TODO: move this to a select2 specific decorator method
   def as_json(options = {})
     {
       id: id,

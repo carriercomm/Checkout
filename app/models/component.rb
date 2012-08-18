@@ -1,41 +1,32 @@
 class Component < ActiveRecord::Base
 
-  #
-  # Macros
-  #
-  
-  strip_attributes
+  ## Macros ##
+
   acts_as_list
+  resourcify
+  strip_attributes
 
 
-  #
-  # Callbacks
-  #
+  ## Callbacks ##
 
   before_validation :upcase_serial_number
 
 
-  #
-  # Associations
-  #
+  ## Associations ##
 
   belongs_to :model, :inverse_of => :components
   belongs_to :kit,   :inverse_of => :components
 
 
-  #
-  # Validations
-  #
-  
+  ## Validations ##
+
   validates_presence_of :model
   validates_presence_of :kit
   validates :asset_tag,     :uniqueness => true, :allow_nil => true
   validates :serial_number, :uniqueness => true, :allow_nil => true
-  
 
-  #
-  # Mass-assignable attributes
-  #
+
+  ## Mass-assignable attributes ##
 
   attr_accessible(:asset_tag,
                   :kit_id,
@@ -45,11 +36,12 @@ class Component < ActiveRecord::Base
                   :serial_number)
 
 
-  #
-  # Virtual attributes
-  #
+  ## Virtual attributes ##
 
   attr_reader :model_name
+
+
+  ## Instance Methods ##
 
   def training_required?
     model.training_required?

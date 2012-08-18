@@ -1,15 +1,15 @@
 class BusinessHour < ActiveRecord::Base
 
-  #
-  # Associations
-  #
+  ## Macros ##
+
+  resourcify
+
+  ## Associations ##
 
   belongs_to :location, :inverse_of => :business_hours
   has_and_belongs_to_many :business_days
 
-  #
-  # Validations
-  #
+  ## Validations ##
 
   # TODO: validate with overlap detection for business hours
 
@@ -26,28 +26,24 @@ class BusinessHour < ActiveRecord::Base
   validates :close_hour,   :numericality => { :only_integer => true,
                                               :greater_than_or_equal_to => 0,
                                               :less_than => 24 }
-  validates :close_minute, :presence => true  
+  validates :close_minute, :presence => true
   validates :close_minute, :numericality => { :only_integer => true,
                                               :greater_than_or_equal_to => 0,
                                               :less_than => 60 }
   validate :should_have_at_least_one_business_day
-  
 
-  #
-  # Mass-assignable attributes
-  #
+
+  ## Mass-assignable attributes ##
 
   attr_accessible(:location_id,
                   :business_day_ids,
-                  :open_hour,   
-                  :open_minute, 
-                  :close_hour, 
+                  :open_hour,
+                  :open_minute,
+                  :close_hour,
                   :close_minute)
 
 
-  #
-  # Static methods
-  #
+  ## Class methods ##
 
   def self.hours_for_select
     (0..23).collect { |i| ["%02d" % i, i]}
@@ -58,9 +54,7 @@ class BusinessHour < ActiveRecord::Base
   end
 
 
-  #
-  # Instance methods
-  #
+  ## Instance methods ##
 
   def localized_hours(ref_time = Time.zone.now)
     "#{ localized_open_time(ref_time) }-#{ localized_close_time(ref_time) }"
@@ -85,7 +79,7 @@ class BusinessHour < ActiveRecord::Base
   # returns an array of [month, day] tuples representing the days with
   # open business hours between now and days_out
   def open_occurrences(days_out = 90, date_start = Time.zone.now)
-    date_end = date_start + days_out.days 
+    date_end = date_start + days_out.days
     schedule =  IceCube::Schedule.new
 
     # add a recurrence for each business day
@@ -106,7 +100,7 @@ class BusinessHour < ActiveRecord::Base
 
   def should_have_at_least_one_business_day
     if business_days.empty?
-      errors[:base] << "Should have at least one open day"      
+      errors[:base] << "Should have at least one open day"
     end
   end
 
@@ -115,4 +109,3 @@ class BusinessHour < ActiveRecord::Base
   end
 
 end
- 

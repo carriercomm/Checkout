@@ -1,17 +1,11 @@
 class Reservation < ActiveRecord::Base
 
-  #
-  # Callbacks
-  #
+  ## Macros ##
 
-  # FIXME: these before filters are setting the days to the wrong day
-  # before_save :adjust_start_at
-  # before_save :adjust_end_at
+  resourcify
 
 
-  #
-  # Associations
-  #
+  ## Associations ##
 
   belongs_to :kit,           :inverse_of => :reservations
   belongs_to :client,        :inverse_of => :reservations, :class_name => "User"
@@ -20,9 +14,7 @@ class Reservation < ActiveRecord::Base
   belongs_to :in_assistant,  :inverse_of => :in_assists,   :class_name => "User"
 
 
-  #
-  # Validations
-  #
+  ## Validations ##
 
   validates_presence_of :client
   validates_presence_of :kit
@@ -32,16 +24,12 @@ class Reservation < ActiveRecord::Base
   validate  :validate_open_on_start_at
 
 
-  #
-  # Virtual Attributes
-  #
+  ## Virtual Attributes ##
 
   attr_writer :model, :location
 
 
-  #
-  # Instance Methods
-  #
+  ## Instance Methods ##
 
   def adjust_start_at
     set_to_location_open_at!

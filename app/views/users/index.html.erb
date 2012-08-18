@@ -17,6 +17,7 @@
       <th><%= sortable('suspension_count', t('user.suspension_count')) %></th>
       <th><%= sortable('suspended_until', t('user.suspended_until')) %></th>
       <th><%= sortable('disabled', t('user.disabled')) %></th>
+      <th><%= t '.roles', :default => t("helpers.roles") %></th>
       <th><%=t '.actions', :default => t("helpers.actions") %></th>
     </tr>
   </thead>
@@ -28,6 +29,7 @@
         <td><%= user.suspension_count %></td>
         <td><%= user.suspended_until %></td>
         <td><%= user.disabled %></td>
+        <td><%= user.roles %></td>
         <td>
           <%= link_to t('.edit', :default => t("helpers.links.edit")),
                       edit_user_path(user), :class => 'btn btn-mini' %>

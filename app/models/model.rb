@@ -1,14 +1,9 @@
 class Model < ActiveRecord::Base
 
-  ## Mixins ##
+  ## Macros ##
 
-  # search can autocomplete on this model
   include Autocomplete
-
-  # apply authorization roles to this model
   resourcify
-
-  # convert empty string attributes to null
   strip_attributes
 
 

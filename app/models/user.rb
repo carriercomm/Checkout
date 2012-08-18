@@ -1,9 +1,9 @@
 class User < ActiveRecord::Base
+
   ## Macros ##
 
   rolify
   strip_attributes :only => [:suspended_until]
-
   # Include default devise modules. Others available are:
   # :token_authenticatable, :encryptable, :confirmable, :lockable, :registerable, :timeoutable and :omniauthable
   devise(:database_authenticatable, :lockable, :recoverable, :rememberable,
