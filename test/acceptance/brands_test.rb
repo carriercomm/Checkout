@@ -8,7 +8,6 @@ describe "User Browsing Brands Acceptance Test" do
     as_user(user) do
       assert brand.valid?
       visit brands_path
-#fails
       assert current_path == brands_path
       assert page.has_content? brand.name
       assert page.has_no_selector? "a.btn-new-brand"

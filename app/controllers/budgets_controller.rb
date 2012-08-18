@@ -6,6 +6,7 @@ class BudgetsController < ApplicationController
   # GET /budgets.json
   def index
     @budgets = Budget.order("budgets.date_start DESC, budgets.number ASC").page(params[:page])
+    @budgets = BudgetDecorator.decorate(@budgets)
 
     respond_to do |format|
       format.html # index.html.erb
@@ -16,7 +17,7 @@ class BudgetsController < ApplicationController
   # GET /budgets/1
   # GET /budgets/1.json
   def show
-    @budget = Budget.find(params[:id])
+    @budget = BudgetDecorator.find(params[:id])
 
     respond_to do |format|
       format.html # show.html.erb

@@ -132,12 +132,17 @@ class KitsController < ApplicationController
 
   def apply_scopes_and_pagination
     scope_by_brand
+    scope_by_budget
     scope_by_category
     @kits = @kits.joins(:models => :brand).order("brands.name, models.name").page(params[:page])
   end
 
   def scope_by_brand
     @kits = @kits.brand(params["brand_id"]) if params["brand_id"].present?
+  end
+
+  def scope_by_budget
+    @kits = @kits.where(budget_id: params["budget_id"]) if params["budget_id"].present?
   end
 
   def scope_by_category

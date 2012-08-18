@@ -1,21 +1,16 @@
 class Kit < ActiveRecord::Base
 
-  #
-  # Macros
-  #
+  ## Macros ##
 
   strip_attributes
 
-  #
-  # Callbacks
-  #
+
+  ## Callbacks ##
 
   before_validation :handle_tombstoned
 
 
-  #
-  # Associations
-  #
+  ## Associations ##
 
   belongs_to :budget,       :inverse_of => :kits
   has_many   :clients,      :through => :reservations
@@ -28,18 +23,14 @@ class Kit < ActiveRecord::Base
   accepts_nested_attributes_for :components, :reject_if => proc { |attributes| attributes['model_id'].blank? }, :allow_destroy=> true
 
 
-  #
-  # Validations
-  #
+  ## Validations ##
 
   validates_presence_of :location
   validate :should_have_at_least_one_component
   validate :tombstoned_should_not_be_checkoutable
 
 
-  #
-  # Mass-assignable attributes
-  #
+  ## Mass-assignable attributes ##
 
   attr_accessible(:budget_id,
                   :checkoutable,
@@ -49,24 +40,19 @@ class Kit < ActiveRecord::Base
                   :location_id,
                   :tombstoned)
 
-  #
-  # Virtual Attributes
-  #
+  ## Virtual Attributes ##
 
   attr_reader :forced_not_checkoutable
 
-  #
-  # Named scopes
-  #
+
+  ## Named scopes ##
 
   scope :checkoutable,     where("kits.tombstoned = ? AND kits.checkoutable = ?", false, true)
   scope :not_checkoutable, where("kits.tombstoned = ? OR kits.checkoutable = ?", true, false)
   scope :tombstoned,       where("kits.tombstoned = ?", true)
 
 
-  #
-  # Class Methods
-  #
+  ## Class Methods ##
 
   def self.asset_tag_search(query, limit=10)
     includes(:components).joins(:components)
@@ -75,9 +61,7 @@ class Kit < ActiveRecord::Base
   end
 
 
-  #
-  # Instance Methods
-  #
+  ## Instance Methods ##
 
   # returns an array of asset tags from components
   def asset_tags

@@ -1,23 +1,17 @@
 class Budget < ActiveRecord::Base
 
-  #
-  # Macros
-  #
-  
+  ## Macros ##
+
   strip_attributes
 
 
-  #
-  # Associations
-  #
-  
+  ## Associations ##
+
   has_many  :kits, :inverse_of => :budget
 
 
-  #
-  # Validations
-  #
-  
+  ## Validations ##
+
   validates :number, :format     => { :with => /\d{2}-\d{4}/, :message => "Must follow format XX-XXXX" }
   validates :number, :presence   => true
   validates :number, :uniqueness => { :scope => :date_start }
@@ -27,9 +21,7 @@ class Budget < ActiveRecord::Base
   # and vice-versa)
 
 
-  #
-  # Mass-assignable Attributes
-  #
+  ## Mass-assignable Attributes ##
 
   attr_accessible(:name,
                   :number,
@@ -37,9 +29,7 @@ class Budget < ActiveRecord::Base
                   :date_end)
 
 
-  #
-  # Static Methods
-  #
+  ## Static Methods ##
 
   def self.active
     where("? BETWEEN budgets.date_start AND budgets.date_end", Time.zone.now).order("budgets.number")
@@ -50,20 +40,15 @@ class Budget < ActiveRecord::Base
   end
 
 
-  #
-  # Instance Methods
-  #
-  
-  def display_date
-    if !!date_start && !!date_end
-      return "#{ date_start.year }-#{ date_end.year }"
-    else
-      return "Unknown"
-    end
+  ## Instance Methods ##
+
+  def to_param
+    "#{ id } #{ name } #{ number }".parameterize
   end
 
-  def to_s
-    "#{ number } #{ name } (#{ display_date.rjust(9) })"
-  end
+  # moved to the decorator
+  # def to_s
+  #   "#{ number } #{ name } (#{ display_date.rjust(9) })"
+  # end
 
 end

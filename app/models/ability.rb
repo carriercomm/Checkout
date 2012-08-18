@@ -7,7 +7,6 @@ class Ability
     else
       can :read, Brand
       can :read, Model
-      can :read, Budget
       can :read, BusinessHour
       can :read, Category
       can :read, Component

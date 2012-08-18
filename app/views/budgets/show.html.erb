@@ -2,20 +2,17 @@
 
 <dl class="dl-horizontal">
   <dt>Number</dt>
-  <dd><%= something(@budget.number) %></dd>
-
+  <dd><%= @budget.number %></dd>
   <dt>Name</dt>
-  <dd><%= something(@budget.name) %></dd>
-
+  <dd><%= @budget.name %></dd>
   <dt>Date start</dt>
-  <dd><%= something(@budget.date_start) %></dd>
-
+  <dd><%= @budget.date_start %></dd>
   <dt>Date end</dt>
-  <dd><%= something(@budget.date_end) %></dd>
+  <dd><%= @budget.date_end %></dd>
 </dl>
 
 <div class="form-actions">
-  <%= link_to 'Back', budgets_path, :class => 'btn'  %>
-  <%= link_to 'Edit', edit_budget_path(@budget), :class => 'btn' %>
-  <%= link_to 'Delete', budget_path(@budget), :method => 'delete', :confirm => 'Are you sure?', :class => 'btn btn-danger' %>
+  <%= link_to 'Back', budgets_path, :class => 'btn' %>
+  <%= link_to 'Edit', edit_budget_path(@budget), :class => 'btn btn-edit-budget' if can? :manage, Budget %>
+  <%= link_to 'Show Kits', budget_kits_path(@budget), :class => 'btn' %></p>
 </div>

@@ -28,7 +28,9 @@ Checkout::Application.routes.draw do
       collection &models_collection_routes
     end
   end
-  resources :budgets, :except => [:destroy]
+  resources :budgets, :except => [:destroy] do
+    resources :kits, :only => [:index]
+  end
   resources :business_hours
   resources :business_hour_exceptions
   resources :categories do

@@ -7,10 +7,9 @@
   <dd><%= @brand.models.count %></dd>
 </dl>
 
-<p><%= link_to t('link.models.show', default: 'Show Models'), brand_models_path(@brand) %></p>
-
 <div class="form-actions">
   <%= link_to 'Back', brands_path, :class => 'btn'  %>
   <%= link_to('Edit', edit_brand_path(@brand), :class => 'btn btn-edit-brand') if can? :manage, Brand %>
   <%= link_to('Delete', brand_path(@brand), :method => 'delete', :confirm => 'Are you sure? This will delete ALL models and components which belong to this brand! This operation is irreversible.', :class => 'btn btn-danger btn-delete-brand') if can? :manage, Brand %>
+  <%= link_to t('link.models.show', default: 'Show Models'), brand_models_path(@brand), :class=>'btn' %>
 </div>

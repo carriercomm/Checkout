@@ -45,11 +45,7 @@
                 <li class="divider"></li>
                 <li><%= link_to "Create", new_brand_path %></li>
               <% end %>
-              <%= dropdown_for "Budgets" do %>
-                <li><%= link_to "All", budgets_path  %></li>
-                <li class="divider"></li>
-                <li><%= link_to "Create", new_budget_path %></li>
-              <% end %>
+              <li><%= link_to "Budgets", budgets_path if can? :read, Budget %></li>
               <%= dropdown_for "Categories" do %>
                 <li><%= link_to "All", categories_path  %></li>
                 <li class="divider"></li>
@@ -73,7 +69,7 @@
             </form>
             <ul class="nav pull-right">
               <li class="divider-vertical"></li>
-              <%= dropdown_for "Account", "icon-user icon-white" do %>
+              <%= dropdown_for(current_user.username, "icon-user icon-white") do %>
                 <li><%= link_to "Sign out", destroy_user_session_path, :method => :delete %></li>
                 <li><%= link_to "Edit", edit_user_registration_path %></li>
               <% end %>

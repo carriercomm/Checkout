@@ -23,7 +23,8 @@
         <td><%= budget.name %></td>
         <td><%= budget.display_date %></td>
         <td>
-          <%= link_to 'Edit', edit_budget_path(budget), :class => 'btn btn-mini' %>
+          <%= link_to 'Show Kits', budget_kits_path(budget), :class => 'btn btn-mini' %>
+          <%= link_to 'Edit', edit_budget_path(budget), :class => 'btn btn-mini btn-edit-budget' if can? :manage, Budget %>
         </td>
       </tr>
     <% end %>
