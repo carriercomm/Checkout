@@ -1,17 +1,15 @@
 <h1>Category</h1>
 
-<p>
-  <b>Name</b><br>
-  <%= @category.name %>
-</p>
-
-<p>
-  <b>Description</b><br>
-  <%= @category.description %>
-</p>
+<dl class="dl-horizontal">
+  <dt>Name</dt>
+  <dd><%= @category.name %></dd>
+  <dt>Description</dt>
+  <dd><%= @category.description %></dd>
+</dl>
 
 <div class="form-actions">
   <%= link_to 'Back', categories_path, :class => 'btn'  %>
-  <%= link_to 'Edit', edit_category_path(@category), :class => 'btn' %>
-  <%= link_to 'Delete', category_path(@category), :method => 'delete', :confirm => 'Are you sure?', :class => 'btn btn-danger' %>
+  <%= link_to 'Show Models', category_models_path(@category), :class => 'btn' %>
+  <%= link_to('Edit', edit_category_path(@category), :class => 'btn btn-edit-category') if can? :manage, Category %>
+  <%= link_to('Delete', category_path(@category), :method => 'delete', :confirm => 'Are you sure?', :class => 'btn btn-danger btn-delete-category') if can? :manage, Category %>
 </div>

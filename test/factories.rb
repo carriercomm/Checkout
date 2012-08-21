@@ -34,6 +34,11 @@ FactoryGirl.define do
     date_closed { Date.new(2012, 12, 25) }
   end
 
+  factory :category do
+    name "Widgets"
+    description "Things that do stuff"
+  end
+
   factory :component do
     sequence(:serial_number) { |n| "THX1138-#{n}" }
     sequence(:asset_tag) { |n| "867-5309-#{n}" }

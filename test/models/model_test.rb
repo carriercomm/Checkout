@@ -56,24 +56,24 @@ describe Model do
     brand2_models.must_include model2
     brand2_models.must_include model3
     brand2_models.length.must_equal 2
-    
+
     # check instances
     model1.must_be :checkoutable?
     model1.checkoutable_kits.must_include kit1
     model1.checkoutable_kits.length.must_equal 1
     model1.checkoutable_kits.wont_include kit2
     model1.wont_be :training_required?
-    model1.kit_asset_tags.length.must_equal 3
-    model1.kit_asset_tags.must_include ["AAA", kit1]
-    model1.kit_asset_tags.must_include ["BBB", kit2]
-    model1.kit_asset_tags.must_include ["EEE", kit2]
-    model1.kit_asset_tags.wont_include ["CCC", kit3]
-    model1.kit_asset_tags.wont_include ["DDD", kit4]
+    model1.kits.length.must_equal 3
+    model1.asset_tags.must_include "AAA"
+    model1.asset_tags.must_include "BBB"
+    model1.asset_tags.must_include "EEE"
+    model1.asset_tags.wont_include "CCC"
+    model1.asset_tags.wont_include "DDD"
 
     model2.wont_be :checkoutable?
     model2.checkoutable_kits.length.must_equal 0
     model2.wont_be :training_required?
-    
+
     model3.wont_be :checkoutable?
     model3.checkoutable_kits.length.must_equal 0
     model3.must_be :training_required?

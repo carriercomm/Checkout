@@ -1,4 +1,4 @@
-<h1><%= @model.brand %> <%= @model %></h1>
+<h1><%= @model %></h1>
 
 <dl class="dl-horizontal">
   <dt>Description</dt>
@@ -17,23 +17,23 @@
 </div>
 
 <h2>Kits</h2>
-<% if @model.kit_asset_tags.empty? %>
-  No asset tags for this model
+<% if @model.kits.empty? %>
+  No kits for this model
 <% else %>
   <table class="table table-striped">
     <thead>
       <tr>
-        <th>Asset Tag</th>
+        <th>Asset Tags</th>
         <th>Components</th>
         <th>Location</th>
         <th>Actions</th>
       </tr>
     </thead>
     <tbody>
-      <% @model.kit_asset_tags.each do |asset_tag, kit| %>
+      <% @model.kits.each do |kit| %>
         <tr>
-          <td><%= link_to(asset_tag, kit_path(kit)) %></td>
-          <td><%= kit.branded_components_description %></td>
+          <td><%= link_to(kit.asset_tags, kit_path(kit)) %></td>
+          <td><%= kit.branded_components %></td>
           <td><%= kit.location %></td>
           <td>
             <% if kit.checkoutable? %>

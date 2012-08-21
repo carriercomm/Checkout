@@ -14,9 +14,11 @@ class ModelsController < ApplicationController
 
     apply_pagination
 
+    @models = ModelDecorator.decorate(@models.all)
+
     respond_to do |format|
       format.html
-      format.json { render json: { items: @models, total: @total} }
+      format.json { render json: { items: @models.map(&:select2_json), total: @total} }
     end
   end
 
@@ -33,6 +35,7 @@ class ModelsController < ApplicationController
   # GET /models/1.json
   def show
     @model = Model.includes(:kits => :location).find(params[:id])
+    @model = ModelDecorator.decorate(@model)
 
     respond_to do |format|
       format.html

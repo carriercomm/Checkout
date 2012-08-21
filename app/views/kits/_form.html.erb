@@ -9,7 +9,7 @@
     <a data-toggle="modal" href="#location_modal">New Location</a>
   </div>
   <%= f.input :checkoutable, :hint => "'True' if you want the kit to be available in the reservation system." %>
-  <%= f.association :budget, :collection => Budget.active, :label_method => :to_s, :prompt => 'Select budget' %>  
+  <%= f.association :budget, :collection => BudgetDecorator.decorate(Budget.active), :label_method => :to_s, :prompt => 'Select budget' %>  
   <div class="controls control-action">
     <!-- displays the budget/new_modal partial -->
     <a data-toggle="modal" href="#budget_modal">New Budget</a>
@@ -19,10 +19,7 @@
   <fieldset>
     <legend>Components</legend>
     <%= f.simple_fields_for :components %>
-    <div>
-      <i class="icon-plus-sign"></i>
-      <%= f.link_to_add "Add Another Component", :components %>
-    </div>
+    <%= f.link_to_add "<i class='icon-plus-sign'></i> Add another component".html_safe, :components %>
   </fieldset>
 
   <div class="form-actions">

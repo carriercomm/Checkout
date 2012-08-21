@@ -1,3 +1,8 @@
+<%= link_to(t('.new',
+            :default => raw("<i class='icon-plus-sign'></i> #{ t('helpers.links.new') }")),
+            new_kit_path,
+            :class => 'btn btn-primary pull-right btn-new-kit') if can? :manage, Kit %>
+
 <h1>Kits</h1>
 
 <%= paginate @kits %>
@@ -6,20 +11,19 @@
   <thead>
     <tr>
       <th>Asset Tag</th>
-      <th>Brand</th>
-      <th>Model</th>
+      <th>Components</th>
       <th>Actions</th>
     </tr>
   </thead>
   <tbody>
     <% @kits.each do |kit| %>
       <tr>
-        <td><%= link_to(kit.primary_component.asset_tag, kit_path(kit)) %></td>
-        <td><%= link_to(kit.primary_model.brand, brand_models_path(kit.primary_model.brand)) %></td>
-        <td><%= link_to(kit.primary_model, model_path(kit.primary_model)) %></td>
+        <td><%= link_to(kit.asset_tags, kit_path(kit)) %></td>
+        <td><%= kit.linked_branded_components %></td>
         <td>
-          <%= link_to 'Reserve', new_reservation_path(:kit_id => kit, :user_id => current_user), :class => 'btn btn-mini' %>
-          <%= link_to 'Reservations', kit_reservations_path(kit), :class => 'btn btn-mini' %>
+          <%= link_to('Reserve', new_reservation_path(:kit_id => kit, :user_id => current_user), :class => 'btn btn-mini') %>
+          <%= link_to('Reservations', kit_reservations_path(kit), :class => 'btn btn-mini') %>
+          <%= link_to('Edit', edit_kit_path(kit), :class => 'btn btn-mini btn-edit-kit') if can? :manage, Kit %>
         </td>
       </tr>
     <% end %>

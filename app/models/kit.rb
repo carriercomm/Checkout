@@ -74,17 +74,6 @@ class Kit < ActiveRecord::Base
     return checkoutable && !tombstoned
   end
 
-  # returns a string of comma delimited model names
-  def components_description
-    model_names = components.order("components.position ASC").collect { |c| c.model.to_s }
-    model_names.join(", ")
-  end
-
-  def branded_components_description
-    model_names = components.order("components.position ASC").collect { |c| c.model.branded_name }
-    model_names.join(", ")
-  end
-
   # equal to location.open_days minus days_reserved returns in format
   # [[month, day], [month, day], ...] for consumption by the
   # javascript date picker

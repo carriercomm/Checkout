@@ -37,12 +37,12 @@ class Category < ActiveRecord::Base
   ## Instance methods ##
 
   # TODO: move this to a select2 specific decorator method
-  def as_json(options = {})
-    {
-      id: id,
-      name: name
-    }
-  end
+  # def as_json(options = {})
+  #   {
+  #     id: id,
+  #     name: name
+  #   }
+  # end
 
   def to_s
     name

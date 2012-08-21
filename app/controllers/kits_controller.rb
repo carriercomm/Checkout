@@ -7,6 +7,7 @@ class KitsController < ApplicationController
   def index
     @kits = Kit
     apply_scopes_and_pagination
+    @kits = KitDecorator.decorate(@kits)
 
     respond_to do |format|
       format.html # index.html.erb
@@ -49,6 +50,8 @@ class KitsController < ApplicationController
               .order("components.position ASC")
               .find(params[:id])
 
+    @kit = KitDecorator.decorate(@kit)
+
     respond_to do |format|
       format.html # show.html.erb
       # format.json { render json: @kit }
@@ -60,7 +63,7 @@ class KitsController < ApplicationController
   def new
     @kit = Kit.new
     @kit.components.build
-      
+
     respond_to do |format|
       format.html # new.html.erb
       # format.json { render json: @kit }

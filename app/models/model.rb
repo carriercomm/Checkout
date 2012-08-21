@@ -52,17 +52,8 @@ class Model < ActiveRecord::Base
 
   ## Instance Methods ##
 
-  # this is specific to the select2 widget used in the kit form view
-  # TODO: move this to a decorator?
-  def as_json(options={})
-    {
-      :id   => id,
-      :text => branded_name
-    }
-  end
-
-  def branded_name
-    return "#{ brand } #{ name }"
+  def asset_tags
+    components.map(&:asset_tag)
   end
 
   # returns a list of checkout locations which have business hours
@@ -100,16 +91,11 @@ class Model < ActiveRecord::Base
 
   # callback to populate :autocomplete
   def generate_autocomplete
-    # you'll have to customize this
-    s = self.branded_name
+    # we'll martial brand into the autocomplete field since it's
+    # natural to search by brand
+    s = "#{ brand } #{ name }"
     s = s.truncate(45, omission: "", separator: " ") if s.length > 45
     self.autocomplete = Model.normalize(s)
-  end
-
-  # helper for generating asset tags with links to their kits
-  def kit_asset_tags
-    ats = components.collect { |c| [c.asset_tag, c.kit] }
-    ats.sort_by! { |a| a.first }
   end
 
   def training_required?
@@ -123,7 +109,7 @@ class Model < ActiveRecord::Base
   end
 
   def to_param
-    "#{ id } #{ branded_name }".parameterize
+    "#{ id } #{ brand } #{ name }".parameterize
   end
 
 end

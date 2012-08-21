@@ -1,44 +1,5 @@
-class ModelDecorator < Draper::Base
-  decorates :model
-
-  def autocomplete_json
-    {
-      :label => to_s,
-      :value => h.url_for(model)
-    }
-  end
-
-  def brand_name
-    model.brand.to_s
-  end
-
-  def kits
-    KitDecorator.decorate(model.kits)
-  end
-
-  def linked_branded_name
-    "#{ linked_brand } #{ linked_name }".html_safe
-  end
-
-  # TODO: delegate this to a BrandDecorator?
-  def linked_brand
-    h.link_to(brand_name, h.brand_path(model.brand))
-  end
-
-  def linked_name
-    h.link_to(model.name, h.model_path(model))
-  end
-
-  def select2_json
-    {
-      :id   => id,
-      :text => to_s
-    }
-  end
-
-  def to_s
-    "#{ brand_name } #{ model.name }"
-  end
+class BrandDecorator < Draper::Base
+  decorates :brand
 
   # Accessing Helpers
   #   You can access any helper via a proxy

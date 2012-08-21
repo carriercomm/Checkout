@@ -5,11 +5,11 @@ class CategoriesController < ApplicationController
   # GET /categories
   # GET /categories.json
   def index
-    @categories = Category.order("LOWER(name) ASC").all
+    @categories = Category.order("LOWER(name) ASC").page(params[:page]).per(params[:page_limit])
 
     respond_to do |format|
       format.html # index.html.erb
-      format.json { render json: @categories }
+      #format.json { render json: @categories }
     end
   end
 
