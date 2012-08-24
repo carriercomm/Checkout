@@ -19,9 +19,9 @@
     <% @brands.each do |brand| %>
       <tr>
         <td><%= link_to brand.name, brand_path(brand) %></td>
-        <td><%= brand.models.count %></td>
+        <td><%= brand.component_models.count %></td>
         <td>
-          <%= link_to 'Show Models',  brand_models_path(brand), :class => 'btn btn-mini' %>
+          <%= link_to 'Show Models',  brand_component_models_path(brand), :class => 'btn btn-mini' %>
           <%= link_to t('.edit',
                         :default => t("helpers.links.edit")),
                         edit_brand_path(brand),

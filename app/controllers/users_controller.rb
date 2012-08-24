@@ -1,6 +1,9 @@
 class UsersController < ApplicationController
 
+  # use CanCan to authorize this resource
   authorize_resource
+
+  # make these methods available in the views
   helper_method :sort_column, :sort_direction
 
   # GET /users

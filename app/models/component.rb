@@ -14,13 +14,13 @@ class Component < ActiveRecord::Base
 
   ## Associations ##
 
-  belongs_to :model, :inverse_of => :components
+  belongs_to :component_model, :inverse_of => :components
   belongs_to :kit,   :inverse_of => :components
 
 
   ## Validations ##
 
-  validates_presence_of :model
+  validates_presence_of :component_model
   validates_presence_of :kit
   validates :asset_tag,     :uniqueness => true, :allow_nil => true
   validates :serial_number, :uniqueness => true, :allow_nil => true
@@ -31,20 +31,20 @@ class Component < ActiveRecord::Base
   attr_accessible(:asset_tag,
                   :kit_id,
                   :missing,
-                  :model_id,
+                  :component_model_id,
                   :position,
                   :serial_number)
 
 
   ## Virtual attributes ##
 
-  attr_reader :model_name
+  attr_reader :component_model_name
 
 
   ## Instance Methods ##
 
   def training_required?
-    model.training_required?
+    component_model.training_required?
   end
 
   private

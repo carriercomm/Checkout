@@ -1,5 +1,6 @@
 class KitsController < ApplicationController
 
+  # use CanCan to authorize this resource
   authorize_resource
 
   # GET /kits
@@ -25,7 +26,7 @@ class KitsController < ApplicationController
   end
 
   def not_checkoutable
-    @models = Kit.not_checkoutable
+    @component_models = Kit.not_checkoutable
     apply_scopes_and_pagination
 
     respond_to do |format|
@@ -34,7 +35,7 @@ class KitsController < ApplicationController
   end
 
   def tombstoned
-    @models = Kit.tombstoned
+    @component_models = Kit.tombstoned
     apply_scopes_and_pagination
 
     respond_to do |format|
@@ -45,8 +46,8 @@ class KitsController < ApplicationController
   # GET /kits/1
   # GET /kits/1.json
   def show
-    @kit = Kit.joins(:location, :budget, :components, :models => :brand)
-              .includes(:location, :budget, :components, :models => :brand)
+    @kit = Kit.joins(:location, :budget, :components, :component_models => :brand)
+              .includes(:location, :budget, :components, :component_models => :brand)
               .order("components.position ASC")
               .find(params[:id])
 
@@ -137,7 +138,7 @@ class KitsController < ApplicationController
     scope_by_brand
     scope_by_budget
     scope_by_category
-    @kits = @kits.joins(:models => :brand).order("brands.name, models.name").page(params[:page])
+    @kits = @kits.joins(:component_models => :brand).order("brands.name, component_models.name").page(params[:page])
   end
 
   def scope_by_brand

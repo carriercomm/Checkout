@@ -2,11 +2,11 @@
   <%= f.link_to_remove "<i class='icon-minus-sign'></i> Remove this component".html_safe, :class => 'danger pull-right' %>
   <br style="clear:both">
   <%= content_tag :div, f.error(:base), :class=>"alert alert-error" if f.error(:base) %>
-  <%= f.input :model_id, :label => "Model", :required => true, :input_html => {
+  <%= f.input :component_model_id, :label => "Model", :required => true, :input_html => {
         :class => 'select2-json-autocomplete',
         :hidden => true,
-        "data-ajax-url" => models_path(:format => :json),
-        "data-text" => f.object.model.try(:to_s)
+        "data-ajax-url" => component_models_path(:format => :json),
+        "data-text" => f.object.component_model.try(:to_s)
       } %>
   <%= f.input :asset_tag %>
   <%= f.input :serial_number %>

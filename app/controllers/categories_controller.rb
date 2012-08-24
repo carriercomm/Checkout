@@ -1,5 +1,6 @@
 class CategoriesController < ApplicationController
 
+  # use CanCan to authorize this resource
   authorize_resource
 
   # GET /categories

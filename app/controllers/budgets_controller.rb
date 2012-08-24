@@ -1,5 +1,6 @@
 class BudgetsController < ApplicationController
 
+  # use CanCan to authorize this resource
   authorize_resource
 
   # GET /budgets

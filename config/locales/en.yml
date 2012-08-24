@@ -31,3 +31,7 @@ en:
       user:
         disabled: "Prevent this client from logging in"
         suspended_until: "Suspend this client's checkout privileges until a specified date"
+  helpers:
+    submit:
+      component_model:
+        update: "Update Model"

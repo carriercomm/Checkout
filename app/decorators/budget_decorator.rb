@@ -1,7 +1,7 @@
 class BudgetDecorator < ApplicationDecorator
   decorates :budget
 
-  allows(:date_end, :date_start, :name, :number)
+  allows :date_end, :date_start, :name, :number
 
   def display_date
     if !!model.date_start && !!model.date_end

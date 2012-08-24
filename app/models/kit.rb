@@ -13,15 +13,15 @@ class Kit < ActiveRecord::Base
 
   ## Associations ##
 
-  belongs_to :budget,       :inverse_of => :kits
-  has_many   :clients,      :through => :reservations
-  has_many   :components,   :inverse_of => :kit
-  belongs_to :location,     :inverse_of => :kits
-  has_many   :models,       :through => :components
-  has_many   :reservations, :inverse_of => :kit
+  belongs_to :budget,           :inverse_of => :kits
+  has_many   :clients,          :through => :reservations
+  has_many   :components,       :inverse_of => :kit
+  belongs_to :location,         :inverse_of => :kits
+  has_many   :component_models, :through => :components, :order => "component_models.name ASC"
+  has_many   :reservations,     :inverse_of => :kit
   # has_and_belongs_to_many :groups
 
-  accepts_nested_attributes_for :components, :reject_if => proc { |attributes| attributes['model_id'].blank? }, :allow_destroy=> true
+  accepts_nested_attributes_for :components, :reject_if => proc { |attributes| attributes['component_model_id'].blank? }, :allow_destroy=> true
 
 
   ## Validations ##
@@ -109,14 +109,14 @@ class Kit < ActiveRecord::Base
   end
 
   # by convention, we use this as the kit descriptor
-  def primary_component
-    components.joins(:model).order("position").first
-  end
+  # def primary_component
+  #   components.joins(:model).order("position").first
+  # end
 
   # by convention, we use this as the kit descriptor
-  def primary_model
-    primary_component.model
-  end
+  # def primary_model
+  #   primary_component.component_model
+  # end
 
   # TODO: add check for permissions
   # TODO: add check for 'hold'
@@ -150,13 +150,14 @@ class Kit < ActiveRecord::Base
     end
   end
 
-  def to_param
-    "#{ id } #{ to_s }".parameterize
-  end
+  # TODO: fix this
+  # def to_param
+  #   "#{ id } #{ to_s }".parameterize
+  # end
 
-  def to_s
-    "#{ primary_model.brand } #{ primary_model }"
-  end
+  # def to_s
+  #   "#{ primary_model.brand } #{ primary_model }"
+  # end
 
   # custom validator
   def tombstoned_should_not_be_checkoutable

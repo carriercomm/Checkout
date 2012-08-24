@@ -1,0 +1,51 @@
+<h1><%= @component_model %></h1>
+
+<dl class="dl-horizontal">
+  <dt>Description</dt>
+  <dd><%= @component_model.description %></dd>
+  <dt>Training required</dt>
+  <dd><%= @component_model.training_required %></dd>
+  <dt>Categories</dt>
+  <dd><%= @component_model.category_list %></dd>
+</dl>
+
+<div class="form-actions">
+  <%= link_to 'Back', component_models_path, :class => 'btn'  %>
+  <%= link_to 'Reserve', new_component_model_reservation_path(@component_model), :class => 'btn btn-primary' %>
+  <%= link_to('Edit', edit_component_model_path(@component_model), :class => 'btn btn-edit-component-model') if can? :manage, ComponentModel %>
+  <%= link_to('Delete', component_model_path(@component_model),
+                :method => 'delete',
+                :confirm => 'Are you sure? This will also delete all the kits and components associated with this model!',
+                :class => 'btn btn-danger btn-delete-component-model') if can? :manage, ComponentModel %>
+</div>
+
+<h2>Kits</h2>
+<% if @component_model.kits.empty? %>
+  No kits for this model
+<% else %>
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>Asset Tags</th>
+        <th>Components</th>
+        <th>Location</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @component_model.kits.each do |kit| %>
+        <tr>
+          <td><%= link_to(kit.asset_tags, kit_path(kit)) %></td>
+          <td><%= kit.component_list %></td>
+          <td><%= kit.location %></td>
+          <td>
+            <% if kit.checkoutable? %>
+            <%= link_to 'Reserve', new_kit_reservation_path(kit, :user_id => current_user), :class => 'btn btn-mini' %>
+            <%= link_to 'Reservations', kit_reservations_path(kit), :class => 'btn btn-mini' %>
+            <% end %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+<% end %>

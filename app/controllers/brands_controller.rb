@@ -1,5 +1,6 @@
 class BrandsController < ApplicationController
 
+  # use CanCan to authorize this resource
   authorize_resource
 
   # GET /brands
@@ -31,7 +32,7 @@ class BrandsController < ApplicationController
   # GET /brands/1
   # GET /brands/1.json
   def show
-    @brand = Brand.includes(:models).find(params[:id])
+    @brand = Brand.includes(:component_models).find(params[:id])
 
     respond_to do |format|
       format.html # show.html.erb
@@ -102,7 +103,7 @@ class BrandsController < ApplicationController
   private
 
   def apply_scopes
-    @brands = @brands.includes(:models).order("brands.name ASC")
+    @brands = @brands.includes(:component_models).order("brands.name ASC")
     scope_by_brand
     scope_by_category
     scope_by_search_params

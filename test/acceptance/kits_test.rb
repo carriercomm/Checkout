@@ -3,8 +3,8 @@ require 'minitest_helper'
 describe "User Browsing Kits Acceptance Test" do
   let(:user) { FactoryGirl.create(:user) }
   let(:kit) do
-    model1     = FactoryGirl.create(:model_with_brand)
-    component1 = FactoryGirl.build(:component, model: model1, asset_tag: "AAA")
+    model1     = FactoryGirl.create(:component_model_with_brand)
+    component1 = FactoryGirl.build(:component, component_model: model1, asset_tag: "AAA")
     FactoryGirl.create(:checkoutable_kit_with_location, components: [component1])
   end
 
@@ -47,8 +47,8 @@ describe "Admin Browsing Kits Acceptance Test" do
     FactoryGirl.create(:user, roles:[role])
   end
   let(:kit) do
-    model1     = FactoryGirl.create(:model_with_brand)
-    component1 = FactoryGirl.build(:component, model: model1, asset_tag: "AAA")
+    model1     = FactoryGirl.create(:component_model_with_brand)
+    component1 = FactoryGirl.build(:component, component_model: model1, asset_tag: "AAA")
     location1  = FactoryGirl.build(:location)
     FactoryGirl.create(:checkoutable_kit_with_location, components: [component1])
   end

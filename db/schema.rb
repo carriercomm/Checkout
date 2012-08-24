@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120814213259) do
+ActiveRecord::Schema.define(:version => 20120822190741) do
 
   create_table "active_admin_comments", :force => true do |t|
     t.string   "resource_id",   :null => false
@@ -85,21 +85,33 @@ ActiveRecord::Schema.define(:version => 20120814213259) do
 
   add_index "categories", ["name"], :name => "index_categories_on_name"
 
-  create_table "categories_models", :id => false, :force => true do |t|
+  create_table "categories_component_models", :id => false, :force => true do |t|
     t.integer "category_id"
-    t.integer "model_id"
+    t.integer "component_model_id"
   end
 
-  add_index "categories_models", ["category_id", "model_id"], :name => "index_categories_models_on_category_id_and_model_id"
+  add_index "categories_component_models", ["category_id", "component_model_id"], :name => "index_categories_models_on_category_id_and_model_id"
+
+  create_table "component_models", :force => true do |t|
+    t.string   "name",                                 :null => false
+    t.text     "description"
+    t.boolean  "training_required", :default => false
+    t.integer  "brand_id",                             :null => false
+    t.datetime "created_at",                           :null => false
+    t.datetime "updated_at",                           :null => false
+    t.string   "autocomplete",                         :null => false
+  end
+
+  add_index "component_models", ["brand_id"], :name => "index_models_on_brand_id"
 
   create_table "components", :force => true do |t|
     t.string   "serial_number"
-    t.boolean  "missing",       :default => false
+    t.boolean  "missing",            :default => false
     t.integer  "kit_id"
-    t.datetime "created_at",                       :null => false
-    t.datetime "updated_at",                       :null => false
+    t.datetime "created_at",                            :null => false
+    t.datetime "updated_at",                            :null => false
     t.string   "asset_tag"
-    t.integer  "model_id"
+    t.integer  "component_model_id"
     t.integer  "position"
   end
 
@@ -123,18 +135,6 @@ ActiveRecord::Schema.define(:version => 20120814213259) do
     t.datetime "created_at", :null => false
     t.datetime "updated_at", :null => false
   end
-
-  create_table "models", :force => true do |t|
-    t.string   "name",                                 :null => false
-    t.text     "description"
-    t.boolean  "training_required", :default => false
-    t.integer  "brand_id",                             :null => false
-    t.datetime "created_at",                           :null => false
-    t.datetime "updated_at",                           :null => false
-    t.string   "autocomplete",                         :null => false
-  end
-
-  add_index "models", ["brand_id"], :name => "index_models_on_brand_id"
 
   create_table "reservations", :force => true do |t|
     t.integer  "kit_id"
@@ -214,16 +214,16 @@ ActiveRecord::Schema.define(:version => 20120814213259) do
 
   add_foreign_key "business_hours", "locations", :name => "business_hours_location_id_fk"
 
-  add_foreign_key "categories_models", "categories", :name => "categories_models_category_id_fk"
-  add_foreign_key "categories_models", "models", :name => "categories_models_model_id_fk"
+  add_foreign_key "categories_component_models", "categories", :name => "categories_models_category_id_fk"
+  add_foreign_key "categories_component_models", "component_models", :name => "categories_models_model_id_fk"
 
+  add_foreign_key "component_models", "brands", :name => "models_brand_id_fk"
+
+  add_foreign_key "components", "component_models", :name => "components_model_id_fk"
   add_foreign_key "components", "kits", :name => "components_kit_id_fk"
-  add_foreign_key "components", "models", :name => "components_model_id_fk"
 
   add_foreign_key "kits", "budgets", :name => "kits_budget_id_fk"
   add_foreign_key "kits", "locations", :name => "kits_location_id_fk"
-
-  add_foreign_key "models", "brands", :name => "models_brand_id_fk"
 
   add_foreign_key "reservations", "kits", :name => "reservations_kit_id_fk"
   add_foreign_key "reservations", "users", :name => "reservations_approver_id_fk", :column => "approver_id"

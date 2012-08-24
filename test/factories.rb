@@ -78,25 +78,14 @@ FactoryGirl.define do
     name "Electric Avenue"
   end
 
-  factory :model do
+  factory :component_model do
     sequence(:name) { |n| "Fluffernutter ##{n}" }
     description "Oh so tasty and crunchy! Takes AA batteries."
     training_required false
 
-    factory :model_with_brand do
+    factory :component_model_with_brand do
       brand
     end
-
-    # factory :model_with_component_and_kit do
-    #   kits { |kits| [kits.association(:kit_with_location)]}
-    # end
-
-    # factory :model_with_component_and_kit do
-    #   after_build do |model|
-    #     model.components << FactoryGirl.build(:component_with_kit, :model => model)
-    #   end
-    # end
-
   end
 
   factory :role do

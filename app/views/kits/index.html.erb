@@ -19,7 +19,7 @@
     <% @kits.each do |kit| %>
       <tr>
         <td><%= link_to(kit.asset_tags, kit_path(kit)) %></td>
-        <td><%= kit.linked_branded_components %></td>
+        <td><%= kit.linked_component_list %></td>
         <td>
           <%= link_to('Reserve', new_reservation_path(:kit_id => kit, :user_id => current_user), :class => 'btn btn-mini') %>
           <%= link_to('Reservations', kit_reservations_path(kit), :class => 'btn btn-mini') %>

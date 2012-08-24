@@ -1,4 +1,4 @@
-class Model < ActiveRecord::Base
+class ComponentModel < ActiveRecord::Base
 
   ## Macros ##
 
@@ -9,8 +9,8 @@ class Model < ActiveRecord::Base
 
   ## Associations ##
 
-  belongs_to :brand,      :inverse_of => :models
-  has_many   :components, :inverse_of => :model
+  belongs_to :brand,      :inverse_of => :component_models
+  has_many   :components, :inverse_of => :component_model
   has_many   :kits, :through => :components, :dependent => :destroy
   has_and_belongs_to_many :categories
 
@@ -95,7 +95,7 @@ class Model < ActiveRecord::Base
     # natural to search by brand
     s = "#{ brand } #{ name }"
     s = s.truncate(45, omission: "", separator: " ") if s.length > 45
-    self.autocomplete = Model.normalize(s)
+    self.autocomplete = self.class.normalize(s)
   end
 
   def training_required?

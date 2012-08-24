@@ -21,7 +21,7 @@
         <td><%= link_to category.name, category_path(category) %></td>
         <td><%= category.description %></td>
         <td>
-          <%= link_to 'Show Models', category_models_path(category), :class => 'btn btn-mini' %>
+          <%= link_to 'Show Models', category_component_models_path(category), :class => 'btn btn-mini' %>
           <%= link_to 'Edit', edit_category_path(category), :class => 'btn btn-mini btn-edit-category' if can? :manage, Category %>
         </td>
       </tr>

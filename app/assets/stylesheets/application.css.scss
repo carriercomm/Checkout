@@ -7,11 +7,13 @@
   font-style:italic;
   color: #999;
 }
-
 .qrcode {
   border:1px solid rgba(0,0,0,0.5);
 }
-
 a.danger {
   color:#F33;
 }
+td.action-buttons {
+  width: 1%;
+}
+    

@@ -13,7 +13,7 @@ class Brand < ActiveRecord::Base
   # Associations
   #
 
-  has_many :models
+  has_many :component_models
 
 
   #
@@ -36,15 +36,15 @@ class Brand < ActiveRecord::Base
   #
 
   def self.having_tombstoned_kits
-    joins(:models => :kits).where("kits.tombstoned = ?", true).uniq
+    joins(:component_models => :kits).where("kits.tombstoned = ?", true).uniq
   end
 
   def self.not_having_checkoutable_kits
-    joins(:models => :kits).where("kits.checkoutable = ?", false).uniq
+    joins(:component_models => :kits).where("kits.checkoutable = ?", false).uniq
   end
 
   def self.having_checkoutable_kits
-    joins(:models => :kits).where("kits.tombstoned = ? AND kits.checkoutable = ?", false, true).uniq
+    joins(:component_models => :kits).where("kits.tombstoned = ? AND kits.checkoutable = ?", false, true).uniq
   end
 
 

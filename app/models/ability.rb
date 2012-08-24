@@ -6,10 +6,10 @@ class Ability
       can :manage, :all
     else
       can :read, Brand
-      can :read, Model
       can :read, BusinessHour
       can :read, Category
       can :read, Component
+      can :read, ComponentModel
       can :read, Kit
       can :read, Location
       can :read, Reservation

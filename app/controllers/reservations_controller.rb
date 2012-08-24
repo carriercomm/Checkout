@@ -1,5 +1,6 @@
 class ReservationsController < ApplicationController
 
+  # use CanCan to authorize this resource
   authorize_resource
 
   # GET /reservations
@@ -38,25 +39,25 @@ class ReservationsController < ApplicationController
 
     # do we have a specific kit to check out?
     if params[:kit_id].present?
-      @kit         = Kit.includes(:location, :models => :brand).find(params[:kit_id])
+      @kit         = Kit.includes(:location).find(params[:kit_id])
       @reservation = @client.reservations.build(:kit_id => @kit.id)
       @locations   = [@kit.location]
 
       # setup javascript data structures to make the date picker work
-      # TODO: move this to a model method on kit (same as implemented for Model)
+      # TODO: move this to a model method on kit (same as implemented for ComponentModel)
       setup_kit_checkout_days(@kit)
 
-    # do we have a general model to check out?
-    elsif params[:model_id].present?
+    # do we have a general component_model to check out?
+    elsif params[:component_model_id].present?
       @reservation = @client.reservations.build
-      @model       = Model.checkoutable.includes(:kits => :location).find(params[:model_id])
+      @model       = ComponentModel.checkoutable.includes(:kits => :location).find(params[:component_model_id])
       @locations   = @model.checkout_locations
       @reservation.location = @locations.first if @locations.size == 1
       gon.locations = @model.checkout_days_json
 
     else
       flash[:error] = "Start by finding something to check out!"
-      redirect_to models_path and return
+      redirect_to component_models_path and return
     end
 
     respond_to do |format|

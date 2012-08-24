@@ -1,12 +1,15 @@
 Checkout::Application.routes.draw do
 
+  # TODO: trim down these routes
+  # TODO: move most of these added collection routes to params, so they can act as facets
+
   # extra collection routes used on 'brands' resource
   brands_collection_routes = Proc.new do
     get 'checkoutable'
   end
 
-  # extra collection routes used on 'models' resource
-  models_collection_routes = Proc.new do
+  # extra collection routes used on 'component_models' resource
+  component_models_collection_routes = Proc.new do
     get 'checkoutable'
   end
 
@@ -17,29 +20,29 @@ Checkout::Application.routes.draw do
     get 'tombstoned'
   end
 
-  root :to => 'models#checkoutable'
+  root :to => 'component_models#checkoutable'
 
   devise_for :user
 
   # TODO: is this being used? mebbe nuke this and its controller
   resources :brands do
     collection &brands_collection_routes
-    resources :models do
-      collection &models_collection_routes
+    resources :models, :as => "component_models", :controller => "component_models" do
+      collection &component_models_collection_routes
     end
   end
   resources :budgets, :except => [:destroy] do
     resources :kits, :only => [:index]
   end
-  resources :business_hours
-  resources :business_hour_exceptions
+#  resources :business_hours
+#  resources :business_hour_exceptions
   resources :categories do
     collection do
       get 'select2'
       get 'suggestions'
     end
-    resources :models do
-      collection &models_collection_routes
+    resources :models, :as => "component_models", :controller => "component_models" do
+      collection &component_models_collection_routes
     end
   end
   resources :components
@@ -48,9 +51,8 @@ Checkout::Application.routes.draw do
     resources :reservations, :only => [:index, :new]
   end
   resources :locations
-  resources :models do
-    collection &models_collection_routes
-    resources :parts
+  resources :models, :as => "component_models", :controller => "component_models" do
+    collection &component_models_collection_routes
     resources :reservations, :only => [:new]
   end
   resources :reservations

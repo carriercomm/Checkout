@@ -1,5 +1,9 @@
 class KitDecorator < ApplicationDecorator
   decorates :kit
+  decorates_association :budget
+  decorates_association :component_models
+  decorates_association :components
+  decorates_association :reservations
 
   allows(:budget_id,
          :checkoutable?,
@@ -16,9 +20,8 @@ class KitDecorator < ApplicationDecorator
     q     = options.delete(:q)
     raise self.inspect if q.nil?
     regexp = Regexp.quote(q)
-    at    = asset_tags.select {|at| /#{regexp}/ =~ at }
-    label = "[#{ at.join(",
-  ") }] #{ branded_components_description }".squish
+    at    = model.asset_tags.select {|at| /#{regexp}/ =~ at }
+    label = "[#{ at.join(", ") }] #{ component_list }".squish
 
     {
       :label => label,
@@ -26,30 +29,12 @@ class KitDecorator < ApplicationDecorator
     }
   end
 
-  def branded_components
-    branded_names = component_models.map { |cm| ModelDecorator.decorate(cm).to_s }
-    branded_names.join(", ").html_safe
-  end
-
-  def linked_branded_components
-    branded_names = component_models.map { |cm| ModelDecorator.decorate(cm).to_s }
-    branded_names.join(", ").html_safe
-  end
-
-  def budget
-    BudgetDecorator.decorate(model.budget).try(:to_s).try(:html_safe)
-  end
-
   def checkoutable
     to_yes_no(model.checkoutable)
   end
 
-  def components
-    ComponentDecorator.decorate(model.components)
-  end
-
   # returns a string of comma delimited model names
-  def components_description
+  def component_list
     component_models.map(&:to_s).join(", ")
   end
 
@@ -59,6 +44,10 @@ class KitDecorator < ApplicationDecorator
 
   def insured
     to_yes_no(model.insured)
+  end
+
+  def linked_component_list
+    component_models.map(&:to_link).join(", ").html_safe
   end
 
   def location
@@ -71,12 +60,6 @@ class KitDecorator < ApplicationDecorator
 
   def training_required
     to_yes_no(model.training_required?)
-  end
-
-  private
-
-  def component_models
-    model.components.order("components.position ASC").collect { |c| c.model }
   end
 
 end
