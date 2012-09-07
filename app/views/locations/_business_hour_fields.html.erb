@@ -1,9 +1,9 @@
 <div class="well business_hour">
+  <%= f.link_to_remove "<i class='icon-minus-sign'></i> Remove these hours".html_safe, :class => 'danger pull-right' %>
   <%= content_tag :div, f.error(:base), :class=>"alert alert-error" if f.error(:base) %>
   <%= f.association :business_days, :as => :check_boxes %>
   <%= f.input :open_hour, :collection => BusinessHour.hours_for_select %>
   <%= f.input :open_minute, :collection => BusinessHour.minutes_for_select %>
   <%= f.input :close_hour, :collection => BusinessHour.hours_for_select %>
   <%= f.input :close_minute, :collection => BusinessHour.minutes_for_select %>
-  <%= f.link_to_remove "Remove these hours", :class => 'btn btn-danger' %>
 </div>

@@ -37,10 +37,12 @@ end
 
 group :test do
   gem 'database_cleaner'        # for creating a clean test database before each test
+  gem 'capybara-webkit'         # javascript driver for integration tests
   gem 'factory_girl_rails'      # factories - instead of fixtures
   gem 'guard-minitest'          # framework for autorunning mintest tests
   gem 'launchy'                 # save and open test pages - for debugging tests
   gem 'minitest-rails-capybara' # test framework
+  gem 'minitest-metadata'
   gem 'turn'                    # test results output formatter
 end
 

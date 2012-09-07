@@ -47,9 +47,4 @@ class Budget < ActiveRecord::Base
     "#{ id } #{ name } #{ number }".parameterize
   end
 
-  # moved to the decorator
-  # def to_s
-  #   "#{ number } #{ name } (#{ display_date.rjust(9) })"
-  # end
-
 end

@@ -10,7 +10,7 @@
   <fieldset>
     <legend>Hours</legend>
     <%= f.simple_fields_for :business_hours %>
-    <%= f.link_to_add "Add Hours", :business_hours, :class => 'btn', :style => "margin:1em 1em 1em 4em;" %>
+    <%= f.link_to_add "<i class='icon-plus-sign'></i> Add more hours".html_safe, :business_hours %>
   </fieldset>
 
   <div class="form-actions">
