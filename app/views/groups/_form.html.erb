@@ -1,0 +1,16 @@
+<%= simple_form_for @group, :html => { :class => 'form-horizontal' } do |f| %>
+  <%= f.input :name %>
+  <%= f.input :expires_at, :as => :date_picker,
+      :input_html => {
+        :value => (f.object.expires_at.nil? ? nil : localize(f.object.expires_at, :format => "%Y-%m-%d"))
+      }  %>
+  <%= f.association :users, :collection => User.order(:username).all, :input_html => {
+        :multiple => true,
+        :class    => 'select2-tagged-field categories-select'
+      } %>
+  <div class="form-actions">
+    <%= f.button :submit, :class => 'btn-primary' %>
+    <%= link_to t('.cancel', :default => t("helpers.links.cancel")),
+                groups_path, :class => 'btn' %>
+  </div>
+<% end %>

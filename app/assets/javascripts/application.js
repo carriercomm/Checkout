@@ -16,7 +16,8 @@
 //= require jquery-ui
 //= require jquery_nested_form
 //= require jquery_ujs
-//= require datepicker    
+//= require datepicker
+//= require groups
 //= require modal_forms
 //= require models
 //= require parts

@@ -46,6 +46,7 @@ Checkout::Application.routes.draw do
     end
   end
   resources :components
+  resources :groups
   resources :kits do
     collection &kits_collection_routes
     resources :reservations, :only => [:index, :new]
@@ -58,6 +59,7 @@ Checkout::Application.routes.draw do
   resources :reservations
   resources :search, :only => [:index]
   resources :users, :except => [:destroy] do
+    resources :groups
     resources :reservations
   end
 

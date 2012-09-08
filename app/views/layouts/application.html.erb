@@ -28,7 +28,7 @@
   </head>
   <body>
 
-    <div class="navbar navbar-fixed-top">
+    <div class="navbar navbar-fixed-top navbar-inverse">
       <div class="navbar-inner">
         <div class="container-fluid">
           <a class="btn btn-navbar" data-target=".nav-collapse" data-toggle="collapse">
@@ -47,6 +47,7 @@
               <% end %>
               <li><%= link_to "Budgets", budgets_path if can? :read, Budget %></li>
               <li><%= link_to "Categories", categories_path  if can? :read, Category %></li>
+              <li><%= link_to "Groups", groups_path if can? :manage, Group %></li>
               <li><%= link_to "Kits", kits_path if can? :manage, Kit %></li>
               <li><%= link_to "Locations", locations_path %></li>
               <%= dropdown_for "Models" do %>

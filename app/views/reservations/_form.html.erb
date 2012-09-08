@@ -21,13 +21,13 @@
         :label => 'Pick Up Date',
         :input_html => {
           :class => 'start_date',
-          :value => (f.object.new_record? ? nil : localize(f.object.start_at, :format => "%Y-%m-%d"))
+          :value => (f.object.start_at.nil? ? nil : localize(f.object.start_at, :format => "%Y-%m-%d"))
         }  %>
     <%= f.input :end_at, :as => :date_picker,
         :label => 'Return Date',
         :input_html => {
           :class => 'end_date',
-          :value => (f.object.new_record? ? nil : localize(f.object.end_at, :format => "%Y-%m-%d"))
+          :value => (f.object.end_at.nil? ? nil : localize(f.object.end_at, :format => "%Y-%m-%d"))
         } %>
 
     <div class="form-actions">

@@ -12,17 +12,6 @@ module ApplicationHelper
     end
   end
 
-  # TODO: delete this 'something' method - its spirit has been subsumed by decorators
-  def something(val)
-    if val.is_a? TrueClass
-      return "Yes"
-    elsif val.is_a? FalseClass
-      return "No"
-    else
-      return val || raw("&nbsp;")
-    end
-  end
-
   def sortable(column, title)
     title ||= column.titleize
     direction = begin
@@ -40,7 +29,5 @@ module ApplicationHelper
     end
     link_to(title, :sort => column, :direction => direction)
   end
-
-  deprecate :something
 
 end

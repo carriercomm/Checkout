@@ -35,3 +35,9 @@ en:
     submit:
       component_model:
         update: "Update Model"
+  user:
+    status:
+      title: 'Status'
+      active: '&nbsp;'
+      disabled: '<a rel="tooltip" title="Disabled"><i class="icon-ban-circle  user-disabled"></i></a>'
+      suspended: '<a rel="tooltip" title="Suspended"><i class="icon-bolt user-suspended"></i></a>'

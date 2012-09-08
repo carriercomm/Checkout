@@ -9,7 +9,7 @@ class UsersController < ApplicationController
   # GET /users
   # GET /users.json
   def index
-    @users  = User.includes(:roles)
+    @users  = User.includes(:roles, :groups)
       .order(sort_column + " " + sort_direction)
       .page(params[:page])
       .per(params[:page_limit])

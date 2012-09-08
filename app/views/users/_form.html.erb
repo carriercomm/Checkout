@@ -4,7 +4,7 @@
   <%= f.input :suspended_until, :as => :date_picker,
     :input_html => {
       :class => 'generic_datepicker',
-      :value => (f.object.new_record? ? nil : localize(f.object.suspended_until, :format => "%Y-%m-%d"))
+      :value => (f.object.suspended_until.nil? ? nil : localize(f.object.suspended_until, :format => "%Y-%m-%d"))
     } %>
   <%= f.input :disabled %>
   <%= f.association :roles, :as => :check_boxes %>

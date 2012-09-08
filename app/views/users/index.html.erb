@@ -12,11 +12,11 @@
 <table class="table table-striped">
   <thead>
     <tr>
+      <th class="status"><%= t('user.status.title') %></th>
       <th><%= sortable('username', t('user.username')) %></th>
       <th><%= sortable('email', t('user.email')) %></th>
       <th><%= sortable('suspension_count', t('user.suspension_count')) %></th>
-      <th><%= sortable('suspended_until', t('user.suspended_until')) %></th>
-      <th><%= sortable('disabled', t('user.disabled')) %></th>
+      <th><%= t '.groups', :default => t("helpers.groups") %></th>
       <th><%= t '.roles', :default => t("helpers.roles") %></th>
       <th><%=t '.actions', :default => t("helpers.actions") %></th>
     </tr>
@@ -24,11 +24,11 @@
   <tbody>
     <% @users.each do |user| %>
       <tr>
+        <td><%= user.status %></td>
         <td><%= link_to user.username, user_path(user) %></td>
         <td><%= user.email %></td>
         <td><%= user.suspension_count %></td>
-        <td><%= user.suspended_until %></td>
-        <td><%= user.disabled %></td>
+        <td><%= user.groups %></td>
         <td><%= user.roles %></td>
         <td>
           <%= link_to t('.edit', :default => t("helpers.links.edit")),

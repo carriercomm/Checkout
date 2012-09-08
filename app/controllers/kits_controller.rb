@@ -141,6 +141,8 @@ class KitsController < ApplicationController
     @kits = @kits.joins(:component_models => :brand).order("brands.name, component_models.name").page(params[:page])
   end
 
+  # TODO: does this make any sense? this might need to be fixed to
+  #       work with multiple brands in a kit
   def scope_by_brand
     @kits = @kits.brand(params["brand_id"]) if params["brand_id"].present?
   end

@@ -13,7 +13,13 @@
 a.danger {
   color:#F33;
 }
-td.action-buttons {
+td.action-buttons,
+th.status {
   width: 1%;
 }
-    
+i.user-disabled {
+  color: red;
+}
+i.user-suspended {
+  color: orange;
+}
