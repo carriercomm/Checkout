@@ -3,7 +3,7 @@ class GroupDecorator < ApplicationDecorator
   decorates_association :users
 
   def name
-    val_or_space(model.name)
+    h.link_to h.h(model.name), h.group_path(model)
   end
 
   def expires_at

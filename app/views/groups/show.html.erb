@@ -2,37 +2,43 @@
   <h1>Group</h1>
 </div>
 
-<dl class="dl-horizontal">
-  <dt>Name</dt>
-  <dd><%= @group.name %></dd>
-  <dt>Expires At</dt>
-  <dd><%= @group.expires_at %></dd>
-</dl>
+<div class="row-fluid">
+  <div class="span12">
+    <dl class="dl-horizontal">
+      <dt>Name</dt>
+      <dd><%= @group.name %></dd>
+      <dt>Expires At</dt>
+      <dd><%= @group.expires_at %></dd>
+    </dl>
+  </div>
+</div>  
 
-<h3>Group Members</h3>
-
-<% if @group.users.empty? %>
-<p>No members</p>
-<% else %>
-<table class="table table-striped">
-  <thead>
-    <tr>
-      <th class="status">Status</th>
-      <th>Username</th>
-      <th>Email</th>
-    </tr>
-  </thead>
-  <tbody>
-    <% @group.users.each do |user| %>
-      <tr>
-        <td><%= user.status %></td>
-        <td><%= link_to user.username, user_path(user) %></td>
-        <td><%= user.email %></td>
-      </tr>
+<div class="row-fluid">
+  <div class="span12">
+    <% if @group.users.empty? %>
+    <p>No members</p>
+    <% else %>
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th class="status">Status</th>
+          <th>Username</th>
+          <th>Email</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @group.users.each do |user| %>
+          <tr>
+            <td><%= user.status %></td>
+            <td><%= link_to user.username, user_path(user) %></td>
+            <td><%= user.email %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
     <% end %>
-  </tbody>
-</table>
-<% end %>
+  </div>
+</div>  
 
 <div class="form-actions">
   <%= link_to t('.back', :default => t("helpers.links.back")),

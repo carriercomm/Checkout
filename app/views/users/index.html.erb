@@ -28,8 +28,8 @@
         <td><%= link_to user.username, user_path(user) %></td>
         <td><%= user.email %></td>
         <td><%= user.suspension_count %></td>
-        <td><%= user.groups %></td>
-        <td><%= user.roles %></td>
+        <td><%= user.groups_list %></td>
+        <td><%= user.roles_list %></td>
         <td>
           <%= link_to t('.edit', :default => t("helpers.links.edit")),
                       edit_user_path(user), :class => 'btn btn-mini' %>

@@ -1,5 +1,7 @@
 class UserDecorator < ApplicationDecorator
   decorates :user
+  decorates_association :groups
+  decorates_association :roles
 
   allows(:created_at,
          :current_sign_in_at,
@@ -32,8 +34,9 @@ class UserDecorator < ApplicationDecorator
     to_yes_no(model.disabled)
   end
 
-  def groups
-    model.groups.map(&:name).join(", ")
+  def groups_list(separator = ", ")
+    return "&nbsp;".html_safe if groups.empty?
+    groups.map(&:name).join(separator).html_safe
   end
 
   def last_sign_in_at
@@ -44,8 +47,10 @@ class UserDecorator < ApplicationDecorator
     localize_unless_nil(model.locked_at, :format => :db)
   end
 
-  def roles
-    model.roles.map(&:name).join(", ")
+  def roles_list(separator = ", ")
+    return "&nbsp;".html_safe if roles.empty?
+    separator.html_safe
+    roles.map(&:name).join(separator).html_safe
   end
 
   def status
