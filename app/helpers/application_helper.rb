@@ -14,6 +14,7 @@ module ApplicationHelper
 
   def sortable(column, title)
     title ||= column.titleize
+    title = h(title)
     direction = begin
       if column == sort_column
         if sort_direction == "asc"
@@ -27,7 +28,7 @@ module ApplicationHelper
         nil
       end
     end
-    link_to(title, :sort => column, :direction => direction)
+    link_to(title.html_safe, :sort => column, :direction => direction)
   end
 
 end

@@ -13,6 +13,8 @@ class User < ActiveRecord::Base
   ## Associations ##
 
   has_many :approvals,    :foreign_key => "approver_id",      :class_name => 'Reservation'
+  has_many :covenant_signatures, :inverse_of => :user
+  has_many :covenants,    :through => :covenant_signatures
   has_and_belongs_to_many :groups
   has_many :in_assists,   :foreign_key => "in_assistant_id",  :class_name => 'Reservation'
   has_many :out_assists,  :foreign_key => "out_assistant_id", :class_name => 'Reservation'
@@ -22,6 +24,8 @@ class User < ActiveRecord::Base
   ## Mass-assignable Attributes ##
 
   attr_accessible(:email,
+                  :first_name,
+                  :last_name,
                   :login,
                   :password,
                   :password_confirmation,
@@ -35,7 +39,16 @@ class User < ActiveRecord::Base
   # to a real persisted field like 'username'
   attr_accessor :login
 
+
+  ## Validations ##
+
+  validates :username, :email, :presence => true
+
+
+  ## Callbacks ##
+
   before_save :downcase_username
+
 
   ## Static Methods ##
 

@@ -1,5 +1,6 @@
 class UserDecorator < ApplicationDecorator
   decorates :user
+  decorates_association :covenants
   decorates_association :groups
   decorates_association :roles
 
@@ -32,6 +33,14 @@ class UserDecorator < ApplicationDecorator
 
   def disabled
     to_yes_no(model.disabled)
+  end
+
+  def first_name
+    val_or_space(model.first_name)
+  end
+
+  def last_name
+    val_or_space(model.last_name)
   end
 
   def groups_list(separator = ", ")

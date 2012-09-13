@@ -5,18 +5,20 @@
 <div class="row-fluid">
   <div class="span12">
     <dl class="dl-horizontal">
-      <dt>Name</dt>
+      <dt><%= t('group.name') %></dt>
       <dd><%= @group.name %></dd>
-      <dt>Expires At</dt>
+      <dt><%= t('group.expires_at') %></dt>
       <dd><%= @group.expires_at %></dd>
     </dl>
   </div>
 </div>  
 
+<h2>Users</h2>
+
 <div class="row-fluid">
   <div class="span12">
     <% if @group.users.empty? %>
-    <p>No members</p>
+    <p>No users</p>
     <% else %>
     <table class="table table-striped">
       <thead>
@@ -38,7 +40,34 @@
     </table>
     <% end %>
   </div>
-</div>  
+</div>
+
+<h2>Kits</h2>
+
+<div class="row-fluid">
+  <div class="span12">
+    <% if @group.kits.empty? %>
+    <p>No kits</p>
+    <% else %>
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>Asset Tag</th>
+          <th>Components</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @group.kits.each do |kit| %>
+        <tr>
+          <td><%= link_to(kit.asset_tags, kit_path(kit)) %></td>
+          <td><%= kit.linked_component_list %></td>
+        </tr>
+        <% end %>
+      </tbody>
+    </table>
+    <% end %>
+  </div>
+</div>
 
 <div class="form-actions">
   <%= link_to t('.back', :default => t("helpers.links.back")),

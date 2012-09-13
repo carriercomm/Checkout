@@ -1,10 +1,23 @@
 class LegacyEquipment < ActiveRecord::Base
   establish_connection :legacy
   set_table_name 'equipment'
-  
+
   belongs_to :legacy_budget, :foreign_key => 'budget_id'
   belongs_to :legacy_category, :foreign_key => 'cat_id'
   belongs_to :legacy_location, :foreign_key => 'loc_id'
+
+
+  def self.fill_in_blank_model_names!
+    self.where("eq_manufacturer IS NULL OR TRIM(eq_manufacturer)=''").all.each do |m|
+      m.update_attributes!(eq_manufacturer:"Unknown")
+    end
+    count = 1
+    self.where("eq_model IS NULL OR TRIM(eq_model)=''").all.each do |i|
+      i.eq_model = "[Unknown] (#{count})"
+      i.save!
+      count += 1
+    end
+  end
 
   def self.convert_special_to_boolean!
     connection.execute "UPDATE equipment SET special = 0 WHERE LCASE(special) = 'no' OR special IS NULL OR TRIM(special) = ''"
@@ -58,7 +71,7 @@ class LegacyEquipment < ActiveRecord::Base
     	from equipment
         group by eq_serial_num
         having count(eq_serial_num) > 1) as duplicates ON equipment.eq_serial_num = duplicates.eq_serial_num
-    set equipment.eq_serial_num = NULL    
+    set equipment.eq_serial_num = NULL
     END_SQL
 
     connection.execute sql_statement
@@ -80,9 +93,30 @@ class LegacyBudget < ActiveRecord::Base
   has_many :legacy_equipments
 end
 
-class LegacyLocation <ActiveRecord::Base
+class LegacyLocation < ActiveRecord::Base
   establish_connection :legacy
   set_table_name 'locations'
   set_primary_key :loc_id
   has_many :legacy_equipments
+end
+
+class LegacyPermission < ActiveRecord::Base
+  establish_connection :legacy
+  set_table_name 'restricted_eq'
+  set_primary_key :restrict_id
+end
+
+class LegacyGroup < ActiveRecord::Base
+  establish_connection :legacy
+  set_table_name 'groups'
+  set_primary_key :group_id
+  has_many :legacy_users
+  has_many :legacy_permissions, foreign_key: 'group_id'
+end
+
+class LegacyUser < ActiveRecord::Base
+  establish_connection :legacy
+  set_table_name 'clients'
+  set_primary_key :client_id
+  belongs_to :legacy_groups
 end

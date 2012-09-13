@@ -19,7 +19,7 @@ class GroupsController < ApplicationController
   # GET /groups/1
   # GET /groups/1.json
   def show
-    @group = Group.includes(:users).order("users.username ASC").find(params[:id])
+    @group = Group.includes(:users, :kits).find(params[:id])
     @group = GroupDecorator.decorate(@group)
 
     respond_to do |format|

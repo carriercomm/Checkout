@@ -46,7 +46,7 @@ class UsersController < ApplicationController
 
   # GET /users/1/edit
   def edit
-    @user = User.includes(:roles).find(params[:id])
+    @user = User.includes(:groups, :roles).find(params[:id])
   end
 
   # POST /users
@@ -61,6 +61,8 @@ class UsersController < ApplicationController
     @user.email           = p[:email]           if p[:email].present?
     @user.suspended_until = p[:suspended_until] if p[:suspended_until].present?
     @user.username        = p[:username]        if p[:username].present?
+    @user.first_name      = p[:first_name]      if p[:first_name].present?
+    @user.last_name       = p[:last_name]       if p[:last_name].present?
 
     respond_to do |format|
       if @user.save
@@ -79,10 +81,12 @@ class UsersController < ApplicationController
     p     = params[:user]
     @user = User.find(params[:id])
 
-    @user.disabled        = p["disabled"]        if p["disabled"].present?
-    @user.email           = p["email"]           if p["email"].present?
-    @user.suspended_until = p["suspended_until"] if p["suspended_until"].present?
-    @user.username        = p["username"]        if p["username"].present?
+    @user.disabled        = p[:disabled]        if p[:disabled].present?
+    @user.email           = p[:email]           if p[:email].present?
+    @user.suspended_until = p[:suspended_until] if p[:suspended_until].present?
+    @user.username        = p[:username]        if p[:username].present?
+    @user.first_name      = p[:first_name]      if p[:first_name].present?
+    @user.last_name       = p[:last_name]       if p[:last_name].present?
 
     respond_to do |format|
       if @user.save

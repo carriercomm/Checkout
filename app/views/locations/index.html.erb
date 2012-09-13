@@ -1,7 +1,6 @@
-<%= link_to(t('.new',
-            :default => raw("<i class='icon-plus-sign'></i> #{ t('helpers.links.new') }")),
+<%= link_to raw(t('helpers.links.new')),
             new_location_path,
-            :class => 'btn btn-primary pull-right btn-new-location') if can? :manage, Location %>
+            :class => 'btn btn-primary pull-right btn-new-location' if can? :manage, Location %>
 
 <h1>Locations</h1>
 <table class="table table-striped">

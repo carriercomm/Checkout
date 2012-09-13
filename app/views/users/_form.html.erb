@@ -1,6 +1,9 @@
 <%= simple_form_for @user, :html => { :class => 'form-horizontal' } do |f| %>
   <%= f.input :username %>
   <%= f.input :email %>
+  <%= f.input :first_name %>
+  <%= f.input :last_name %>
+  <%= f.association :covenants, :as => :check_boxes %>
   <%= f.input :suspended_until, :as => :date_picker,
     :input_html => {
       :class => 'generic_datepicker',

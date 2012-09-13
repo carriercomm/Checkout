@@ -1,7 +1,6 @@
-<%= link_to(t('.new',
-            :default => raw("<i class='icon-plus-sign'></i> #{ t('helpers.links.new') }")),
+<%= link_to raw(t('helpers.links.new')),
             new_category_path,
-            :class => 'btn btn-primary pull-right btn-new-category') if can? :manage, Category %>
+            :class => 'btn btn-primary pull-right btn-new-category' if can? :manage, Category %>
 
 <h1>Categories</h1>
 

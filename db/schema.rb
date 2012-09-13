@@ -11,22 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120907004231) do
-
-  create_table "active_admin_comments", :force => true do |t|
-    t.string   "resource_id",   :null => false
-    t.string   "resource_type", :null => false
-    t.integer  "author_id"
-    t.string   "author_type"
-    t.text     "body"
-    t.datetime "created_at",    :null => false
-    t.datetime "updated_at",    :null => false
-    t.string   "namespace"
-  end
-
-  add_index "active_admin_comments", ["author_type", "author_id"], :name => "index_active_admin_comments_on_author_type_and_author_id"
-  add_index "active_admin_comments", ["namespace"], :name => "index_active_admin_comments_on_namespace"
-  add_index "active_admin_comments", ["resource_type", "resource_id"], :name => "index_admin_notes_on_resource_type_and_resource_id"
+ActiveRecord::Schema.define(:version => 20120912235848) do
 
   create_table "brands", :force => true do |t|
     t.string   "name"
@@ -93,35 +78,50 @@ ActiveRecord::Schema.define(:version => 20120907004231) do
   add_index "categories_component_models", ["category_id", "component_model_id"], :name => "index_categories_models_on_category_id_and_model_id"
 
   create_table "component_models", :force => true do |t|
+    t.integer  "brand_id",                             :null => false
     t.string   "name",                                 :null => false
+    t.string   "autocomplete",                         :null => false
     t.text     "description"
     t.boolean  "training_required", :default => false
-    t.integer  "brand_id",                             :null => false
     t.datetime "created_at",                           :null => false
     t.datetime "updated_at",                           :null => false
-    t.string   "autocomplete",                         :null => false
   end
 
   add_index "component_models", ["brand_id"], :name => "index_models_on_brand_id"
 
   create_table "components", :force => true do |t|
+    t.integer  "kit_id"
+    t.integer  "component_model_id"
+    t.string   "asset_tag"
     t.string   "serial_number"
     t.boolean  "missing",            :default => false
-    t.integer  "kit_id"
+    t.integer  "position"
     t.datetime "created_at",                            :null => false
     t.datetime "updated_at",                            :null => false
-    t.string   "asset_tag"
-    t.integer  "component_model_id"
-    t.integer  "position"
   end
 
   add_index "components", ["kit_id"], :name => "index_parts_on_kit_id"
 
+  create_table "covenant_signatures", :force => true do |t|
+    t.integer  "user_id"
+    t.integer  "covenant_id"
+    t.datetime "created_at",  :null => false
+    t.datetime "updated_at",  :null => false
+  end
+
+  create_table "covenants", :force => true do |t|
+    t.string   "name",        :null => false
+    t.text     "description"
+    t.datetime "created_at",  :null => false
+    t.datetime "updated_at",  :null => false
+  end
+
   create_table "groups", :force => true do |t|
     t.string   "name"
+    t.text     "description"
     t.date     "expires_at"
-    t.datetime "created_at", :null => false
-    t.datetime "updated_at", :null => false
+    t.datetime "created_at",  :null => false
+    t.datetime "updated_at",  :null => false
   end
 
   create_table "groups_users", :force => true do |t|
@@ -147,6 +147,18 @@ ActiveRecord::Schema.define(:version => 20120907004231) do
     t.datetime "created_at", :null => false
     t.datetime "updated_at", :null => false
   end
+
+  create_table "permissions", :force => true do |t|
+    t.integer  "group_id"
+    t.integer  "kit_id"
+    t.date     "expires_at"
+    t.date     "exclusive_until"
+    t.datetime "created_at",      :null => false
+    t.datetime "updated_at",      :null => false
+  end
+
+  add_index "permissions", ["group_id"], :name => "index_permissions_on_group_id"
+  add_index "permissions", ["kit_id"], :name => "index_permissions_on_kit_id"
 
   create_table "reservations", :force => true do |t|
     t.integer  "kit_id"
@@ -188,6 +200,8 @@ ActiveRecord::Schema.define(:version => 20120907004231) do
   create_table "users", :force => true do |t|
     t.string   "username",                                  :null => false
     t.string   "email",                                     :null => false
+    t.string   "first_name"
+    t.string   "last_name"
     t.string   "encrypted_password",                        :null => false
     t.string   "reset_password_token"
     t.datetime "reset_password_sent_at"
@@ -234,13 +248,25 @@ ActiveRecord::Schema.define(:version => 20120907004231) do
   add_foreign_key "components", "component_models", :name => "components_model_id_fk"
   add_foreign_key "components", "kits", :name => "components_kit_id_fk"
 
+  add_foreign_key "covenant_signatures", "covenants", :name => "covenant_signatures_covenant_id_fk"
+  add_foreign_key "covenant_signatures", "users", :name => "covenant_signatures_user_id_fk"
+
+  add_foreign_key "groups_users", "groups", :name => "groups_users_group_id_fk"
+  add_foreign_key "groups_users", "users", :name => "groups_users_user_id_fk"
+
   add_foreign_key "kits", "budgets", :name => "kits_budget_id_fk"
   add_foreign_key "kits", "locations", :name => "kits_location_id_fk"
+
+  add_foreign_key "permissions", "groups", :name => "permissions_group_id_fk"
+  add_foreign_key "permissions", "kits", :name => "permissions_kit_id_fk"
 
   add_foreign_key "reservations", "kits", :name => "reservations_kit_id_fk"
   add_foreign_key "reservations", "users", :name => "reservations_approver_id_fk", :column => "approver_id"
   add_foreign_key "reservations", "users", :name => "reservations_client_id_fk", :column => "client_id"
   add_foreign_key "reservations", "users", :name => "reservations_in_assistant_id_fk", :column => "in_assistant_id"
   add_foreign_key "reservations", "users", :name => "reservations_out_assistant_id_fk", :column => "out_assistant_id"
+
+  add_foreign_key "users_roles", "roles", :name => "users_roles_role_id_fk"
+  add_foreign_key "users_roles", "users", :name => "users_roles_user_id_fk"
 
 end

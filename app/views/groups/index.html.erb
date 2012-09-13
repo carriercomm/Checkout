@@ -1,7 +1,6 @@
-<%= link_to(t('.new',
-            :default => raw("<i class='icon-plus-sign'></i> #{ t('helpers.links.new') }")),
+<%= link_to raw(t('helpers.links.new')),
             new_group_path,
-            :class => 'btn btn-primary pull-right btn-new-group') if can? :manage, Group %>
+            :class => 'btn btn-primary pull-right btn-new-group' if can? :manage, Group %>
 
 <h1>Groups</h1>
 
@@ -10,16 +9,18 @@
 <table class="table table-striped">
   <thead>
     <tr>
-      <th>Name</th>
-      <th>Expires At</th>
-      <th>User Count</th>
-      <th>Actions</th>
+      <th><%= t('group.name') %></th>
+      <th><%= t('group.description') %></th>
+      <th><%= t('group.expires_at') %></th>
+      <th class="skinny-column"><%= t('group.user_count') %></th>
+      <th><%= t('.actions') %></th>
     </tr>
   </thead>
   <tbody>
     <% @groups.each do |group| %>
       <tr>
         <td><%= link_to group.name, group_path(group) %></td>
+        <td><%= group.description %></td>
         <td><%= group.expires_at %></td>
         <td><%= group.users.count %></td>
         <td>

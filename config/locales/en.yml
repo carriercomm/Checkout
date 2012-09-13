@@ -31,11 +31,24 @@ en:
       user:
         disabled: "Prevent this client from logging in"
         suspended_until: "Suspend this client's checkout privileges until a specified date"
+  group:
+    expires_at: "Expires"
   helpers:
+    links:
+      new: "<i class='icon-plus-sign'></i> New"
     submit:
       component_model:
         update: "Update Model"
   user:
+    first_name: "First Name"
+    last_name: "Last Name"
+    username: "Username"
+    email: "Email"
+    suspension_count: "Suspensions"
+    suspended_until: "Suspended Until"
+    disabled: "Disabled"
+    roles: "Roles"
+    groups: "Groups"
     status:
       title: 'Status'
       active: '&nbsp;'

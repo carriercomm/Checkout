@@ -46,6 +46,7 @@ Checkout::Application.routes.draw do
     end
   end
   resources :components
+  resources :covenants
   resources :groups
   resources :kits do
     collection &kits_collection_routes

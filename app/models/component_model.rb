@@ -18,7 +18,7 @@ class ComponentModel < ActiveRecord::Base
   ## Validations ##
 
   validates :name, :presence => true
-  validates :name, :uniqueness => {:case_sensitive => false}
+  validates :name, :uniqueness => {:scope => :brand_id, :case_sensitive => false}
   validates_presence_of :brand
 
 

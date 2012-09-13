@@ -15,11 +15,12 @@ class Kit < ActiveRecord::Base
 
   belongs_to :budget,           :inverse_of => :kits
   has_many   :clients,          :through => :reservations
-  has_many   :components,       :inverse_of => :kit
-  belongs_to :location,         :inverse_of => :kits
   has_many   :component_models, :through => :components, :order => "component_models.name ASC"
+  has_many   :components,       :inverse_of => :kit
+  has_many   :groups,           :through => :permissions, :order => "groups.name ASC"
+  belongs_to :location,         :inverse_of => :kits
+  has_many   :permissions,      :inverse_of => :kit
   has_many   :reservations,     :inverse_of => :kit
-  # has_and_belongs_to_many :groups
 
   accepts_nested_attributes_for :components, :reject_if => proc { |attributes| attributes['component_model_id'].blank? }, :allow_destroy=> true
 

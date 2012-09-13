@@ -1,7 +1,6 @@
-<%= link_to(t('.new',
-            :default => raw("<i class='icon-plus-sign'></i> #{ t('helpers.links.new') }")),
+<%= link_to raw(t("helpers.links.new")),
             new_budget_path,
-            :class => 'btn btn-primary pull-right btn-new-budget') if can? :manage, Budget %>
+            :class => 'btn btn-primary pull-right btn-new-budget' if can? :manage, Budget %>
 
 <h1>Budgets</h1>
 

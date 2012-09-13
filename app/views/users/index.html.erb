@@ -1,7 +1,6 @@
-<%= link_to t('.new',
-            :default => raw("<i class='icon-plus-sign'></i> #{ t('helpers.links.new') }")),
+<%= link_to raw(t('helpers.links.new')),
             new_user_path,
-            :class => 'btn btn-primary pull-right' %>
+            :class => 'btn btn-primary pull-right btn-new-user' if can? :manage, User %>
 
 <div class="page-header">
   <h1><%=t '.title', :default => "Users" %></h1>
@@ -12,10 +11,12 @@
 <table class="table table-striped">
   <thead>
     <tr>
-      <th class="status"><%= t('user.status.title') %></th>
+      <th class="skinny-column"><%= t('user.status.title') %></th>
       <th><%= sortable('username', t('user.username')) %></th>
       <th><%= sortable('email', t('user.email')) %></th>
-      <th><%= sortable('suspension_count', t('user.suspension_count')) %></th>
+      <th><%= sortable('last_name', t('user.last_name')) %></th>
+      <th><%= sortable('first_name', t('user.first_name')) %></th>
+      <th class="skinny-column"><%= sortable('suspension_count', t('user.suspension_count').html_safe) %></th>
       <th><%= t '.groups', :default => t("helpers.groups") %></th>
       <th><%= t '.roles', :default => t("helpers.roles") %></th>
       <th><%=t '.actions', :default => t("helpers.actions") %></th>
@@ -27,12 +28,14 @@
         <td><%= user.status %></td>
         <td><%= link_to user.username, user_path(user) %></td>
         <td><%= user.email %></td>
+        <td><%= user.last_name %></td>
+        <td><%= user.first_name %></td>
         <td><%= user.suspension_count %></td>
         <td><%= user.groups_list %></td>
         <td><%= user.roles_list %></td>
         <td>
           <%= link_to t('.edit', :default => t("helpers.links.edit")),
-                      edit_user_path(user), :class => 'btn btn-mini' %>
+                      edit_user_path(user), :class => 'btn btn-mini' if can? :manage, User %>
         </td>
       </tr>
     <% end %>

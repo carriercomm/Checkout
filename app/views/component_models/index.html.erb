@@ -1,6 +1,6 @@
-<%= link_to(t('.new', :default => raw("<i class='icon-plus-sign'></i> #{ t('helpers.links.new') }")),
+<%= link_to raw(t('helpers.links.new')),
             new_component_model_path,
-            :class => 'btn btn-primary pull-right btn-new-component-model') if can? :manage, ComponentModel %>
+            :class => 'btn btn-primary pull-right btn-new-component-model' if can? :manage, ComponentModel %>
 
 <h1>Models</h1>
 

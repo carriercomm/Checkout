@@ -1,7 +1,6 @@
-<%= link_to(t('.new',
-            :default => raw("<i class='icon-plus-sign'></i> #{ t('helpers.links.new') }")),
+<%= link_to raw(t("helpers.links.new")),
             new_brand_path,
-            :class => 'btn btn-primary pull-right btn-new-brand') if can? :manage, Brand %>
+            :class => 'btn btn-primary pull-right btn-new-brand' if can? :manage, Brand %>
 
 <h1>Brands</h1>
 
