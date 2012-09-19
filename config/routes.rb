@@ -3,36 +3,30 @@ Checkout::Application.routes.draw do
   # TODO: trim down these routes
   # TODO: move most of these added collection routes to params, so they can act as facets
 
-  # extra collection routes used on 'brands' resource
-  brands_collection_routes = Proc.new do
-    get 'checkoutable'
-  end
-
   # extra collection routes used on 'component_models' resource
   component_models_collection_routes = Proc.new do
-    get 'checkoutable'
+    ['checkoutable'].each do |r|
+      get r, to: "component_models#index", filter: r
+    end
   end
 
-  # extra collection routes used on 'kits' resource
-  kits_collection_routes = Proc.new do
-    get 'checkoutable'
-    get 'not_checkoutable'
-    get 'tombstoned'
-  end
-
-  root :to => 'component_models#checkoutable'
+  root to: 'component_models#checkoutable'
 
   devise_for :user
 
   # TODO: is this being used? mebbe nuke this and its controller
   resources :brands do
-    collection &brands_collection_routes
-    resources :models, :as => "component_models", :controller => "component_models" do
+    collection do
+      ["checkoutable", "non_checkoutable"].each do |r|
+        get r, to: "brands#index", filter: r
+      end
+    end
+    resources :models, as: "component_models", controller: "component_models" do
       collection &component_models_collection_routes
     end
   end
-  resources :budgets, :except => [:destroy] do
-    resources :kits, :only => [:index]
+  resources :budgets, except: [:destroy] do
+    resources :kits, only: [:index]
   end
 #  resources :business_hours
 #  resources :business_hour_exceptions
@@ -41,7 +35,7 @@ Checkout::Application.routes.draw do
       get 'select2'
       get 'suggestions'
     end
-    resources :models, :as => "component_models", :controller => "component_models" do
+    resources :models, as: "component_models", controller: "component_models" do
       collection &component_models_collection_routes
     end
   end
@@ -49,17 +43,27 @@ Checkout::Application.routes.draw do
   resources :covenants
   resources :groups
   resources :kits do
-    collection &kits_collection_routes
-    resources :reservations, :only => [:index, :new]
+    collection do
+      ['checkoutable', 'missing_components', 'non_checkoutable', 'tombstoned'].each do |r|
+        get r, to: "kits#index", filter: r
+      end
+    end
+    resources :reservations, only: [:index, :new]
   end
   resources :locations
-  resources :models, :as => "component_models", :controller => "component_models" do
+  resources :models, as: "component_models", controller: "component_models" do
     collection &component_models_collection_routes
-    resources :reservations, :only => [:new]
+    resources :reservations, only: [:new]
   end
   resources :reservations
-  resources :search, :only => [:index]
-  resources :users, :except => [:destroy] do
+  resources :search, only: [:index]
+  resources :users, except: [:destroy] do
+    collection do
+      ["active", "disabled", "suspended"].each do |r|
+        get r, to: "users#index", filter: r
+      end
+      get "select2"
+    end
     resources :groups
     resources :reservations
   end
@@ -72,7 +76,7 @@ Checkout::Application.routes.draw do
   # Keep in mind you can assign values other than :controller and :action
 
   # Sample of named route:
-  #   match 'products/:id/purchase' => 'catalog#purchase', :as => :purchase
+  #   match 'products/:id/purchase' => 'catalog#purchase', as: :purchase
   # This route can be invoked with purchase_url(:id => product.id)
 
   # Sample resource route (maps HTTP verbs to controller actions automatically):

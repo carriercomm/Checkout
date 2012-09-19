@@ -6,7 +6,7 @@ class LocationsController < ApplicationController
   # GET /locations
   # GET /locations.json
   def index
-    @locations = Location.includes(:business_hours => :business_days).page(params[:page])
+    @locations = Location.includes(:business_hours => :business_days).page(params[:page]).per(params[:page_limit])
 
     respond_to do |format|
       format.html # index.html.erb

@@ -1,37 +1,62 @@
-<%= link_to raw(t('helpers.links.new')),
-            new_component_model_path,
-            :class => 'btn btn-primary pull-right btn-new-component-model' if can? :manage, ComponentModel %>
+<div class="span2">
+  <!--Sidebar content-->
+  <div class="well sidebar-nav">
+    <ul class="nav nav-list">
+      <li class="nav-header"><%= t(".actions") %></li>
+      <%= sidebar_link(t("helpers.links.new"),
+                       new_component_model_path,
+                       t("component_model.sidebar.add.default_tooltip"),
+                       can?(:manage, ComponentModel),
+                       t("component_model.sidebar.add.denied_tooltip")) %>
+      <li class="nav-header"><%= t("component_model.sidebar.filters") %></li>
+      <%= sidebar_link t("component_model.sidebar.all.text"),
+                       component_models_path,
+                       t("component_model.sidebar.all.default_tooltip") %>
+      <%= sidebar_link t("component_model.sidebar.checkoutable.text"),
+                       checkoutable_component_models_path,
+                       t("component_model.sidebar.checkoutable.default_tooltip") %>
+      <%#= sidebar_link t("component_model.sidebar.non_checkoutable.text"),
+                       non_checkoutable_component_models_path,
+                       t("component_model.sidebar.non_checkoutable.default_tooltip") %>
+    </ul>
+  </div>
+</div>
+<div class="span10">
+  <!--Main content-->
+  <div class="page-header">
+    <h1><%= t('component_model.title') %></h1>
+  </div>
 
-<h1>Models</h1>
+  <%= paginate @component_models %>
 
-<%= paginate @component_models %>
-
-<table class="table table-striped">
-  <thead>
-    <tr>
-      <th>Brand</th>
-      <th>Model</th>
-      <th>Description</th>
-      <th>Count</th>
-      <th colspan="2">Actions</th>
-    </tr>
-  </thead>
-  <tbody>
-    <% @component_models.each do |cm| %>
+  <table class="table table-striped">
+    <thead>
       <tr>
-        <td><%= link_to cm.brand.name, brand_path(cm.brand) %></td>
-        <td><%= link_to cm.name, component_model_path(cm) %></td>
-        <td><%= cm.description %></td>
-        <td><%= cm.kits.count %></td>
-        <td class="action-buttons">
-          <%= link_to('Reserve', new_component_model_reservation_path(:component_model_id => cm), :class => 'btn btn-mini') if cm.checkoutable? %>
-        </td>
-        <td class="action-buttons">
-          <%= link_to('Edit', edit_component_model_path(cm), :class => 'btn btn-mini btn-edit-component-model') if can? :manage, ComponentModel %>
-        </td>
+        <th>Brand</th>
+        <th>Model</th>
+        <th>Description</th>
+        <th>Count</th>
+        <th colspan="2">Actions</th>
       </tr>
-    <% end %>
-  </tbody>
-</table>
+    </thead>
+    <tbody>
+      <% @component_models.each do |cm| %>
+        <tr>
+          <td><%= link_to cm.brand.name, brand_path(cm.brand) %></td>
+          <td><%= link_to cm.name, component_model_path(cm) %></td>
+          <td><%= cm.description %></td>
+          <td><%= cm.kits.count %></td>
+          <td class="action-buttons">
+            <%= link_to('Reserve', new_component_model_reservation_path(:component_model_id => cm), :class => 'btn btn-mini') if cm.checkoutable? %>
+          </td>
+          <td class="action-buttons">
+            <%= link_to('Edit', edit_component_model_path(cm), :class => 'btn btn-mini btn-edit-component-model') if can? :manage, ComponentModel %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
 
-<%= paginate @component_models %>
+  <%= paginate @component_models %>
+
+</div>

@@ -1,5 +1,36 @@
 module ApplicationHelper
 
+  def active(path)
+    (current_page? path) ? 'class="active"'.html_safe : ""
+  end
+
+  def sidebar_link(text, path, default_tooltip = "", condition = true, failure_tooltip = "")
+    # setup the base options for the tooltip
+    link_opts = {
+      :rel   => "tooltip",
+      "data-placement" => "right"
+    }
+
+    li_opts = {}
+
+    # if the link is to the current page, then we'll highlight it
+    li_opts[:class] = "active" if current_page? path
+
+    if condition
+      link_opts[:title] = default_tooltip unless default_tooltip.blank?
+      content_tag :li, li_opts do
+        link_to raw(text), path, link_opts
+      end
+    else
+      link_opts[:title] = failure_tooltip unless failure_tooltip.blank?
+      link_opts[:class] = "disabled"
+      link_opts[:onclick] = "return false;"
+      content_tag :li do
+        link_to raw(text), "#", link_opts
+      end
+    end
+  end
+
   def dropdown_for(name, icon_class = nil, &block)
     content_tag("li", :class=>"dropdown") do
       link_text = String.new

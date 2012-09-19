@@ -1,33 +1,53 @@
-<%= link_to raw(t('helpers.links.new')),
-            new_kit_path,
-            :class => 'btn btn-primary pull-right btn-new-kit' if can? :manage, Kit %>
+<div class="span2">
+  <!--Sidebar content-->
+  <div class="well sidebar-nav">
+    <ul class="nav nav-list">
+      <li class="nav-header"><%= t(".actions") %></li>
+      <%= sidebar_link(t('helpers.links.new'),
+                       new_kit_path,
+                       t('kit.sidebar.add.default_tooltip'),
+                       can?(:manage, Kit),
+                       t('kit.sidebar.add.denied_tooltip')) %>
+      <li class="nav-header"><%= t("kit.sidebar.filters") %></li>
+      <%= sidebar_link t("kit.sidebar.all.text"), kits_path, t("kit.sidebar.all.default_tooltip") %>
+      <%= sidebar_link t("kit.sidebar.checkoutable.text"), checkoutable_kits_path, t("kit.sidebar.checkoutable.default_tooltip") %>
+      <%= sidebar_link t("kit.sidebar.non_checkoutable.text"), non_checkoutable_kits_path, t("kit.sidebar.non_checkoutable.default_tooltip") %>
+      <%= sidebar_link t("kit.sidebar.missing_components.text"), missing_components_kits_path, t("kit.sidebar.missing_components.default_tooltip") %>
+      <%= sidebar_link t("kit.sidebar.tombstoned.text"), tombstoned_kits_path, t("kit.sidebar.tombstoned.default_tooltip") %>
+    </ul>
+  </div>
+</div>
+<div class="span10">
+  <!--Main content-->
+  <div class="page-header">
+    <h1><%= t('kit.title') %></h1>
+  </div>
 
-<h1>Kits</h1>
+  <%= paginate @kits %>
 
-<%= paginate @kits %>
-
-<table class="table table-striped">
-  <thead>
-    <tr>
-      <th>Asset Tag</th>
-      <th>Components</th>
-      <th>Actions</th>
-    </tr>
-  </thead>
-  <tbody>
-    <% @kits.each do |kit| %>
+  <table class="table table-striped">
+    <thead>
       <tr>
-        <td><%= link_to(kit.asset_tags, kit_path(kit)) %></td>
-        <td><%= kit.linked_component_list %></td>
-        <td>
-          <%= link_to('Reserve', new_reservation_path(:kit_id => kit, :user_id => current_user), :class => 'btn btn-mini') %>
-          <%= link_to('Reservations', kit_reservations_path(kit), :class => 'btn btn-mini') %>
-          <%= link_to('Edit', edit_kit_path(kit), :class => 'btn btn-mini btn-edit-kit') if can? :manage, Kit %>
-        </td>
+        <th>Asset Tag</th>
+        <th>Components</th>
+        <th>Actions</th>
       </tr>
-    <% end %>
-  </tbody>
-</table>
+    </thead>
+    <tbody>
+      <% @kits.each do |kit| %>
+        <tr>
+          <td><%= link_to(kit.asset_tags, kit_path(kit)) %></td>
+          <td><%= kit.linked_component_list %></td>
+          <td>
+            <%= link_to('Reserve', new_reservation_path(:kit_id => kit, :user_id => current_user), :class => 'btn btn-mini') %>
+            <%= link_to('Reservations', kit_reservations_path(kit), :class => 'btn btn-mini') %>
+            <%= link_to('Edit', edit_kit_path(kit), :class => 'btn btn-mini btn-edit-kit') if can? :manage, Kit %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
 
-<%= paginate @kits %>
+  <%= paginate @kits %>
 
+</div>

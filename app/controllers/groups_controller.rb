@@ -19,8 +19,12 @@ class GroupsController < ApplicationController
   # GET /groups/1
   # GET /groups/1.json
   def show
-    @group = Group.includes(:users, :kits).find(params[:id])
+    @group = Group.includes(:kits).find(params[:id].to_i)
     @group = GroupDecorator.decorate(@group)
+
+    # TODO: figure out how to sort this in the database
+    @memberships = @group.memberships.sort_by {|m| m.user.username}
+    @memberships = MembershipDecorator.decorate(@memberships)
 
     respond_to do |format|
       format.html # show.html.erb
@@ -41,7 +45,17 @@ class GroupsController < ApplicationController
 
   # GET /groups/1/edit
   def edit
-    @group = Group.find(params[:id])
+    # this doesn;t work because of the inner joins, it needs to be
+    # broken up into separate intermediate tables
+    # join_sql =<<-END_SQL
+    # LEFT JOIN memberships ON groups.id = memberships.group_id
+    # INNER JOIN users ON memberships.user_id = users.id
+    # LEFT JOIN permissions ON groups.id = permissions.group_id
+    # INNER JOIN kits ON permissions.kit_id = kits.id
+    # END_SQL
+    @group = Group.includes(:kits).find(params[:id].to_i)
+    # TODO: figure out how to sort this in the database
+    @memberships = @group.memberships.sort_by {|m| m.user.username}
   end
 
   # POST /groups
@@ -92,7 +106,9 @@ class GroupsController < ApplicationController
 
   def apply_scopes_and_pagination
     scope_by_user
-    @groups = @groups.includes(:users).order("groups.name").page(params[:page])
+    @groups = @groups.includes(:kits, :users)
+      .where(["memberships.expires_at IS NULL OR memberships.expires_at > ?", Date.today])
+      .order("groups.name").page(params[:page])
   end
 
   def scope_by_user

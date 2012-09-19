@@ -1,39 +1,30 @@
 <div class="page-header">
-  <h1>Group</h1>
+  <h1>Group <small><%= @group.name %></small></h1>
 </div>
-
-<div class="row-fluid">
-  <div class="span12">
-    <dl class="dl-horizontal">
-      <dt><%= t('group.name') %></dt>
-      <dd><%= @group.name %></dd>
-      <dt><%= t('group.expires_at') %></dt>
-      <dd><%= @group.expires_at %></dd>
-    </dl>
-  </div>
-</div>  
 
 <h2>Users</h2>
 
 <div class="row-fluid">
   <div class="span12">
-    <% if @group.users.empty? %>
+    <% if @memberships.empty? %>
     <p>No users</p>
     <% else %>
     <table class="table table-striped">
       <thead>
         <tr>
-          <th class="status">Status</th>
+          <th class="skinny-column">Status</th>
           <th>Username</th>
           <th>Email</th>
+          <th>Membership Expires</th>
         </tr>
       </thead>
       <tbody>
-        <% @group.users.each do |user| %>
+        <% @memberships.each do |m| %>
           <tr>
-            <td><%= user.status %></td>
-            <td><%= link_to user.username, user_path(user) %></td>
-            <td><%= user.email %></td>
+            <td><%= m.user.status %></td>
+            <td><%= link_to m.user.username, user_path(m.user) %></td>
+            <td><%= m.user.email %></td>
+            <td><%= m.expires_at %></td>
           </tr>
         <% end %>
       </tbody>

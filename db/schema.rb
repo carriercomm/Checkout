@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120912235848) do
+ActiveRecord::Schema.define(:version => 20120919041357) do
 
   create_table "brands", :force => true do |t|
     t.string   "name"
@@ -119,14 +119,8 @@ ActiveRecord::Schema.define(:version => 20120912235848) do
   create_table "groups", :force => true do |t|
     t.string   "name"
     t.text     "description"
-    t.date     "expires_at"
     t.datetime "created_at",  :null => false
     t.datetime "updated_at",  :null => false
-  end
-
-  create_table "groups_users", :force => true do |t|
-    t.integer "group_id"
-    t.integer "user_id"
   end
 
   create_table "kits", :force => true do |t|
@@ -146,6 +140,12 @@ ActiveRecord::Schema.define(:version => 20120912235848) do
     t.string   "name"
     t.datetime "created_at", :null => false
     t.datetime "updated_at", :null => false
+  end
+
+  create_table "memberships", :force => true do |t|
+    t.integer "group_id"
+    t.integer "user_id"
+    t.date    "expires_at"
   end
 
   create_table "permissions", :force => true do |t|
@@ -251,11 +251,11 @@ ActiveRecord::Schema.define(:version => 20120912235848) do
   add_foreign_key "covenant_signatures", "covenants", :name => "covenant_signatures_covenant_id_fk"
   add_foreign_key "covenant_signatures", "users", :name => "covenant_signatures_user_id_fk"
 
-  add_foreign_key "groups_users", "groups", :name => "groups_users_group_id_fk"
-  add_foreign_key "groups_users", "users", :name => "groups_users_user_id_fk"
-
   add_foreign_key "kits", "budgets", :name => "kits_budget_id_fk"
   add_foreign_key "kits", "locations", :name => "kits_location_id_fk"
+
+  add_foreign_key "memberships", "groups", :name => "groups_users_group_id_fk"
+  add_foreign_key "memberships", "users", :name => "groups_users_user_id_fk"
 
   add_foreign_key "permissions", "groups", :name => "permissions_group_id_fk"
   add_foreign_key "permissions", "kits", :name => "permissions_kit_id_fk"

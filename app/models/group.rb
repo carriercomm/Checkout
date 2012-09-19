@@ -5,19 +5,21 @@ class Group < ActiveRecord::Base
   resourcify
   strip_attributes
 
-
   ## Associations ##
 
-  has_and_belongs_to_many :users, :order => "users.username ASC"
-  has_many :permissions, :inverse_of => :group
+  has_many :memberships, :inverse_of => :group
+  has_many :users, :through => :memberships, :order => "users.username ASC"
+  has_many :permissions, :inverse_of => :group, :dependent => :destroy
   has_many :kits, :through => :permissions
 
   ## Mass-assignable Attributes ##
 
   attr_accessible(:description,
                   :expires_at,
-                  :name,
-                  :user_ids)
+                  :memberships_attributes,
+                  :name)
+
+  accepts_nested_attributes_for :memberships
 
   def to_param
     "#{ id } #{ name }".parameterize

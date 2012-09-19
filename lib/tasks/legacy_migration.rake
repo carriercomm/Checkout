@@ -297,6 +297,7 @@ namespace :dbx do
     #
 
     puts "Creating covenants..."
+    puts
     sor = Covenant.create!(name:"Statement of Responsibility", description:'Users have signed and submitted the "Statement of Responsibility"')
 
 
@@ -307,6 +308,8 @@ namespace :dbx do
     puts "Migrating users..."
     success_count = 0
     error_count   = 0
+
+    current_user = ["jehughes", "bgrace", "mtm5", "coupe", "maja08", "karpen", "pampin", "hana21", "steliosm", "varchaus", "rtwomey", "annabelc", "mtrainor", "tivon", "peberger", "ozubko", "shawnx", "mones", "joshp", "ganter", "blake", "mwatras", "hraikes", "hugosg", "trebacze", "mem5", "jimified", "marcinp"]
 
     LegacyUser.all.each do |lu|
      begin
@@ -333,6 +336,7 @@ namespace :dbx do
        if lu.stat_of_responsibility.downcase.strip == "yes"
          u.covenants = [sor]
        end
+       u.disabled = (current_user.include? username) ? false : true
        u.save!
        success_count += 1
      rescue StandardError => e
@@ -354,18 +358,30 @@ namespace :dbx do
     puts "Migrating groups and permissions..."
     group_success_count = 0
     permissions_success_count = 0
+    users_success_count = 0
     error_count = 0
 
     LegacyGroup.includes(:legacy_permissions).all.each do |lg|
       begin
         g = Group.create!(name: lg.group_name, description: lg.group_description)
         group_success_count += 1
+
         lg.legacy_permissions.each do |lp|
           c = Component.find_by_asset_tag(lp.eq_uw_tag.to_s)
           raise "No asset tag: #{ lp.eq_uw_tag }" if c.nil?
           g.kits << c.kit
           permissions_success_count += 1
         end
+
+        lg.legacy_users.map(&:client_id).each do |username|
+          u = User.find_by_username(username)
+          # don't bother unless this is an active user
+          unless u.nil? || u.disabled
+            g.users << u
+            users_success_count += 1
+          end
+        end
+
         g.save
       rescue StandardError => e
         error_count += 1
@@ -374,7 +390,9 @@ namespace :dbx do
       end
     end
 
-    puts "Successfully migrated #{ group_success_count } groups with #{ permissions_success_count } permissions"
+    puts "Successfully migrated #{ group_success_count } groups:"
+    puts "\t#{ permissions_success_count } permissions"
+    puts "\t#{ users_success_count } users"
     puts "#{ error_count } errors"
     puts
 

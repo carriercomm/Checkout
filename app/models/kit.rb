@@ -49,9 +49,10 @@ class Kit < ActiveRecord::Base
 
   ## Named scopes ##
 
-  scope :checkoutable,     where("kits.tombstoned = ? AND kits.checkoutable = ?", false, true)
-  scope :not_checkoutable, where("kits.tombstoned = ? OR kits.checkoutable = ?", true, false)
-  scope :tombstoned,       where("kits.tombstoned = ?", true)
+  scope :checkoutable,       where("kits.tombstoned = ? AND kits.checkoutable = ?", false, true)
+  scope :missing_components, joins(:components).where("kits.tombstoned = ? AND components.missing = ?", false, true)
+  scope :non_checkoutable,   where("kits.tombstoned = ? AND kits.checkoutable = ?", false, false)
+  scope :tombstoned,         where("kits.tombstoned = ?", true)
 
 
   ## Class Methods ##

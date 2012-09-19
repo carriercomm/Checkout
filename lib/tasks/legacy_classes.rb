@@ -110,7 +110,8 @@ class LegacyGroup < ActiveRecord::Base
   establish_connection :legacy
   set_table_name 'groups'
   set_primary_key :group_id
-  has_many :legacy_users
+  has_many :legacy_group_users, foreign_key: 'group_id'
+  has_many :legacy_users, :through => :legacy_group_users
   has_many :legacy_permissions, foreign_key: 'group_id'
 end
 
@@ -118,5 +119,12 @@ class LegacyUser < ActiveRecord::Base
   establish_connection :legacy
   set_table_name 'clients'
   set_primary_key :client_id
-  belongs_to :legacy_groups
+end
+
+class LegacyGroupUser < ActiveRecord::Base
+  establish_connection :legacy
+  set_table_name 'clients_status'
+  set_primary_key :status_id
+  belongs_to :legacy_group, foreign_key: 'group_id'
+  belongs_to :legacy_user, foreign_key: 'client_id'
 end

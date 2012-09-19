@@ -1,33 +1,48 @@
-<%= link_to raw(t("helpers.links.new")),
-            new_budget_path,
-            :class => 'btn btn-primary pull-right btn-new-budget' if can? :manage, Budget %>
+<div class="span2">
+  <!--Sidebar content-->
+  <div class="well sidebar-nav">
+    <ul class="nav nav-list">
+      <li class="nav-header"><%= t(".actions") %></li>
+      <%= sidebar_link(t('helpers.links.new'),
+                       new_budget_path,
+                       t('budget.sidebar.add.default_tooltip'),
+                       can?(:manage, Budget),
+                       t('budget.sidebar.add.denied_tooltip')) %>
+    </ul>
+  </div>
+</div>
+<div class="span10">
+  <!--Main content-->
+  <div class="page-header">
+    <h1><%= t('budget.title') %></h1>
+  </div>
 
-<h1>Budgets</h1>
+  <%= paginate @budgets %>
 
-<%= paginate @budgets %>
-
-<table class="table table-striped">
-  <thead>
-    <tr>
-      <th>Number</th>
-      <th>Name</th>
-      <th>Dates</th>
-      <th>Actions</th>
-    </tr>
-  </thead>
-  <tbody>
-    <% @budgets.each do |budget| %>
+  <table class="table table-striped">
+    <thead>
       <tr>
-        <td><%= link_to budget.number, budget_path(budget) %></td>
-        <td><%= budget.name %></td>
-        <td><%= budget.display_date %></td>
-        <td>
-          <%= link_to 'Show Kits', budget_kits_path(budget), :class => 'btn btn-mini' %>
-          <%= link_to 'Edit', edit_budget_path(budget), :class => 'btn btn-mini btn-edit-budget' if can? :manage, Budget %>
-        </td>
+        <th>Number</th>
+        <th>Name</th>
+        <th>Dates</th>
+        <th>Actions</th>
       </tr>
-    <% end %>
-  </tbody>
-</table>
+    </thead>
+    <tbody>
+      <% @budgets.each do |budget| %>
+        <tr>
+          <td><%= link_to budget.number, budget_path(budget) %></td>
+          <td><%= budget.name %></td>
+          <td><%= budget.display_date %></td>
+          <td>
+            <%= link_to 'Show Kits', budget_kits_path(budget), :class => 'btn btn-mini' %>
+            <%= link_to 'Edit', edit_budget_path(budget), :class => 'btn btn-mini btn-edit-budget' if can? :manage, Budget %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
 
-<%= paginate @budgets %>
+  <%= paginate @budgets %>
+
+</div>

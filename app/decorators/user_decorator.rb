@@ -62,6 +62,13 @@ class UserDecorator < ApplicationDecorator
     roles.map(&:name).join(separator).html_safe
   end
 
+  def select2_json
+    {
+      :id   => model.id,
+      :text => model.to_s
+    }
+  end
+
   def status
     if model.disabled
       h.t("user.status.disabled").html_safe

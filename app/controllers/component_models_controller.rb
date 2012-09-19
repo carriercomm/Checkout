@@ -24,15 +24,6 @@ class ComponentModelsController < ApplicationController
     end
   end
 
-  def checkoutable
-    @component_models = ComponentModel.checkoutable
-    apply_scopes_and_pagination
-
-    respond_to do |format|
-      format.html { render :action => 'index' }
-    end
-  end
-
   # GET /models/1
   # GET /models/1.json
   def show
@@ -108,6 +99,7 @@ class ComponentModelsController < ApplicationController
 
   def apply_scopes
     @component_models = @component_models.joins(:brand).includes(:brand).order("brands.name, component_models.name")
+    scope_by_filter_params
     scope_by_brand
     scope_by_category
     scope_by_search_params
@@ -117,10 +109,10 @@ class ComponentModelsController < ApplicationController
     @component_models = @component_models.page(params[:page]).per(params[:page_limit])
   end
 
-  def apply_scopes_and_pagination
-    apply_scopes
-    apply_pagination
-  end
+  # def apply_scopes_and_pagination
+  #   apply_scopes
+  #   apply_pagination
+  # end
 
   def authorize_manage
     authorize! :manage, ComponentModel
@@ -128,6 +120,12 @@ class ComponentModelsController < ApplicationController
 
   def authorize_read
     authorize! :read, ComponentModel
+  end
+
+  def scope_by_filter_params
+    case params[:filter]
+    when "checkoutable"     then @component_models = @component_models.checkoutable
+    end
   end
 
   def scope_by_brand

@@ -42,7 +42,12 @@ body {
 textarea {
   height:210px;
 }
-
+.nav-header {
+  font-size:12px;
+}
+.sidebar-nav {
+  padding: 9px 0;
+}
 select.date {
   width:auto;
 }
@@ -82,4 +87,33 @@ input[type="date_picker"],
 //    .box-shadow(inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(82,168,236,.6));
   }
 
+}
+
+// use this for button_to elements in a dropdown menu
+form.dropdown-menu-item {
+  margin:0;
+  background-color: @dropdownBackground;
+  color: @dropdownLinkColor;
+
+  input[type="submit"] {
+    border: 0;
+    color: inherit;
+    background-color: transparent;
+    display: block;
+    padding: 3px 20px;
+    clear: both;
+    font-weight: normal;
+    line-height: 20px;
+    white-space: nowrap;
+  }
+
+  &:hover {
+    background-color: @dropdownLinkBackgroundHover;
+    color: @dropdownLinkColorHover;
+  }
+}
+
+// use this for forms that are table-ized, like the nested users on the group form
+.table-form div.controls {
+  margin-left:0;
 }

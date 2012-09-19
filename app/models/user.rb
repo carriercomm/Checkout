@@ -15,8 +15,9 @@ class User < ActiveRecord::Base
   has_many :approvals,    :foreign_key => "approver_id",      :class_name => 'Reservation'
   has_many :covenant_signatures, :inverse_of => :user
   has_many :covenants,    :through => :covenant_signatures
-  has_and_belongs_to_many :groups
+  has_many :groups,       :through => :memberships
   has_many :in_assists,   :foreign_key => "in_assistant_id",  :class_name => 'Reservation'
+  has_many :memberships,  :inverse_of => :user
   has_many :out_assists,  :foreign_key => "out_assistant_id", :class_name => 'Reservation'
   has_many :reservations, :foreign_key => "client_id"
 

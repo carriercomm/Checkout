@@ -1,26 +1,46 @@
-<%= link_to raw(t('helpers.links.new')),
-            new_location_path,
-            :class => 'btn btn-primary pull-right btn-new-location' if can? :manage, Location %>
+<div class="span2">
+  <!--Sidebar content-->
+  <div class="well sidebar-nav">
+    <ul class="nav nav-list">
+      <li class="nav-header"><%= t(".actions") %></li>
+      <%= sidebar_link(t('helpers.links.new'),
+                       new_location_path,
+                       t('location.sidebar.add.default_tooltip'),
+                       can?(:manage, Location),
+                       t('location.sidebar.add.denied_tooltip')) %>
+    </ul>
+  </div>
+</div>
+<div class="span10">
+  <!--Main content-->
+  <div class="page-header">
+    <h1><%= t('location.title') %></h1>
+  </div>
 
-<h1>Locations</h1>
-<table class="table table-striped">
-  <thead>
-    <tr>
-      <th>Name</th>
-      <th>Business Hours</th>
-      <th>Actions</th>
-    </tr>
-  </thead>
-  <tbody>
-    <% @locations.each do |location| %>
+  <%= paginate @locations %>
+
+  <table class="table table-striped">
+    <thead>
       <tr>
-        <td><%= link_to location.name, location_path(location) %></td>
-        <td><%= raw(location.hours_to_s.join("<br>")) %></td>
-        <td>
-          <%= link_to 'Edit', edit_location_path(location), :class => 'btn btn-mini' %>
-          <%= link_to 'Destroy', location_path(location), :method => :delete, :confirm => 'Are you sure?', :class => 'btn btn-mini btn-danger' %>
-        </td>
+        <th>Name</th>
+        <th>Business Hours</th>
+        <th>Actions</th>
       </tr>
-    <% end %>
-  </tbody>
-</table>
+    </thead>
+    <tbody>
+      <% @locations.each do |location| %>
+        <tr>
+          <td><%= link_to location.name, location_path(location) %></td>
+          <td><%= raw(location.hours_to_s.join("<br>")) %></td>
+          <td>
+            <%= link_to 'Edit', edit_location_path(location), :class => 'btn btn-mini' %>
+            <%= link_to 'Destroy', location_path(location), :method => :delete, :confirm => 'Are you sure?', :class => 'btn btn-mini btn-danger' %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+
+  <%= paginate @locations %>  
+
+</div>

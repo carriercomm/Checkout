@@ -11,14 +11,35 @@ class UsersController < ApplicationController
   def index
     @users  = User.includes(:roles, :groups)
       .order(sort_column + " " + sort_direction)
-      .page(params[:page])
-      .per(params[:page_limit])
+
+    if params[:filter]
+      case params[:filter]
+      when "active"     then @users = @users.where(:disabled => false)
+      when "disabled"   then @users = @users.where(:disabled => true)
+      when "suspended"  then @users = @users.where(["users.suspended_until > ?", Date.today])
+      end
+    end
+
+    # get a total (used by the select2 widget) before we apply pagination
+    @total  = @users.count
+
+    @users = @users.page(params[:page]).per(params[:page_limit])
 
     @users = UserDecorator.decorate(@users)
 
     respond_to do |format|
       format.html # index.html.erb
-      # format.json { render json: @users }
+      #format.json { render json: { items: @users.map(&:select2_json), total: @total} }
+    end
+  end
+
+  def select2
+    q = params["q"]
+    total = User.where("users.username LIKE ?", "%#{ q }%").count
+    users  = UserDecorator.decorate(User.username_search(q, 10))
+    respond_to do |format|
+      #format.html # index.html.erb
+      format.json { render json: { items: users.map(&:select2_json), total: total} }
     end
   end
 

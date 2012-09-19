@@ -107,6 +107,7 @@ class BrandsController < ApplicationController
     scope_by_brand
     scope_by_category
     scope_by_search_params
+    scope_by_filter_params
   end
 
   def apply_pagination
@@ -124,6 +125,13 @@ class BrandsController < ApplicationController
 
   def scope_by_category
     @brands = @brands.category(params["category_id"]) if params["category_id"].present?
+  end
+
+  def scope_by_filter_params
+    case params[:filter]
+    when "checkoutable"     then @brands = @brands.having_checkoutable_kits
+    when "non_checkoutable" then @brands = @brands.not_having_checkoutable_kits
+    end
   end
 
   def scope_by_search_params

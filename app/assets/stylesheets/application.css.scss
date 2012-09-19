@@ -10,6 +10,10 @@
 .qrcode {
   border:1px solid rgba(0,0,0,0.5);
 }
+a.disabled {
+  color: #aaa;
+  cursor:default;
+}
 a.danger {
   color:#F33;
 }
@@ -23,3 +27,26 @@ i.user-disabled {
 i.user-suspended {
   color: orange;
 }
+
+ // use this for forms that are table-ized, like the nested users on the group form
+.table-form {
+  div.controls {
+    margin-left:0;
+  }
+}
+.table-form.control-group {
+  margin:0;
+}
+
+// fix for bootstrap/select2 conflict when rendering autocomplete results
+td.item-info,
+.table-striped tbody tr:nth-child(odd) td.item-info,
+.table-striped tbody tr:nth-child(even) td.item-info {
+  background-color: transparent;
+  padding: 1px;
+  line-height: 11px;
+  text-align: left;
+  vertical-align: middle;
+  border-top: 0;
+}
+

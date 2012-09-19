@@ -1,14 +1,47 @@
-<%= simple_form_for @group, :html => { :class => 'form-horizontal' } do |f| %>
+<%= simple_nested_form_for @group, :html => { :class => 'form-horizontal' } do |f| %>
   <%= f.input :name %>
   <%= f.input :description %>
-  <%= f.input :expires_at, :as => :date_picker,
-      :input_html => {
-        :value => (f.object.expires_at.nil? ? nil : localize(f.object.expires_at, :format => "%Y-%m-%d"))
-      }  %>
-  <%= f.association :users, :collection => User.order(:username).all, :input_html => {
-        :multiple => true,
-        :class    => 'select2-tagged-field categories-select'
-      } %>
+  <table class="table">
+    <thead>
+      <th>Username</th>
+      <th>Expires At</th>
+      <th>Actions</th>
+    </thead>
+    <tbody>
+      <%= f.simple_fields_for :memberships, @memberships,
+                              :defaults => {
+                                :label => false,
+                                :wrapper_html => {
+                                  :class => 'table-form'
+                                }
+                              } do |guf| %>
+      <tr>
+        <td><%= guf.input :user_id,
+                          :input_html => {
+                            :class => 'select2-json-autocomplete select-model',
+                            :hidden => true,
+                            "data-ajax-url" => select2_users_path(:format => :json),
+                            "data-text" => guf.object.try(:user).try(:to_s)                      
+                          } %>
+        </td>
+        <td><%= guf.input :expires_at,
+                          :as => :date_picker,
+                          :input_html => {
+                            :class => "generic_datepicker"
+          # :value => (guf.object.nil? ? nil : localize(guf.object.expires_at, :format => "%Y-%m-%d"))
+                          } %>
+        </td>
+        <td><%= guf.link_to_remove "Remove" %></td>
+      </tr>
+      <% end %>
+      <tr><td colspan="3"><%#= f.link_to_add "Add a group_user", :memberships %></td></tr>
+    </tbody>
+  </table>
+
+  <% #
+     # YOU WERE HERE ABOUT TO ADD KIT EDITING
+     # %>
+
   <div class="form-actions">
     <%= f.button :submit, :class => 'btn-primary' %>
     <%= link_to t('.cancel', :default => t("helpers.links.cancel")),

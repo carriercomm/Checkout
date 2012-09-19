@@ -10,6 +10,12 @@ en:
       compact_date: "%Y-%m-%d"
       tabular: "%a %Y-%m-%d"
       db: "%Y-%m-%d %H:%M:%S"
+  date:
+    formats:
+      business_hour: "%-l:%M%P"
+      compact_date: "%Y-%m-%d"
+      tabular: "%a %Y-%m-%d"
+      db: "%Y-%m-%d %H:%M:%S"
  # :number=>"%Y%m%d%H%M%S",
  # :time=>"%H:%M",
  # :short=>"%d %b %H:%M",
@@ -31,22 +37,131 @@ en:
       user:
         disabled: "Prevent this client from logging in"
         suspended_until: "Suspend this client's checkout privileges until a specified date"
-  group:
-    expires_at: "Expires"
   helpers:
     links:
       new: "<i class='icon-plus-sign'></i> New"
     submit:
       component_model:
         update: "Update Model"
+  brand:
+    title: "Brands"
+    sidebar:
+      filters: "Brands Filters"
+      add:
+        default_tooltip: "Add a new brand"
+        denied_tooltip: "You don't have sufficient permissions to add a new brand"
+      all:
+        text: "All"
+        default_tooltip: "Show all brands"
+      checkoutable:
+        text: "Checkoutable"
+        default_tooltip: "Show brands with checkoutable kits"
+      non_checkoutable:
+        text: "Non Checkoutable"
+        default_tooltip: "Show brands with non checkoutable kits"
+  budget:
+    title: "Budgets"
+    sidebar:
+      filters: "Budgets Filters"
+      add:
+        default_tooltip: "Add a new budget"
+        denied_tooltip: "You don't have sufficient permissions to add a new budget"
+  category:
+    title: "Categories"
+    sidebar:
+      filters: "Categories Filters"
+      add:
+        default_tooltip: "Add a new category"
+        denied_tooltip: "You don't have sufficient permissions to add a new category"
+  covenant:
+    title: "Covenants"
+    sidebar:
+      add:
+        default_tooltip: "Add a new covenant"
+        denied_tooltip: "You don't have sufficient permissions to add a new covenant"
+  group:
+    title: "Groups"
+    sidebar:
+      add:
+        default_tooltip: "Add a new group"
+        denied_tooltip: "You don't have sufficient permissions to add a new group"
+    expires_at: "Expires"
+  kit:
+    title: "Kits"
+    sidebar:
+      filters: "Kits Filters"
+      add:
+        default_tooltip: "Add a new kit"
+        denied_tooltip: "You don't have sufficient permissions to add a new kit"
+      all:
+        text: "All"
+        default_tooltip: "Show all kits"
+      checkoutable:
+        text: "Checkoutable"
+        default_tooltip: "Show all checkoutable kits"
+      missing_components:
+        text: "Missing Components"
+        default_tooltip: "Show all kits with missing components (excluding tombstoned kits)"
+      non_checkoutable:
+        text: "Non Checkoutable"
+        default_tooltip: "Show all non checkoutable kits (excluding tombstoned kits)"
+      tombstoned:
+        text: "Tombstoned"
+        default_tooltip: "Show all tombstoned kits<br>(e.g. dead, missing, etc)"
+  location:        
+    title: "Locations"
+    sidebar:
+      filters: "Locations Filters"
+      add:
+        default_tooltip: "Add a new location"
+        denied_tooltip: "You don't have sufficient permissions to add a new location"
+  component_model:
+    title: "Models"
+    sidebar:
+      add:
+        default_tooltip: "Add a new model"
+        denied_tooltip: "You don't have sufficient permissions to add a new model"
+      filters: "Models Filters"
+      all:
+        text: "All"
+        default_tooltip: "Show all models"
+      checkoutable:
+        text: "Checkoutable"
+        default_tooltip: "Show all checkoutable models"
+      # non_checkoutable:
+      #   text: "Non Checkoutable"
+      #   default_tooltip: "Show all non checkoutable models"
   user:
+    title: "Users"
+    sidebar:
+      filters: "Users Filters"
+      add:
+        default_tooltip: "Add a new user"
+        denied_tooltip: "You don't have sufficient permissions to add a new user"
+      csv_import:
+        text: '<i class="icon-upload"></i> CSV Import'
+        default_tooltip: "Bulk upload and creation of users defined in a CSV file"
+        denied_tooltip: "You don't have sufficient permissions to create users"
+      all:
+        text: "All"
+        default_tooltip: "Show all users"
+      active:
+        text: "Active"
+        default_tooltip: "Show all active users<br>(includes suspended users)"
+      suspended:
+        text: "Suspended"
+        default_tooltip: "Show all suspended users"
+      disabled:
+        text: "Disabled"
+        default_tooltip: "Show all disabled users"
+
+    sidebar_title: "User Filters"
     first_name: "First Name"
     last_name: "Last Name"
     username: "Username"
     email: "Email"
     suspension_count: "Suspensions"
     suspended_until: "Suspended Until"
-    disabled: "Disabled"
     roles: "Roles"
     groups: "Groups"
     status:

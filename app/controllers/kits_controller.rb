@@ -16,33 +16,6 @@ class KitsController < ApplicationController
     end
   end
 
-  def checkoutable
-    @kits = Kit.checkoutable
-    apply_scopes_and_pagination
-
-    respond_to do |format|
-      format.html { render :action => 'index' }
-    end
-  end
-
-  def not_checkoutable
-    @component_models = Kit.not_checkoutable
-    apply_scopes_and_pagination
-
-    respond_to do |format|
-      format.html { render :action => 'index' }
-    end
-  end
-
-  def tombstoned
-    @component_models = Kit.tombstoned
-    apply_scopes_and_pagination
-
-    respond_to do |format|
-      format.html { render :action => 'index' }
-    end
-  end
-
   # GET /kits/1
   # GET /kits/1.json
   def show
@@ -135,10 +108,20 @@ class KitsController < ApplicationController
   private
 
   def apply_scopes_and_pagination
+    scope_by_filter_params
     scope_by_brand
     scope_by_budget
     scope_by_category
     @kits = @kits.joins(:component_models => :brand).order("brands.name, component_models.name").page(params[:page])
+  end
+
+  def scope_by_filter_params
+    case params["filter"]
+    when "checkoutable"       then @kits = @kits.checkoutable
+    when "missing_components" then @kits = @kits.missing_components
+    when "non_checkoutable"   then @kits = @kits.non_checkoutable
+    when "tombstoned"         then @kits = @kits.tombstoned
+    end
   end
 
   # TODO: does this make any sense? this might need to be fixed to

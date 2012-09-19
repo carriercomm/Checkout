@@ -39,23 +39,15 @@
           <a class="brand" href="/">Checkout</a>
           <div class="container-fluid nav-collapse">
             <ul class="nav">
-              <%= dropdown_for "Brands" do %>
-                <li><%= link_to "All", brands_path if can? :read, Brand %></li>
-                <li><%= link_to "Checkoutable", checkoutable_brands_path if can? :read, Brand %></li>
-                <li class="divider"></li>
-                <li><%= link_to "Create", new_brand_path if can? :manage, Brand %></li>
-              <% end %>
+              <li><%= link_to "Brands", checkoutable_brands_path if can? :read, Brand %></li>
               <li><%= link_to "Budgets", budgets_path if can? :read, Budget %></li>
               <li><%= link_to "Categories", categories_path  if can? :read, Category %></li>
               <li><%= link_to "Covenants", covenants_path  if can? :manage, Covenant %></li>
               <li><%= link_to "Groups", groups_path if can? :manage, Group %></li>
-              <li><%= link_to "Kits", kits_path if can? :manage, Kit %></li>
+              <li><%= link_to "Kits", checkoutable_kits_path if can? :manage, Kit %></li>
               <li><%= link_to "Locations", locations_path if can? :read, Location %></li>
-              <%= dropdown_for "Models" do %>
-                <li><%= link_to "All", component_models_path if can? :read, ComponentModel %></li>
-                <li><%= link_to "Checkoutable", checkoutable_component_models_path if can? :read, ComponentModel %></li>
-              <% end %>
-              <li><%= link_to("Users", users_path) if can? :manage, User %></li>
+              <li><%= link_to "Models", checkoutable_component_models_path if can? :read, ComponentModel %></li>
+              <li><%= link_to("Users", active_users_path) if can? :manage, User %></li>
             </ul>
             <form class="navbar-search pull-left" action="">
               <input id="q" name="q" placeholder="Search" type="text" class="search-query span2 ui-autocomplete-input" autocomplete="off"></input>
@@ -63,7 +55,7 @@
             <ul class="nav pull-right">
               <li class="divider-vertical"></li>
               <%= dropdown_for(current_user.username, "icon-user icon-white") do %>
-                <li><%= link_to "Sign out", destroy_user_session_path, :method => :delete %></li>
+                <li><%= button_to "Sign out", destroy_user_session_path, :method => :delete, :form_class => 'dropdown-menu-item' %></li>
                 <li><%= link_to "Edit", edit_user_registration_path %></li>
               <% end %>
             </ul>
@@ -99,10 +91,7 @@
         </div>
       <% end %>
       <div class="row-fluid">
-        <%= yield :sidebar %>
-        <div>
-          <%= yield %>
-        </div>
+        <%= yield %>
       </div><!--/row-->
 
       <footer>
