@@ -2,6 +2,10 @@ class MembershipDecorator < ApplicationDecorator
   decorates :membership
   decorates_association :user
 
+  def username
+    model.user.username
+  end
+
   def expires_at
     if model.expires_at.nil?
       return "Never"

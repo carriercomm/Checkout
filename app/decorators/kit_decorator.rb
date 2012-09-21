@@ -42,6 +42,10 @@ class KitDecorator < ApplicationDecorator
     h.number_to_currency(model.cost)
   end
 
+  def description
+    "[#{ asset_tags }] #{ component_list }".squish
+  end
+
   def insured
     to_yes_no(model.insured)
   end
@@ -52,6 +56,13 @@ class KitDecorator < ApplicationDecorator
 
   def location
     val_or_space(model.location)
+  end
+
+  def select2_json
+    {
+      :id   => model.id,
+      :text => description
+    }
   end
 
   def tombstoned

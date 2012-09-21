@@ -13,5 +13,11 @@ class Permission < ActiveRecord::Base
 
   ## Mass-assignable attributes ##
 
-  attr_accessible :exclusive_until, :expires_at
+  attr_accessible(:kit_id, :exclusive_until, :expires_at)
+
+  def data_text
+    return if new_record?
+    KitDecorator.decorate(kit).description
+  end
+
 end

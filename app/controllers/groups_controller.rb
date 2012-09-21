@@ -23,7 +23,7 @@ class GroupsController < ApplicationController
     @group = GroupDecorator.decorate(@group)
 
     # TODO: figure out how to sort this in the database
-    @memberships = @group.memberships.sort_by {|m| m.user.username}
+    @memberships = @group.memberships.sort_by {|m| m.username}
     @memberships = MembershipDecorator.decorate(@memberships)
 
     respond_to do |format|
@@ -53,7 +53,7 @@ class GroupsController < ApplicationController
     # LEFT JOIN permissions ON groups.id = permissions.group_id
     # INNER JOIN kits ON permissions.kit_id = kits.id
     # END_SQL
-    @group = Group.includes(:kits).find(params[:id].to_i)
+    @group = Group.includes(:kits).find(params[:id])
     # TODO: figure out how to sort this in the database
     @memberships = @group.memberships.sort_by {|m| m.user.username}
   end

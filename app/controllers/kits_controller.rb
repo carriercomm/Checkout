@@ -16,6 +16,17 @@ class KitsController < ApplicationController
     end
   end
 
+  # GET /kits/select2.json
+  def select2
+    q = params["q"]
+    total  = Kit.asset_tag_search_count(q)
+    kits   = KitDecorator.decorate(Kit.asset_tag_search(q, 20))
+    respond_to do |format|
+      #format.html # index.html.erb
+      format.json { render json: { items: kits.map(&:select2_json), total: total} }
+    end
+  end
+
   # GET /kits/1
   # GET /kits/1.json
   def show

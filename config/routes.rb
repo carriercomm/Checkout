@@ -1,5 +1,7 @@
 Checkout::Application.routes.draw do
 
+  root to: 'component_models#index', filter: "checkoutable"
+
   # TODO: trim down these routes
   # TODO: move most of these added collection routes to params, so they can act as facets
 
@@ -9,8 +11,6 @@ Checkout::Application.routes.draw do
       get r, to: "component_models#index", filter: r
     end
   end
-
-  root to: 'component_models#checkoutable'
 
   devise_for :user
 
@@ -47,6 +47,7 @@ Checkout::Application.routes.draw do
       ['checkoutable', 'missing_components', 'non_checkoutable', 'tombstoned'].each do |r|
         get r, to: "kits#index", filter: r
       end
+      get "select2"
     end
     resources :reservations, only: [:index, :new]
   end

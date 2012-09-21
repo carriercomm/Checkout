@@ -1,46 +1,25 @@
 <%= simple_nested_form_for @group, :html => { :class => 'form-horizontal' } do |f| %>
   <%= f.input :name %>
   <%= f.input :description %>
-  <table class="table">
-    <thead>
-      <th>Username</th>
-      <th>Expires At</th>
-      <th>Actions</th>
-    </thead>
-    <tbody>
-      <%= f.simple_fields_for :memberships, @memberships,
-                              :defaults => {
-                                :label => false,
-                                :wrapper_html => {
-                                  :class => 'table-form'
-                                }
-                              } do |guf| %>
-      <tr>
-        <td><%= guf.input :user_id,
-                          :input_html => {
-                            :class => 'select2-json-autocomplete select-model',
-                            :hidden => true,
-                            "data-ajax-url" => select2_users_path(:format => :json),
-                            "data-text" => guf.object.try(:user).try(:to_s)                      
-                          } %>
-        </td>
-        <td><%= guf.input :expires_at,
-                          :as => :date_picker,
-                          :input_html => {
-                            :class => "generic_datepicker"
-          # :value => (guf.object.nil? ? nil : localize(guf.object.expires_at, :format => "%Y-%m-%d"))
-                          } %>
-        </td>
-        <td><%= guf.link_to_remove "Remove" %></td>
-      </tr>
-      <% end %>
-      <tr><td colspan="3"><%#= f.link_to_add "Add a group_user", :memberships %></td></tr>
-    </tbody>
-  </table>
-
-  <% #
-     # YOU WERE HERE ABOUT TO ADD KIT EDITING
-     # %>
+  <h2>Members</h2>
+  <div class="records">
+    <div class="fields field-headers">
+      <div class="field field-header">Username</div>
+      <div class="field field-header">Expires At</div>
+      <div class="field field-header">Actions</div>
+    </div>
+    <%= f.simple_fields_for :memberships, @memberships %>
+    <%= f.link_to_add raw("<i class='icon-plus-sign'></i> Add another user"), :memberships, :id=>"memberships-add-user" %>
+  </div>
+  <h2>Kits</h2>
+  <div class="records">
+    <div class="fields field-headers">
+      <div class="field field-header">Asset Tags</div>
+      <div class="field field-header">Expires At</div>
+      <div class="field field-header">Actions</div>
+    </div>
+    <%= f.simple_fields_for :permissions %>
+    <%= f.link_to_add raw("<i class='icon-plus-sign'></i> Add another kit"), :permissions, :id=>"permissions-add-kit" %>
 
   <div class="form-actions">
     <%= f.button :submit, :class => 'btn-primary' %>

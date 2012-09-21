@@ -15,8 +15,6 @@ jQuery ->
 
   ajaxConfig =
     minimumInputLength: 1
-    # TODO: figure out how to move this width to a stylesheet
-    width:'220px'
     ajax:
       crossDomain: false
       dataType: 'json'
@@ -57,7 +55,6 @@ jQuery ->
     .not('.select2-bound')
     .addClass('select2-bound')
     .select2(ajaxConfig)
-
 
   #
   # Select box to tags widget

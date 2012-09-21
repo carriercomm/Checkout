@@ -14,6 +14,7 @@ class UserDecorator < ApplicationDecorator
          :sign_in_count,
          :suspended_until,
          :suspension_count,
+         :to_s,
          :username)
 
   def autocomplete_json(options={})

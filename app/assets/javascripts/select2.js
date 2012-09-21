@@ -234,6 +234,7 @@
                 if( null !== handler){
                     handler.abort();
                 }
+
                 handler = transport.call(null, {
                     url: options.url,
                     dataType: options.dataType,

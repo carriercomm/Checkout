@@ -16,4 +16,11 @@ class Membership < ActiveRecord::Base
                   :group_id,
                   :user_id)
 
+  validates_presence_of :group
+  validates_presence_of :user
+
+  def username
+    user.username
+  end
+
 end

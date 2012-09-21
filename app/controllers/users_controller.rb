@@ -33,6 +33,7 @@ class UsersController < ApplicationController
     end
   end
 
+  # GET /kits/select2.json
   def select2
     q = params["q"]
     total = User.where("users.username LIKE ?", "%#{ q }%").count

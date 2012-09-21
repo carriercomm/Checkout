@@ -63,6 +63,12 @@ class Kit < ActiveRecord::Base
       .order("components.asset_tag ASC").limit(limit)
   end
 
+  def self.asset_tag_search_count(query)
+    includes(:components).joins(:components)
+      .where("components.asset_tag LIKE ?", "%#{ query }%")
+      .order("components.asset_tag ASC").count
+  end
+
 
   ## Instance Methods ##
 
