@@ -6,7 +6,7 @@ class SearchController < ApplicationController
     results = []
 
     if can? :read, User
-      users  = UserDecorator.decorate(User.username_search(q, 10))
+      users  = UserDecorator.decorate(User.username_search(q).limit(10))
       results.concat(users.map(&:autocomplete_json).concat(results))
     end
 
@@ -16,7 +16,7 @@ class SearchController < ApplicationController
     end
 
     if can? :read, Kit
-      kits = KitDecorator.decorate(Kit.asset_tag_search(q, 20))
+      kits = KitDecorator.decorate(Kit.asset_tag_search(q).limit(20))
       results.concat(kits.map { |k| k.autocomplete_json(q: q) })
     end
 

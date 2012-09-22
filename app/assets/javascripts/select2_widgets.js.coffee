@@ -15,6 +15,7 @@ jQuery ->
 
   ajaxConfig =
     minimumInputLength: 1
+    width: 'element'
     ajax:
       crossDomain: false
       dataType: 'json'
@@ -46,7 +47,7 @@ jQuery ->
         return !this.id.match(/[a-z_]+_attributes_new_[a-z]+/);
       .not('.select2-bound')
       .addClass('select2-bound')
-      .select2(ajaxConfig)
+      .select2($.extend(true, {}, ajaxConfig))
 
   # bind the select2 widget to existing nested components in the form
   $('input.select2-json-autocomplete')
@@ -54,7 +55,7 @@ jQuery ->
       return !this.id.match(/[a-z_]+_attributes_new_[a-z]+/);
     .not('.select2-bound')
     .addClass('select2-bound')
-    .select2(ajaxConfig)
+    .select2($.extend(true, {}, ajaxConfig))
 
   #
   # Select box to tags widget

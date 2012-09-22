@@ -18,6 +18,7 @@ class Membership < ActiveRecord::Base
 
   validates_presence_of :group
   validates_presence_of :user
+  validates :user, :uniqueness => { :scope => :group_id }
 
   def username
     user.username

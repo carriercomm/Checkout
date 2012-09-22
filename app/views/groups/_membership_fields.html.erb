@@ -1,26 +1,26 @@
-<div class="field">
+<div class="field span6">
+  <% if f.object.new_record? %>
   <%= f.input :user_id,
               :label => false,
-              :wrapper_html => {
-                :class => 'table-form'
-              },
+              :wrapper_html => { :class => 'table-form' },
               :input_html => {
                   :class => 'select2-json-autocomplete select-user',
                   :hidden => true,
-                  "data-ajax-url" => select2_users_path(:format => :json),
-                  "data-text" => f.object.try(:user).try(:username)
+                  "data-ajax-url" => select2_users_path(:format => :json, :group_id =>  @group.id)
               } %>
+  <% else %>
+  <span class="select-user"><%= f.object.user.username %></span>
+  <%= f.input :user_id, :as => :hidden %>
+  <% end %>
 </div>
-<div class="field">
+<div class="field span4">
   <%= f.input :expires_at,
               :as => :date_picker,
               :label => false,
-              :wrapper_html => {
-                :class => 'table-form'
-              },
+              :wrapper_html => { :class => 'table-form' },
               :input_html => {
                 :class => "generic_datepicker",
                 :value => (f.object.nil? ? nil : f.object.expires_at)
               } %>
 </div>
-<div class="field"><%= f.link_to_remove "Remove", :class => "btn btn-danger" %></div>
+<div class="field span2"><%= f.link_to_remove "Delete", :class => "btn btn-danger" %></div>

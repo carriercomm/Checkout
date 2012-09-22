@@ -59,9 +59,21 @@ class User < ActiveRecord::Base
     where(conditions).where(["lower(username) = :value OR lower(email) = :value", { :value => login.strip.downcase }]).first
   end
 
-  def self.username_search(query, limit=10)
+  # returns an AREL which filters out users who are already in a
+  # specific group (specified by the group id)
+  def self.not_in_group(group_id)
+    group = Group.find(group_id)
+    return if group.nil?
+
+    user_ids = group.users.map(&:id)
+    return if user_ids.empty?
+
+    where("users.id NOT IN (?)", user_ids)
+  end
+
+  def self.username_search(query)
       self.where("users.username LIKE ?", "%#{ query }%")
-      .order("users.username ASC").limit(limit)
+      .order("users.username ASC")
   end
 
 

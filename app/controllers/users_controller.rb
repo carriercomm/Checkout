@@ -35,9 +35,21 @@ class UsersController < ApplicationController
 
   # GET /kits/select2.json
   def select2
-    q = params["q"]
-    total = User.where("users.username LIKE ?", "%#{ q }%").count
-    users  = UserDecorator.decorate(User.username_search(q, 10))
+    users = User
+
+    # constrain the query to find users not already in a specified group
+    if params[:group_id].present?
+      users = users.not_in_group(params["group_id"])
+    end
+
+    users = users.username_search(params["q"])
+
+    # get a count of all the users meeting the query params
+    total = users.count
+
+    # grab the first 10
+    users = UserDecorator.decorate(users.limit(10))
+
     respond_to do |format|
       #format.html # index.html.erb
       format.json { render json: { items: users.map(&:select2_json), total: total} }

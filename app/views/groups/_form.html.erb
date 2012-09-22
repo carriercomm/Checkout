@@ -2,21 +2,22 @@
   <%= f.input :name %>
   <%= f.input :description %>
   <h2>Members</h2>
-  <div class="records">
-    <div class="fields field-headers">
-      <div class="field field-header">Username</div>
-      <div class="field field-header">Expires At</div>
-      <div class="field field-header">Actions</div>
+  <div class="records row-fluid">
+    <div class="fields field-headers row-fluid">
+      <div class="field field-header span6">Username</div>
+      <div class="field field-header span4">Expires At</div>
+      <div class="field field-header span2">Actions</div>
     </div>
     <%= f.simple_fields_for :memberships, @memberships %>
     <%= f.link_to_add raw("<i class='icon-plus-sign'></i> Add another user"), :memberships, :id=>"memberships-add-user" %>
   </div>
   <h2>Kits</h2>
-  <div class="records">
-    <div class="fields field-headers">
-      <div class="field field-header">Asset Tags</div>
-      <div class="field field-header">Expires At</div>
-      <div class="field field-header">Actions</div>
+  <div class="records row-fluid">
+    <div class="fields field-headers row-fluid">
+      <div class="field field-header span2">Asset Tags</div>
+      <div class="field field-header span4">Components</div>
+      <div class="field field-header span4">Expires At</div>
+      <div class="field field-header span2">Actions</div>
     </div>
     <%= f.simple_fields_for :permissions %>
     <%= f.link_to_add raw("<i class='icon-plus-sign'></i> Add another kit"), :permissions, :id=>"permissions-add-kit" %>

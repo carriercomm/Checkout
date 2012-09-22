@@ -1,5 +1,7 @@
 @import "twitter/bootstrap/bootstrap";
 @import "twitter/bootstrap/responsive";
+@import "twitter/bootstrap/variables";
+@import "twitter/bootstrap/mixins";
 
 // Set the correct sprite paths
 @iconSpritePath: asset-path('twitter/bootstrap/glyphicons-halflings.png');
@@ -116,4 +118,46 @@ form.dropdown-menu-item {
 // use this for forms that are table-ized, like the nested users on the group form
 .table-form div.controls {
   margin-left:0;
+}
+
+// tabular forms (like in the groups form)
+div.records {
+  display: table;
+  border-collapse: collapse;
+  border-spacing: 0;
+
+  div.fields {
+    display: table-row;
+    border-bottom: 1px solid #ddd;
+  }
+
+  div.field {
+    padding: 8px;
+    line-height:20px;
+    vertical-align: middle;
+  }
+
+  div.field-headers {
+    div.field-header {
+      display: table-cell;
+      font-weight: bold;
+      vertical-align: bottom;
+    }
+  }
+}
+
+div.records div.fields:nth-child(even) {
+  background-color:#F9F9F9
+}
+
+.permission-kit-id {
+
+}
+
+#memberships-add-user,
+#permissions-add-kit
+{
+  display: block;
+  padding: 8px;
+  margin-top:0.5em;
 }
