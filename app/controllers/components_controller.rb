@@ -4,6 +4,7 @@ class ComponentsController < ApplicationController
   authorize_resource
   before_filter :strip_brand, :only => [:create, :update, :destroy]
 
+=begin
   # GET /components
   # GET /components.json
   def index
@@ -18,6 +19,7 @@ class ComponentsController < ApplicationController
       format.json { render json: @components }
     end
   end
+=end
 
   # GET /components/1
   # GET /components/1.json
@@ -25,10 +27,13 @@ class ComponentsController < ApplicationController
     @component = Component.find(params[:id])
 
     respond_to do |format|
-      format.html # show.html.erb
-      format.json { render json: @component }
+      #format.html # show.html.erb
+      format.js
+      #format.json { render json: @component }
     end
   end
+
+=begin
 
   # GET /admin/components/new
   # GET /admin/components/new.json
@@ -63,21 +68,26 @@ class ComponentsController < ApplicationController
     end
   end
 
+=end
+
+
   # PUT /admin/components/1
   # PUT /admin/components/1.json
   def update
-    @component = Component.find(params[:id])
+    @component = ComponentDecorator.find(params[:id])
 
     respond_to do |format|
       if @component.update_attributes(params[:component])
-        format.html { redirect_to component_path(@component), notice: 'Component was successfully updated.' }
-        format.json { head :no_content }
+        # format.html { redirect_to component_path(@component), notice: 'Component was successfully updated.' }
+        format.js
       else
-        format.html { render action: "edit" }
-        format.json { render json: @component.errors, status: :unprocessable_entity }
+        #format.html { render action: "edit" }
+        format.js   { render :template => 'components/error.js.erb' }
       end
     end
   end
+
+=begin
 
   # DELETE /admin/components/1
   # DELETE /admin/components/1.json
@@ -90,7 +100,7 @@ class ComponentsController < ApplicationController
       format.json { head :no_content }
     end
   end
-
+=end
   protected
 
   def strip_brand

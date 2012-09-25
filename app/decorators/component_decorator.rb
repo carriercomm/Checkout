@@ -2,7 +2,7 @@ class ComponentDecorator < ApplicationDecorator
   decorates :component
   decorates_association :component_model
 
-  allows :asset_tag, :serial_number
+  allows :asset_tag, :serial_number, :update_attributes
 
   def linked_brand
     ComponentModelDecorator.decorate(model.component_model).linked_brand

@@ -40,15 +40,7 @@
       <th width="span3">Serial Number</th>
       <th width="span1">Missing</th>
     </tr>
-  <% @kit.components.each do |c| %>
-    <tr>
-      <td><%= c.linked_brand %></td>
-      <td><%= c.linked_model %></td>
-      <td><%= c.asset_tag %></td>
-      <td><%= c.serial_number %></td>
-      <td><%= c.missing %></td>
-    </tr>
-  <% end %>
+  <%= render :partial => 'component', :collection =>  @kit.components %>
   </tbody>
 </table>
 

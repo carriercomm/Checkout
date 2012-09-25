@@ -1,0 +1,12 @@
+<tr id="component_<%= component.id %>">
+  <td><%= component.linked_brand %></td>
+  <td><%= component.linked_model %></td>
+  <td><%= component.asset_tag %></td>
+  <td><%= component.serial_number %></td>
+  <td>
+    <%= simple_form_for component.model, :remote => true, :method => :put do |f| %>
+      <%= f.input :missing, :as => :hidden, :input_html => { :value => !component.model.missing } %>
+      <%= f.submit component.missing, :class => 'btn btn-small', :disable_with => "..." %>
+    <% end %>
+  </td>
+</tr>

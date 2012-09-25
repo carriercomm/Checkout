@@ -6,7 +6,7 @@ class ApplicationDecorator < Draper::Base
   end
 
   def to_yes_no(val)
-    val ? h.t('yes') : h.t('no')
+    val ? h.t('boolean.yes') : h.t('boolean.no')
   end
 
   def val_or_space(val)
