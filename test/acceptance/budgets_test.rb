@@ -46,7 +46,7 @@ describe "Admin Browsing Budgets Acceptance Test" do
       visit budgets_path
       assert current_path == budgets_path
       assert page.has_content? budget.name
-      assert page.has_selector? "a.btn-new-budget"
+      assert page.has_selector? "a.btn-new"
       assert page.has_selector? "a.btn-edit-budget"
     end
   end

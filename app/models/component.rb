@@ -22,8 +22,8 @@ class Component < ActiveRecord::Base
 
   validates_presence_of :component_model
   validates_presence_of :kit
-  validates :asset_tag,     :uniqueness => true, :allow_nil => true
-  validates :serial_number, :uniqueness => true, :allow_nil => true
+  validates :asset_tag,     :uniqueness => { :case_sensitive => false }, :allow_nil => true
+  validates :serial_number, :uniqueness => { :case_sensitive => false }, :allow_nil => true
 
 
   ## Mass-assignable attributes ##

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120919041357) do
+ActiveRecord::Schema.define(:version => 20120925015305) do
 
   create_table "brands", :force => true do |t|
     t.string   "name"
@@ -148,6 +148,8 @@ ActiveRecord::Schema.define(:version => 20120919041357) do
     t.date    "expires_at"
   end
 
+  add_index "memberships", ["user_id", "group_id"], :name => "index_memberships_on_user_id_and_group_id", :unique => true
+
   create_table "permissions", :force => true do |t|
     t.integer  "group_id"
     t.integer  "kit_id"
@@ -158,6 +160,7 @@ ActiveRecord::Schema.define(:version => 20120919041357) do
   end
 
   add_index "permissions", ["group_id"], :name => "index_permissions_on_group_id"
+  add_index "permissions", ["kit_id", "group_id"], :name => "index_permissions_on_kit_id_and_group_id", :unique => true
   add_index "permissions", ["kit_id"], :name => "index_permissions_on_kit_id"
 
   create_table "reservations", :force => true do |t|

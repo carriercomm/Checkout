@@ -4,7 +4,8 @@ module ApplicationHelper
     (current_page? path) ? 'class="active"'.html_safe : ""
   end
 
-  def sidebar_link(text, path, default_tooltip = "", condition = true, failure_tooltip = "")
+  # TODO: ummm, this is clumsy. Like... no, really. It's actually embarrassing me.
+  def sidebar_link(text, path, default_tooltip = "", condition = true, failure_tooltip = nil, options = {})
     # setup the base options for the tooltip
     link_opts = {
       :rel   => "tooltip",
@@ -13,13 +14,17 @@ module ApplicationHelper
 
     li_opts = {}
 
+    logger.debug "---root_path: " + root_path
+    logger.debug "---path: " + path
+
     # if the link is to the current page, then we'll highlight it
-    li_opts[:class] = "active" if current_page? path
+    # TODO: make this work for the root url
+    li_opts[:class] = "active" if current_page?(path)
 
     if condition
       link_opts[:title] = default_tooltip unless default_tooltip.blank?
       content_tag :li, li_opts do
-        link_to raw(text), path, link_opts
+        link_to raw(text), path, link_opts.merge(options)
       end
     else
       link_opts[:title] = failure_tooltip unless failure_tooltip.blank?

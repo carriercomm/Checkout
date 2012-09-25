@@ -3,17 +3,26 @@
   <div class="well sidebar-nav">
     <ul class="nav nav-list">
       <li class="nav-header"><%= t(".actions") %></li>
-      <%= sidebar_link(t('helpers.links.new'),
+      <%= sidebar_link(t("helpers.links.new"),
                        new_kit_path,
-                       t('kit.sidebar.add.default_tooltip'),
+                       t("kit.sidebar.add.default_tooltip"),
                        can?(:manage, Kit),
-                       t('kit.sidebar.add.denied_tooltip')) %>
+                       t("kit.sidebar.add.denied_tooltip"),
+                       :class=>'btn-new') %>
       <li class="nav-header"><%= t("kit.sidebar.filters") %></li>
       <%= sidebar_link t("kit.sidebar.all.text"), kits_path, t("kit.sidebar.all.default_tooltip") %>
-      <%= sidebar_link t("kit.sidebar.checkoutable.text"), checkoutable_kits_path, t("kit.sidebar.checkoutable.default_tooltip") %>
-      <%= sidebar_link t("kit.sidebar.non_checkoutable.text"), non_checkoutable_kits_path, t("kit.sidebar.non_checkoutable.default_tooltip") %>
-      <%= sidebar_link t("kit.sidebar.missing_components.text"), missing_components_kits_path, t("kit.sidebar.missing_components.default_tooltip") %>
-      <%= sidebar_link t("kit.sidebar.tombstoned.text"), tombstoned_kits_path, t("kit.sidebar.tombstoned.default_tooltip") %>
+      <%= sidebar_link(t("kit.sidebar.checkoutable.text"),
+                       checkoutable_kits_path,
+                       t("kit.sidebar.checkoutable.default_tooltip")) %>
+      <%= sidebar_link(t("kit.sidebar.non_checkoutable.text"),
+                       non_checkoutable_kits_path,
+                       t("kit.sidebar.non_checkoutable.default_tooltip")) %>
+      <%= sidebar_link(t("kit.sidebar.missing_components.text"),
+                       missing_components_kits_path,
+                       t("kit.sidebar.missing_components.default_tooltip")) %>
+      <%= sidebar_link(t("kit.sidebar.tombstoned.text"),
+                       tombstoned_kits_path,
+                       t("kit.sidebar.tombstoned.default_tooltip")) %>
     </ul>
   </div>
 </div>
@@ -30,6 +39,7 @@
       <tr>
         <th>Asset Tag</th>
         <th>Components</th>
+        <th>Groups</th>
         <th>Actions</th>
       </tr>
     </thead>
@@ -38,6 +48,7 @@
         <tr>
           <td><%= link_to(kit.asset_tags, kit_path(kit)) %></td>
           <td><%= kit.linked_component_list %></td>
+          <td><%= kit.linked_groups_list %></td>
           <td>
             <%= link_to('Reserve', new_reservation_path(:kit_id => kit, :user_id => current_user), :class => 'btn btn-mini') %>
             <%= link_to('Reservations', kit_reservations_path(kit), :class => 'btn btn-mini') %>

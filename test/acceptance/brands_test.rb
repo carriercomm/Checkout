@@ -10,7 +10,7 @@ describe "User Browsing Brands Acceptance Test" do
       visit brands_path
       assert current_path == brands_path
       assert page.has_content? brand.name
-      assert page.has_no_selector? "a.btn-new-brand"
+      assert page.has_no_selector? "a.btn-new"
       assert page.has_no_selector? "a.btn-edit-brand"
     end
   end
@@ -50,7 +50,7 @@ describe "Admin Browsing Brands Acceptance Test" do
       visit brands_path
       assert current_path == brands_path
       assert page.has_content? brand.name
-      assert page.has_selector? "a.btn-new-brand"
+      assert page.has_selector? "a.btn-new"
       assert page.has_selector? "a.btn-edit-brand"
     end
   end

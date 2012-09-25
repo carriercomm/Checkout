@@ -7,7 +7,9 @@
                        new_brand_path,
                        t("brand.sidebar.add.default_tooltip"),
                        can?(:manage, Brand),
-                       t("brand.sidebar.add.denied_tooltip")) %>
+                       t("brand.sidebar.add.denied_tooltip"),
+                       :class => 'btn-new')
+          %>
       <li class="nav-header"><%= t("brand.sidebar.filters") %></li>
       <%= sidebar_link t("brand.sidebar.all.text"),
                        brands_path,

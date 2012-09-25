@@ -7,7 +7,8 @@
                        new_category_path,
                        t('category.sidebar.add.default_tooltip'),
                        can?(:manage, Category),
-                       t('category.sidebar.add.denied_tooltip')) %>
+                       t('category.sidebar.add.denied_tooltip'),
+                       :class => 'btn-new') %>
     </ul>
   </div>
 </div>

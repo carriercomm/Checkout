@@ -16,6 +16,8 @@ class KitsController < ApplicationController
     end
   end
 
+  # TODO: add a group params contraint to this query - a la the
+  #       select2 method in users_controller.
   # GET /kits/select2.json
   def select2
     kits   = Kit.asset_tag_search(params["q"])

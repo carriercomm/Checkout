@@ -3,6 +3,7 @@ class KitDecorator < ApplicationDecorator
   decorates_association :budget
   decorates_association :component_models
   decorates_association :components
+  decorates_association :groups
   decorates_association :reservations
 
   allows(:budget_id,
@@ -44,6 +45,10 @@ class KitDecorator < ApplicationDecorator
 
   def description
     "[#{ asset_tags }] #{ component_list }".squish
+  end
+
+  def linked_groups_list
+    groups.map(&:to_link).join(", ").html_safe
   end
 
   def insured

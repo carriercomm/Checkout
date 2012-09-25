@@ -7,7 +7,8 @@
                        new_budget_path,
                        t('budget.sidebar.add.default_tooltip'),
                        can?(:manage, Budget),
-                       t('budget.sidebar.add.denied_tooltip')) %>
+                       t('budget.sidebar.add.denied_tooltip'),
+                       :class=>'btn-new') %>
     </ul>
   </div>
 </div>

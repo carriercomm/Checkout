@@ -27,7 +27,7 @@ describe "User Browsing Component Models Acceptance Test" do
       visit component_models_path
       assert current_path == component_models_path
       assert page.has_content? component_model.name
-      assert page.has_no_selector? "a.btn-new-component-model"
+      assert page.has_no_selector? "a.btn-new"
       assert page.has_no_selector? "a.btn-edit-component-model"
     end
   end
@@ -72,7 +72,7 @@ describe "Admin Browsing Component Models Acceptance Test" do
       visit component_models_path
       assert current_path == component_models_path
       assert page.has_content? component_model.name
-      assert page.has_selector? "a.btn-new-component-model"
+      assert page.has_selector? "a.btn-new"
       assert page.has_selector? "a.btn-edit-component-model"
     end
   end

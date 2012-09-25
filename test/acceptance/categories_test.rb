@@ -10,7 +10,7 @@ describe "User Browsing Categories Acceptance Test" do
       visit categories_path
       assert current_path == categories_path
       assert page.has_content? category.name
-      assert page.has_no_selector? "a.btn-new-category"
+      assert page.has_no_selector? "a.btn-new"
       assert page.has_no_selector? "a.btn-edit-category"
     end
   end
@@ -50,7 +50,7 @@ describe "Admin Browsing Categories Acceptance Test" do
       visit categories_path
       assert current_path == categories_path
       assert page.has_content? category.name
-      assert page.has_selector? "a.btn-new-category"
+      assert page.has_selector? "a.btn-new"
       assert page.has_selector? "a.btn-edit-category"
     end
   end

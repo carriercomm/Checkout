@@ -28,6 +28,15 @@ class Group < ActiveRecord::Base
                                 :reject_if => proc { |attributes| attributes['kit_id'].blank? },
                                 :allow_destroy=> true)
 
+  # TODO: there is an outstanding Rails bug, which makes these
+  # validations meaningless:
+  # https://github.com/rails/rails/issues/4568
+  #
+  # I added a unique index to the each table to enforce this at the DB
+  # level, but it throws ugly errors
+  validates_associated :memberships
+  validates_associated :permissions
+
   def to_param
     "#{ id } #{ name }".parameterize
   end

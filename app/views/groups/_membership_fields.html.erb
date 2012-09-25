@@ -1,16 +1,18 @@
+<%= content_tag :div, f.error(:base), :class=>"alert alert-error span12" if f.error(:base) %>
+
 <div class="field span6">
-  <% if f.object.new_record? %>
-  <%= f.input :user_id,
-              :label => false,
-              :wrapper_html => { :class => 'table-form' },
-              :input_html => {
-                  :class => 'select2-json-autocomplete select-user',
-                  :hidden => true,
-                  "data-ajax-url" => select2_users_path(:format => :json, :group_id =>  @group.id)
-              } %>
+  <% if f.object.id.nil? %>
+    <%= f.input :user_id,
+                :label => false,
+                :wrapper_html => { :class => 'table-form' },
+                :input_html => {
+                    :class => 'select2-json-autocomplete select-user',
+                    :hidden => true,
+                    "data-ajax-url" => select2_users_path(:format => :json, :group_id =>  @group.id)
+                } %>
   <% else %>
-  <span class="select-user"><%= f.object.user.username %></span>
-  <%= f.input :user_id, :as => :hidden %>
+    <%= f.object.user.username %>
+    <%= f.input :user_id, :as => :hidden %>
   <% end %>
 </div>
 <div class="field span4">

@@ -16,11 +16,19 @@
   </div>
   <%= f.input :insured %>
   <%= f.input :tombstoned, :hint => "'True' if this kit is missing/stolen/destroyed and never coming back."  %>
-  <fieldset>
-    <legend>Components</legend>
+
+  <h2>Components</h2>
+  <div class="records row-fluid">
+    <div class="fields field-headers row-fluid">
+      <div class="field field-header span3">Model</div>
+      <div class="field field-header span3">Asset Tag</div>
+      <div class="field field-header span3">Serial Number</div>
+      <div class="field field-header span1">Missing</div>
+      <div class="field field-header span2">Actions</div>
+    </div><!-- // -->
     <%= f.simple_fields_for :components %>
-    <%= f.link_to_add "<i class='icon-plus-sign'></i> Add another component".html_safe, :components %>
-  </fieldset>
+    <%= f.link_to_add raw("<i class='icon-plus-sign'></i> Add another component"), :components %>
+  </div>
 
   <div class="form-actions">
     <%= f.submit nil, :class => 'btn btn-primary' %>

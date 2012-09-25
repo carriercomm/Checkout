@@ -23,7 +23,14 @@
   <dd><%= @kit.insured %></dd>
 </dl>
 
-<h3>Components</h3>
+<% unless @kit.groups.empty? %>
+  <h2>Groups</h2>
+  <% @kit.groups.each do |group| %>
+    <div><%= link_to group.name, group_path(group) %></div>
+  <% end %>
+<% end %>
+
+<h2>Components</h2>
 <table class="table table-striped">
   <tbody>
     <tr>
@@ -33,7 +40,7 @@
       <th width="span3">Serial Number</th>
       <th width="span1">Missing</th>
     </tr>
-<% @kit.components.each do |c| %>
+  <% @kit.components.each do |c| %>
     <tr>
       <td><%= c.linked_brand %></td>
       <td><%= c.linked_model %></td>
@@ -41,7 +48,7 @@
       <td><%= c.serial_number %></td>
       <td><%= c.missing %></td>
     </tr>
-<% end %>
+  <% end %>
   </tbody>
 </table>
 

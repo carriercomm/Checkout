@@ -14,7 +14,7 @@ describe "User Browsing Kits Acceptance Test" do
       visit kits_path
       assert(current_path == kits_path)
       assert(page.has_content? KitDecorator.decorate(kit).asset_tags)
-      assert(page.has_no_selector? "a.btn-new-kit")
+      assert(page.has_no_selector? "a.btn-new")
       assert(page.has_no_selector? "a.btn-edit-kit")
     end
   end
@@ -59,7 +59,7 @@ describe "Admin Browsing Kits Acceptance Test" do
       visit kits_path
       assert(current_path == kits_path)
       assert(page.has_content? KitDecorator.decorate(kit).asset_tags)
-      assert(page.has_selector? "a.btn-new-kit")
+      assert(page.has_selector? "a.btn-new")
       assert(page.has_selector? "a.btn-edit-kit")
     end
   end
