@@ -1,7 +1,12 @@
 FactoryGirl.define do
 
+  sequence(:id) { |n| n }
+
   factory :brand do
-    sequence(:name) { |n| "Sandwich R Us ##{n}" }
+    after(:build) do |b|
+      n      = FactoryGirl.generate :id
+      b.name = "Sandwich R Us ##{n}"
+    end
   end
 
   factory :budget do
@@ -42,6 +47,25 @@ FactoryGirl.define do
   factory :component do
     sequence(:serial_number) { |n| "THX1138-#{n}" }
     sequence(:asset_tag) { |n| "867-5309-#{n}" }
+
+    factory :component_with_branded_component_model do
+      association :component_model, :factory => :branded_component_model, :strategy => :build
+    end
+
+  end
+
+  factory :component_model do
+    description "Oh so tasty and crunchy! Takes AA batteries."
+    training_required false
+
+    after(:build) do |cm|
+      n      = FactoryGirl.generate :id
+      cm.name = "Fluffernutter ##{n}"
+    end
+
+    factory :branded_component_model do
+      association :brand, :strategy => :build
+    end
   end
 
   factory :kit do
@@ -71,21 +95,23 @@ FactoryGirl.define do
     factory :kit_with_location do
       location
     end
-
   end
 
   factory :location do
-    name "Electric Avenue"
+    after(:build) do |l|
+      n      = FactoryGirl.generate :id
+      l.name = "#{n } Electric Avenue"
+    end
   end
 
-  factory :component_model do
-    sequence(:name) { |n| "Fluffernutter ##{n}" }
-    description "Oh so tasty and crunchy! Takes AA batteries."
-    training_required false
+  factory :permission do
+    group
+    kit_with_location
+  end
 
-    factory :component_model_with_brand do
-      brand
-    end
+  factory :reservation do
+    kit_with_location
+    user
   end
 
   factory :role do

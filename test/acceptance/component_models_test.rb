@@ -16,7 +16,7 @@ end
 describe "User Browsing Component Models Acceptance Test" do
   let(:user) { FactoryGirl.create(:user) }
   let(:component_model) do
-    model1     = FactoryGirl.create(:component_model_with_brand)
+    model1     = FactoryGirl.create(:branded_component_model)
     component1 = FactoryGirl.build(:component, component_model: model1, asset_tag: "AAA")
     model1
   end
@@ -61,7 +61,7 @@ describe "Admin Browsing Component Models Acceptance Test" do
     FactoryGirl.create(:user, roles:[role])
   end
   let(:component_model) do
-    model1     = FactoryGirl.create(:component_model_with_brand)
+    model1     = FactoryGirl.create(:branded_component_model)
     component1 = FactoryGirl.build(:component, component_model: model1, asset_tag: "AAA")
     model1
   end

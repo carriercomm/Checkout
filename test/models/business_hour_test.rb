@@ -49,6 +49,8 @@ describe BusinessHour do
     bh.localized_open_time.must_equal "0:30"
     bh.close_hour = 12
     bh.localized_close_time.must_equal "12:20"
+
+    I18n.locale = :en
   end
 
   it "should not be valid with missing or malformed fields" do

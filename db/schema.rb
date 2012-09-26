@@ -15,16 +15,16 @@ ActiveRecord::Schema.define(:version => 20120925015305) do
 
   create_table "brands", :force => true do |t|
     t.string   "name"
+    t.string   "autocomplete", :null => false
     t.datetime "created_at",   :null => false
     t.datetime "updated_at",   :null => false
-    t.string   "autocomplete", :null => false
   end
 
   create_table "budgets", :force => true do |t|
     t.string   "number"
     t.string   "name"
-    t.date     "date_start"
-    t.date     "date_end"
+    t.date     "starts_at"
+    t.date     "ends_at"
     t.datetime "created_at", :null => false
     t.datetime "updated_at", :null => false
   end
@@ -62,10 +62,10 @@ ActiveRecord::Schema.define(:version => 20120925015305) do
 
   create_table "categories", :force => true do |t|
     t.string   "name"
+    t.string   "autocomplete", :null => false
     t.text     "description"
     t.datetime "created_at",   :null => false
     t.datetime "updated_at",   :null => false
-    t.string   "autocomplete", :null => false
   end
 
   add_index "categories", ["name"], :name => "index_categories_on_name"
@@ -124,14 +124,14 @@ ActiveRecord::Schema.define(:version => 20120925015305) do
   end
 
   create_table "kits", :force => true do |t|
+    t.integer  "location_id"
+    t.integer  "budget_id"
     t.boolean  "tombstoned"
     t.boolean  "checkoutable", :default => false
-    t.integer  "location_id"
-    t.datetime "created_at",                      :null => false
-    t.datetime "updated_at",                      :null => false
-    t.integer  "budget_id"
     t.decimal  "cost"
     t.boolean  "insured",      :default => false
+    t.datetime "created_at",                      :null => false
+    t.datetime "updated_at",                      :null => false
   end
 
   add_index "kits", ["location_id"], :name => "index_kits_on_location_id"
@@ -146,6 +146,8 @@ ActiveRecord::Schema.define(:version => 20120925015305) do
     t.integer "group_id"
     t.integer "user_id"
     t.date    "expires_at"
+    t.datetime "created_at",      :null => false
+    t.datetime "updated_at",      :null => false
   end
 
   add_index "memberships", ["user_id", "group_id"], :name => "index_memberships_on_user_id_and_group_id", :unique => true
@@ -164,18 +166,18 @@ ActiveRecord::Schema.define(:version => 20120925015305) do
   add_index "permissions", ["kit_id"], :name => "index_permissions_on_kit_id"
 
   create_table "reservations", :force => true do |t|
+    t.integer  "client_id"
     t.integer  "kit_id"
-    t.datetime "start_at"
-    t.datetime "end_at"
+    t.datetime "starts_at"
+    t.datetime "ends_at"
     t.datetime "out_at"
     t.datetime "in_at"
-    t.boolean  "late"
-    t.integer  "client_id"
+    t.integer  "out_assistant_id"
+    t.integer  "in_assistant_id"
+    t.boolean  "late",      :default => false
     t.text     "request_note"
     t.integer  "approver_id"
     t.text     "approval_note"
-    t.integer  "out_assistant_id"
-    t.integer  "in_assistant_id"
     t.datetime "created_at",       :null => false
     t.datetime "updated_at",       :null => false
   end

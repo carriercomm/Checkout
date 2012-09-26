@@ -16,7 +16,7 @@ class MiniTest::Spec
   before :each do
     DatabaseCleaner.clean       # Truncate the database
     Warden.test_reset!          # logout any active users
-    Capybara.use_default_driver # 
+    Capybara.use_default_driver #
     Capybara.reset_sessions!    # Forget the (simulated) browser state
   end
 

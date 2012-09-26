@@ -43,6 +43,7 @@ group :test do
   gem 'launchy'                 # save and open test pages - for debugging tests
   gem 'minitest-rails-capybara' # test framework
   gem 'minitest-metadata'
+  gem 'rb-fsevent'              # guard dependency
   gem 'turn'                    # test results output formatter
 end
 

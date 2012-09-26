@@ -400,10 +400,10 @@ namespace :dbx do
 end
 
 namespace :db do
-  desc "drop, create, migrate"
-  task :rebuild => ["db:drop", "db:create", "db:migrate", "db:seed"]
+  desc "drop, create, schema load"
+  task :rebuild => ["db:drop", "db:create", "db:schema:load", "db:seed"]
 
-  desc "drop, create, migrate, dbx:migrate"
+  desc "drop, create, schema load, dbx:migrate"
   task :repop => ["db:rebuild", "dbx:migrate", "db:seed_dev"]
 
   desc "loads some fake data, helpful for development"

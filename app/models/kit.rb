@@ -71,6 +71,10 @@ class Kit < ActiveRecord::Base
     return at.compact
   end
 
+  def checked_out?
+    reservations.where("reservations.out_at < ? AND reservations.end_at > ?", Date.today, Date.today).count > 0
+  end
+
   def checkoutable?
     return checkoutable && !tombstoned
   end

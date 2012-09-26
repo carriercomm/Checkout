@@ -3,8 +3,7 @@ require 'minitest_helper'
 describe "User Browsing Kits Acceptance Test" do
   let(:user) { FactoryGirl.create(:user) }
   let(:kit) do
-    model1     = FactoryGirl.create(:component_model_with_brand)
-    component1 = FactoryGirl.build(:component, component_model: model1, asset_tag: "AAA")
+    component1 = FactoryGirl.build(:component_with_branded_component_model, asset_tag: "AAA")
     FactoryGirl.create(:checkoutable_kit_with_location, components: [component1])
   end
 
@@ -47,7 +46,7 @@ describe "Admin Browsing Kits Acceptance Test" do
     FactoryGirl.create(:user, roles:[role])
   end
   let(:kit) do
-    model1     = FactoryGirl.create(:component_model_with_brand)
+    model1     = FactoryGirl.create(:branded_component_model)
     component1 = FactoryGirl.build(:component, component_model: model1, asset_tag: "AAA")
     location1  = FactoryGirl.build(:location)
     FactoryGirl.create(:checkoutable_kit_with_location, components: [component1])
@@ -80,7 +79,7 @@ describe "Admin Browsing Kits Acceptance Test" do
     Capybara.current_driver = Capybara.javascript_driver
     location  = FactoryGirl.create(:location, name: "Krypton")
     budget    = BudgetDecorator.decorate(FactoryGirl.create(:budget))
-    model     = FactoryGirl.create(:component_model_with_brand)
+    model     = FactoryGirl.create(:branded_component_model)
     as_user(admin) do
       visit new_kit_path
       assert current_path == new_kit_path

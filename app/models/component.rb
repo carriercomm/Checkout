@@ -21,7 +21,9 @@ class Component < ActiveRecord::Base
   ## Validations ##
 
   validates_presence_of :component_model
-  validates_presence_of :kit
+  # removing this so there's some mechanism for moving components from
+  # one kit to another
+  # validates_presence_of :kit
   validates :asset_tag,     :uniqueness => { :case_sensitive => false }, :allow_nil => true
   validates :serial_number, :uniqueness => { :case_sensitive => false }, :allow_nil => true
 
