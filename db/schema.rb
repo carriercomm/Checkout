@@ -184,12 +184,12 @@ ActiveRecord::Schema.define(:version => 20120925015305) do
 
   add_index "reservations", ["approver_id"], :name => "index_reservations_on_approver_id"
   add_index "reservations", ["client_id"], :name => "index_reservations_on_client_id"
-  add_index "reservations", ["end_at", "in_at", "late"], :name => "index_reservations_on_end_at_and_in_at_and_late"
-  add_index "reservations", ["end_at"], :name => "index_reservations_on_end_at"
+  add_index "reservations", ["ends_at", "in_at", "late"], :name => "index_reservations_on_ends_at_and_in_at_and_late"
+  add_index "reservations", ["ends_at"], :name => "index_reservations_on_ends_at"
   add_index "reservations", ["in_assistant_id"], :name => "index_reservations_on_in_assistant_id"
   add_index "reservations", ["kit_id"], :name => "index_reservations_on_kit_id"
   add_index "reservations", ["out_assistant_id"], :name => "index_reservations_on_out_assistant_id"
-  add_index "reservations", ["start_at", "out_at"], :name => "index_reservations_on_start_at_and_out_at"
+  add_index "reservations", ["starts_at", "out_at"], :name => "index_reservations_on_starts_at_and_out_at"
 
   create_table "roles", :force => true do |t|
     t.string   "name"

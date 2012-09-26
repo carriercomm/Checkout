@@ -169,18 +169,18 @@ namespace :dbx do
         number = le.budget_number
         nom    = (!le.budget_name.blank? && le.budget_name.downcase != "unknown") ? le.budget_name : nil
         bienn  = (!le.eq_budget_biennium.blank? && le.eq_budget_biennium.downcase != "unknown") ? le.eq_budget_biennium : nil
-        date_start, date_end = nil
+        starts_at, ends_at = nil
 
         # try to parse biennium
         unless bienn.nil?
           ds, de = bienn.split("-")
           unless de.nil?
-            date_start = Date.new(ds.to_i, 7, 1).to_s
-            date_end   = Date.new(de.to_i, 6, 30).to_s
+            starts_at = Date.new(ds.to_i, 7, 1).to_s
+            ends_at   = Date.new(de.to_i, 6, 30).to_s
           end
         end
 
-        budget = Budget.where(:number => number, :name => nom, :date_start => date_start, :date_end => date_end).first_or_initialize
+        budget = Budget.where(:number => number, :name => nom, :starts_at => starts_at, :ends_at => ends_at).first_or_initialize
 
         if budget.new_record?
           if budget.save
@@ -227,18 +227,18 @@ namespace :dbx do
         number = le.legacy_budget.budget_number
         nom    = (!le.legacy_budget.budget_name.blank? && le.legacy_budget.budget_name.downcase != "unknown") ? le.legacy_budget.budget_name : nil
         bienn  = (!le.eq_budget_biennium.blank? && le.eq_budget_biennium.downcase != "unknown") ? le.eq_budget_biennium : nil
-        date_start, date_end = nil
+        starts_at, ends_at = nil
 
         # try to parse biennium
         unless bienn.nil?
           ds, de = bienn.split("-")
           unless de.nil?
-            date_start = Date.new(ds.to_i, 7, 1).to_s
-            date_end   = Date.new(de.to_i, 6, 30).to_s
+            starts_at = Date.new(ds.to_i, 7, 1).to_s
+            ends_at   = Date.new(de.to_i, 6, 30).to_s
           end
         end
 
-        budget = Budget.where(:number => number, :name => nom, :date_start => date_start, :date_end => date_end).first
+        budget = Budget.where(:number => number, :name => nom, :starts_at => starts_at, :ends_at => ends_at).first
 
         # find or create a matching asset tag
         component = Component.where(:asset_tag => le.eq_uw_tag.to_s).first_or_initialize
