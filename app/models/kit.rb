@@ -14,13 +14,13 @@ class Kit < ActiveRecord::Base
   ## Associations ##
 
   belongs_to :budget,           :inverse_of => :kits
-  has_many   :clients,          :through => :reservations
+  has_many   :clients,          :through => :loans
   has_many   :component_models, :through => :components, :order => "component_models.name ASC"
   has_many   :components,       :inverse_of => :kit
   has_many   :groups,           :through => :permissions, :order => "groups.name ASC"
   belongs_to :location,         :inverse_of => :kits
   has_many   :permissions,      :inverse_of => :kit
-  has_many   :reservations,     :inverse_of => :kit
+  has_many   :loans,     :inverse_of => :kit
 
   accepts_nested_attributes_for :components, :reject_if => proc { |attributes| attributes['component_model_id'].blank? }, :allow_destroy=> true
 
@@ -72,7 +72,7 @@ class Kit < ActiveRecord::Base
   end
 
   def checked_out?
-    reservations.where("reservations.out_at < ? AND reservations.end_at > ?", Date.today, Date.today).count > 0
+    loans.where("loans.out_at < ? AND loans.ends_at > ?", Date.today, Date.today).count > 0
   end
 
   def checkoutable?
@@ -82,25 +82,35 @@ class Kit < ActiveRecord::Base
   # equal to location.open_days minus days_reserved returns in format
   # [[month, day], [month, day], ...] for consumption by the
   # javascript date picker
-  def days_reservable(days_out = 90)
-    return location.open_days(days_out) - days_reserved(days_out)
+  def dates_reservable_for_datepicker(days_out = 90)
+    return location.dates_open_for_datepicker(days_out) - dates_reserved_for_datepicker(days_out)
   end
 
-  # returns in format [[month, day], [month, day], ...] for
+    # returns in format [[month, day], [month, day], ...] for
   # consumption by the javascript date picker
-  def days_reserved(days_out = 90)
-    days = []
+  def dates_reserved(days_out = 90)
+    dates = []
+
+    # build up params for where clause
     start_range = Time.now.at_beginning_of_day
     end_range   = start_range + days_out.days
     time_range  = (start_range..end_range)
-    reservations.where(:start_at => time_range).all.each do |r|
-      start_range = r.start_at.to_date
-      end_range   = r.end_at.to_date
+
+    # iterate over the set of loans in this range
+    loans.where(:starts_at => time_range).all.each do |r|
+      start_range = r.starts_at.to_date
+      end_range   = r.ends_at.to_date
+
+      # add a day for every day in the range
       (start_range..end_range).each do |date|
-        days.concat([date.month, date.day])
+        dates.concat(date)
       end
     end
-    return days
+    return dates
+  end
+
+  def dates_reserved_for_datepicker(days_out = 90)
+    dates_reserved(days_out).collect { |d| [d.month, d.day] }
   end
 
   # before_validation callback:

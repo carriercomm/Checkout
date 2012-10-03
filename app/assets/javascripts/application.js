@@ -21,7 +21,7 @@
 //= require modal_forms
 //= require models
 //= require parts
-//= require reservations
+//= require loans
 //= require search
 //= require select2
 //= require select2_widgets

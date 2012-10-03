@@ -1,6 +1,5 @@
 class Location < ActiveRecord::Base
 
-
   ## Macros ##
 
   resourcify
@@ -33,22 +32,32 @@ class Location < ActiveRecord::Base
     return !open_on?(date)
   end
 
-  # returns an array of [month, day] pairs for each
-  # business_hour_exception at this location
-  def exception_days(days_out = 90)
+  # returns an array of dates for each business_hour_exception
+  # at this location
+  def dates_exception(days_out = 90)
     start_date = Time.now.to_date
     end_date   = start_date + days_out.days
 
     # find any exceptions that fall on or between these days
-    dates = business_hour_exceptions.where("date_closed >= ? AND date_closed <= ?", start_date, end_date)
+    bhe = business_hour_exceptions
+      .where("closed_at >= ? AND closed_at <= ?", start_date, end_date)
+      .all
 
-    # convert them to an array
-    dates.collect { |d| d.to_a }
+    bhe.map(&:closed_at)
   end
+
+=begin
+  # returns an array of [month, day] pairs for each
+  # business_hour_exception at this location
+  def dates_exception_for_datepicker(days_out = 90)
+    # convert them to an array
+    dates_exception(days_out).to_a
+  end
+=end
 
   def hours_on(date)
     # return nothing if we're closed on this day
-    if !business_hour_exceptions.where("date_closed = ?", date.to_date).empty?
+    if !business_hour_exceptions.where("closed_at = ?", date.to_date).empty?
       return []
     end
 
@@ -66,11 +75,22 @@ class Location < ActiveRecord::Base
     return !hours_on(date).empty?
   end
 
-  def open_days(days_out = 90)
-    days = []
-    business_hours.each { |x| days.concat(x.open_occurrences(days_out)) }
-    days.uniq!
-    return days - exception_days
+  def dates_open(days_out = 90)
+    return dates_regular(days_out) - dates_exception(days_out)
+  end
+
+  def dates_open_for_datepicker(days_out = 90)
+    dates_open(days_out).collect { |d| [d.month, d.day] }
+  end
+
+  def dates_regular(days_out = 90)
+    dates = []
+    business_hours.each do |x|
+      occurrences = x.open_occurrences(days_out)
+      occurrences.map!(&:to_date)
+      dates.concat(occurrences)
+    end
+    dates.uniq
   end
 
   def to_param
@@ -80,5 +100,5 @@ class Location < ActiveRecord::Base
   def to_s
     name
   end
-  
+
 end

@@ -8,7 +8,7 @@
     <!-- displays the location/new_modal partial -->
     <a data-toggle="modal" href="#location_modal">New Location</a>
   </div>
-  <%= f.input :checkoutable, :hint => "'True' if you want the kit to be available in the reservation system." %>
+  <%= f.input :checkoutable, :hint => "'True' if you want the kit to be available in the loan system." %>
   <%= f.association :budget, :collection => BudgetDecorator.decorate(Budget.active), :label_method => :to_s, :prompt => 'Select budget' %>  
   <div class="controls control-action">
     <!-- displays the budget/new_modal partial -->

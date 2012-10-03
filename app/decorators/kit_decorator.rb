@@ -4,7 +4,7 @@ class KitDecorator < ApplicationDecorator
   decorates_association :component_models
   decorates_association :components
   decorates_association :groups
-  decorates_association :reservations
+  decorates_association :loans
 
   allows(:budget_id,
          :checkoutable?,

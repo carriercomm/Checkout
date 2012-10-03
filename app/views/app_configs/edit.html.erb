@@ -1,0 +1,13 @@
+<% title t('app_config.index.title') %>
+<%= simple_form_for @app_config.model, :url => app_config_path, :html => { :class => 'form-horizontal' } do |f| %>
+  <fieldset>
+    <legend><%= t('loan.index.title') %></legend>
+    <%= f.input :default_checkout_length %>
+  <fieldset>
+
+  <div class="form-actions">
+    <%= f.button :submit, :class => 'btn-primary' %>
+    <%= link_to t('.cancel', :default => t("helpers.links.cancel")),
+                app_config_path, :class => 'btn' %>
+  </div>
+<% end %>

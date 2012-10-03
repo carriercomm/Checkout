@@ -12,8 +12,8 @@ FactoryGirl.define do
   factory :budget do
     sequence(:number) {|n| "11-2222-#{n}" }
     name "Slush Fund"
-    date_start { Date.today - 30.days }
-    date_end { Date.today - 30.days + 2.years }
+    starts_at { Date.today - 30.days }
+    ends_at { Date.today - 30.days + 2.years }
   end
 
   factory :business_day do
@@ -36,7 +36,7 @@ FactoryGirl.define do
   end
 
   factory :business_hour_exception do
-    date_closed { Date.new(2012, 12, 25) }
+    closed_at { Date.new(2012, 12, 25) }
   end
 
   factory :category do
@@ -60,11 +60,18 @@ FactoryGirl.define do
 
     after(:build) do |cm|
       n      = FactoryGirl.generate :id
-      cm.name = "Fluffernutter ##{n}"
+      cm.name = "Fluffernutter #{n}"
     end
 
     factory :branded_component_model do
       association :brand, :strategy => :build
+    end
+  end
+
+  factory :group do
+    after(:build) do |g|
+      n      = FactoryGirl.generate :id
+      g.name = "Ariste Grouparama #{n}"
     end
   end
 
@@ -109,9 +116,9 @@ FactoryGirl.define do
     kit_with_location
   end
 
-  factory :reservation do
-    kit_with_location
-    user
+  factory :loan do
+    starts_at Date.today - 1.day
+    ends_at   Date.today + 1.day
   end
 
   factory :role do

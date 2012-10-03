@@ -1,6 +1,7 @@
 class ComponentDecorator < ApplicationDecorator
   decorates :component
   decorates_association :component_model
+  decorates_association :kit
 
   allows :asset_tag, :serial_number, :update_attributes
 

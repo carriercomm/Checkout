@@ -1,4 +1,4 @@
-This project is still in alpha development stages. Don't expect everything to work. In particular, reservations are very broken.
+This project is still in alpha development stages. Don't expect everything to work. In particular, reservations/loans are very broken.
 
 # Installation
 

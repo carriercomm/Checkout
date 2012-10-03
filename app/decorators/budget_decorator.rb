@@ -1,22 +1,22 @@
 class BudgetDecorator < ApplicationDecorator
   decorates :budget
 
-  allows :date_end, :date_start, :name, :number
+  allows :ends_at, :starts_at, :name, :number
 
   def display_date
-    if !!model.date_start && !!model.date_end
-      return "#{ model.date_start.year }-#{ model.date_end.year }"
+    if !!model.starts_at && !!model.ends_at
+      return "#{ model.starts_at.year }-#{ model.ends_at.year }"
     else
       return "Unknown"
     end
   end
 
-  def date_end
-    val_or_space(model.date_end)
+  def ends_at
+    val_or_space(model.ends_at)
   end
 
-  def date_start
-    val_or_space(model.date_start)
+  def starts_at
+    val_or_space(model.starts_at)
   end
 
   def name

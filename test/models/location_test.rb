@@ -10,13 +10,13 @@ describe Location do
   it "should obey business hours" do
     # create a business hour exception - make sure this exception falls on one of
     # our regular business hour days
-    date_closed = Time.zone.now
-    while (!date_closed.monday? && !date_closed.wednesday?)
-      date_closed = date_closed + 1.days
+    closed_at = Time.zone.now
+    while (!closed_at.monday? && !closed_at.wednesday?)
+      closed_at = closed_at + 1.days
     end
 
     # get a day we know we should be open
-    date_open = date_closed + 1.days
+    date_open = closed_at + 1.days
     while (!date_open.monday? && !date_open.wednesday?)
       date_open = date_open + 1.days
     end
@@ -26,7 +26,7 @@ describe Location do
     wednesday = FactoryGirl.build(:business_day, index: 3, name: "Wednesday")
     morning   = FactoryGirl.build(:business_hour, open_hour: 9, close_hour: 12, business_days: [monday, wednesday])
     afternoon = FactoryGirl.build(:business_hour, open_hour: 13, close_hour: 17, business_days: [monday, wednesday])
-    exception = FactoryGirl.build(:business_hour_exception, :date_closed => date_closed)
+    exception = FactoryGirl.build(:business_hour_exception, :closed_at => closed_at)
     location  = FactoryGirl.create(:location, name: "Republic of Vanuatu", business_hours: [morning, afternoon], business_hour_exceptions: [exception])
 
     location.business_hours.length.must_equal(2)
@@ -62,7 +62,7 @@ describe Location do
     # location.last_closing_time_on_date(query_time).must_be_nil
     # puts
     # puts "open:   " + date_open.to_s
-    # puts "closed: " + date_closed.to_s
+    # puts "closed: " + closed_at.to_s
     # puts "base:   " + base_time.to_s
     # puts "query:  " + query_time.to_s
     # puts
@@ -73,7 +73,7 @@ describe Location do
     location.closed_on?(query_time).must_equal(true)
 
     # test a business hour exception
-    query_time = date_closed + 12.hours
+    query_time = closed_at + 12.hours
     # location.first_opening_time_on_date(query_time).must_be_nil
     # location.last_closing_time_on_date(query_time).must_be_nil
     location.open_on?(query_time).must_equal(false)
@@ -81,7 +81,7 @@ describe Location do
 
     # make sure the exception is only the one day and the same day the
     # next week is open
-    query_time = date_closed + 1.week
+    query_time = closed_at + 1.week
     # opens_at   = base_time + 2.days + 1.week + 9.hours
     # closes_at  = base_time + 2.days + 1.week + 17.hours
     # location.first_opening_time_on_date(query_time).must_equal(opens_at)

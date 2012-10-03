@@ -1,0 +1,49 @@
+<%= simple_form_for @loan, :html => { :class => 'form-horizontal' } do |f| %>
+  <fieldset>
+    <legend><%= yield :title %></legend>
+
+    <% if @default_checkout_length %>
+      <div class="alert alert-info">
+        <button type="button" class="close" data-dismiss="alert">×</button>
+        <strong>Note:</strong> The default length of a checkout is <%= @default_checkout_length %> day(s). If you select a return date beyond <%= @default_checkout_length %> day(s), your reservation will require approval.
+      </div>
+    <% end %>
+
+    <%= f.association :client, :as => :hidden %>
+    <%= f.input       :client, :readonly => true, :disabled => true %>
+
+<%#
+----
+---- YOU WERE HERE TRYING TO MAKE SENSE OF THIS MESS
+----
+%>
+
+    <% unless @model.nil? %>
+      <% f.simple_fields_for @model do |mf| %>
+        <%= mf.input :id,   :as => :hidden %>
+        <%= mf.input :name, :disabled => true %>
+      <% end %>
+    <% end %>
+
+    <%= f.input :location, :collection => @locations, :prompt => "Select a checkout location" %>
+
+    <%= f.association :kit, :as => :hidden    unless @kit.nil? %>
+    <%= f.input       :kit, :readonly => true, :disabled => true unless @kit.nil? %>
+
+    <%= f.input :starts_at, :as => :date_picker,
+        :label => 'Pick Up Date',
+        :input_html => {
+          :value => (f.object.starts_at.nil? ? nil : localize(f.object.starts_at, :format => "%Y-%m-%d"))
+        }  %>
+    <%= f.input :ends_at, :as => :date_picker,
+        :label => 'Return Date',
+        :input_html => {
+          :value => (f.object.ends_at.nil? ? nil : localize(f.object.ends_at, :format => "%Y-%m-%d"))
+        } %>
+
+    <div class="form-actions">
+      <%= f.submit nil, :class => 'btn btn-primary' %>
+      <%= link_to 'Cancel', loans_path, :class => 'btn' %>
+    </div>
+  </fieldset>
+<% end %>

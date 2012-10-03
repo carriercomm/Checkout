@@ -5,6 +5,8 @@ class ComponentModelsController < ApplicationController
   before_filter :authorize_read, :only => [:index, :show]
   before_filter :authorize_manage, :only => [:new, :create, :edit, :update, :destroy]
 
+  layout 'sidebar', :only => ['index']
+
   # GET /models
   # GET /models.json
   def index

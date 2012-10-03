@@ -1,17 +1,20 @@
-class NewBaseline < ActiveRecord::Migration
+class MigrationRollup < ActiveRecord::Migration
   def up
     create_table "brands", :force => true do |t|
       t.string   "name"
+      t.string   "autocomplete", :null => false
       t.datetime "created_at",   :null => false
       t.datetime "updated_at",   :null => false
-      t.string   "autocomplete", :null => false
     end
+
+    add_index "brands", ["autocomplete"], :name => "index_brands_on_autocomplete"
+    add_index "brands", ["name"], :name => "index_brands_on_name", :unique => true
 
     create_table "budgets", :force => true do |t|
       t.string   "number"
       t.string   "name"
-      t.date     "date_start"
-      t.date     "date_end"
+      t.date     "starts_at"
+      t.date     "ends_at"
       t.datetime "created_at", :null => false
       t.datetime "updated_at", :null => false
     end
@@ -30,7 +33,7 @@ class NewBaseline < ActiveRecord::Migration
 
     create_table "business_hour_exceptions", :force => true do |t|
       t.integer  "location_id", :null => false
-      t.date     "date_closed", :null => false
+      t.date     "closed_at",   :null => false
       t.datetime "created_at",  :null => false
       t.datetime "updated_at",  :null => false
     end
@@ -47,12 +50,14 @@ class NewBaseline < ActiveRecord::Migration
       t.datetime "updated_at",   :null => false
     end
 
+    add_index "business_hours", ["location_id"], :name => "index_business_hours_on_location_id"
+
     create_table "categories", :force => true do |t|
       t.string   "name"
+      t.string   "autocomplete", :null => false
       t.text     "description"
       t.datetime "created_at",   :null => false
       t.datetime "updated_at",   :null => false
-      t.string   "autocomplete", :null => false
     end
 
     add_index "categories", ["name"], :name => "index_categories_on_name"
@@ -74,7 +79,9 @@ class NewBaseline < ActiveRecord::Migration
       t.datetime "updated_at",                           :null => false
     end
 
+    add_index "component_models", ["autocomplete"], :name => "index_component_models_on_autocomplete"
     add_index "component_models", ["brand_id"], :name => "index_models_on_brand_id"
+    add_index "component_models", ["name", "brand_id"], :name => "index_component_models_on_name_and_brand_id", :unique => true
 
     create_table "components", :force => true do |t|
       t.integer  "kit_id"
@@ -87,32 +94,43 @@ class NewBaseline < ActiveRecord::Migration
       t.datetime "updated_at",                            :null => false
     end
 
+    add_index "components", ["asset_tag"], :name => "index_components_on_asset_tag", :unique => true
     add_index "components", ["kit_id"], :name => "index_parts_on_kit_id"
+    add_index "components", ["missing"], :name => "index_components_on_missing"
 
-    create_table "groups", :force => true do |t|
-      t.string   "name"
-      t.text     "description"
-      t.date     "expires_at"
+    create_table "covenant_signatures", :force => true do |t|
+      t.integer  "user_id"
+      t.integer  "covenant_id"
       t.datetime "created_at",  :null => false
       t.datetime "updated_at",  :null => false
     end
 
-    create_table "groups_users", :force => true do |t|
-      t.integer "group_id"
-      t.integer "user_id"
+    create_table "covenants", :force => true do |t|
+      t.string   "name",        :null => false
+      t.text     "description"
+      t.datetime "created_at",  :null => false
+      t.datetime "updated_at",  :null => false
+    end
+
+    create_table "groups", :force => true do |t|
+      t.string   "name"
+      t.text     "description"
+      t.datetime "created_at",  :null => false
+      t.datetime "updated_at",  :null => false
     end
 
     create_table "kits", :force => true do |t|
+      t.integer  "location_id"
+      t.integer  "budget_id"
       t.boolean  "tombstoned"
       t.boolean  "checkoutable", :default => false
-      t.integer  "location_id"
-      t.datetime "created_at",                      :null => false
-      t.datetime "updated_at",                      :null => false
-      t.integer  "budget_id"
       t.decimal  "cost"
       t.boolean  "insured",      :default => false
+      t.datetime "created_at",                      :null => false
+      t.datetime "updated_at",                      :null => false
     end
 
+    add_index "kits", ["checkoutable"], :name => "index_kits_on_checkoutable"
     add_index "kits", ["location_id"], :name => "index_kits_on_location_id"
 
     create_table "locations", :force => true do |t|
@@ -120,6 +138,18 @@ class NewBaseline < ActiveRecord::Migration
       t.datetime "created_at", :null => false
       t.datetime "updated_at", :null => false
     end
+
+    create_table "memberships", :force => true do |t|
+      t.integer  "group_id"
+      t.integer  "user_id"
+      t.date     "expires_at"
+      t.datetime "created_at", :null => false
+      t.datetime "updated_at", :null => false
+    end
+
+    add_index "memberships", ["group_id"], :name => "index_memberships_on_group_id"
+    add_index "memberships", ["user_id", "group_id"], :name => "index_memberships_on_user_id_and_group_id", :unique => true
+    add_index "memberships", ["user_id"], :name => "index_memberships_on_user_id"
 
     create_table "permissions", :force => true do |t|
       t.integer  "group_id"
@@ -131,33 +161,34 @@ class NewBaseline < ActiveRecord::Migration
     end
 
     add_index "permissions", ["group_id"], :name => "index_permissions_on_group_id"
+    add_index "permissions", ["kit_id", "group_id"], :name => "index_permissions_on_kit_id_and_group_id", :unique => true
     add_index "permissions", ["kit_id"], :name => "index_permissions_on_kit_id"
 
     create_table "reservations", :force => true do |t|
+      t.integer  "client_id"
       t.integer  "kit_id"
-      t.datetime "start_at"
-      t.datetime "end_at"
+      t.datetime "starts_at"
+      t.datetime "ends_at"
       t.datetime "out_at"
       t.datetime "in_at"
-      t.boolean  "late"
-      t.integer  "client_id"
+      t.integer  "out_assistant_id"
+      t.integer  "in_assistant_id"
+      t.boolean  "late",             :default => false
       t.text     "request_note"
       t.integer  "approver_id"
       t.text     "approval_note"
-      t.integer  "out_assistant_id"
-      t.integer  "in_assistant_id"
-      t.datetime "created_at",       :null => false
-      t.datetime "updated_at",       :null => false
+      t.datetime "created_at",                          :null => false
+      t.datetime "updated_at",                          :null => false
     end
 
     add_index "reservations", ["approver_id"], :name => "index_reservations_on_approver_id"
     add_index "reservations", ["client_id"], :name => "index_reservations_on_client_id"
-    add_index "reservations", ["end_at", "in_at", "late"], :name => "index_reservations_on_end_at_and_in_at_and_late"
-    add_index "reservations", ["end_at"], :name => "index_reservations_on_end_at"
+    add_index "reservations", ["ends_at", "in_at", "late"], :name => "index_reservations_on_ends_at_and_in_at_and_late"
+    add_index "reservations", ["ends_at"], :name => "index_reservations_on_ends_at"
     add_index "reservations", ["in_assistant_id"], :name => "index_reservations_on_in_assistant_id"
     add_index "reservations", ["kit_id"], :name => "index_reservations_on_kit_id"
     add_index "reservations", ["out_assistant_id"], :name => "index_reservations_on_out_assistant_id"
-    add_index "reservations", ["start_at", "out_at"], :name => "index_reservations_on_start_at_and_out_at"
+    add_index "reservations", ["starts_at", "out_at"], :name => "index_reservations_on_starts_at_and_out_at"
 
     create_table "roles", :force => true do |t|
       t.string   "name"
@@ -221,14 +252,27 @@ class NewBaseline < ActiveRecord::Migration
     add_foreign_key "components", "component_models", :name => "components_model_id_fk"
     add_foreign_key "components", "kits", :name => "components_kit_id_fk"
 
+    add_foreign_key "covenant_signatures", "covenants", :name => "covenant_signatures_covenant_id_fk"
+    add_foreign_key "covenant_signatures", "users", :name => "covenant_signatures_user_id_fk"
+
     add_foreign_key "kits", "budgets", :name => "kits_budget_id_fk"
     add_foreign_key "kits", "locations", :name => "kits_location_id_fk"
+
+    add_foreign_key "memberships", "groups", :name => "groups_users_group_id_fk"
+    add_foreign_key "memberships", "users", :name => "groups_users_user_id_fk"
+
+    add_foreign_key "permissions", "groups", :name => "permissions_group_id_fk"
+    add_foreign_key "permissions", "kits", :name => "permissions_kit_id_fk"
 
     add_foreign_key "reservations", "kits", :name => "reservations_kit_id_fk"
     add_foreign_key "reservations", "users", :name => "reservations_approver_id_fk", :column => "approver_id"
     add_foreign_key "reservations", "users", :name => "reservations_client_id_fk", :column => "client_id"
     add_foreign_key "reservations", "users", :name => "reservations_in_assistant_id_fk", :column => "in_assistant_id"
     add_foreign_key "reservations", "users", :name => "reservations_out_assistant_id_fk", :column => "out_assistant_id"
+
+    add_foreign_key "users_roles", "roles", :name => "users_roles_role_id_fk"
+    add_foreign_key "users_roles", "users", :name => "users_roles_user_id_fk"
+
   end
 
   def down

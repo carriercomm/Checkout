@@ -1,70 +1,60 @@
-<div class="span2">
-  <!--Sidebar content-->
-  <div class="well sidebar-nav">
-    <ul class="nav nav-list">
-      <li class="nav-header"><%= t(".actions") %></li>
-      <%= sidebar_link(t("helpers.links.new"),
-                       new_brand_path,
-                       t("brand.sidebar.add.default_tooltip"),
-                       can?(:manage, Brand),
-                       t("brand.sidebar.add.denied_tooltip"),
-                       :class => 'btn-new')
-          %>
-      <li class="nav-header"><%= t("brand.sidebar.filters") %></li>
-      <%= sidebar_link t("brand.sidebar.all.text"),
-                       brands_path,
-                       t("brand.sidebar.all.default_tooltip") %>
-      <%= sidebar_link t("brand.sidebar.checkoutable.text"),
-                       checkoutable_brands_path,
-                       t("brand.sidebar.checkoutable.default_tooltip") %>
-      <%= sidebar_link t("brand.sidebar.non_checkoutable.text"),
-                       non_checkoutable_brands_path,
-                       t("brand.sidebar.non_checkoutable.default_tooltip") %>
-    </ul>
-  </div>
+<% title 'brand.title' %>
+
+<% content_for :sidebar do %>
+  <li class="nav-header"><%= t(".actions") %></li>
+  <%= sidebar_link(t("helpers.links.new"),
+                   new_brand_path,
+                   t("brand.sidebar.add.default_tooltip"),
+                   can?(:manage, Brand),
+                   t("brand.sidebar.add.denied_tooltip"),
+                   :class => 'btn-new')
+      %>
+  <li class="nav-header"><%= t("brand.sidebar.filters") %></li>
+  <%= sidebar_link t("brand.sidebar.all.text"),
+                   brands_path,
+                   t("brand.sidebar.all.default_tooltip") %>
+  <%= sidebar_link t("brand.sidebar.checkoutable.text"),
+                   checkoutable_brands_path,
+                   t("brand.sidebar.checkoutable.default_tooltip") %>
+  <%= sidebar_link t("brand.sidebar.non_checkoutable.text"),
+                   non_checkoutable_brands_path,
+                   t("brand.sidebar.non_checkoutable.default_tooltip") %>
+<% end %>
+
+<% if params[:filter] && params[:filter] == "non_checkoutable" %>
+<div class="alert alert-info">
+  <button type="button" class="close" data-dismiss="alert">×</button>
+  <strong>Note!</strong> This list of "non-checkoutable" brands only
+  means these brands have kits in them that are not
+  checkoutable. They may also have kits which <em>are</em> checkoutable.
 </div>
-<div class="span10">
-  <!--Main content-->
-  <div class="page-header">
-    <h1><%= t('brand.title') %></h1>
-  </div>
+<% end %>
 
-  <% if params[:filter] && params[:filter] == "non_checkoutable" %>
-  <div class="alert alert-info">
-    <button type="button" class="close" data-dismiss="alert">×</button>
-    <strong>Note!</strong> This list of "non-checkoutable" brands only
-    means these brands have kits in them that are not
-    checkoutable. They may also have kits which <em>are</em> checkoutable.
-  </div>
-  <% end %>
+<%= paginate @brands %>
 
-  <%= paginate @brands %>
-
-  <table class="table table-striped">
-    <thead>
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Model Count</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @brands.each do |brand| %>
       <tr>
-        <th>Name</th>
-        <th>Model Count</th>
-        <th>Actions</th>
+        <td><%= link_to brand.name, brand_path(brand) %></td>
+        <td><%= brand.component_models.count %></td>
+        <td>
+          <%= link_to 'Show Models',  brand_component_models_path(brand), :class => 'btn btn-mini' %>
+          <%= link_to t('.edit',
+                        :default => t("helpers.links.edit")),
+                        edit_brand_path(brand),
+                        :class => 'btn btn-mini btn-edit-brand' if can? :manage, Brand %>
+        </td>
       </tr>
-    </thead>
-    <tbody>
-      <% @brands.each do |brand| %>
-        <tr>
-          <td><%= link_to brand.name, brand_path(brand) %></td>
-          <td><%= brand.component_models.count %></td>
-          <td>
-            <%= link_to 'Show Models',  brand_component_models_path(brand), :class => 'btn btn-mini' %>
-            <%= link_to t('.edit',
-                          :default => t("helpers.links.edit")),
-                          edit_brand_path(brand),
-                          :class => 'btn btn-mini btn-edit-brand' if can? :manage, Brand %>
-          </td>
-        </tr>
-      <% end %>
-    </tbody>
-  </table>
+    <% end %>
+  </tbody>
+</table>
 
-  <%= paginate @brands %>
-  
-</div>
+<%= paginate @brands %>

@@ -1,47 +1,37 @@
-<div class="span2">
-  <!--Sidebar content-->
-  <div class="well sidebar-nav">
-    <ul class="nav nav-list">
-      <li class="nav-header"><%= t(".actions") %></li>
-      <%= sidebar_link(t('helpers.links.new'),
-                       new_category_path,
-                       t('category.sidebar.add.default_tooltip'),
-                       can?(:manage, Category),
-                       t('category.sidebar.add.denied_tooltip'),
-                       :class => 'btn-new') %>
-    </ul>
-  </div>
-</div>
-<div class="span10">
-  <!--Main content-->
-  <div class="page-header">
-    <h1><%= t('category.title') %></h1>
-  </div>
+<% title 'category.title' %>
 
-  <%= paginate @categories %>
+<% content_for :sidebar do %>
+  <li class="nav-header"><%= t(".actions") %></li>
+  <%= sidebar_link(t('helpers.links.new'),
+                   new_category_path,
+                   t('category.sidebar.add.default_tooltip'),
+                   can?(:manage, Category),
+                   t('category.sidebar.add.denied_tooltip'),
+                   :class => 'btn-new') %>
+<% end %>
 
-  <table class="table table-striped">
-    <thead>
+<%= paginate @categories %>
+
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Description</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @categories.each do |category| %>
       <tr>
-        <th>Name</th>
-        <th>Description</th>
-        <th>Actions</th>
+        <td><%= link_to category.name, category_path(category) %></td>
+        <td><%= category.description %></td>
+        <td>
+          <%= link_to 'Show Models', category_component_models_path(category), :class => 'btn btn-mini' %>
+          <%= link_to 'Edit', edit_category_path(category), :class => 'btn btn-mini btn-edit-category' if can? :manage, Category %>
+        </td>
       </tr>
-    </thead>
-    <tbody>
-      <% @categories.each do |category| %>
-        <tr>
-          <td><%= link_to category.name, category_path(category) %></td>
-          <td><%= category.description %></td>
-          <td>
-            <%= link_to 'Show Models', category_component_models_path(category), :class => 'btn btn-mini' %>
-            <%= link_to 'Edit', edit_category_path(category), :class => 'btn btn-mini btn-edit-category' if can? :manage, Category %>
-          </td>
-        </tr>
-      <% end %>
-    </tbody>
-  </table>
+    <% end %>
+  </tbody>
+</table>
 
-  <%= paginate @categories %>
-
-</div>
+<%= paginate @categories %>

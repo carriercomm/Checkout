@@ -2,6 +2,7 @@ require 'minitest_helper'
 
 describe "User Browsing Kits Acceptance Test" do
   let(:user) { FactoryGirl.create(:user) }
+
   let(:kit) do
     component1 = FactoryGirl.build(:component_with_branded_component_model, asset_tag: "AAA")
     FactoryGirl.create(:checkoutable_kit_with_location, components: [component1])

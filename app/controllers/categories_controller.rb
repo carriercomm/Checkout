@@ -3,6 +3,8 @@ class CategoriesController < ApplicationController
   # use CanCan to authorize this resource
   authorize_resource
 
+  layout 'sidebar', :only => ['index']
+
   # GET /categories
   # GET /categories.json
   def index

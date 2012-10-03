@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <title>Checkout</title>
+    <title>Checkout<%= content_for?(:title) ? (t('title_separator') + yield(:title)) : '' %></title>
     <%= include_gon %>
     <%= csrf_meta_tags %>
 
@@ -91,7 +91,7 @@
         </div>
       <% end %>
       <div class="row-fluid">
-        <%= yield %>
+        <%= content_for?(:main) ? yield(:main) : yield %>
       </div><!--/row-->
 
       <footer>

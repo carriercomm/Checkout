@@ -1,4 +1,4 @@
-<h1>Reservations</h1>
+<% title 'loan.title' %>
 <table class="table table-striped">
   <thead>
     <tr>
@@ -12,14 +12,14 @@
     </tr>
   </thead>
   <tbody>
-    <% @reservations.each do |reservation| %>
+    <% @loans.each do |loan| %>
       <tr>
-        <td><%= link_to reservation.client, users_reservations_path(reservation.client) unless reservation.client.nil? %>
-        <td><%= link_to reservation.kit, kit_path(reservation.kit) unless reservation.kit.nil? %></td>
-        <td><%= reservation.start_at.to_s(:tabular) %></td>
-        <td><%= reservation.end_at.to_s(:tabular) %></td>
-        <td><%= reservation.out_at.try(:to_s, :tabular) %></td>
-        <td><%= reservation.in_at.try(:to_s, :tabular) %></td>
+        <td><%= link_to loan.client, users_loans_path(loan.client) unless loan.client.nil? %>
+        <td><%= link_to loan.kit, kit_path(loan.kit) unless loan.kit.nil? %></td>
+        <td><%= loan.starts_at.to_s(:tabular) %></td>
+        <td><%= loan.ends_at.to_s(:tabular) %></td>
+        <td><%= loan.out_at.try(:to_s, :tabular) %></td>
+        <td><%= loan.in_at.try(:to_s, :tabular) %></td>
         <td>
           <div class="btn-group">
             <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
@@ -28,20 +28,20 @@
             </a>
             <ul class="dropdown-menu">
               <li>
-                <%= link_to reservation_path(reservation) do %>
+                <%= link_to loan_path(loan) do %>
                   <i class="icon-info-sign"></i>
                   Show
                 <% end %>
               </li>
               <li>
-                <%= link_to edit_reservation_path(reservation)  do %>
+                <%= link_to edit_loan_path(loan)  do %>
                   <i class="icon-pencil"></i>
                   Edit
                 <% end %>
               </li>
               <li class="divider"></li>
               <li>
-                <%= link_to reservation_path(reservation), :method => :delete, :confirm => 'Are you sure?' do %>
+                <%= link_to loan_path(loan), :method => :delete, :confirm => 'Are you sure?' do %>
                   <i class="icon-trash"></i>
                   Delete
                 <% end %>
@@ -54,5 +54,5 @@
   </tbody>
 </table>
 
-<%# TODO: this should feed into some sort of wizard - 1) select equipment, 2) select client, 3) new reservation %>
-<%#= link_to 'New', new_reservation_path, :class => 'btn btn-primary' %>
+<%# TODO: this should feed into some sort of wizard - 1) select equipment, 2) select client, 3) new loan %>
+<%#= link_to 'New', new_loan_path, :class => 'btn btn-primary' %>

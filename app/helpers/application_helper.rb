@@ -4,6 +4,18 @@ module ApplicationHelper
     (current_page? path) ? 'class="active"'.html_safe : ""
   end
 
+  def dropdown_for(name, icon_class = nil, &block)
+    content_tag("li", :class=>"dropdown") do
+      link_text = String.new
+      link_text << '<i class="' + icon_class + '"></i>' unless icon_class.nil?
+      link_text << name.html_safe
+      link_text << '<b class="caret"></b>'
+
+      link_to(raw(link_text), "#", :class=>"dropdown-toggle", "data-toggle" =>"dropdown") +
+        content_tag("ul", :class=>"dropdown-menu", &block)
+    end
+  end
+
   # TODO: ummm, this is clumsy. Like... no, really. It's actually embarrassing me.
   def sidebar_link(text, path, default_tooltip = "", condition = true, failure_tooltip = nil, options = {})
     # setup the base options for the tooltip
@@ -36,18 +48,6 @@ module ApplicationHelper
     end
   end
 
-  def dropdown_for(name, icon_class = nil, &block)
-    content_tag("li", :class=>"dropdown") do
-      link_text = String.new
-      link_text << '<i class="' + icon_class + '"></i>' unless icon_class.nil?
-      link_text << name.html_safe
-      link_text << '<b class="caret"></b>'
-
-      link_to(raw(link_text), "#", :class=>"dropdown-toggle", "data-toggle" =>"dropdown") +
-        content_tag("ul", :class=>"dropdown-menu", &block)
-    end
-  end
-
   def sortable(column, title)
     title ||= column.titleize
     title = h(title)
@@ -65,6 +65,10 @@ module ApplicationHelper
       end
     end
     link_to(title.html_safe, :sort => column, :direction => direction)
+  end
+
+  def title(page_title)
+    content_for(:title, page_title)
   end
 
 end

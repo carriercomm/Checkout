@@ -1,0 +1,19 @@
+<% content_for :main do %>
+  <div class="span2">
+    <!--Sidebar content-->
+    <div class="well sidebar-nav">
+      <ul class="nav nav-list">
+        <%= yield :sidebar %>
+      </ul>
+    </div>
+  </div>
+  <div class="span10">
+    <!--Main content-->
+    <div class="page-header">
+      <h1><%= yield :title %></h1>
+    </div>
+    <%= yield %>
+  </div>
+<% end %>
+
+<%= render :template => 'layouts/application' %>

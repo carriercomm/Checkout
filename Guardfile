@@ -24,6 +24,6 @@ guard 'minitest' do
   watch(%r|^app/controllers/(.*)_controller\.rb$|) { |m| "test/acceptance/#{m[1]}_test.rb" }
   watch(%r|^app/decorators/(.*)_decorator\.rb$|) { |m| "test/acceptance/#{m[1]}s_test.rb" }
   watch(%r|^app/helpers/(.*)\.rb$|)     { |m| "test/helpers/#{m[1]}_test.rb" }
-  watch(%r|^app/models/(.*)\.rb$|)      { |m| "test/unit/#{m[1]}_test.rb" }
+  watch(%r|^app/models/(.*)\.rb$|)      { |m| "test/models/#{m[1]}_test.rb" }
   watch(%r|^app/views/(.*)\/(.*)\.erb$|) { |m| "test/acceptance/#{m[1]}_test.rb" }
 end

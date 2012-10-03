@@ -12,14 +12,14 @@ class User < ActiveRecord::Base
 
   ## Associations ##
 
-  has_many :approvals,    :foreign_key => "approver_id",      :class_name => 'Reservation'
+  has_many :approvals,    :foreign_key => "approver_id",      :class_name => 'Loan'
   has_many :covenant_signatures, :inverse_of => :user
   has_many :covenants,    :through => :covenant_signatures
   has_many :groups,       :through => :memberships
-  has_many :in_assists,   :foreign_key => "in_assistant_id",  :class_name => 'Reservation'
+  has_many :in_assists,   :foreign_key => "in_assistant_id",  :class_name => 'Loan'
   has_many :memberships,  :inverse_of => :user
-  has_many :out_assists,  :foreign_key => "out_assistant_id", :class_name => 'Reservation'
-  has_many :reservations, :foreign_key => "client_id"
+  has_many :out_assists,  :foreign_key => "out_assistant_id", :class_name => 'Loan'
+  has_many :loans, :foreign_key => "client_id"
 
 
   ## Mass-assignable Attributes ##

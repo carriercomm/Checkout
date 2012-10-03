@@ -1,21 +1,31 @@
 jQuery ->
   $(document).ready ->
     # store the ID of the current active location (if there is one)
-    $("#reservation_location option:selected").each (i) ->
+    $("#loan_location option:selected").each (i) ->
       window.gon.active_location = parseInt($(this).val())
 
     # update the ID of the current active location when the location
     # select box changes
-    $("#reservation_location").change (val) ->
+    $("#loan_location").change (val) ->
       window.gon.active_location = parseInt(val.srcElement.value)
 
       # clear out the date fields
-      $("input.start_date").val(null);
-      $("input.end_date").val(null);
+      $("#loan_starts_at").val(null);
+      $("#load_ends_at").val(null);
+
+    $("#loan_starts_at").change (e) ->
+      val = $(this).val()
+      if val == "" || gon.default_checkout_length == undefined
+        console.log("date cleared")
+        return
+      start_year  = parseInt(val.split("-")[0])
+      start_month = parseInt(val.split("-")[1])
+      start_day   = parseInt(val.split("-")[2]) + gon.default_checkout_length
+      $("#loan_ends_at").val([start_year, start_month, start_day].join("-"))
 
 
   # configure the start_date datepicker
-  $("input.start_date").datepicker(
+  $("#loan_starts_at").datepicker(
     altFormat: "yy-mm-dd",
     dateFormat: "yy-mm-dd",
     minDate: "-0d",
@@ -34,7 +44,7 @@ jQuery ->
   )
 
   # configure the end_date datepicker
-  $("input.end_date").datepicker(
+  $("#loan_ends_at").datepicker(
     altFormat: "yy-mm-dd",
     dateFormat: "yy-mm-dd",
     minDate: "-0d",
@@ -49,7 +59,7 @@ jQuery ->
       # FIXME: THIS CODE IS HORRIBLE!!
 
       # grab the start date so we have a starting reference point
-      start_date  = $("input.start_date").val()
+      start_date  = $("#loan_starts_at").val()
 
       if !start_date
         return [false]

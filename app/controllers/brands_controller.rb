@@ -3,6 +3,8 @@ class BrandsController < ApplicationController
   # use CanCan to authorize this resource
   authorize_resource
 
+  layout 'sidebar', :only => ['index']
+
   # GET /brands
   # GET /brands.json
   def index

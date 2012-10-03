@@ -1,68 +1,58 @@
-<div class="span2">
-  <!--Sidebar content-->
-  <div class="well sidebar-nav">
-    <ul class="nav nav-list">
-      <li class="nav-header"><%= t(".actions") %></li>
-      <%= sidebar_link t('helpers.links.new'),
-                       new_user_path,
-                       t('user.sidebar.add.default_tooltip'),
-                       can?(:manage, User),
-                       t('user.sidebar.add.denied_tooltip') %>
-      <%= sidebar_link t('user.sidebar.csv_import.text'),
-                       '#',
-                       t('user.sidebar.csv_import.default_tooltip'),
-                       can?(:manage, User),
-                       t('user.sidebar.csv_import.denied_tooltip') %>
-      <li class="nav-header"><%= t("user.sidebar.filters") %></li>
-      <%= sidebar_link t("user.sidebar.all.text"), users_path, t("user.sidebar.all.default_tooltip") %>
-      <%= sidebar_link t("user.sidebar.active.text"), active_users_path, t("user.sidebar.active.default_tooltip") %>
-      <%= sidebar_link t("user.sidebar.suspended.text"), suspended_users_path, t("user.sidebar.suspended.default_tooltip") %>
-      <%= sidebar_link t("user.sidebar.disabled.text"), disabled_users_path, t("user.sidebar.disabled.default_tooltip") %>
-    </ul>
-  </div>
-</div>
-<div class="span10">
-  <!--Main content-->
-  <div class="page-header">
-    <h1><%= t('user.title') %></h1>
-  </div>
+<% title 'user.title' %>
 
-  <%= paginate @users %>
+<% content_for :sidebar do %>
+  <li class="nav-header"><%= t(".actions") %></li>
+  <%= sidebar_link t('helpers.links.new'),
+                   new_user_path,
+                   t('user.sidebar.add.default_tooltip'),
+                   can?(:manage, User),
+                   t('user.sidebar.add.denied_tooltip') %>
+  <%= sidebar_link t('user.sidebar.csv_import.text'),
+                   '#',
+                   t('user.sidebar.csv_import.default_tooltip'),
+                   can?(:manage, User),
+                   t('user.sidebar.csv_import.denied_tooltip') %>
+  <li class="nav-header"><%= t("user.sidebar.filters") %></li>
+  <%= sidebar_link t("user.sidebar.all.text"), users_path, t("user.sidebar.all.default_tooltip") %>
+  <%= sidebar_link t("user.sidebar.active.text"), active_users_path, t("user.sidebar.active.default_tooltip") %>
+  <%= sidebar_link t("user.sidebar.suspended.text"), suspended_users_path, t("user.sidebar.suspended.default_tooltip") %>
+  <%= sidebar_link t("user.sidebar.disabled.text"), disabled_users_path, t("user.sidebar.disabled.default_tooltip") %>
+<% end %>
 
-  <table class="table table-striped">
-    <thead>
-      <tr>
-        <th class="skinny-column"><%= t('user.status.title') %></th>
-        <th><%= sortable('username', t('user.username')) %></th>
-        <th><%= sortable('email', t('user.email')) %></th>
-        <th><%= sortable('last_name', t('user.last_name')) %></th>
-        <th><%= sortable('first_name', t('user.first_name')) %></th>
-        <th class="skinny-column"><%= sortable('suspension_count', t('user.suspension_count').html_safe) %></th>
-        <th><%= t '.groups', :default => t("helpers.groups") %></th>
-        <th><%= t '.roles', :default => t("helpers.roles") %></th>
-        <th><%=t '.actions', :default => t("helpers.actions") %></th>
-      </tr>
-    </thead>
-    <tbody>
-      <% @users.each do |user| %>
-      <tr>
-        <td><%= user.status %></td>
-        <td><%= link_to user.username, user_path(user) %></td>
-        <td><%= user.email %></td>
-        <td><%= user.last_name %></td>
-        <td><%= user.first_name %></td>
-        <td><%= user.suspension_count %></td>
-        <td><%= user.groups_list %></td>
-        <td><%= user.roles_list %></td>
-        <td>
-          <%= link_to t('.edit', :default => t("helpers.links.edit")),
-          edit_user_path(user), :class => 'btn btn-mini' if can? :manage, User %>
-        </td>
-      </tr>
-      <% end %>
-    </tbody>
-  </table>
+<%= paginate @users %>
 
-  <%= paginate @users %>
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th class="skinny-column"><%= t('user.status.title') %></th>
+      <th><%= sortable('username', t('user.username')) %></th>
+      <th><%= sortable('email', t('user.email')) %></th>
+      <th><%= sortable('last_name', t('user.last_name')) %></th>
+      <th><%= sortable('first_name', t('user.first_name')) %></th>
+      <th class="skinny-column"><%= sortable('suspension_count', t('user.suspension_count').html_safe) %></th>
+      <th><%= t '.groups', :default => t("helpers.groups") %></th>
+      <th><%= t '.roles', :default => t("helpers.roles") %></th>
+      <th><%=t '.actions', :default => t("helpers.actions") %></th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @users.each do |user| %>
+    <tr>
+      <td><%= user.status %></td>
+      <td><%= link_to user.username, user_path(user) %></td>
+      <td><%= user.email %></td>
+      <td><%= user.last_name %></td>
+      <td><%= user.first_name %></td>
+      <td><%= user.suspension_count %></td>
+      <td><%= user.groups_list %></td>
+      <td><%= user.roles_list %></td>
+      <td>
+        <%= link_to t('.edit', :default => t("helpers.links.edit")),
+        edit_user_path(user), :class => 'btn btn-mini' if can? :manage, User %>
+      </td>
+    </tr>
+    <% end %>
+  </tbody>
+</table>
 
-</div>
+<%= paginate @users %>

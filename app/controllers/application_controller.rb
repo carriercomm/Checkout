@@ -1,7 +1,7 @@
 class ApplicationController < ActionController::Base
   protect_from_forgery
   before_filter :ensure_signed_in
-  # layout :layout_by_role
+  layout 'no_sidebar'
 
   # NOTE: layout for Devise is setup in config/application.rb
 

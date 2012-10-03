@@ -4,10 +4,12 @@ class BusinessHour < ActiveRecord::Base
 
   resourcify
 
+
   ## Associations ##
 
   belongs_to :location, :inverse_of => :business_hours
   has_and_belongs_to_many :business_days
+
 
   ## Validations ##
 
@@ -31,6 +33,8 @@ class BusinessHour < ActiveRecord::Base
                                               :greater_than_or_equal_to => 0,
                                               :less_than => 60 }
   validate :should_have_at_least_one_business_day
+  validates :location_id,  :uniqueness => { :scope   => [:open_hour, :open_minute],
+                                            :message => "You can't have duplicate open hours. Add additional days to the existing business hours instead." }
 
 
   ## Mass-assignable attributes ##
@@ -76,7 +80,7 @@ class BusinessHour < ActiveRecord::Base
     return I18n.l(time, :format => :business_hour)
   end
 
-  # returns an array of [month, day] tuples representing the days with
+  # returns an array of dates representing the days with
   # open business hours between now and days_out
   def open_occurrences(days_out = 90, date_start = Time.zone.now)
     date_end = date_start + days_out.days
@@ -88,10 +92,7 @@ class BusinessHour < ActiveRecord::Base
       schedule.add_recurrence_rule IceCube::Rule.weekly.day(day)
     end
 
-    occurrences = schedule.occurrences_between(date_start, date_end)
-    open_days   = occurrences.collect { |d| [d.month, d.day]}
-
-    return open_days
+    return schedule.occurrences_between(date_start, date_end)
   end
 
   def required_attrs_blank?

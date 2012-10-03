@@ -1,0 +1,6 @@
+<%
+  subtitle = (@model.nil?) ? @kit.to_s : @model.to_s
+  title t('loan.new.title') + ": #{ subtitle }"
+%>
+
+<%= render :partial => 'form' %>

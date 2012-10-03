@@ -1,6 +1,7 @@
 source 'https://rubygems.org'
 
 gem 'acts_as_list'              # plugin for creating sortable lists
+gem 'acts_as_singleton'         # singletons in the database - used for storing app settings
 gem 'cancan'                    # authorization
 gem 'devise'                    # authentication
 gem 'draper'                    # model/view decorators (presenters)
@@ -14,6 +15,7 @@ gem 'nested_form'               # dynamic nested form helper
 gem 'rails', '3.2.8'            # rails
 gem 'rolify'                    # role management
 gem 'simple_form'               # form builder
+gem 'state_machine'             # support for mixing in state machine behavior to models
 gem 'strip_attributes'          # strips model attributes, and converts blanks to nil
 gem 'thin'                      # web server
 
@@ -30,6 +32,7 @@ end
 group :development do
   gem 'awesome_print'           # pretty object printer
   gem 'foreigner'               # foreign key constraints
+  gem 'ruby-graphviz', :require => 'graphviz'
   gem 'immigrant'               # migration generator for foreign keys
   gem "minitest-rails"          # minitest test framework
   gem 'pry-rails'               # rails console on steroids

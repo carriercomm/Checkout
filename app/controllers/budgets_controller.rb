@@ -3,10 +3,12 @@ class BudgetsController < ApplicationController
   # use CanCan to authorize this resource
   authorize_resource
 
+  layout 'sidebar', :only => ['index']
+
   # GET /budgets
   # GET /budgets.json
   def index
-    @budgets = Budget.order("budgets.date_start DESC, budgets.number ASC").page(params[:page])
+    @budgets = Budget.order("budgets.starts_at DESC, budgets.number ASC").page(params[:page])
     @budgets = BudgetDecorator.decorate(@budgets)
 
     respond_to do |format|

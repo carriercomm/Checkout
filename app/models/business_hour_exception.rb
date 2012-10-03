@@ -7,25 +7,25 @@ class BusinessHourException < ActiveRecord::Base
 
   ## Associations ##
 
-
   belongs_to :location, :inverse_of => :business_hour_exceptions
 
 
   ## Validations ##
 
   validates_presence_of :location
-  validates :date_closed, :presence => true
+  validates :closed_at, :presence => true
+  validates :closed_at, :uniqueness => { :scope => :location_id }
 
 
   ## Mass-assignable attributes ##
 
-  attr_accessible(:location_id, :location, :date_closed)
+  attr_accessible(:location_id, :location, :closed_at)
 
 
   ## Instance Methods ##
 
   def day
-    date_closed.strftime('%e')
+    closed_at.strftime('%e')
   end
 
   def day_sym
@@ -33,7 +33,7 @@ class BusinessHourException < ActiveRecord::Base
   end
 
   def month
-    date_closed.strftime('%-m')
+    closed_at.strftime('%-m')
   end
 
   def to_a

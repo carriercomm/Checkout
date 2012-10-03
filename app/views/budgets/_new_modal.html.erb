@@ -14,8 +14,8 @@
         :html => { :class => 'form-horizontal new-budget modal-form' } do |f| %>
       <%= f.input :number %>
       <%= f.input :name %>
-      <%= f.input :date_start, :include_blank => true %>
-      <%= f.input :date_end,   :include_blank => true %>
+      <%= f.input :starts_at, :include_blank => true %>
+      <%= f.input :ends_at,   :include_blank => true %>
       <div class="modal-footer">
         <%= link_to 'Cancel', '#', :class => 'btn', "data-dismiss" => "modal" %>
         <%= f.submit nil, :class => 'btn btn-primary modal-submit' %>

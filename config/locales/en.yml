@@ -2,6 +2,7 @@
 # See https://github.com/svenfuchs/rails-i18n/tree/master/rails%2Flocale for starting points.
 
 en:
+  title_separator: " :: "
   boolean:
     'yes': 'Yes'
     'no': 'No'
@@ -29,12 +30,16 @@ en:
  # :tabular=>"%a %Y-%m-%d"}
   simple_form:
     labels:
+      app_config:
+        default_checkout_length: 'Default Length'
       user:
         username: 'Username'
         password: 'Password'
         password_confirmation: 'Password Confirmation'
         suspended_until: 'Suspended Until'
     hints:
+      app_config:
+        default_checkout_length: 'Standard checkout length (in days). A blank value will allow users<br>to check out items indefinitely without additional approval.'
       user:
         disabled: "Prevent this client from logging in"
         suspended_until: "Suspend this client's checkout privileges until a specified date"
@@ -44,8 +49,12 @@ en:
     submit:
       component_model:
         update: "Update Model"
+  app_config:
+    index:
+      title: 'Global Configuration'
   brand:
-    title: "Brands"
+    index:
+      title: "Brands"
     sidebar:
       filters: "Brands Filters"
       add:
@@ -61,34 +70,42 @@ en:
         text: "Non Checkoutable"
         default_tooltip: "Show brands with non checkoutable kits"
   budget:
-    title: "Budgets"
+    index:
+      title: "Budgets"
     sidebar:
       filters: "Budgets Filters"
       add:
         default_tooltip: "Add a new budget"
         denied_tooltip: "You don't have sufficient permissions to add a new budget"
   category:
-    title: "Categories"
+    index:
+      title: "Categories"
     sidebar:
       filters: "Categories Filters"
       add:
         default_tooltip: "Add a new category"
         denied_tooltip: "You don't have sufficient permissions to add a new category"
   covenant:
-    title: "Covenants"
+    index:
+      title: "Covenants"
     sidebar:
       add:
         default_tooltip: "Add a new covenant"
         denied_tooltip: "You don't have sufficient permissions to add a new covenant"
+  dashboard:
+    index:
+      title: "Dashboard"
   group:
-    title: "Groups"
+    index:
+      title: "Groups"
     sidebar:
       add:
         default_tooltip: "Add a new group"
         denied_tooltip: "You don't have sufficient permissions to add a new group"
     expires_at: "Expires"
   kit:
-    title: "Kits"
+    index:
+      title: "Kits"
     sidebar:
       filters: "Kits Filters"
       add:
@@ -109,15 +126,22 @@ en:
       tombstoned:
         text: "Tombstoned"
         default_tooltip: "Show all tombstoned kits<br>(e.g. dead, missing, etc)"
+  loan:
+    new:
+      title: "New Loan"
+    index:
+      title: "Loans"
   location:        
-    title: "Locations"
+    index:
+      title: "Locations"
     sidebar:
       filters: "Locations Filters"
       add:
         default_tooltip: "Add a new location"
         denied_tooltip: "You don't have sufficient permissions to add a new location"
   component_model:
-    title: "Models"
+    index:
+      title: "Models"
     sidebar:
       add:
         default_tooltip: "Add a new model"
@@ -133,7 +157,8 @@ en:
       #   text: "Non Checkoutable"
       #   default_tooltip: "Show all non checkoutable models"
   user:
-    title: "Users"
+    index:
+      title: "Users"
     sidebar:
       filters: "Users Filters"
       add:

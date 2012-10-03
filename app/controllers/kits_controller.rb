@@ -3,6 +3,8 @@ class KitsController < ApplicationController
   # use CanCan to authorize this resource
   authorize_resource
 
+  layout 'sidebar', :only => ['index']
+
   # GET /kits
   # GET /kits.json
   def index

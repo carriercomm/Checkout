@@ -74,7 +74,7 @@ class ComponentModel < ActiveRecord::Base
   # TODO: test this
   # returns a JSON object with the available checkout days for each
   # kit, grouped by location. Consumed by the javascript date picker
-  def checkout_days_json(days_out = 90)
+  def checkout_dates_for_datepicker(days_out = 90)
     locations = {}
     checkoutable_kits.each do |kit|
       if locations[kit.location.id].nil?
@@ -82,7 +82,7 @@ class ComponentModel < ActiveRecord::Base
       end
       kit_hash = {
         'kit_id' => kit.id,
-        'days_reservable' => kit.days_reservable(days_out)
+        'days_reservable' => kit.dates_reservable_for_datepicker(days_out)
       }
       locations[kit.location.id]['kits'] << kit_hash
     end

@@ -3,6 +3,8 @@ class LocationsController < ApplicationController
   # use CanCan to authorize this resource
   authorize_resource
 
+  layout 'sidebar', :only => ['index']
+
   # GET /locations
   # GET /locations.json
   def index

@@ -1,5 +1,7 @@
 Checkout::Application.routes.draw do
 
+  resources :kit_loans
+
   root to: 'component_models#index', filter: "checkoutable"
 
   # TODO: trim down these routes
@@ -14,7 +16,7 @@ Checkout::Application.routes.draw do
 
   devise_for :user
 
-  # TODO: is this being used? mebbe nuke this and its controller
+  resource  :app_config, :only => [:show, :edit, :update]
   resources :brands do
     collection do
       ["checkoutable", "non_checkoutable"].each do |r|
@@ -41,6 +43,7 @@ Checkout::Application.routes.draw do
   end
   resources :components
   resources :covenants
+  match 'dashboard' => 'dashboard#index'
   resources :groups
   resources :kits do
     collection do
@@ -49,14 +52,14 @@ Checkout::Application.routes.draw do
       end
       get "select2"
     end
-    resources :reservations, only: [:index, :new]
+    resources :loans, only: [:index, :new]
   end
   resources :locations
   resources :models, as: "component_models", controller: "component_models" do
     collection &component_models_collection_routes
-    resources :reservations, only: [:new]
+    resources :loans, only: [:new]
   end
-  resources :reservations
+  resources :loans
   resources :search, only: [:index]
   resources :users, except: [:destroy] do
     collection do
@@ -66,7 +69,7 @@ Checkout::Application.routes.draw do
       get "select2"
     end
     resources :groups
-    resources :reservations
+    resources :loans
   end
 
   # The priority is based upon order of creation:

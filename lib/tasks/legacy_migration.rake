@@ -440,14 +440,13 @@ namespace :db do
         }
         l.business_hours.create(attrs)
       end
-      l.save
     end
 
     BusinessHour.all.each do |x|
       open_days = x.open_occurrences
       open_days.each_with_index do |y, idx|
         if idx % 5 == 0
-          BusinessHourException.create!(:location => x.location, :date_closed => Date.new(Time.now.year, y.first, y.last))
+          BusinessHourException.first_or_create(:location => x.location, :closed_at => Date.new(Time.now.year, y.month, y.day))
         end
       end
     end

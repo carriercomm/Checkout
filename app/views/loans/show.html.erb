@@ -1,0 +1,62 @@
+<h1>Loan</h1>
+
+<p>
+  <b>Client</b><br>
+  <%= @client %>
+</p>
+
+<p>
+  <b>Check Out Location</b><br>
+  <%= @location %>
+</p>
+
+<p>
+  <b>Kit</b><br>
+  <%= link_to @kit, kit_path(@kit) %>
+</p>
+
+<p>
+  <b>Check Out Day</b><br>
+  <%= @loan.starts_at.to_formatted_s(:verbose) %>
+</p>
+
+<p>
+  <b>Check In Day</b><br>
+  <%= @loan.ends_at.to_formatted_s(:verbose) %>
+</p>
+
+<p>
+  <b>Checked Out At</b><br>
+  <%= @loan.out_at ||= 'Not checked out yet' %>
+</p>
+
+<p>
+  <b>Checked In At</b><br>
+  <%= @loan.in_at ||= 'Not checked in yet' %>
+</p>
+
+<p>
+  <b>Late</b><br>
+  <%= @loan.late ||= false.to_s %>
+</p>
+
+<p>
+  <b>Approver</b><br>
+  <%= @loan.approver_id %>
+</p>
+
+<p>
+  <b>Checked Out By</b><br>
+  <%= @loan.out_assistant_id %>
+</p>
+
+<p>
+  <b>Checked In By</b><br>
+  <%= @loan.in_assistant_id %>
+</p>
+
+<div class="form-actions">
+  <%= link_to 'Back', loans_path, :class => 'btn'  %>
+  <%= link_to 'Edit', edit_loan_path(@loan), :class => 'btn' %>
+  <%= link_to 'Delete', loan_path(@loan), :method => 'delete', :confirm => 'Are you sure?', :class => 'btn btn-danger' %>
+</div>

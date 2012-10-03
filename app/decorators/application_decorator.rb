@@ -10,7 +10,18 @@ class ApplicationDecorator < Draper::Base
   end
 
   def val_or_space(val)
-    return val || "&nbsp;".html_safe
+    ActiveSupport::Deprecation.warn "val_or_space() is deprecated, use coalesce() instead.", caller
+    coalesce(val)
+  end
+
+  def coalesce(val, empty_val = "&nbsp;", suffix = "")
+    response = String.new
+    if val
+      response = val.to_s + " " + suffix
+    else
+      response = empty_val
+    end
+    response.html_safe
   end
 
 end
