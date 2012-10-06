@@ -1,4 +1,4 @@
-<% title 'kit.title' %>
+<% title t('kit.index.title') %>
 
 <% content_for :sidebar do %>
   <li class="nav-header"><%= t(".actions") %></li>
@@ -29,7 +29,8 @@
 <table class="table table-striped">
   <thead>
     <tr>
-      <th>Asset Tag</th>
+      <th>Kit ID</th>
+      <th>Asset Tags</th>
       <th>Components</th>
       <th>Groups</th>
       <th>Actions</th>
@@ -38,7 +39,8 @@
   <tbody>
     <% @kits.each do |kit| %>
       <tr>
-        <td><%= link_to(kit.asset_tags, kit_path(kit)) %></td>
+        <td><%= kit.id %></td>
+        <td><%= kit.asset_tags %></td>
         <td><%= kit.linked_component_list %></td>
         <td><%= kit.linked_groups_list %></td>
         <td>

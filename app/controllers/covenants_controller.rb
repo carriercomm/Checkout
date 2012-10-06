@@ -3,8 +3,6 @@ class CovenantsController < ApplicationController
   # use CanCan to authorize this resource
   authorize_resource
 
-  layout 'sidebar', :only => ['index']
-
   # GET /covenants
   # GET /covenants.json
   def index

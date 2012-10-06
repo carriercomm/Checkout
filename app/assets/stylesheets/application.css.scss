@@ -37,3 +37,11 @@ i.user-suspended {
 .table-form.control-group {
   margin:0;
 }
+
+// datepicker-related styles
+.return-date-ok a {
+  border-color: green !important;
+}
+.return-date-warn a {
+  border-color: orange !important;
+}  

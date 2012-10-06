@@ -47,6 +47,10 @@ class KitDecorator < ApplicationDecorator
     "[#{ asset_tags }] #{ component_list }".squish
   end
 
+  def id
+    h.link_to(model.id, h.kit_path(model))
+  end
+
   def linked_groups_list
     groups.map(&:to_link).join(", ").html_safe
   end
@@ -63,11 +67,19 @@ class KitDecorator < ApplicationDecorator
     val_or_space(model.location)
   end
 
+  def raw_id
+    model.id
+  end
+
   def select2_json
     {
       :id   => model.id,
       :text => description
     }
+  end
+
+  def to_s
+    h.link_to(model.id, h.kit_path(model))
   end
 
   def tombstoned

@@ -3,8 +3,6 @@ class LoansController < ApplicationController
   # use CanCan to authorize this resource
   authorize_resource
 
-  layout 'sidebar', :only => ['index']
-
   # GET /loans
   # GET /loans.json
   def index
@@ -16,6 +14,8 @@ class LoansController < ApplicationController
       @loans = Loan.order("loans.starts_at DESC").page(params[:page])
     end
 
+    @loans = LoanDecorator.decorate(@loans)
+
     respond_to do |format|
       format.html # index.html.erb
     end
@@ -24,10 +24,7 @@ class LoansController < ApplicationController
   # GET /loans/1
   # GET /loans/1.json
   def show
-    @loan = Loan.find(params[:id])
-    @client      = @loan.client
-    @kit         = @loan.kit
-    @location    = @kit.location
+    @loan = LoanDecorator.find(params[:id])
 
     respond_to do |format|
       format.html # show.html.erb
@@ -37,35 +34,32 @@ class LoansController < ApplicationController
   # GET /loans/new
   # GET /loans/new.json
   def new
-    @client = (params[:user_id]) ? User.find(params[:user_id]) : current_user
+    client = (params[:user_id]) ? User.find(params[:user_id]) : current_user
 
     # do we have a specific kit to check out?
     if params[:kit_id].present?
-      @kit       = Kit.includes(:location).find(params[:kit_id])
-      @loan      = @client.loans.build(:kit_id => @kit.id)
-      @locations = [@kit.location]
+      kit       = Kit.includes(:location).find(params[:kit_id])
+      @loan      = client.loans.build(:kit_id => kit.id)
 
       # setup javascript data structures to make the date picker work
       # TODO: move this to a model method on kit (same as implemented for ComponentModel)
-      setup_kit_checkout_days(@kit)
+      setup_kit_checkout_days(kit)
 
     # do we have a general component_model to check out?
     elsif params[:component_model_id].present?
-      @loan          = @client.loans.build
-      @model         = ComponentModel.checkoutable.includes(:kits => :location).find(params[:component_model_id])
-      @model         = ComponentModelDecorator.decorate(@model)
-      @locations     = @model.checkout_locations
-      @loan.location = @locations.first if @locations.size == 1
-      gon.locations  = @model.checkout_dates_for_datepicker
+      component_model = ComponentModel.checkoutable.includes(:kits => :location).find(params[:component_model_id])
+      @loan           = client.loans.build(:component_model => component_model)
+      gon.locations   = component_model.dates_checkoutable_for_datepicker
     else
       flash[:error] = "Start by finding something to check out!"
       redirect_to component_models_path and return
     end
 
+    @loan = LoanDecorator.decorate(@loan)
+
     # stuff the default checkout length into the gon object if it's available
-    if @default_checkout_length = AppConfig.instance.default_checkout_length
-      gon.default_checkout_length = @default_checkout_length
-    end
+    @default_checkout_length = AppConfig.instance.default_checkout_length
+    gon.default_checkout_length = @default_checkout_length
 
     respond_to do |format|
       format.html # new.html.erb
@@ -74,9 +68,8 @@ class LoansController < ApplicationController
 
   # GET /loans/1/edit
   def edit
-    @loan = Loan.find(params[:id])
-    @kit         = @loan.kit
-    setup_kit_checkout_days(@kit)
+    @loan = LoanDecorator.find(params[:id])
+    setup_kit_checkout_days(@loan.model.kit)
   end
 
   # POST /loans
@@ -84,13 +77,11 @@ class LoansController < ApplicationController
   def create
     @loan = Loan.new(params[:loan])
 
-    # validate that the item is checkoutable
-    # validate that starts_at and ends_at are on checkout days
-    # validate that the item isn't already reserved for the requested days
-    # validate that this client has permissions
-
     respond_to do |format|
-      if @loan.save
+      if @loan.kit.nil? && @loan.component_model && @loan.location && @loan.starts_at && @loan.ends_at
+        @kits = KitDecorator.decorate(@loan.available_checkoutable_kits)
+        format.html { render :kit_select }
+      elsif @loan.save
         format.html { redirect_to @loan, notice: 'Loan was successfully created.' }
       else
         format.html { render action: "new" }
@@ -101,13 +92,12 @@ class LoansController < ApplicationController
   # PUT /loans/1
   # PUT /loans/1.json
   def update
-    @loan = Loan.find(params[:id])
+    @loan = LoanDecorator.find(params[:id])
 
     respond_to do |format|
       if @loan.update_attributes(params[:loan])
         format.html { redirect_to @loan, notice: 'Loan was successfully updated.' }
       else
-        set_open_days
         format.html { render action: "edit" }
       end
     end
@@ -127,6 +117,9 @@ class LoansController < ApplicationController
 
   private
 
+
+  # TODO: make this smarter so it add the days included in this loan
+  #       (if any)
   # gather the available checkout days for the kit and format for
   # datepicker consumption
   def setup_kit_checkout_days(kit)
@@ -134,8 +127,10 @@ class LoansController < ApplicationController
       kit.location.id => {
         'kits' => [{
                      'kit_id' => kit.id,
-                     'days_reservable' => kit.days_reservable
-                   }]
+                     'days_reservable' => kit.dates_checkoutable_for_datepicker
+                  }],
+        'dates_open' => kit.location.dates_open_for_datepicker
+
       }
     }
   end

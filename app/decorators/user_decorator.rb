@@ -32,12 +32,22 @@ class UserDecorator < ApplicationDecorator
     localize_unless_nil(model.current_sign_in_at, :format => :db)
   end
 
+  def description
+    text = h.link_to(model.username, h.user_path(model))
+    text << "(#{ full_name })" unless full_name.empty?
+    text
+  end
+
   def disabled
     to_yes_no(model.disabled)
   end
 
   def first_name
     val_or_space(model.first_name)
+  end
+
+  def full_name
+    "#{ model.first_name } #{ model.last_name }".squish
   end
 
   def last_name
@@ -84,7 +94,15 @@ class UserDecorator < ApplicationDecorator
     localize_unless_nil(model.suspended_until, :format => :tabular)
   end
 
+  def to_s
+    description
+  end
+
   def updated_at
     localize_unless_nil(model.updated_at, :format => :db)
+  end
+
+  def username
+    h.link_to(model.username, h.user_path(model))
   end
 end

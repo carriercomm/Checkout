@@ -3,8 +3,6 @@ class KitsController < ApplicationController
   # use CanCan to authorize this resource
   authorize_resource
 
-  layout 'sidebar', :only => ['index']
-
   # GET /kits
   # GET /kits.json
   def index
@@ -22,9 +20,21 @@ class KitsController < ApplicationController
   #       select2 method in users_controller.
   # GET /kits/select2.json
   def select2
-    kits   = Kit.asset_tag_search(params["q"])
-    total  = kits.count
-    kits   = KitDecorator.decorate(kits.limit(20))
+    # find things by asset tag
+    asset_tags = Kit.asset_tag_search(params["q"])
+
+    # find things by the kit id
+    ids = Kit.id_search(params["q"])
+
+    # calculate the totals for the select2 widget
+    total = asset_tags.count + ids.count
+
+    # actually do the query, and concatenate the results
+    kits = [asset_tags.limit(10), ids.limit(10)].flatten
+
+    # dress 'em up
+    kits = KitDecorator.decorate(kits)
+
     respond_to do |format|
       #format.html # index.html.erb
       format.json { render json: { items: kits.map(&:select2_json), total: total} }

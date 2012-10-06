@@ -43,7 +43,7 @@ class Location < ActiveRecord::Base
       .where("closed_at >= ? AND closed_at <= ?", start_date, end_date)
       .all
 
-    bhe.map(&:closed_at)
+    bhe.map(&:closed_at).uniq
   end
 
 =begin
@@ -54,6 +54,24 @@ class Location < ActiveRecord::Base
     dates_exception(days_out).to_a
   end
 =end
+
+  def dates_open(days_out = 90)
+    return dates_regular(days_out) - dates_exception(days_out)
+  end
+
+  def dates_open_for_datepicker(days_out = 90)
+    dates_open(days_out).collect { |d| [d.month, d.day] }
+  end
+
+  def dates_regular(days_out = 90)
+    dates = []
+    business_hours.each do |x|
+      occurrences = x.open_occurrences(days_out)
+      occurrences.map!(&:to_date)
+      dates.concat(occurrences)
+    end
+    dates.uniq
+  end
 
   def hours_on(date)
     # return nothing if we're closed on this day
@@ -73,24 +91,6 @@ class Location < ActiveRecord::Base
 
   def open_on?(date)
     return !hours_on(date).empty?
-  end
-
-  def dates_open(days_out = 90)
-    return dates_regular(days_out) - dates_exception(days_out)
-  end
-
-  def dates_open_for_datepicker(days_out = 90)
-    dates_open(days_out).collect { |d| [d.month, d.day] }
-  end
-
-  def dates_regular(days_out = 90)
-    dates = []
-    business_hours.each do |x|
-      occurrences = x.open_occurrences(days_out)
-      occurrences.map!(&:to_date)
-      dates.concat(occurrences)
-    end
-    dates.uniq
   end
 
   def to_param

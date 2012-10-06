@@ -43,6 +43,7 @@
     <table class="table table-striped">
       <thead>
         <tr>
+          <th>Kit ID</th>
           <th>Asset Tag</th>
           <th>Components</th>
         </tr>
@@ -50,7 +51,8 @@
       <tbody>
         <% @group.kits.each do |kit| %>
         <tr>
-          <td><%= link_to(kit.asset_tags, kit_path(kit)) %></td>
+          <td><%= kit.id %></td>
+          <td><%= kit.asset_tags %></td>
           <td><%= kit.linked_component_list %></td>
         </tr>
         <% end %>

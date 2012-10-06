@@ -1,6 +1,5 @@
-<div class="page-header">
-  <h1>Kit <%= @kit.id.to_s %> <small><%= @kit.component_list %></small></h1>
-</div>
+<% title "Kit #{ @kit.model.id }" %>
+<% subtitle @kit.component_list %>
 
 <div class="pull-right">
   <img src="https://chart.googleapis.com/chart?chs=150x150&cht=qr&chl=<%= u(kit_url(@kit)) %>&choe=UTF-8" alt="QR code" class="qrcode">

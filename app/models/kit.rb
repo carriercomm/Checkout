@@ -58,9 +58,23 @@ class Kit < ActiveRecord::Base
   ## Class Methods ##
 
   def self.asset_tag_search(query)
-    includes(:components).joins(:components)
+    includes(:components)
+      .joins(:components)
       .where("components.asset_tag LIKE ?", "%#{ query }%")
       .order("components.asset_tag ASC")
+  end
+
+  def self.id_search(query)
+    where("CAST(kits.id AS TEXT) LIKE ?", "%#{ query }%")
+      .order("kits.id ASC")
+  end
+
+  # returns any loans which overlap with the start and end dates
+  # passed as parameters
+  def self.loaned_between(start_range, end_range)
+    includes(:loans)
+      .joins(:loans)
+      .where("(loans.starts_at BETWEEN ? AND ?) OR (loans.ends_at BETWEEN ? AND ?)", start_range, end_range, start_range, end_range)
   end
 
   ## Instance Methods ##
@@ -69,6 +83,10 @@ class Kit < ActiveRecord::Base
   def asset_tags
     at = components.collect { |c| (c.asset_tag.blank?) ? nil : c.asset_tag }
     return at.compact
+  end
+
+  def can_be_loaned_to?(client)
+    groups.map(&:users).flatten.include?(client)
   end
 
   def checked_out?
@@ -82,35 +100,33 @@ class Kit < ActiveRecord::Base
   # equal to location.open_days minus days_reserved returns in format
   # [[month, day], [month, day], ...] for consumption by the
   # javascript date picker
-  def dates_reservable_for_datepicker(days_out = 90)
-    return location.dates_open_for_datepicker(days_out) - dates_reserved_for_datepicker(days_out)
+  def dates_checkoutable_for_datepicker(days_out = 90)
+    return location.dates_open_for_datepicker(days_out) - dates_loaned_for_datepicker(days_out)
   end
 
-    # returns in format [[month, day], [month, day], ...] for
-  # consumption by the javascript date picker
-  def dates_reserved(days_out = 90)
+  # returns the dates this kit is loaned within the time range specified
+  def dates_loaned(days_out = 90)
     dates = []
 
     # build up params for where clause
     start_range = Time.now.at_beginning_of_day
     end_range   = start_range + days_out.days
-    time_range  = (start_range..end_range)
 
     # iterate over the set of loans in this range
-    loans.where(:starts_at => time_range).all.each do |r|
-      start_range = r.starts_at.to_date
-      end_range   = r.ends_at.to_date
+    loans_between(start_range, end_range).all.each do |r|
+      starts_at = r.starts_at.to_date
+      ends_at   = r.ends_at.to_date
 
       # add a day for every day in the range
-      (start_range..end_range).each do |date|
-        dates.concat(date)
+      (starts_at..ends_at).each do |date|
+        dates << date
       end
     end
-    return dates
+    return dates.uniq
   end
 
-  def dates_reserved_for_datepicker(days_out = 90)
-    dates_reserved(days_out).collect { |d| [d.month, d.day] }
+  def dates_loaned_for_datepicker(days_out = 90)
+    dates_loaned(days_out).collect { |d| [d.month, d.day] }
   end
 
   # before_validation callback:
@@ -123,39 +139,24 @@ class Kit < ActiveRecord::Base
     return true
   end
 
-  # by convention, we use this as the kit descriptor
-  # def primary_component
-  #   components.joins(:model).order("position").first
-  # end
+  # returns all the loans that overlap with the range specified by the
+  # start and end dates
+  def loans_between(start_date, end_date, excluded_loans = [])
+    ids = excluded_loans.map(&:id)
+    loans.where("((loans.starts_at BETWEEN :start AND :end) OR (loans.ends_at BETWEEN :start AND :end)) AND loans.id NOT IN (:ids)",
+              :start => start_date,
+              :end => end_date,
+              :ids => ids)
+  end
 
-  # by convention, we use this as the kit descriptor
-  # def primary_model
-  #   primary_component.component_model
-  # end
+  def loaned_between?(start_date, end_date, excluded_loans)
+    !loans_between(start_date, end_date, excluded_loans).empty?
+  end
 
   # TODO: add check for permissions
   # TODO: add check for 'hold'
   def reservable?
     checkoutable
-  end
-
-  # TODO: enforce the should_have_at_least_one_component at all times
-  # def save
-  #   saved = false
-  #   ActiveRecord::Base.transaction do
-  #     saved = super
-  #     if self.conditions.size < 1
-  #       saved = false
-  #       errors[:base] << "A rule must have at least one condition."
-  #       raise ActiveRecord::Rollback
-  #     end
-  #   end
-  #   saved
-  # end
-
-  # TODO: test this
-  def training_required?
-    @training_required ||= uncached_training_required?
   end
 
   # custom validator
@@ -165,20 +166,20 @@ class Kit < ActiveRecord::Base
     end
   end
 
-  # TODO: fix this
-  # def to_param
-  #   "#{ id } #{ to_s }".parameterize
-  # end
-
-  # def to_s
-  #   "#{ primary_model.brand } #{ primary_model }"
-  # end
+  def to_s
+    id.to_s
+  end
 
   # custom validator
   def tombstoned_should_not_be_checkoutable
     if tombstoned && checkoutable
       errors[:base] << "Kit cannot be tombstoned AND checkoutable"
     end
+  end
+
+  # TODO: test this
+  def training_required?
+    @training_required ||= uncached_training_required?
   end
 
   def uncached_training_required?

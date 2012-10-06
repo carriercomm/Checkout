@@ -2,7 +2,11 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <title>Checkout<%= content_for?(:title) ? (t('title_separator') + yield(:title)) : '' %></title>
+    <title>
+      Checkout
+      <%= content_for?(:title) ? (t('title_separator') + yield(:title)) : '' %>
+      <%= content_for?(:subtitle) ? (t('title_separator') + yield(:subtitle)) : '' %>
+    </title>
     <%= include_gon %>
     <%= csrf_meta_tags %>
 

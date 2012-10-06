@@ -3,8 +3,6 @@ class UsersController < ApplicationController
   # use CanCan to authorize this resource
   authorize_resource
 
-  layout 'sidebar', :only => ['index']
-
   # make these methods available in the views
   helper_method :sort_column, :sort_direction
 

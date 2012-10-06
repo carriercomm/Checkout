@@ -1,59 +1,43 @@
-<h1>Loan</h1>
+<% title t('loan.show.title', :id => @loan.model.id) %>
+<% subtitle @loan.kit.component_list %>
 
-<p>
-  <b>Client</b><br>
-  <%= @client %>
-</p>
+<dl class="dl-horizontal">
+  <dt>Client</dt>
+  <dd><%= @loan.client %></dd>
+  <dt>Check Out Location</dt>
+  <dd><%= @loan.location %></dd>
+  <dt>Kit</dt>
+  <dd><%= @loan.kit %></dd>
+  <dt>Check Out Day</dt>
+  <dd><%= @loan.starts_at %></dd>
+  <dt>Check In Day</dt>
+  <dd><%= @loan.ends_at %></dd>
+  <dt>Status</dt>
+  <dd><%= @loan.state %></dd>
 
-<p>
-  <b>Check Out Location</b><br>
-  <%= @location %>
-</p>
+  <% if @loan.model.approver %>
+    <dt>Approved By</dt>
+    <dd><%= @loan.approver %></dd>
+  <% end %>
 
-<p>
-  <b>Kit</b><br>
-  <%= link_to @kit, kit_path(@kit) %>
-</p>
+  <% if @loan.model.out_at %>
+    <dt>Checked Out At</dt>
+    <dd><%= @loan.out_at %></dd>
+    <dt>Checked Out By</dt>
+    <dd><%= @loan.out_assistant %></dd>
+  <% end %>
 
-<p>
-  <b>Check Out Day</b><br>
-  <%= @loan.starts_at.to_formatted_s(:verbose) %>
-</p>
+  <% if @loan.model.in_at %>
+    <dt>Checked In At</dt>
+    <dd><%= @loan.in_at %></dd>
+    <dt>Checked In By</dt>
+    <dd><%= @loan.in_assistant %></dd>
+    <dt>Late</dt>
+    <dd><%= @loan.late %></dd>
+  <% end %>
 
-<p>
-  <b>Check In Day</b><br>
-  <%= @loan.ends_at.to_formatted_s(:verbose) %>
-</p>
 
-<p>
-  <b>Checked Out At</b><br>
-  <%= @loan.out_at ||= 'Not checked out yet' %>
-</p>
-
-<p>
-  <b>Checked In At</b><br>
-  <%= @loan.in_at ||= 'Not checked in yet' %>
-</p>
-
-<p>
-  <b>Late</b><br>
-  <%= @loan.late ||= false.to_s %>
-</p>
-
-<p>
-  <b>Approver</b><br>
-  <%= @loan.approver_id %>
-</p>
-
-<p>
-  <b>Checked Out By</b><br>
-  <%= @loan.out_assistant_id %>
-</p>
-
-<p>
-  <b>Checked In By</b><br>
-  <%= @loan.in_assistant_id %>
-</p>
+</dl>
 
 <div class="form-actions">
   <%= link_to 'Back', loans_path, :class => 'btn'  %>

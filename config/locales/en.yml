@@ -32,6 +32,8 @@ en:
     labels:
       app_config:
         default_checkout_length: 'Default Length'
+      loan:
+        component_model: 'Model'
       user:
         username: 'Username'
         password: 'Password'
@@ -127,10 +129,24 @@ en:
         text: "Tombstoned"
         default_tooltip: "Show all tombstoned kits<br>(e.g. dead, missing, etc)"
   loan:
-    new:
-      title: "New Loan"
     index:
       title: "Loans"
+    edit:
+      title: "Edit Loan #%{id}"
+    new:
+      title: "New Loan"
+
+    not_checked_out: "Not checked out yet"
+    not_checked_in: 'Not checked in yet'
+    show:
+      title: "Loan #%{id}"
+    state:
+      approved: "Approved"
+      canceled: "Canceled"
+      checked_in: "Checked In"
+      checked_out: "Checked Out"
+      rejected: "Rejected"
+      unapproved: "Unapproved"
   location:        
     index:
       title: "Locations"

@@ -1,7 +1,5 @@
 Checkout::Application.routes.draw do
 
-  resources :kit_loans
-
   root to: 'component_models#index', filter: "checkoutable"
 
   # TODO: trim down these routes

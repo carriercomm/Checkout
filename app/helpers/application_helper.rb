@@ -67,6 +67,10 @@ module ApplicationHelper
     link_to(title.html_safe, :sort => column, :direction => direction)
   end
 
+  def subtitle(page_subtitle)
+    content_for(:subtitle, page_subtitle)
+  end
+
   def title(page_title)
     content_for(:title, page_title)
   end

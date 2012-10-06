@@ -3,8 +3,6 @@ class GroupsController < ApplicationController
   # use CanCan to authorize this resource
   authorize_resource
 
-  layout 'sidebar', :only => ['index']
-
   # GET /groups
   # GET /groups.json
   def index

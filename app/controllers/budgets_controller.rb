@@ -3,8 +3,6 @@ class BudgetsController < ApplicationController
   # use CanCan to authorize this resource
   authorize_resource
 
-  layout 'sidebar', :only => ['index']
-
   # GET /budgets
   # GET /budgets.json
   def index

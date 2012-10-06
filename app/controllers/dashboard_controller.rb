@@ -1,7 +1,5 @@
 class DashboardController < ApplicationController
 
-  layout 'sidebar'
-
   def index
     # @outgoing_loans =
     # @incoming_loans =

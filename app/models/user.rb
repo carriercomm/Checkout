@@ -63,10 +63,10 @@ class User < ActiveRecord::Base
   # specific group (specified by the group id)
   def self.not_in_group(group_id)
     group = Group.find(group_id)
-    return if group.nil?
+    return self if group.nil?
 
     user_ids = group.users.map(&:id)
-    return if user_ids.empty?
+    return self if user_ids.empty?
 
     where("users.id NOT IN (?)", user_ids)
   end

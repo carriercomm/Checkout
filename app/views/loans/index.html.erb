@@ -1,4 +1,4 @@
-<% title 'loan.title' %>
+<% title t('loan.index.title') %>
 <table class="table table-striped">
   <thead>
     <tr>
@@ -14,12 +14,12 @@
   <tbody>
     <% @loans.each do |loan| %>
       <tr>
-        <td><%= link_to loan.client, users_loans_path(loan.client) unless loan.client.nil? %>
-        <td><%= link_to loan.kit, kit_path(loan.kit) unless loan.kit.nil? %></td>
-        <td><%= loan.starts_at.to_s(:tabular) %></td>
-        <td><%= loan.ends_at.to_s(:tabular) %></td>
-        <td><%= loan.out_at.try(:to_s, :tabular) %></td>
-        <td><%= loan.in_at.try(:to_s, :tabular) %></td>
+        <td><%= loan.client %>
+        <td><%= loan.kit %></td>
+        <td><%= loan.starts_at %></td>
+        <td><%= loan.ends_at %></td>
+        <td><%= loan.out_at %></td>
+        <td><%= loan.in_at %></td>
         <td>
           <div class="btn-group">
             <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
