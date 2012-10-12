@@ -7,11 +7,7 @@ class Loan < ActiveRecord::Base
   state_machine :initial => :unapproved do
 
     event :approve do
-      transition [:rejected, :unapproved] => :approved, :if => :valid?
-    end
-
-    event :reject do
-      transition :unapproved => :rejected
+      transition [:building, :rejected, :unapproved] => :approved, :if => :valid?
     end
 
     event :cancel do
@@ -26,8 +22,27 @@ class Loan < ActiveRecord::Base
       transition :checked_out => :checked_in
     end
 
+    event :reject do
+      transition :unapproved => :rejected
+    end
+
+    state :approved do
+      validates_presence_of :approver
+    end
+
+    state :checked_in do
+      validates_presence_of :in_assistant
+      validates :in_at, :presence => true
+    end
+
+    state :checked_out do
+      validates_presence_of :out_assistant
+      validates :out_at, :presence => true
+    end
+
     state :unapproved do
-      validate  :validate_open_on_starts_at
+      before_save :try_auto_approve
+      validate    :validate_open_on_starts_at
     end
 
   end
@@ -62,6 +77,7 @@ class Loan < ActiveRecord::Base
 
   ## Instance Methods ##
 
+=begin
   def adjust_starts_at
     set_to_location_open_at!
   end
@@ -69,6 +85,7 @@ class Loan < ActiveRecord::Base
   def adjust_ends_at
     set_to_location_close_at!
   end
+=end
 
   def available_checkoutable_kits
     return nil if component_model.nil?
@@ -95,7 +112,6 @@ class Loan < ActiveRecord::Base
   end
 
   def location=(val)
-    logger.debug "----- " + val
     if val.is_a? String
       @location = Location.find(val.to_i)
     elsif val.is_a? Fixnum
@@ -141,6 +157,29 @@ class Loan < ActiveRecord::Base
   # set the ends_at datetime to the time the location closes
   def set_to_location_close_at!
     self.ends_at = kit.location.closes_at(self.ends_at)
+  end
+
+  def within_default_length?
+    default        = AppConfig.instance.default_checkout_length
+
+    # if there's no default length, then go, go, go!
+    return true unless default
+
+    expected_time  = (starts_at + default.days).to_time
+    next_date_open = location.next_date_open(expected_time)
+
+    return (ends_at.to_date <= next_date_open)
+  end
+
+  private
+
+  # this should only be called after validations have run
+  def try_auto_approve
+    if within_default_length?
+      # the default scope excludes "system"
+      self.approver = User.unscoped.find_by_username("system")
+      approve
+    end
   end
 
   def validate_client_has_permission

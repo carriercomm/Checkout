@@ -34,13 +34,12 @@ class Location < ActiveRecord::Base
 
   # returns an array of dates for each business_hour_exception
   # at this location
-  def dates_exception(days_out = 90)
-    start_date = Time.now.to_date
-    end_date   = start_date + days_out.days
+  def dates_exception(days_out = 90, date_start = Time.zone.now)
+    date_end   = date_start + days_out.days
 
     # find any exceptions that fall on or between these days
     bhe = business_hour_exceptions
-      .where("closed_at >= ? AND closed_at <= ?", start_date, end_date)
+      .where("closed_at >= ? AND closed_at <= ?", date_start, date_end)
       .all
 
     bhe.map(&:closed_at).uniq
@@ -55,18 +54,18 @@ class Location < ActiveRecord::Base
   end
 =end
 
-  def dates_open(days_out = 90)
-    return dates_regular(days_out) - dates_exception(days_out)
+  def dates_open(days_out = 90, date_start = Time.zone.now)
+    return dates_regular(days_out, date_start) - dates_exception(days_out, date_start)
   end
 
-  def dates_open_for_datepicker(days_out = 90)
-    dates_open(days_out).collect { |d| [d.month, d.day] }
+  def dates_open_for_datepicker(days_out = 90, date_start = Time.zone.now)
+    dates_open(days_out, date_start).collect { |d| [d.month, d.day] }
   end
 
-  def dates_regular(days_out = 90)
+  def dates_regular(days_out = 90, date_start = Time.zone.now)
     dates = []
     business_hours.each do |x|
-      occurrences = x.open_occurrences(days_out)
+      occurrences = x.open_occurrences(days_out, date_start)
       occurrences.map!(&:to_date)
       dates.concat(occurrences)
     end
@@ -87,6 +86,11 @@ class Location < ActiveRecord::Base
 
   def hours_to_s
     business_hours.collect { |bh| bh.to_s }
+  end
+
+  # finds the closest open date on, or after, the time passed
+  def next_date_open(time = Time.zone.now)
+    dates_open(90, time).first
   end
 
   def open_on?(date)

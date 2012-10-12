@@ -82,7 +82,7 @@ class ComponentModel < ActiveRecord::Base
   # TODO: test this returns a JSON object with the available checkout
   # days for each kit (for pick up days), dates open (for return
   # days), grouped by location. Consumed by the javascript date picker
-  def dates_checkoutable_for_datepicker(days_out = 90)
+  def locations_with_dates_checkoutable_for_datepicker(days_out = 90)
     locations = {}
 
     # roll up the kits, with their location and dates reservable
@@ -94,14 +94,8 @@ class ComponentModel < ActiveRecord::Base
         locations[loc_id] = { 'kits' => [] }
       end
 
-      # create the data structure for this kit
-      kit_hash = {
-        'kit_id' => kit.id,
-        'days_reservable' => kit.dates_checkoutable_for_datepicker(days_out)
-      }
-
-      # add it to the collection of kits in this location
-      locations[loc_id]['kits'] << kit_hash
+      # add the kit to the collection of kits in this location
+      locations[loc_id]['kits'] << kit.kit_record_for_datepicker(days_out)
     end
 
     # roll up the locations and their dates open

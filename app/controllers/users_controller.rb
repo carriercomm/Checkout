@@ -17,6 +17,8 @@ class UsersController < ApplicationController
       when "active"     then @users = @users.where(:disabled => false)
       when "disabled"   then @users = @users.where(:disabled => true)
       when "suspended"  then @users = @users.where(["users.suspended_until > ?", Date.today])
+      when "admins"     then @users = @users.where("roles.name = 'admin'")
+      when "attendants" then @users = @users.where("roles.name = 'attendant'")
       end
     end
 
@@ -97,6 +99,10 @@ class UsersController < ApplicationController
     @user.username        = p[:username]        if p[:username].present?
     @user.first_name      = p[:first_name]      if p[:first_name].present?
     @user.last_name       = p[:last_name]       if p[:last_name].present?
+    @user.role_ids        = p[:role_ids]        if p[:role_ids].present?
+
+    # TODO: this is possibly dangerous, is there a more manual way to handle it?
+    @user.memberships_attributes = p[:memberships_attributes] if p[:memberships_attributes].present?
 
     respond_to do |format|
       if @user.save
@@ -113,6 +119,7 @@ class UsersController < ApplicationController
   # PUT /users/1.json
   def update
     p     = params[:user]
+    # TODO: make modifying 'system' fail more elegantly
     @user = User.find(params[:id])
 
     @user.disabled        = p[:disabled]        if p[:disabled].present?
@@ -121,6 +128,10 @@ class UsersController < ApplicationController
     @user.username        = p[:username]        if p[:username].present?
     @user.first_name      = p[:first_name]      if p[:first_name].present?
     @user.last_name       = p[:last_name]       if p[:last_name].present?
+    @user.role_ids        = p[:role_ids]        if p[:role_ids].present?
+
+    # TODO: this is possibly dangerous, is there a more manual way to handle it?
+    @user.memberships_attributes = p[:memberships_attributes] if p[:memberships_attributes].present?
 
     respond_to do |format|
       if @user.save

@@ -1,4 +1,4 @@
-<%= simple_form_for @user, :html => { :class => 'form-horizontal' } do |f| %>
+<%= simple_nested_form_for @user, :html => { :class => 'form-horizontal' } do |f| %>
   <%= f.input :username %>
   <%= f.input :email %>
   <%= f.input :first_name %>
@@ -10,10 +10,22 @@
       :value => (f.object.suspended_until.nil? ? nil : localize(f.object.suspended_until, :format => "%Y-%m-%d"))
     } %>
   <%= f.input :disabled %>
+
   <%= f.association :roles, :as => :check_boxes %>
+
+  <div class="records row-fluid">
+    <div class="fields field-headers row-fluid">
+      <div class="field field-header span6">Group</div>
+      <div class="field field-header span4">Expires At</div>
+      <div class="field field-header span2">Actions</div>
+    </div>
+    <%= f.simple_fields_for :memberships, @user.memberships %>
+    <%= f.link_to_add raw("<i class='icon-plus-sign'></i> Add another group"), :memberships %>
+  </div>
+
   <div class="form-actions">
     <%= f.button :submit, :class => 'btn-primary' %>
     <%= link_to t('.cancel', :default => t("helpers.links.cancel")),
-                users_path, :class => 'btn' %>
+                active_users_path, :class => 'btn' %>
   </div>
 <% end %>

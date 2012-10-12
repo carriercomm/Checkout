@@ -2,20 +2,16 @@
 
 <% content_for :sidebar do %>
   <li class="nav-header"><%= t(".menu") %></li>
-  <%= sidebar_link t('app_config.title'),
+  <%= sidebar_link t('app_config.show.title'),
                    app_config_path,
                    '',
                    can?(:manage, AppConfig) %>
-  <%= sidebar_link t('helpers.links.new'),
+  <%= sidebar_link t('user.new.title'),
                    new_user_path,
                    t('user.sidebar.add.default_tooltip'),
                    can?(:manage, User),
                    t('user.sidebar.add.denied_tooltip') %>
-  <li class="nav-header"><%= t("user.sidebar.filters") %></li>
-  <%= sidebar_link t("user.sidebar.all.text"), users_path, t("user.sidebar.all.default_tooltip") %>
-  <%= sidebar_link t("user.sidebar.active.text"), active_users_path, t("user.sidebar.active.default_tooltip") %>
-  <%= sidebar_link t("user.sidebar.suspended.text"), suspended_users_path, t("user.sidebar.suspended.default_tooltip") %>
-  <%= sidebar_link t("user.sidebar.disabled.text"), disabled_users_path, t("user.sidebar.disabled.default_tooltip") %>
+
 <% end %>
 
 <dl class="dl-horizontal">

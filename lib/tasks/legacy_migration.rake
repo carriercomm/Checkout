@@ -309,7 +309,11 @@ namespace :dbx do
     success_count = 0
     error_count   = 0
 
-    current_user = ["jehughes", "bgrace", "mtm5", "coupe", "maja08", "karpen", "pampin", "hana21", "steliosm", "varchaus", "rtwomey", "annabelc", "mtrainor", "tivon", "peberger", "ozubko", "shawnx", "mones", "joshp", "ganter", "blake", "mwatras", "hraikes", "hugosg", "trebacze", "mem5", "jimified", "marcinp"]
+    current_user = ["jehughes", "bgrace", "mtm5", "coupe", "maja08", "karpen", "pampin", "hana21", "steliosm", "varchaus", "rtwomey", "annabelc", "mtrainor", "tivon", "peberger", "ozubko", "shawnx", "mones", "joshp", "ganter", "blake", "mwatras", "hraikes", "hugosg", "trebacze", "mem5", "jimified", "marcinp", "chesnd", "swlcomp"]
+
+    admins = ["jehughes", "bgrace", "mtm5", "coupe", "karpen", "pampin", "trebacze", "shawnx"]
+
+    attendants = ["maja08", "hana21", "steliosm", "varchaus", "rtwomey", "annabelc", "mtrainor", "tivon", "joshp", "hraikes", "hugosg", "mem5", "jimified", "marcinp", "chesnd", "swlcomp"]
 
     LegacyUser.all.each do |lu|
      begin
@@ -338,6 +342,12 @@ namespace :dbx do
        end
        u.disabled = (current_user.include? username) ? false : true
        u.save!
+       if admins.include?(username)
+         u.add_role "admin"
+       end
+       if attendants.include?(username)
+         u.add_role "attendant"
+       end
        success_count += 1
      rescue StandardError => e
        error_count += 1

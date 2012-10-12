@@ -61,7 +61,7 @@ Checkout::Application.routes.draw do
   resources :search, only: [:index]
   resources :users, except: [:destroy] do
     collection do
-      ["active", "disabled", "suspended"].each do |r|
+      ["active", "disabled", "suspended", "admins", "attendants"].each do |r|
         get r, to: "users#index", filter: r
       end
       get "select2"

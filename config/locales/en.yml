@@ -52,8 +52,10 @@ en:
       component_model:
         update: "Update Model"
   app_config:
-    index:
-      title: 'Global Configuration'
+    show:
+      title: 'App Configuration'
+    edit:
+      title: 'Edit App Configuration'
   brand:
     index:
       title: "Brands"
@@ -87,6 +89,23 @@ en:
       add:
         default_tooltip: "Add a new category"
         denied_tooltip: "You don't have sufficient permissions to add a new category"
+  component_model:
+    index:
+      title: "Models"
+    sidebar:
+      add:
+        default_tooltip: "Add a new model"
+        denied_tooltip: "You don't have sufficient permissions to add a new model"
+      filters: "Models Filters"
+      all:
+        text: "All"
+        default_tooltip: "Show all models"
+      checkoutable:
+        text: "Checkoutable"
+        default_tooltip: "Show all checkoutable models"
+      # non_checkoutable:
+      #   text: "Non Checkoutable"
+      #   default_tooltip: "Show all non checkoutable models"
   covenant:
     index:
       title: "Covenants"
@@ -132,10 +151,9 @@ en:
     index:
       title: "Loans"
     edit:
-      title: "Edit Loan #%{id}"
+      title: "Edit Loan %{id}"
     new:
       title: "New Loan"
-
     not_checked_out: "Not checked out yet"
     not_checked_in: 'Not checked in yet'
     show:
@@ -155,26 +173,14 @@ en:
       add:
         default_tooltip: "Add a new location"
         denied_tooltip: "You don't have sufficient permissions to add a new location"
-  component_model:
-    index:
-      title: "Models"
-    sidebar:
-      add:
-        default_tooltip: "Add a new model"
-        denied_tooltip: "You don't have sufficient permissions to add a new model"
-      filters: "Models Filters"
-      all:
-        text: "All"
-        default_tooltip: "Show all models"
-      checkoutable:
-        text: "Checkoutable"
-        default_tooltip: "Show all checkoutable models"
-      # non_checkoutable:
-      #   text: "Non Checkoutable"
-      #   default_tooltip: "Show all non checkoutable models"
+  role:
+    admin: "Administrator"
+    attendant: "Attendant"
   user:
     index:
       title: "Users"
+    new:
+      title: "New User"
     sidebar:
       filters: "Users Filters"
       add:
@@ -196,7 +202,12 @@ en:
       disabled:
         text: "Disabled"
         default_tooltip: "Show all disabled users"
-
+      admins:
+        text: "Administrators"
+        default_tooltip: "Show all administrators"
+      attendants:
+        text: "Attendants"
+        default_tooltip: "Show all attendants"
     sidebar_title: "User Filters"
     first_name: "First Name"
     last_name: "Last Name"

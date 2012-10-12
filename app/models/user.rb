@@ -33,6 +33,10 @@ class User < ActiveRecord::Base
                   :remember_me,
                   :username)
 
+  accepts_nested_attributes_for(:memberships,
+                                :reject_if => proc { |attributes| attributes['group_id'].blank? },
+                                :allow_destroy=> true)
+
 
   ## Virtual Attributes ##
 
@@ -49,6 +53,11 @@ class User < ActiveRecord::Base
   ## Callbacks ##
 
   before_save :downcase_username
+
+
+  ## Named Scopes ##
+
+  default_scope where("users.username <> 'system'")
 
 
   ## Static Methods ##

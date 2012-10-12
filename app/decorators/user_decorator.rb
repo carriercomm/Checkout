@@ -56,7 +56,7 @@ class UserDecorator < ApplicationDecorator
 
   def groups_list(separator = ", ")
     return "&nbsp;".html_safe if groups.empty?
-    groups.map(&:name).join(separator).html_safe
+    groups.map(&:to_link).join(separator).html_safe
   end
 
   def last_sign_in_at
@@ -68,9 +68,10 @@ class UserDecorator < ApplicationDecorator
   end
 
   def roles_list(separator = ", ")
-    return "&nbsp;".html_safe if roles.empty?
+    return "&nbsp;".html_safe if model.roles.empty?
     separator.html_safe
-    roles.map(&:name).join(separator).html_safe
+    role_names = model.roles.collect {|r| h.t("role.#{ r.name }") }
+    role_names.join(separator).html_safe
   end
 
   def select2_json

@@ -14,6 +14,23 @@ BusinessDay.create!(:index => 4, :name => 'Thursday')
 BusinessDay.create!(:index => 5, :name => 'Friday')
 BusinessDay.create!(:index => 6, :name => 'Saturday')
 
-u = User.create!(:username => 'admin', :email => 'admin@example.com', :password => 'password', :password_confirmation => 'password')
-u.add_role "admin"
+Role.create!(:name => 'admin')
+Role.create!(:name => 'attendant')
 
+# these users skip validations because they have invalid email
+# addresses. We don't want to inadvertantly send email out into the
+# world.
+
+u = User.new
+u.username = 'system'
+u.email    = 'system@localhost'
+u.password = Devise.friendly_token.first(8)
+u.disabled = true
+u.save!(:validate => false)
+
+u = User.new
+u.username = 'admin'
+u.email    = 'admin@localhost'
+u.password = 'password'
+u.save!(:validate => false)
+u.add_role "admin"

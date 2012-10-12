@@ -1,3 +1,8 @@
+# TODO: move some of this logic to an AJAX call to the server.  It
+#       won't scale as-is. There's also an issue of refining the
+#       return dates based on the date_start selection - it will be
+#       easier to keep track of on the server side.
+
 jQuery ->
   $(document).ready ->
     # store the ID of the current active location (if there is one)
@@ -139,9 +144,12 @@ jQuery ->
 
         # if this day is in the set of open dates, then thumbs up
         if (open_day == this_day && open_month == this_month)
-          if (gon.default_return_date && ((this_day <= default_return_day && this_month == default_return_month) || this_month < default_return_month))
-            return [true, "return-date-ok", "No additional approval required"]
+          if (gon.default_return_date)
+            if (this_month < default_return_month || (this_day <= default_return_day && this_month == default_return_month))
+              return [true, "return-date-ok", "No additional approval required"]
+            else
+              return [true, "return-date-warn", "Requires approval"]
           else
-            return [true, "return-date-warn", "Requires approval"]
+            return [true]
       return [false]
   )

@@ -85,8 +85,9 @@ class Kit < ActiveRecord::Base
     return at.compact
   end
 
+  # TODO: add check for 'hold'
   def can_be_loaned_to?(client)
-    groups.map(&:users).flatten.include?(client)
+    checkoutable && (client.has_role? "admin" || groups.map(&:users).flatten.include?(client))
   end
 
   def checked_out?
@@ -100,12 +101,12 @@ class Kit < ActiveRecord::Base
   # equal to location.open_days minus days_reserved returns in format
   # [[month, day], [month, day], ...] for consumption by the
   # javascript date picker
-  def dates_checkoutable_for_datepicker(days_out = 90)
-    return location.dates_open_for_datepicker(days_out) - dates_loaned_for_datepicker(days_out)
+  def dates_checkoutable_for_datepicker(days_out = 90, excluded_loans = [])
+    return location.dates_open_for_datepicker(days_out) - dates_loaned_for_datepicker(days_out, excluded_loans)
   end
 
   # returns the dates this kit is loaned within the time range specified
-  def dates_loaned(days_out = 90)
+  def dates_loaned(days_out = 90, excluded_loans = [])
     dates = []
 
     # build up params for where clause
@@ -113,7 +114,7 @@ class Kit < ActiveRecord::Base
     end_range   = start_range + days_out.days
 
     # iterate over the set of loans in this range
-    loans_between(start_range, end_range).all.each do |r|
+    loans_between(start_range, end_range, excluded_loans).all.each do |r|
       starts_at = r.starts_at.to_date
       ends_at   = r.ends_at.to_date
 
@@ -125,8 +126,8 @@ class Kit < ActiveRecord::Base
     return dates.uniq
   end
 
-  def dates_loaned_for_datepicker(days_out = 90)
-    dates_loaned(days_out).collect { |d| [d.month, d.day] }
+  def dates_loaned_for_datepicker(days_out = 90, excluded_loans = [])
+    dates_loaned(days_out, excluded_loans).collect { |d| [d.month, d.day] }
   end
 
   # before_validation callback:
@@ -139,24 +140,61 @@ class Kit < ActiveRecord::Base
     return true
   end
 
+  # returns a record for this kit (without location info), to populate into
+  # gon for the datepicker
+  def kit_record_for_datepicker(days_out = 90, excluded_loans = [])
+    {
+      'kit_id' => id,
+      'days_reservable' => dates_checkoutable_for_datepicker(days_out, excluded_loans)
+    }
+  end
+
+  # returns the full data structure to populate into gon for the datepicker
+  def location_and_availability_record_for_datepicker(days_out = 90, excluded_loans = [])
+    {
+      location.id => {
+        'kits' => [kit_record_for_datepicker(days_out, excluded_loans)],
+        'dates_open' => return_dates_for_datepicker(days_out, excluded_loans)
+      }
+    }
+  end
+
   # returns all the loans that overlap with the range specified by the
   # start and end dates
   def loans_between(start_date, end_date, excluded_loans = [])
-    ids = excluded_loans.map(&:id)
-    loans.where("((loans.starts_at BETWEEN :start AND :end) OR (loans.ends_at BETWEEN :start AND :end)) AND loans.id NOT IN (:ids)",
+    sql = "((loans.starts_at BETWEEN :start AND :end) OR (loans.ends_at BETWEEN :start AND :end))"
+
+    unless excluded_loans.empty?
+      sql << " AND loans.id NOT IN (:ids)"
+    end
+
+    loans.where(sql,
               :start => start_date,
               :end => end_date,
-              :ids => ids)
+              :ids => excluded_loans.map(&:id))
   end
 
   def loaned_between?(start_date, end_date, excluded_loans)
     !loans_between(start_date, end_date, excluded_loans).empty?
   end
 
-  # TODO: add check for permissions
-  # TODO: add check for 'hold'
-  def reservable?
-    checkoutable
+  # move this to an alias
+  def reservable?(client)
+    can_be_loaned_to? client
+  end
+
+  def return_dates_for_datepicker(days_out = 90, excluded_loans = [])
+    return_dates = []
+    next_loan_date = dates_loaned_for_datepicker(days_out, excluded_loans).first
+
+    # iterate over the dates, adding them to the return dates, until
+    # we get to the next return date
+    location.dates_open_for_datepicker(days_out).each do |date|
+      return_dates << date
+      break if date == next_loan_date
+    end
+
+    return_dates
   end
 
   # custom validator

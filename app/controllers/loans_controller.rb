@@ -7,11 +7,11 @@ class LoansController < ApplicationController
   # GET /loans.json
   def index
     if params[:user_id].present?
-      @loans = User.find(params[:user_id]).loans.order("loans.starts_at DESC").page(params[:page])
+      @loans = User.find(params[:user_id]).loans.order("loans.starts_at ASC").page(params[:page])
     elsif params[:kit_id].present?
-      @loans = Kit.find(params[:kit_id]).loans.order("loans.starts_at DESC").page(params[:page])
+      @loans = Kit.find(params[:kit_id]).loans.order("loans.starts_at ASC").page(params[:page])
     else
-      @loans = Loan.order("loans.starts_at DESC").page(params[:page])
+      @loans = Loan.order("loans.starts_at ASC").page(params[:page])
     end
 
     @loans = LoanDecorator.decorate(@loans)
@@ -40,16 +40,16 @@ class LoansController < ApplicationController
     if params[:kit_id].present?
       kit       = Kit.includes(:location).find(params[:kit_id])
       @loan      = client.loans.build(:kit_id => kit.id)
-
       # setup javascript data structures to make the date picker work
-      # TODO: move this to a model method on kit (same as implemented for ComponentModel)
-      setup_kit_checkout_days(kit)
+      gon.locations = kit.location_and_availability_record_for_datepicker
 
     # do we have a general component_model to check out?
     elsif params[:component_model_id].present?
       component_model = ComponentModel.checkoutable.includes(:kits => :location).find(params[:component_model_id])
       @loan           = client.loans.build(:component_model => component_model)
-      gon.locations   = component_model.dates_checkoutable_for_datepicker
+
+      # setup javascript data structures to make the date picker work
+      gon.locations   = component_model.locations_with_dates_checkoutable_for_datepicker
     else
       flash[:error] = "Start by finding something to check out!"
       redirect_to component_models_path and return
@@ -69,13 +69,14 @@ class LoansController < ApplicationController
   # GET /loans/1/edit
   def edit
     @loan = LoanDecorator.find(params[:id])
-    setup_kit_checkout_days(@loan.model.kit)
+    gon.locations = @loan.model.kit.location_and_availability_record_for_datepicker(90, @loan)
   end
 
   # POST /loans
   # POST /loans.json
   def create
     @loan = Loan.new(params[:loan])
+    @loan = LoanDecorator.decorate(@loan)
 
     respond_to do |format|
       if @loan.kit.nil? && @loan.component_model && @loan.location && @loan.starts_at && @loan.ends_at
@@ -84,6 +85,7 @@ class LoansController < ApplicationController
       elsif @loan.save
         format.html { redirect_to @loan, notice: 'Loan was successfully created.' }
       else
+        logger.debug @loan.errors.inspect
         format.html { render action: "new" }
       end
     end
@@ -113,26 +115,6 @@ class LoansController < ApplicationController
       format.html { redirect_to loans_url }
       format.json { head :no_content }
     end
-  end
-
-  private
-
-
-  # TODO: make this smarter so it add the days included in this loan
-  #       (if any)
-  # gather the available checkout days for the kit and format for
-  # datepicker consumption
-  def setup_kit_checkout_days(kit)
-    gon.locations = {
-      kit.location.id => {
-        'kits' => [{
-                     'kit_id' => kit.id,
-                     'days_reservable' => kit.dates_checkoutable_for_datepicker
-                  }],
-        'dates_open' => kit.location.dates_open_for_datepicker
-
-      }
-    }
   end
 
 end
