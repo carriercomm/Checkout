@@ -1,11 +1,11 @@
-<h1><%= @component_model %></h1>
+<% title @component_model %>
 
 <dl class="dl-horizontal">
-  <dt>Description</dt>
+  <dt><%= t('simple_form.labels.component_model.description') %></dt>
   <dd><%= @component_model.description %></dd>
-  <dt>Training required</dt>
+  <dt><%= t('simple_form.labels.component_model.training_required') %></dt>
   <dd><%= @component_model.training_required %></dd>
-  <dt>Categories</dt>
+  <dt><%= t('simple_form.labels.component_model.categories') %></dt>
   <dd><%= @component_model.category_list %></dd>
 </dl>
 
@@ -22,7 +22,7 @@
                 :class => 'btn btn-danger btn-delete-component-model') if can? :manage, ComponentModel %>
 </div>
 
-<h2>Kits</h2>
+<h2>Kits Containing This Model</h2>
 <% if @component_model.kits.empty? %>
   No kits for this model
 <% else %>

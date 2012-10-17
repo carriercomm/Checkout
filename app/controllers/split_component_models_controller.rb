@@ -4,6 +4,7 @@ class SplitComponentModelsController < ApplicationController
   before_filter :setup_instances
 
   def new
+    @split_component_model.component_models << ComponentModel.new
   end
 
   def create

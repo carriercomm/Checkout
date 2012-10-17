@@ -38,6 +38,7 @@ class Loan < ActiveRecord::Base
     state :checked_out do
       validates_presence_of :out_assistant
       validates :out_at, :presence => true
+      validate :validate_client_signed_all_covenants
     end
 
     state :unapproved do
@@ -185,6 +186,12 @@ class Loan < ActiveRecord::Base
   def validate_client_has_permission
     unless kit.can_be_loaned_to? client
       errors.add(:client, "does not have permission to check out this kit.")
+    end
+  end
+
+  def validate_client_signed_all_covenants
+    unless client.signed_all_covenants?
+      errors.add(:client, "has not signed all covenants.")
     end
   end
 

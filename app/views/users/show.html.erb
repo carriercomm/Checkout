@@ -1,35 +1,29 @@
-<div class="page-header">
-  <h1>User</h1>
-</div>
+<%= title @user.to_s %>
 
-<div class="row-fluid">
-  <div class="span12">
-    <dl class="dl-horizontal">
-      <dt><%= t('user.first_name') %></dt>
-      <dd><%= @user.first_name %></dd>
-      <dt><%= t('user.last_name') %></dt>
-      <dd><%= @user.last_name %></dd>
-      <dt><%= t('user.username') %></dt>
-      <dd><%= @user.username %></dd>
-      <dt><%= t('user.email') %></dt>
-      <dd><%= @user.email %></dd>
-      <% Covenant.all.each do |c| %>
-        <dt title="<%= c.name %>"><%= c.name %></dt>
-        <dd><%= @user.to_yes_no(@user.covenants.include? c) %></dd>
-      <% end %>
-      <dt title="<%= t('user.suspension_count') %>"><%= t('user.suspension_count') %></dt>
-      <dd><%= @user.suspension_count %></dd>
-      <dt><%= t('user.suspended_until') %></dt>
-      <dd><%= @user.suspended_until %></dd>
-      <dt><%= t('user.disabled') %></dt>
-      <dd><%= @user.disabled %></dd>
-      <dt><%= t('user.roles') %></dt>
-      <dd><%= @user.roles_list("<br>") %></dd>
-      <dt><%= t('user.groups') %></dt>
-      <dd><%= @user.groups_list("<br>") %></dd>
-    </dl>
-  </div>
-</div>
+<dl class="dl-horizontal">
+  <dt><%= t('simple_form.labels.user.first_name') %></dt>
+  <dd><%= @user.first_name %></dd>
+  <dt><%= t('simple_form.labels.user.last_name') %></dt>
+  <dd><%= @user.last_name %></dd>
+  <dt><%= t('simple_form.labels.user.username') %></dt>
+  <dd><%= @user.username %></dd>
+  <dt><%= t('simple_form.labels.user.email') %></dt>
+  <dd><%= @user.email %></dd>
+  <% Covenant.all.each do |c| %>
+    <dt title="<%= c.name %>"><%= c.name %></dt>
+    <dd><%= @user.to_yes_no(@user.covenants.include? c) %></dd>
+  <% end %>
+  <dt title="<%= t('simple_form.labels.user.suspension_count') %>"><%= t('simple_form.labels.user.suspension_count') %></dt>
+  <dd><%= @user.suspension_count %></dd>
+  <dt><%= t('simple_form.labels.user.suspended_until') %></dt>
+  <dd><%= @user.suspended_until %></dd>
+  <dt><%= t('simple_form.labels.user.disabled') %></dt>
+  <dd><%= @user.disabled %></dd>
+  <dt><%= t('simple_form.labels.user.roles') %></dt>
+  <dd><%= @user.roles_list("<br>") %></dd>
+  <dt><%= t('simple_form.labels.user.groups') %></dt>
+  <dd><%= @user.groups_list("<br>") %></dd>
+</dl>
 
 <div class="form-actions">
   <%= link_to t('.back', :default => t("helpers.links.back")),

@@ -38,10 +38,8 @@ en:
         component_models:
           id: "Model"
       user:
-        username: 'Username'
-        password: 'Password'
         password_confirmation: 'Password Confirmation'
-        suspended_until: 'Suspended Until'
+        suspension_count: "Suspensions"
     hints:
       app_config:
         default_checkout_length: 'Standard checkout length (in days). A blank value will allow users<br>to check out items indefinitely without additional approval.'
@@ -73,6 +71,10 @@ en:
   brand:
     index:
       title: "Brands"
+    new:
+      title: "New Brand"
+    edit:
+      title: "Edit Brand"
     sidebar:
       filters: "Brands Filters"
       add:
@@ -90,6 +92,10 @@ en:
   budget:
     index:
       title: "Budgets"
+    new:
+      title: "New Budget"
+    edit:
+      title: "Edit Budget"
     sidebar:
       filters: "Budgets Filters"
       add:
@@ -98,6 +104,10 @@ en:
   category:
     index:
       title: "Categories"
+    new:
+      title: "New Category"
+    edit:
+      title: "Edit Category"
     sidebar:
       filters: "Categories Filters"
       add:
@@ -126,10 +136,14 @@ en:
       #   default_tooltip: "Show all non checkoutable models"
   component_model_splitter:
     edit:
-      title: "Split: %{component_model_name}"
+      title: "Split Model"
   covenant:
     index:
       title: "Covenants"
+    new:
+      title: "New Covenant"
+    edit:
+      title: "Edit Covenant"
     sidebar:
       add:
         default_tooltip: "Add a new covenant"
@@ -140,6 +154,10 @@ en:
   group:
     index:
       title: "Groups"
+    new:
+      title: "New Group"
+    edit:
+      title: "Edit Group"
     sidebar:
       add:
         default_tooltip: "Add a new group"
@@ -214,6 +232,8 @@ en:
       title: "Users"
     new:
       title: "New User"
+    edit:
+      title: "Edit User"
     sidebar:
       filters: "Users Filters"
       add:
@@ -242,16 +262,7 @@ en:
         text: "Attendants"
         default_tooltip: "Show all attendants"
     sidebar_title: "User Filters"
-    first_name: "First Name"
-    last_name: "Last Name"
-    username: "Username"
-    email: "Email"
-    suspension_count: "Suspensions"
-    suspended_until: "Suspended Until"
-    roles: "Roles"
-    groups: "Groups"
     status:
-      title: 'Status'
       active: '&nbsp;'
       disabled: '<a rel="tooltip" title="Disabled"><i class="icon-ban-circle  user-disabled"></i></a>'
       suspended: '<a rel="tooltip" title="Suspended"><i class="icon-bolt user-suspended"></i></a>'

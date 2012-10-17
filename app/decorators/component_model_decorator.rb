@@ -17,7 +17,12 @@ class ComponentModelDecorator < ApplicationDecorator
   end
 
   def category_list
-    categories.map(&:to_link).join(", ").html_safe
+    list = categories.map(&:to_link).join(", ")
+    coalesce(list)
+  end
+
+  def component_count
+    model.components.count
   end
 
   def description

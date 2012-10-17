@@ -26,6 +26,11 @@ class Location < ActiveRecord::Base
   attr_accessible :name, :business_hours_attributes
 
 
+  ## Named Scopes ##
+
+  scope :with_business_hours, joins(:business_hours).includes(:business_hours)
+
+
   ## Instance Methods ##
 
   def closed_on?(date)

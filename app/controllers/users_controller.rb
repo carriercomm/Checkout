@@ -23,10 +23,8 @@ class UsersController < ApplicationController
     end
 
     # get a total (used by the select2 widget) before we apply pagination
-    @total  = @users.count
-
+    @total = @users.count
     @users = @users.page(params[:page]).per(params[:page_limit])
-
     @users = UserDecorator.decorate(@users)
 
     respond_to do |format|
@@ -73,6 +71,7 @@ class UsersController < ApplicationController
   # GET /users/new.json
   def new
     @user = User.new
+    @user = UserDecorator.decorate(@user)
 
     respond_to do |format|
       format.html # new.html.erb
@@ -83,6 +82,7 @@ class UsersController < ApplicationController
   # GET /users/1/edit
   def edit
     @user = User.includes(:groups, :roles).find(params[:id])
+    @user = UserDecorator.decorate(@user)
   end
 
   # POST /users
@@ -90,6 +90,7 @@ class UsersController < ApplicationController
   def create
     p     = params[:user]
     @user = User.new
+    @user = UserDecorator.decorate(@user)
 
     # generate a random password
     @user.password        = Devise.friendly_token.first(6)
@@ -115,12 +116,14 @@ class UsersController < ApplicationController
     end
   end
 
+  # TODO: DRY this up with create
   # PUT /users/1
   # PUT /users/1.json
   def update
     p     = params[:user]
     # TODO: make modifying 'system' fail more elegantly
     @user = User.find(params[:id])
+    @user = UserDecorator.decorate(@user)
 
     @user.disabled        = p[:disabled]        if p[:disabled].present?
     @user.email           = p[:email]           if p[:email].present?

@@ -5,14 +5,11 @@ class UserDecorator < ApplicationDecorator
   decorates_association :roles
 
   allows(:created_at,
-         :current_sign_in_at,
-         :disabled,
-         :email,
          :failed_attempts,
          :last_sign_in_at,
          :locked_at,
+         :memberships,
          :sign_in_count,
-         :suspended_until,
          :suspension_count,
          :to_s,
          :username)
@@ -34,12 +31,16 @@ class UserDecorator < ApplicationDecorator
 
   def description
     text = h.link_to(model.username, h.user_path(model))
-    text << "(#{ full_name })" unless full_name.empty?
+    text << " (#{ full_name })" unless full_name.empty?
     text
   end
 
   def disabled
     to_yes_no(model.disabled)
+  end
+
+  def email
+    h.mail_to(model.email)
   end
 
   def first_name

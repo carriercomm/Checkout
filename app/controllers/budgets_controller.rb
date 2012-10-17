@@ -30,6 +30,7 @@ class BudgetsController < ApplicationController
   # GET /budgets/new.json
   def new
     @budget = Budget.new
+    @budget = BudgetDecorator.decorate(@budget)
 
     respond_to do |format|
       format.html # new.html.erb
@@ -40,12 +41,14 @@ class BudgetsController < ApplicationController
   # GET /budgets/1/edit
   def edit
     @budget = Budget.find(params[:id])
+    @budget = BudgetDecorator.decorate(@budget)
   end
 
   # POST /budgets
   # POST /budgets.json
   def create
     @budget = Budget.new(params[:budget])
+    @budget = BudgetDecorator.decorate(@budget)
 
     respond_to do |format|
       if @budget.save
@@ -62,6 +65,7 @@ class BudgetsController < ApplicationController
   # PUT /budgets/1.json
   def update
     @budget = Budget.find(params[:id])
+    @budget = BudgetDecorator.decorate(@budget)
 
     respond_to do |format|
       if @budget.update_attributes(params[:budget])

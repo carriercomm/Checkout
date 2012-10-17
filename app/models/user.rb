@@ -92,6 +92,10 @@ class User < ActiveRecord::Base
     username.downcase!
   end
 
+  def signed_all_covenants?
+    covenant_signatures.count == Covenant.count
+  end
+
   def to_s
     username
   end

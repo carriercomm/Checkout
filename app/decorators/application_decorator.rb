@@ -14,9 +14,12 @@ class ApplicationDecorator < Draper::Base
     coalesce(val)
   end
 
+  # makes sure something is returned (usually a blank space). helpful
+  # for dealing with definition lists, where nil or empty values break
+  # the list formatting
   def coalesce(val, empty_val = "&nbsp;", suffix = "")
     response = String.new
-    if val
+    if val && !val.to_s.squish.empty?
       response = val.to_s + " " + suffix
     else
       response = empty_val

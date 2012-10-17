@@ -36,6 +36,7 @@ class GroupsController < ApplicationController
   # GET /groups/new.json
   def new
     @group = Group.new
+    @group = GroupDecorator.decorate(@group)
 
     respond_to do |format|
       format.html # new.html.erb
@@ -54,6 +55,7 @@ class GroupsController < ApplicationController
     # INNER JOIN kits ON permissions.kit_id = kits.id
     # END_SQL
     @group = Group.includes(:kits).find(params[:id])
+    @group = GroupDecorator.decorate(@group)
     # TODO: figure out how to sort this in the database
     @memberships = @group.memberships.sort_by {|m| m.user.username}
   end
@@ -62,6 +64,7 @@ class GroupsController < ApplicationController
   # POST /groups.json
   def create
     @group = Group.new(params[:group])
+    @group = GroupDecorator.decorate(@group)
 
     respond_to do |format|
       if @group.save
@@ -77,7 +80,7 @@ class GroupsController < ApplicationController
   # PUT /groups/1
   # PUT /groups/1.json
   def update
-    @group = Group.find(params[:id])
+    @group = GroupDecorator.find(params[:id])
 
     respond_to do |format|
       if @group.update_attributes(params[:group])

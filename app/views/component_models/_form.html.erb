@@ -1,5 +1,3 @@
-<% title t("component_model.#{controller.action_name}.title") %>
-
 <div class="well">
   <p>
     <strong>Good model names</strong> should include specs, revisions, and model
@@ -30,7 +28,7 @@
   </p>
 </div>
 
-<%= simple_form_for @component_model, :html => { :class => 'form-horizontal' } do |f| %>
+<%= simple_form_for @component_model.model, :html => { :class => 'form-horizontal' } do |f| %>
   <%= f.input :brand_id, :label => "Brand", :required => true, :input_html => {
         :class          => 'select2-json-autocomplete',
         :hidden         => true,
@@ -43,7 +41,7 @@
   </div>
   <%= f.input :name %>
   <%= f.input :description %>
-  <%= f.input :training_required %>
+  <%= f.input :training_required, :as => :radio_buttons %>
   <div id="suggestion_popover" class="popover-anchor"></div>
   <%= f.association :categories, :collection => Category.order(:name).all, :input_html => {
         :multiple => true,

@@ -20,8 +20,10 @@ class BrandsController < ApplicationController
     end
   end
 
+  # TODO: is this being used? move it to a collection route on the index action
   def checkoutable
     @brands = Brand.order("brands.name ASC").having_checkoutable_kits.page(params[:page])
+    @brands = BrandDecorator.decorate(@brands)
 
     respond_to do |format|
       format.html { render :action => 'index' }
@@ -33,6 +35,7 @@ class BrandsController < ApplicationController
   # GET /brands/1.json
   def show
     @brand = Brand.includes(:component_models).find(params[:id])
+    @brand = BrandDecorator.decorate(@brand)
 
     respond_to do |format|
       format.html # show.html.erb
@@ -44,6 +47,7 @@ class BrandsController < ApplicationController
   # GET /brands/new.json
   def new
     @brand = Brand.new
+    @brand = BrandDecorator.decorate(@brand)
 
     respond_to do |format|
       format.html # new.html.erb
@@ -53,13 +57,14 @@ class BrandsController < ApplicationController
 
   # GET /brands/1/edit
   def edit
-    @brand = Brand.find(params[:id])
+    @brand = BrandDecorator.find(params[:id])
   end
 
   # POST /brands
   # POST /brands.json
   def create
     @brand = Brand.new(params[:brand])
+    @brand = BrandDecorator.decorate(@brand)
 
     respond_to do |format|
       if @brand.save
@@ -75,7 +80,7 @@ class BrandsController < ApplicationController
   # PUT /brands/1
   # PUT /brands/1.json
   def update
-    @brand = Brand.find(params[:id])
+    @brand = BrandDecorator.find(params[:id])
 
     respond_to do |format|
       if @brand.update_attributes(params[:brand])
@@ -112,6 +117,7 @@ class BrandsController < ApplicationController
 
   def apply_pagination
     @brands = @brands.page(params[:page]).per(params[:page_limit])
+    @brands = BrandDecorator.decorate(@brands)
   end
 
   def apply_scopes_and_pagination

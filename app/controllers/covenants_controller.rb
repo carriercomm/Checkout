@@ -7,6 +7,7 @@ class CovenantsController < ApplicationController
   # GET /covenants.json
   def index
     @covenants = Covenant.page(params[:page]).per(params[:page_limit])
+    @covenants = CovenantDecorator.decorate(@covenants)
 
     respond_to do |format|
       format.html # index.html.erb
@@ -17,7 +18,7 @@ class CovenantsController < ApplicationController
   # GET /covenants/1
   # GET /covenants/1.json
   def show
-    @covenant = Covenant.find(params[:id])
+    @covenant = CovenantDecorator.find(params[:id])
 
     respond_to do |format|
       format.html # show.html.erb
@@ -29,6 +30,7 @@ class CovenantsController < ApplicationController
   # GET /covenants/new.json
   def new
     @covenant = Covenant.new
+    @covenant = CovenantDecorator.decorate(@covenant)
 
     respond_to do |format|
       format.html # new.html.erb
@@ -38,13 +40,14 @@ class CovenantsController < ApplicationController
 
   # GET /covenants/1/edit
   def edit
-    @covenant = Covenant.find(params[:id])
+    @covenant = CovenantDecorator.find(params[:id])
   end
 
   # POST /covenants
   # POST /covenants.json
   def create
     @covenant = Covenant.new(params[:covenant])
+    @covenant = CovenantDecorator.decorate(@covenant)
 
     respond_to do |format|
       if @covenant.save
@@ -60,7 +63,7 @@ class CovenantsController < ApplicationController
   # PUT /covenants/1
   # PUT /covenants/1.json
   def update
-    @covenant = Covenant.find(params[:id])
+    @covenant = CovenantDecorator.find(params[:id])
 
     respond_to do |format|
       if @covenant.update_attributes(params[:covenant])

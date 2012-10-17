@@ -1,12 +1,12 @@
-<div class="page-header">
-  <h1><%= t('brand.title', default: 'Brand') %></h1>
-</div>
+ <% title @brand.name %>
 
 <dl class="dl-horizontal">
   <dt>Brand Name</dt>
   <dd><%= @brand.name %></dd>
   <dt>Model Count</dt>
   <dd><%= @brand.component_models.count %></dd>
+  <dt>Component Count</dt>
+  <dd><%= @brand.component_count %></dd>
 </dl>
 
 <div class="form-actions">

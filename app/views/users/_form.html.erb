@@ -1,4 +1,4 @@
-<%= simple_nested_form_for @user, :html => { :class => 'form-horizontal' } do |f| %>
+<%= simple_nested_form_for @user.model, :html => { :class => 'form-horizontal' } do |f| %>
   <%= f.input :username %>
   <%= f.input :email %>
   <%= f.input :first_name %>
@@ -9,7 +9,7 @@
       :class => 'generic_datepicker',
       :value => (f.object.suspended_until.nil? ? nil : localize(f.object.suspended_until, :format => "%Y-%m-%d"))
     } %>
-  <%= f.input :disabled %>
+  <%= f.input :disabled, :as => :radio_buttons %>
 
   <%= f.association :roles, :as => :check_boxes %>
 

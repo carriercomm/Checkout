@@ -3,7 +3,7 @@ class Covenant < ActiveRecord::Base
   ## Associations ##
 
   has_many :covenant_signatures, :inverse_of => :covenant
-  has_many :covenants, :through => :covenant_signatures
+  has_many :users, :through => :covenant_signatures
 
   ## Mass-assignable Attributes ##
 

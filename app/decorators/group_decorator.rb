@@ -8,5 +8,8 @@ class GroupDecorator < ApplicationDecorator
     h.link_to(model.name, h.group_path(model))
   end
 
+  def to_s
+    model.name
+  end
 
 end
