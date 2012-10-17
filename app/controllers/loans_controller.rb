@@ -78,6 +78,8 @@ class LoansController < ApplicationController
     @loan = Loan.new(params[:loan])
     @loan = LoanDecorator.decorate(@loan)
 
+    # TODO: validate training?
+
     respond_to do |format|
       if @loan.kit.nil? && @loan.component_model && @loan.location && @loan.starts_at && @loan.ends_at
         @kits = KitDecorator.decorate(@loan.available_checkoutable_kits)

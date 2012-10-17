@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120928200043) do
+ActiveRecord::Schema.define(:version => 20121017012907) do
 
   create_table "app_configs", :force => true do |t|
     t.integer  "default_checkout_length"
@@ -141,7 +141,7 @@ ActiveRecord::Schema.define(:version => 20120928200043) do
   create_table "kits", :force => true do |t|
     t.integer  "location_id"
     t.integer  "budget_id"
-    t.boolean  "tombstoned"
+    t.boolean  "tombstoned",   :default => false
     t.boolean  "checkoutable", :default => false
     t.decimal  "cost"
     t.boolean  "insured",      :default => false

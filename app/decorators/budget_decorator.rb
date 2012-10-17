@@ -12,19 +12,19 @@ class BudgetDecorator < ApplicationDecorator
   end
 
   def ends_at
-    val_or_space(model.ends_at)
+    coalesce(model.ends_at)
   end
 
   def starts_at
-    val_or_space(model.starts_at)
+    coalesce(model.starts_at)
   end
 
   def name
-    val_or_space(model.name)
+    coalesce(model.name)
   end
 
   def number
-    val_or_space(model.number)
+    coalesce(model.number)
   end
 
   def to_s

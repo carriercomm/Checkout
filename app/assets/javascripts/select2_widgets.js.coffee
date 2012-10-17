@@ -35,30 +35,37 @@ jQuery ->
         return results
     formatResult: formatAjaxResult
     formatSelection: formatAjaxSelection
-    initSelection: (element) ->
+    initSelection: (element, callback) ->
       id = element.val()
       text = element.data('text');
-      return {id: id, text: text}
+      callback({id: id, text: text})
+
+  bindJsonAutocomplete = ->
+    $('input.select2-json-autocomplete')
+      .select2("destroy")
+      # .filter ->
+      #   return !this.id.match(/[a-z_]+_attributes_new_[a-z]+/);
+      # .not('.select2-bound')
+      # .addClass('select2-bound')
+      # .select2(ajaxConfig)
+      .each ->
+        $(this).select2($.extend(true, {}, ajaxConfig))    
+
+  # call it
+  bindJsonAutocomplete()
 
   # make sure the select2 widget binds to any new nested components added to the form
   $('form').bind 'nested:fieldAdded', ->
-    $('input.select2-json-autocomplete')
-      .filter ->
-        return !this.id.match(/[a-z_]+_attributes_new_[a-z]+/);
-      .not('.select2-bound')
-      .addClass('select2-bound')
-      .select2($.extend(true, {}, ajaxConfig))
+    bindJsonAutocomplete()
+    $('.select2-tagged-field').select2("destroy")
+    $('.select2-tagged-field').select2()
 
-  # bind the select2 widget to existing nested components in the form
-  $('input.select2-json-autocomplete')
-    .filter ->
-      return !this.id.match(/[a-z_]+_attributes_new_[a-z]+/);
-    .not('.select2-bound')
-    .addClass('select2-bound')
-    .select2($.extend(true, {}, ajaxConfig))
+  $('form').bind 'form-switcher:existing-shown', (e) ->
+    debugger
+    $(e.target).find(".existing-component-model input.select-model").select2(ajaxConfig)
 
   #
   # Select box to tags widget
   #
 
-  $('.select2-tagged-field').select2();
+  $('.select2-tagged-field').select2()

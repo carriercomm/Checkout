@@ -13,9 +13,12 @@
   <%= link_to 'Back', component_models_path, :class => 'btn'  %>
   <%= link_to 'Reserve', new_component_model_loan_path(@component_model), :class => 'btn btn-primary' %>
   <%= link_to('Edit', edit_component_model_path(@component_model), :class => 'btn btn-edit-component-model') if can? :manage, ComponentModel %>
+  <%= link_to('Split',
+                new_split_component_model_path("split_component_model[root_component_model_id]" => @component_model.id),
+                :class => 'btn btn-split-component-model') if can? :manage, ComponentModel %>
   <%= link_to('Delete', component_model_path(@component_model),
                 :method => 'delete',
-                :confirm => 'Are you sure? This will also delete all the kits and components associated with this model!',
+                :confirm => 'Are you sure? This will also delete all the components associated with this model!',
                 :class => 'btn btn-danger btn-delete-component-model') if can? :manage, ComponentModel %>
 </div>
 

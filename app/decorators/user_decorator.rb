@@ -43,7 +43,7 @@ class UserDecorator < ApplicationDecorator
   end
 
   def first_name
-    val_or_space(model.first_name)
+    coalesce(model.first_name)
   end
 
   def full_name
@@ -51,7 +51,7 @@ class UserDecorator < ApplicationDecorator
   end
 
   def last_name
-    val_or_space(model.last_name)
+    coalesce(model.last_name)
   end
 
   def groups_list(separator = ", ")

@@ -128,3 +128,10 @@ class LegacyGroupUser < ActiveRecord::Base
   belongs_to :legacy_group, foreign_key: 'group_id'
   belongs_to :legacy_user, foreign_key: 'client_id'
 end
+
+class LegacyBundleItem < ActiveRecord::Base
+  establish_connection :legacy
+  set_table_name 'bundle_items'
+  set_primary_key :bundle_id
+  belongs_to :legacy_equipment, foreign_key: 'eq_uw_tag'
+end

@@ -64,7 +64,7 @@ class KitDecorator < ApplicationDecorator
   end
 
   def location
-    val_or_space(model.location)
+    coalesce(model.location)
   end
 
   def raw_id

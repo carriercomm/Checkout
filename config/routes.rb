@@ -57,6 +57,7 @@ Checkout::Application.routes.draw do
     collection &component_models_collection_routes
     resources :loans, only: [:new]
   end
+  resources :split_model, as:"split_component_models", controller:"split_component_models", only:[:new, :create]
   resources :loans
   resources :search, only: [:index]
   resources :users, except: [:destroy] do

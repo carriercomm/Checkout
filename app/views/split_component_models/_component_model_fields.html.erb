@@ -1,0 +1,51 @@
+<% # TODO: merge this with the _form view of component_model %>
+<% # TODO: add modal dialogues for inline "new brand" and "new category" %>
+
+  <div class="well fields">
+
+    <% unless f.object == @component_model.model %>
+      <%= f.link_to_remove t('split_component_model.edit.remove_component_model').html_safe, :class => 'danger pull-right' %>
+      <div class="control-group boolean optional">
+        <label class="boolean optional control-label" for="<%= f.object.object_id %>_radio">Model Type</label>
+        <div class="controls" data-toggle="form-switcher">
+          <label class="radio"><input type="radio" name="<%= f.object.object_id %>_radio" data-field-type="new" value="" checked>New model</label>
+          <label class="radio"><input type="radio" name="<%= f.object.object_id %>_radio" data-field-type="existing" value="">Existing model</label>
+        </div>
+      </div>
+    <% end %>
+
+    <div class="new-model">
+      <%= f.input :brand_id, :label => "Brand", :required => true, :input_html => {
+            :class          => 'select2-json-autocomplete',
+            :hidden         => true,
+            "data-ajax-url" => brands_path(:format => :json),
+            "data-text" => f.object.try(:brand).try(:name)
+          } %>
+      <!-- <div class="controls control-action"> -->
+      <!--   <\!-- displays the brands/new_modal partial -\-> -->
+      <!--   <a data-toggle="modal" href="#brand_modal">New Brand</a> -->
+      <!-- </div> -->
+      <%= f.input :name %>
+      <%= f.input :description %>
+      <%= f.input :training_required, :as => :radio_buttons %>
+      <div id="suggestion_popover" class="popover-anchor"></div>
+      <%= f.association :categories, :collection => Category.order(:name).all, :input_html => {
+            :multiple => true,
+            :class    => 'select2-tagged-field categories-select'
+          } %>
+      <!-- <div class="controls control-action"> -->
+      <!--   <\!-- displays the categories/new_modal partial -\-> -->
+      <!--   <a data-toggle="modal" href="#category_modal">New Category</a> -->
+      <!-- </div> -->
+    </div>
+
+    <div class="existing-model hidden">
+      <%= f.input :id,
+                  :input_html => {
+                      :class => 'select2-json-autocomplete select-model',
+                      :hidden => true,
+                      "data-ajax-url" => component_models_path(:format => :json)
+          } %>
+      Existing!
+    </div>
+  </div>

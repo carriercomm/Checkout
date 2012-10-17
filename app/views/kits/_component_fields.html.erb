@@ -1,39 +1,36 @@
-<%
-   unless f.object.new_record?
-    component = ComponentDecorator.decorate(f.object)
-   end
-%>
+<% component = ComponentDecorator.decorate(f.object) unless f.object.new_record? %>
+<div class="fields">
+  <%= content_tag :div, f.error(:base), :class=>"alert alert-error span12" if f.error(:base) %>
 
-<%= content_tag :div, f.error(:base), :class=>"alert alert-error span12" if f.error(:base) %>
-
-<div class="field span3">
-  <% if f.object.new_record? %>
-    <%= f.input :component_model_id,
+  <div class="field span3">
+    <% if f.object.new_record? %>
+      <%= f.input :component_model_id,
+                  :label => false,
+                  :wrapper_html => { :class => 'table-form' },
+                  :input_html => {
+                      :class => 'select2-json-autocomplete select-model',
+                      :hidden => true,
+                      "data-ajax-url" => component_models_path(:format => :json)
+          } %>
+    <% else %>
+      <%= component.component_model.name %>
+      <%= f.input :component_model_id, :as => :hidden %>
+    <% end %>
+  </div>
+  <div class="field span3">
+    <%= f.input :asset_tag,
                 :label => false,
-                :wrapper_html => { :class => 'table-form' },
-                :input_html => {
-                    :class => 'select2-json-autocomplete select-model',
-                    :hidden => true,
-                    "data-ajax-url" => component_models_path(:format => :json)
-        } %>
-  <% else %>
-    <%= component.component_model.name %>
-    <%= f.input :component_model_id, :as => :hidden %>
-  <% end %>
+                :wrapper_html => { :class => 'table-form' } %>
+  </div>
+  <div class="field span3">
+    <%= f.input :serial_number,
+                :label => false,
+                :wrapper_html => { :class => 'table-form' } %>
+  </div>
+  <div class="field span1">
+    <%= f.input :missing,
+                :label => false,
+                :wrapper_html => { :class => 'table-form' } %>
+  </div>
+  <div class="field span2"><%= f.link_to_remove "Delete", :class => "btn btn-danger" %></div>
 </div>
-<div class="field span3">
-  <%= f.input :asset_tag,
-              :label => false,
-              :wrapper_html => { :class => 'table-form' } %>
-</div>
-<div class="field span3">
-  <%= f.input :serial_number,
-              :label => false,
-              :wrapper_html => { :class => 'table-form' } %>
-</div>
-<div class="field span1">
-  <%= f.input :missing,
-              :label => false,
-              :wrapper_html => { :class => 'table-form' } %>
-</div>
-<div class="field span2"><%= f.link_to_remove "Delete", :class => "btn btn-danger" %></div>

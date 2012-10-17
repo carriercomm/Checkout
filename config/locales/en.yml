@@ -34,6 +34,9 @@ en:
         default_checkout_length: 'Default Length'
       loan:
         component_model: 'Model'
+      split_component_model:
+        component_models:
+          id: "Model"
       user:
         username: 'Username'
         password: 'Password'
@@ -42,6 +45,15 @@ en:
     hints:
       app_config:
         default_checkout_length: 'Standard checkout length (in days). A blank value will allow users<br>to check out items indefinitely without additional approval.'
+      component_model: &hints_component_model
+        name: 'Good model names should include specs, revisions, and model numbers (e.g. Mac Mini, 2.3GHz dual-core i5, 2GB RAM, 500GB HD)'
+        description: 'Descriptions are a good place to put extensive technical specifications, and any special notes on usage.'
+      kit:
+        checkoutable: "'Yes' if you want the kit to be available in the loan system."
+        tombstoned: "'Yes' if this kit is missing/stolen/destroyed and never coming back."
+      split_component_model:
+        component_models:
+          <<: *hints_component_model
       user:
         disabled: "Prevent this client from logging in"
         suspended_until: "Suspend this client's checkout privileges until a specified date"
@@ -51,6 +63,8 @@ en:
     submit:
       component_model:
         update: "Update Model"
+      split_component_model:
+        create: "Split Model"
   app_config:
     show:
       title: 'App Configuration'
@@ -92,6 +106,10 @@ en:
   component_model:
     index:
       title: "Models"
+    edit:
+      title: "Edit Model"
+    new:
+      title: "New Model"
     sidebar:
       add:
         default_tooltip: "Add a new model"
@@ -106,6 +124,9 @@ en:
       # non_checkoutable:
       #   text: "Non Checkoutable"
       #   default_tooltip: "Show all non checkoutable models"
+  component_model_splitter:
+    edit:
+      title: "Split: %{component_model_name}"
   covenant:
     index:
       title: "Covenants"
@@ -127,6 +148,10 @@ en:
   kit:
     index:
       title: "Kits"
+    edit:
+      title: "Edit Kit %{name}"
+    new:
+      title: "New Kit"      
     sidebar:
       filters: "Kits Filters"
       add:
@@ -168,6 +193,10 @@ en:
   location:        
     index:
       title: "Locations"
+    edit:
+      title: "Edit %{name}"
+    new:
+      title: "New Location"
     sidebar:
       filters: "Locations Filters"
       add:
@@ -176,6 +205,10 @@ en:
   role:
     admin: "Administrator"
     attendant: "Attendant"
+  split_component_model:
+    edit:
+      add_new_component_model: "<i class='icon-plus-sign'></i> Add a new model"
+      remove_component_model: "<i class='icon-minus-sign'></i> Remove this model"
   user:
     index:
       title: "Users"

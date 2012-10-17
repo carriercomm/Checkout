@@ -60,7 +60,7 @@ class KitsController < ApplicationController
   # GET /kits/new
   # GET /kits/new.json
   def new
-    @kit = Kit.new
+    @kit = KitDecorator.decorate(Kit.new)
     @kit.components.build
 
     respond_to do |format|
@@ -71,13 +71,13 @@ class KitsController < ApplicationController
 
   # GET /kits/1/edit
   def edit
-    @kit = Kit.find(params[:id])
+    @kit = KitDecorator.find(params[:id])
   end
 
   # POST /kits
   # POST /kits.json
   def create
-    @kit = Kit.new(params[:kit])
+    @kit = KitDecorator.decorate(Kit.new(params[:kit]))
 
     respond_to do |format|
       kit_saved = @kit.save
@@ -99,7 +99,7 @@ class KitsController < ApplicationController
   # PUT /kits/1
   # PUT /kits/1.json
   def update
-    @kit = Kit.find(params[:id])
+    @kit = KitDecorator.find(params[:id])
 
     respond_to do |format|
       kit_updated = @kit.update_attributes(params[:kit])

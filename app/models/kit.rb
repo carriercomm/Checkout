@@ -79,6 +79,11 @@ class Kit < ActiveRecord::Base
 
   ## Instance Methods ##
 
+  # adds a component of type component_model to the kit
+  def add_component(component_model)
+    components << Component.create(component_model_id: component_model.id)
+  end
+
   # returns an array of asset tags from components
   def asset_tags
     at = components.collect { |c| (c.asset_tag.blank?) ? nil : c.asset_tag }

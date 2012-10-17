@@ -17,8 +17,8 @@
   <%= sidebar_link t("user.sidebar.active.text"), active_users_path, t("user.sidebar.active.default_tooltip") %>
   <%= sidebar_link t("user.sidebar.suspended.text"), suspended_users_path, t("user.sidebar.suspended.default_tooltip") %>
   <%= sidebar_link t("user.sidebar.disabled.text"), disabled_users_path, t("user.sidebar.disabled.default_tooltip") %>
-  <%= sidebar_link t("user.sidebar.admins.text"), admins_users_path, t("user.sidebar.disabled.default_tooltip") %>
-  <%= sidebar_link t("user.sidebar.attendants.text"), attendants_users_path, t("user.sidebar.disabled.default_tooltip") %>
+  <%= sidebar_link t("user.sidebar.admins.text"), admins_users_path, t("user.sidebar.admins.default_tooltip") %>
+  <%= sidebar_link t("user.sidebar.attendants.text"), attendants_users_path, t("user.sidebar.attendants.default_tooltip") %>
 <% end %>
 
 <%= paginate @users %>

@@ -10,8 +10,8 @@ class ComponentModel < ActiveRecord::Base
   ## Associations ##
 
   belongs_to :brand,      :inverse_of => :component_models
-  has_many   :components, :inverse_of => :component_model
-  has_many   :kits, :through => :components, :dependent => :destroy
+  has_many   :components, :inverse_of => :component_model, :dependent => :destroy
+  has_many   :kits, :through => :components
   has_and_belongs_to_many :categories
 
 
@@ -47,6 +47,11 @@ class ComponentModel < ActiveRecord::Base
   # TODO: test this
   def self.category(category_id)
     joins(:categories).where('categories.id = ?', category_id.to_i)
+  end
+
+  # HACK HACK: this is just to appease nested_form, but this is a terrible hack.
+  def self.klass
+    ComponentModel
   end
 
 

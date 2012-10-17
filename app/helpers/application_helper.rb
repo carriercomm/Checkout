@@ -26,9 +26,6 @@ module ApplicationHelper
 
     li_opts = {}
 
-    logger.debug "---root_path: " + root_path
-    logger.debug "---path: " + path
-
     # if the link is to the current page, then we'll highlight it
     # TODO: make this work for the root url
     li_opts[:class] = "active" if current_page?(path)

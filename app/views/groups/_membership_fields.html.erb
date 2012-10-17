@@ -1,35 +1,28 @@
-<%
-   unless f.object.new_record?
-    user = UserDecorator.decorate(f.object.user)
-   end
-%>
-
-
-<%= content_tag :div, f.error(:base), :class=>"alert alert-error span12" if f.error(:base) %>
-
-<div class="field span6">
-  <% if f.object.id.nil? %>
-    <%= f.input :user_id,
-                :label => false,
-                :wrapper_html => { :class => 'table-form' },
+<% user = UserDecorator.decorate(f.object.user) unless f.object.new_record? %>
+<%= raw('<div class="fields">') unless f.object.new_record? %>
+  <%= content_tag :div, f.error(:base), :class=>"alert alert-error span12" if f.error(:base) %>
+  <div class="field span6">
+    <% if f.object.id.nil? %>
+      <%= f.input :user_id,
+                  :wrapper => :tabular,
+                  :input_html => {
+                      :class => 'select2-json-autocomplete select-user',
+                      :hidden => true,
+                      "data-ajax-url" => select2_users_path(:format => :json, :group_id =>  @group.id)
+                  } %>
+    <% else %>
+      <%= user.username %>
+      <%= f.input :user_id, :as => :hidden %>
+    <% end %>
+  </div>
+  <div class="field span4">
+    <%= f.input :expires_at,
+                :as => :date_picker,
+                :wrapper => :tabular,
                 :input_html => {
-                    :class => 'select2-json-autocomplete select-user',
-                    :hidden => true,
-                    "data-ajax-url" => select2_users_path(:format => :json, :group_id =>  @group.id)
+                  :class => "generic_datepicker",
+                  :value => (f.object.nil? ? nil : f.object.expires_at)
                 } %>
-  <% else %>
-    <%= user.username %>
-    <%= f.input :user_id, :as => :hidden %>
-  <% end %>
-</div>
-<div class="field span4">
-  <%= f.input :expires_at,
-              :as => :date_picker,
-              :label => false,
-              :wrapper_html => { :class => 'table-form' },
-              :input_html => {
-                :class => "generic_datepicker",
-                :value => (f.object.nil? ? nil : f.object.expires_at)
-              } %>
-</div>
-<div class="field span2"><%= f.link_to_remove "Delete", :class => "btn btn-danger" %></div>
+  </div>
+  <div class="field span2"><%= f.link_to_remove "Delete", :class => "btn btn-danger" %></div>
+<%= raw('</div>') unless f.object.new_record? %>

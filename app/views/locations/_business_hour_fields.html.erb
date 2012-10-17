@@ -1,4 +1,4 @@
-<div class="well business_hour">
+<div class="well business_hour fields">
   <%= f.link_to_remove "<i class='icon-minus-sign'></i> Remove these hours".html_safe, :class => 'danger pull-right' %>
   <%= content_tag :div, f.error(:base), :class=>"alert alert-error" if f.error(:base) %>
   <%= f.association :business_days, :as => :check_boxes %>

@@ -1,21 +1,17 @@
-<div class="page-header">
-  <h1><%= controller.action_name.capitalize %> Kit</h1>
-</div>
-
-<%= simple_nested_form_for @kit, :html => { :class => 'form-horizontal' } do |f| %>
+<%= simple_nested_form_for @kit.model, :html => { :class => 'form-horizontal' } do |f| %>
   <%= f.association :location, :prompt => 'Select location', :input_html => { :class  => 'location-select' } %>
   <div class="controls control-action">
     <!-- displays the location/new_modal partial -->
     <a data-toggle="modal" href="#location_modal">New Location</a>
   </div>
-  <%= f.input :checkoutable, :hint => "'True' if you want the kit to be available in the loan system." %>
+  <%= f.input :checkoutable, :as => :radio_buttons %>
   <%= f.association :budget, :collection => BudgetDecorator.decorate(Budget.active), :label_method => :to_s, :prompt => 'Select budget' %>  
   <div class="controls control-action">
     <!-- displays the budget/new_modal partial -->
     <a data-toggle="modal" href="#budget_modal">New Budget</a>
   </div>
-  <%= f.input :insured %>
-  <%= f.input :tombstoned, :hint => "'True' if this kit is missing/stolen/destroyed and never coming back."  %>
+  <%= f.input :insured, :as => :radio_buttons %>
+  <%= f.input :tombstoned, :as => :radio_buttons %>
 
   <h2>Components</h2>
   <div class="records row-fluid">

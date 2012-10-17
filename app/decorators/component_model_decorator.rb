@@ -21,7 +21,7 @@ class ComponentModelDecorator < ApplicationDecorator
   end
 
   def description
-    val_or_space(model.description)
+    coalesce(model.description)
   end
 
   def linked_branded_name

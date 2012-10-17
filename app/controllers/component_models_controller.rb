@@ -90,7 +90,7 @@ class ComponentModelsController < ApplicationController
     @component_model.destroy
 
     respond_to do |format|
-      format.html { redirect_to models_url }
+      format.html { redirect_to component_models_url }
       # format.json { head :no_content }
     end
   end
