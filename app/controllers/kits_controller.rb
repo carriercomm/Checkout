@@ -99,7 +99,7 @@ class KitsController < ApplicationController
   # PUT /kits/1
   # PUT /kits/1.json
   def update
-    @kit = KitDecorator.find(params[:id])
+    @kit = Kit.find(params[:id])
 
     respond_to do |format|
       kit_updated = @kit.update_attributes(params[:kit])
@@ -107,6 +107,8 @@ class KitsController < ApplicationController
       if @kit.forced_not_checkoutable
         flash[:warning] = "Kit cannot be tombstoned and checkoutable, so it was forced to be non-checkoutable."
       end
+
+      @kit = KitDecorator.decorate(@kit)
 
       if kit_updated
         format.html { redirect_to @kit, notice: 'Kit was successfully updated.' }

@@ -23,6 +23,7 @@ class Ability
       can :manage, Membership
       can :manage, Permission
       can :read,   Role
+      can :manage, User, [:username, :email, :first_name, :last_name]
       can :read,   User
     else
       can :read, Brand

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 class SplitComponentModelsController < ApplicationController
 
   before_filter :setup_instances

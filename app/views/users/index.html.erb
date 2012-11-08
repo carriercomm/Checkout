@@ -34,13 +34,13 @@
       <th class="skinny-column"><%= sortable('suspension_count', t('user.suspension_count').html_safe) %></th>
       <th><%= t '.groups', :default => t("helpers.groups") %></th>
       <th><%= t '.roles', :default => t("helpers.roles") %></th>
-      <th><%=t '.actions', :default => t("helpers.actions") %></th>
+      <th><%= t '.actions', :default => t("helpers.actions") %></th>
     </tr>
   </thead>
   <tbody>
     <% @users.each do |user| %>
     <tr>
-      <td><%= user.status %></td>
+      <td><%= user.status_icon %></td>
       <td><%= link_to user.username, user_path(user) %></td>
       <td><%= user.email %></td>
       <td><%= user.last_name %></td>

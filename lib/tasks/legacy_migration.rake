@@ -2,13 +2,14 @@ namespace :dbx do
 
   desc 'reload the dbx db from a sql backup'
   task :reload => :environment do
-    files = Dir.glob("#{Rails.root}/db/dbx*.sql")
+    files = Dir.glob("#{Rails.root}/db/dbx*.sql.gz")
     files.sort!
-    `mysql --user=root -p dbx2 < #{files.last}`
+    puts files.last
+    `gzcat #{files.last} | mysql --user=root -p dbx2`
   end
 
   desc 'migrate data from dbx'
-  task :migrate => :environment do
+  task :migrate  => :environment do
     require 'tasks/legacy_classes'
 
     #
@@ -32,24 +33,26 @@ namespace :dbx do
     success_count = 0
     error_count   = 0
 
-    LegacyEquipment.all.each do |le|
-      next if le.eq_manufacturer.nil?
-      le.eq_manufacturer.strip!
-      next if le.eq_manufacturer.nil? || le.eq_manufacturer.empty?
-      begin
-        brand = Brand.where("UPPER(name) = ?", le.eq_manufacturer.upcase).first
-        brand = Brand.new(name: le.eq_manufacturer) if brand.nil?
-        if brand.new_record?
-          if brand.save
-            success_count += 1
-          else
-            error_count += 1
-            puts "\tError saving #{brand.id}:'#{ brand.name }'"
+    LegacyEquipment.find_in_batches do |batch|
+      batch.each do |le|
+        next if le.eq_manufacturer.nil?
+        le.eq_manufacturer.strip!
+        next if le.eq_manufacturer.nil? || le.eq_manufacturer.empty?
+        begin
+          brand = Brand.where("UPPER(name) = ?", le.eq_manufacturer.upcase).first
+          brand = Brand.new(name: le.eq_manufacturer) if brand.nil?
+          if brand.new_record?
+            if brand.save
+              success_count += 1
+            else
+              error_count += 1
+              puts "\tError saving #{brand.id}:'#{ brand.name }'"
+            end
           end
+        rescue StandardError => e
+          error_count += 1
+          puts "\tError migrating #{le.id}: #{ e }"
         end
-      rescue StandardError => e
-        error_count += 1
-        puts "\tError migrating #{le.id}: #{ e }"
       end
     end
 
@@ -147,6 +150,7 @@ namespace :dbx do
     puts "#{ error_count } errors"
     puts
 
+
     #
     # Migrate Budgets
     #
@@ -201,96 +205,99 @@ namespace :dbx do
     puts "#{ error_count } errors"
     puts
 
+
     #
-    # Migrate Components
+    # Migrate Equipment
     #
 
-    puts "Migrating asset tags, kits, and components..."
+    puts "Migrating kits, and components..."
     success_count = 0
     error_count = 0
 
-    LegacyEquipment.includes(:legacy_budget, :legacy_location).all.each do |le|
+    LegacyEquipment.includes(:legacy_budget, :legacy_location).find_in_batches do |batch|
+      batch.each do |le|
+        begin
+          # look up the brand
+          brand = Brand.where("UPPER(name) = ?", le.eq_manufacturer.upcase).first
 
-      begin
-        # look up the brand
-        brand = Brand.where("UPPER(name) = ?", le.eq_manufacturer.upcase).first
+          # look up the model
+          model_name = le.eq_model.blank? ? "Unknown" : le.eq_model.strip
+          model_obj = brand.component_models.where("UPPER(component_models.name) = ?", model_name.upcase).first
 
-        # look up the model
-        model_name = le.eq_model.blank? ? "Unknown" : le.eq_model.strip
-        model_obj = brand.component_models.where("UPPER(component_models.name) = ?", model_name.upcase).first
+          # look up the budget
+          le.legacy_budget.budget_number.strip! unless le.legacy_budget.budget_number.nil?
+          le.legacy_budget.budget_name.strip!   unless le.legacy_budget.budget_name.nil?
+          le.eq_budget_biennium.strip!          unless le.eq_budget_biennium.nil?
 
-        # look up the budget
-        le.legacy_budget.budget_number.strip! unless le.legacy_budget.budget_number.nil?
-        le.legacy_budget.budget_name.strip!   unless le.legacy_budget.budget_name.nil?
-        le.eq_budget_biennium.strip!          unless le.eq_budget_biennium.nil?
+          number = le.legacy_budget.budget_number
+          nom    = (!le.legacy_budget.budget_name.blank? && le.legacy_budget.budget_name.downcase != "unknown") ? le.legacy_budget.budget_name : nil
+          bienn  = (!le.eq_budget_biennium.blank? && le.eq_budget_biennium.downcase != "unknown") ? le.eq_budget_biennium : nil
+          starts_at, ends_at = nil
 
-        number = le.legacy_budget.budget_number
-        nom    = (!le.legacy_budget.budget_name.blank? && le.legacy_budget.budget_name.downcase != "unknown") ? le.legacy_budget.budget_name : nil
-        bienn  = (!le.eq_budget_biennium.blank? && le.eq_budget_biennium.downcase != "unknown") ? le.eq_budget_biennium : nil
-        starts_at, ends_at = nil
-
-        # try to parse biennium
-        unless bienn.nil?
-          ds, de = bienn.split("-")
-          unless de.nil?
-            starts_at = Date.new(ds.to_i, 7, 1).to_s
-            ends_at   = Date.new(de.to_i, 6, 30).to_s
-          end
-        end
-
-        budget = Budget.where(:number => number, :name => nom, :starts_at => starts_at, :ends_at => ends_at).first
-
-        # find or create a matching asset tag
-        component = Component.where(:asset_tag => le.eq_uw_tag.to_s).first_or_initialize
-
-        if component.new_record?
-          # start building up the component's attrs
-          serial_number      = le.eq_serial_num.try(:strip)
-          cost               = (le.eq_cost == 0) ? nil : le.eq_cost
-          insured            = le.eq_insured
-          missing            = le.eq_removed
-          checkoutable       = le.checkoutable
-
-          component.component_model = model_obj
-          component.missing         = missing
-          component.serial_number   = serial_number
-          component.created_at      = le.eq_date_entered
-
-          kit                = Kit.new
-          kit.budget         = budget
-          kit.checkoutable   = checkoutable
-          kit.cost           = cost
-          kit.insured        = insured
-          kit.location       = Location.find_or_create_by_name(le.legacy_location.loc_name)
-          kit.tombstoned     = missing
-
-          kit.components << component
-
-          if kit.save
-            success_count += 1
-          else
-            error_count += 1
-            puts "Error saving #{ le.eq_uw_tag }:"
-            puts model_name.inspect
-            puts model_obj.inspect
-            puts
-            puts component.errors.inspect
-            puts
-            puts kit.errors.inspect
-            puts "----"
+          # try to parse biennium
+          unless bienn.nil?
+            ds, de = bienn.split("-")
+            unless de.nil?
+              starts_at = Date.new(ds.to_i, 7, 1).to_s
+              ends_at   = Date.new(de.to_i, 6, 30).to_s
+            end
           end
 
+          budget = Budget.where(:number => number, :name => nom, :starts_at => starts_at, :ends_at => ends_at).first
+
+          # find or create a matching asset tag
+          component = Component.where(:asset_tag => le.eq_uw_tag.to_s).first_or_initialize
+
+          if component.new_record?
+            # start building up the component's attrs
+            serial_number      = le.eq_serial_num.try(:strip)
+            cost               = (le.eq_cost == 0) ? nil : le.eq_cost
+            insured            = le.eq_insured
+            missing            = le.eq_removed
+            checkoutable       = le.checkoutable
+
+            component.component_model = model_obj
+            component.missing         = missing
+            component.serial_number   = serial_number
+            component.created_at      = le.eq_date_entered
+
+            kit                = Kit.new
+            kit.budget         = budget
+            kit.checkoutable   = checkoutable
+            kit.cost           = cost
+            kit.insured        = insured
+            kit.location       = Location.find_or_create_by_name(le.legacy_location.loc_name)
+            kit.tombstoned     = missing
+
+            kit.components << component
+
+            if kit.save
+              success_count += 1
+            else
+              error_count += 1
+              puts "Error saving #{ le.eq_uw_tag }:"
+              puts model_name.inspect
+              puts model_obj.inspect
+              puts
+              puts component.errors.inspect
+              puts
+              puts kit.errors.inspect
+              puts "----"
+            end
+
+          end
+        rescue StandardError => e
+          error_count += 1
+          puts "\tError migrating #{le.eq_uw_tag}: #{ e }"
+          puts e.backtrace
         end
-      rescue StandardError => e
-        error_count += 1
-        puts "\tError migrating #{le.eq_uw_tag}: #{ e }"
-        puts e.backtrace
       end
     end
 
     puts "Successfully migrated #{ success_count } asset tags, kits, and components"
     puts "#{ error_count } errors"
     puts
+
 
     #
     # Create Covenants
@@ -299,7 +306,6 @@ namespace :dbx do
     puts "Creating covenants..."
     puts
     sor = Covenant.create!(name:"Statement of Responsibility", description:'Users have signed and submitted the "Statement of Responsibility"')
-
 
     #
     # Migrate Users
@@ -316,44 +322,44 @@ namespace :dbx do
     attendants = ["maja08", "hana21", "steliosm", "varchaus", "rtwomey", "annabelc", "mtrainor", "tivon", "joshp", "hraikes", "hugosg", "mem5", "jimified", "marcinp", "chesnd", "swlcomp"]
 
     LegacyUser.all.each do |lu|
-     begin
-       username = lu.client_id.strip
-       name = lu.name.split(',')
-       first_name = String.new
-       last_name  = String.new
-       if name.size > 1
-         last_name = name.first.strip
-         first_name = name.last.strip
-       else
-         name = lu.name.split(" ")
-         last_name = name.pop.strip
-         first_name = name.join(" ").strip
-       end
-       email = username + "@uw.edu"
-       password = Devise.friendly_token.first(6)
-       u = User.new
-       u.username = username
-       u.first_name = first_name
-       u.last_name = last_name
-       u.email = email
-       u.password = password
-       if lu.stat_of_responsibility.downcase.strip == "yes"
-         u.covenants = [sor]
-       end
-       u.disabled = (current_user.include? username) ? false : true
-       u.save!
-       if admins.include?(username)
-         u.add_role "admin"
-       end
-       if attendants.include?(username)
-         u.add_role "attendant"
-       end
-       success_count += 1
-     rescue StandardError => e
-       error_count += 1
-       puts "\tError migrating #{lu.client_id}: #{ e }"
-       #puts e.backtrace
-     end
+      begin
+        username = lu.client_id.gsub(/[^a-z0-9]/, "").strip
+        name = lu.name.split(',')
+        first_name = String.new
+        last_name  = String.new
+        if name.size > 1
+          last_name = name.first.strip
+          first_name = name.last.strip
+        else
+          name = lu.name.split(" ")
+          last_name = name.pop.strip
+          first_name = name.join(" ").strip
+        end
+        email = username + "@uw.edu"
+        password = Devise.friendly_token.first(6)
+        u = User.new
+        u.username = username
+        u.first_name = first_name
+        u.last_name = last_name
+        u.email = email
+        u.password = password
+        if lu.stat_of_responsibility.downcase.strip == "yes"
+          u.covenants = [sor]
+        end
+        u.disabled = (current_user.include? username) ? false : true
+        u.save!
+        if admins.include?(username)
+          u.add_role "admin"
+        end
+        if attendants.include?(username)
+          u.add_role "attendant"
+        end
+        success_count += 1
+      rescue StandardError => e
+        error_count += 1
+        puts "\tError migrating #{lu.client_id}: #{ e }"
+        #puts e.backtrace
+      end
     end
 
     puts "Successfully migrated #{ success_count } users"
@@ -386,7 +392,7 @@ namespace :dbx do
         lg.legacy_users.map(&:client_id).each do |username|
           u = User.find_by_username(username)
           # don't bother unless this is an active user
-          unless u.nil? || u.disabled
+          unless u.nil? #|| u.disabled
             g.users << u
             users_success_count += 1
           end
@@ -400,9 +406,175 @@ namespace :dbx do
       end
     end
 
-    puts "Successfully migrated #{ group_success_count } groups:"
+    puts "Successfully migrated #{ group_success_count } groups"
     puts "\t#{ permissions_success_count } permissions"
-    puts "\t#{ users_success_count } users"
+    puts "\t#{ users_success_count } memberships"
+    puts "#{ error_count } errors"
+    puts
+
+  end
+
+
+  desc 'migrate data from dbx'
+  task :res  => :environment do
+    require 'tasks/legacy_classes'
+
+    Loan.delete_all
+
+    #
+    # Migrate Checkouts/Reservations
+    #
+
+    puts "Migrating checkouts and reservations..."
+    checkout_success_count = 0
+    reservation_success_count = 0
+    error_count = 0
+
+    #
+    # Clean up the database a bit
+    #
+
+    LegacyCheckout.nullify_bogus_values!
+    LegacyCheckout.create_indexes!
+    LegacyReservation.nullify_bogus_values!
+    LegacyReservation.create_indexes!
+
+    system_approver = User.unscoped.find_by_username("system")
+
+    LegacyReservation.includes(:legacy_checkout).find_in_batches do |batch|
+      batch.each do |r|
+        begin
+          client_id = r.client_id.downcase.gsub(/[^a-z0-9]/, "").strip
+          client = User.find_by_username(client_id)
+          raise "couldn't find reservation client: #{ client_id }" if client.nil?
+
+          kit = Kit.find_by_asset_tag(r.eq_uw_tag)
+          raise "couldn't find kit: #{ r.eq_uw_tag }" if kit.nil?
+
+          l = Loan.new
+          l.importing = true
+          l.starts_at = r.resdate
+          l.ends_at   = r.resdate_end || kit.default_return_date(l.starts_at)
+          l.client    = client
+          l.kit       = kit
+
+          c = r.legacy_checkout
+          unless c.nil?
+            staffout_id     = c.staffout_id.downcase.gsub(/[^a-z0-9]/, "").strip
+            staffin_id      = c.staffin_id.downcase.gsub(/[^a-z0-9]/, "").strip
+            out_assistant   = User.find_by_username(staffout_id)
+            in_assistant    = User.find_by_username(staffin_id)
+
+            l.out_at        = c.dateout     unless c.dateout.nil?
+            l.ends_at       = c.datedue || kit.default_return_date(l.starts_at) if l.ends_at.nil?
+            l.in_at         = c.datein      unless c.datein.nil?
+            l.out_assistant = out_assistant unless out_assistant.nil?
+            l.in_assistant  = in_assistant  unless in_assistant.nil?
+          end
+
+          if l.in_assistant
+            l.state = "checked_in"
+          elsif l.out_assistant
+            l.state = "checked_out"
+          elsif l.starts_at
+            if l.starts_at >= Date.today
+              l.state = "approved"
+              l.approver = system_approver
+            else
+              l.state = "canceled"
+            end
+          end
+
+          if l.save
+            reservation_success_count += 1
+            if r.legacy_checkout
+              checkout_success_count += 1
+            end
+            unless l.valid?
+              puts "--------"
+              puts "\tError migrating #{r.res_id}:"
+              puts "\t\t #{ l.inspect }"
+              puts "\t\t #{ r.inspect }"
+              puts "\t\t #{ c.inspect }"
+              l.errors.messages.each {|k,v| puts "\t\t#{ k.to_s.titleize } #{ v }" }
+            end
+          else
+            puts "--------"
+            puts "\tError migrating #{r.res_id}:"
+            puts "\t\t #{ l.inspect }"
+            puts "\t\t #{ r.inspect }"
+            puts "\t\t #{ c.inspect }"
+            l.errors.messages.each {|k,v| puts "\t\t#{ k.to_s.titleize } #{ v }" }
+            error_count += 1
+          end
+        rescue StandardError => e
+          error_count += 1
+          puts "\tError migrating #{r.res_id}: #{ e }"
+        end
+      end
+    end
+
+    # migrate the checkouts that didn't have a reservation
+    # some of these have a reservation id, but no corresponding reservation record
+    where_clause = "res_id IS NULL OR (checkout.res_id IS NOT NULL AND checkout.res_id NOT IN (select res_id from reservation))"
+    LegacyCheckout.where(where_clause).find_in_batches do |batch|
+      batch.each do |c|
+        begin
+          client_id = c.client_id.downcase.gsub(/[^a-z0-9]/, "").strip
+          client = User.find_by_username(client_id)
+          raise "couldn't find checkout client: #{ client_id }" if client.nil?
+
+          kit = Kit.find_by_asset_tag(c.eq_uw_tag)
+          raise "couldn't find kit: #{ c.eq_uw_tag }" if kit.nil?
+
+          out_assistant = User.find_by_username(c.staffout_id)
+          in_assistant  = User.find_by_username(c.staffin_id)
+
+          l = Loan.new
+          l.importing     = true
+          l.client        = client
+          l.kit           = kit
+          l.starts_at     = c.dateout
+          l.ends_at       = c.datedue || kit.default_return_date(l.starts_at)
+          l.out_at        = c.dateout     unless c.dateout.nil?
+          l.in_at         = c.datein      unless c.datein.nil?
+          l.out_assistant = out_assistant unless out_assistant.nil?
+          l.in_assistant  = in_assistant  unless in_assistant.nil?
+
+          if l.in_assistant
+            l.state = "checked_in"
+          elsif l.out_assistant
+            l.state = "checked_out"
+          else
+            raise "Couldn't determine what state this checkout should be in: #{ c.checkout_id }"
+          end
+
+          if l.save
+            checkout_success_count += 1
+            unless l.valid?
+              puts "--------"
+              puts "\tError migrating #{c.checkout_id}:"
+              puts "\t\t #{ l.inspect }"
+              puts "\t\t #{ c.inspect }"
+              l.errors.messages.each {|k,v| puts "\t\t#{ k.to_s.titleize } #{ v }" }
+            end
+          else
+            puts "--------"
+            puts "\tError migrating #{c.checkout_id}:"
+            puts "\t\t #{ l.inspect }"
+            puts "\t\t #{ c.inspect }"
+            l.errors.messages.each {|k,v| puts "\t\t#{ k.to_s.titleize } #{ v }" }
+            error_count += 1
+          end
+        rescue StandardError => e
+          error_count += 1
+          puts "\tError migrating #{c.checkout_id}: #{ e }"
+        end
+      end
+    end
+
+    puts "Successfully migrated #{ reservation_success_count } of #{ LegacyReservation.count.to_s } reservations"
+    puts "\t#{ checkout_success_count } of #{ LegacyCheckout.count.to_s } checkouts"
     puts "#{ error_count } errors"
     puts
 

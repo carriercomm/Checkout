@@ -1,5 +1,4 @@
 <% kit = KitDecorator.decorate(f.object.kit) unless f.object.new_record? %>
-<div class="fields">
 <%= content_tag :div, f.error(:base), :class=>"alert alert-error span12" if f.error(:base) %>
 
 <% if f.object.new_record? %>
@@ -26,11 +25,6 @@
   <div class="field span3">
     <%= f.input :expires_at,
                 :as => :date_picker,
-                :wrapper => :tabular,
-                :input_html => {
-                    :class => "generic_datepicker",
-                    :value => (f.object.new_record? || f.object.nil?) ? nil : f.object.expires_at
-                } %>
+                :wrapper => :tabular %>
   </div>
   <div class="field span2"><%= f.link_to_remove "Delete", :class => "btn btn-danger" %></div>
-</div>

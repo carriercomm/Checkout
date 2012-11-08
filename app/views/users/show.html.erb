@@ -1,4 +1,17 @@
-<%= title @user.to_s %>
+<%= title @user.username %>
+<%= subtitle @user.full_name %>
+
+<% if @user.disabled? %>
+  <div class="alert alert-warning">
+    <a class="close" data-dismiss="alert">×</a>
+    <%= t('user.status.disabled.text').html_safe %>
+  </div>
+<% elsif @user.suspended? %>
+  <div class="alert alert-warning">
+    <a class="close" data-dismiss="alert">×</a>
+    <%= t('user.status.suspended.text').html_safe %>
+  </div>
+<% end %>
 
 <dl class="dl-horizontal">
   <dt><%= t('simple_form.labels.user.first_name') %></dt>

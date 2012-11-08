@@ -2,12 +2,12 @@
 
 jQuery ->
   bindDatepicker = ->
-    $("input.generic_datepicker")
+    $("input.date_picker")
       .filter ->
-        return !this.id.match(/[a-z_]+_attributes_new_[a-z]+/)
+        return !(this.id == 'loan_starts_at' or this.id == 'loan_ends_at')
       .datepicker(
-        altFormat: "yy-mm-dd",
-        dateFormat: "yy-mm-dd",
+        altFormat: "yy/mm/dd",
+        dateFormat: "yy/mm/dd",
         minDate: "-0d",
         showOtherMonths: true,
         selectOtherMonths: true

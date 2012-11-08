@@ -83,8 +83,8 @@ class BusinessHour < ActiveRecord::Base
   # returns an array of dates representing the days with
   # open business hours between now and days_out
   def open_occurrences(days_out = 90, date_start = Time.zone.now)
+    schedule =  IceCube::Schedule.new(date_start)
     date_end = date_start + days_out.days
-    schedule =  IceCube::Schedule.new
 
     # add a recurrence for each business day
     business_days.each do |bd|
@@ -92,7 +92,7 @@ class BusinessHour < ActiveRecord::Base
       schedule.add_recurrence_rule IceCube::Rule.weekly.day(day)
     end
 
-    return schedule.occurrences_between(date_start, date_end)
+    return schedule.occurrences(date_end)
   end
 
   def required_attrs_blank?

@@ -6,14 +6,35 @@ class LoansController < ApplicationController
   # GET /loans
   # GET /loans.json
   def index
+    @forward_params = {}
+
     if params[:user_id].present?
-      @loans = User.find(params[:user_id]).loans.order("loans.starts_at ASC").page(params[:page])
+      @loans = User.find(params[:user_id]).loans
+
+      # keep track of some params we want to use in the view to construct urls
+      @forward_params[:user_id] = params[:user_id]
     elsif params[:kit_id].present?
-      @loans = Kit.find(params[:kit_id]).loans.order("loans.starts_at ASC").page(params[:page])
+      @loans = Kit.find(params[:kit_id]).loans
+
+      # keep track of some params we want to use in the view to construct urls
+      @forward_params[:kit_id] = params[:kit_id]
     else
-      @loans = Loan.order("loans.starts_at ASC").page(params[:page])
+      @loans = Loan
     end
 
+    if params[:filter]
+      case params[:filter]
+      when "pending"     then @loans = @loans.where("loans.state = 'pending'")
+      when "approved"    then @loans = @loans.where("loans.state = 'approved'")
+      when "checked_out" then @loans = @loans.where("loans.state = 'checked_out'")
+      when "checked_in"  then @loans = @loans.where("loans.state = 'checked_in'")
+      when "rejected"    then @loans = @loans.where("loans.state = 'rejected'")
+      when "canceled"    then @loans = @loans.where("loans.state = 'canceled'")
+#      when "archived"    then @loans = @loans.where("loans.in_at IS NOT NULL OR ")
+      end
+    end
+
+    @loans = @loans.order("loans.starts_at DESC").page(params[:page])
     @loans = LoanDecorator.decorate(@loans)
 
     respond_to do |format|
@@ -38,8 +59,19 @@ class LoansController < ApplicationController
 
     # do we have a specific kit to check out?
     if params[:kit_id].present?
-      kit       = Kit.includes(:location).find(params[:kit_id])
-      @loan      = client.loans.build(:kit_id => kit.id)
+      kit   = Kit.includes(:location).find(params[:kit_id])
+      @loan = client.loans.build(:kit_id => kit.id)
+
+      # TODO: move this into a model
+      if params[:state_event] && params[:state_event] == "checkout"
+        starts_at = Date.today
+        ends_at   = kit.default_return_date(starts_at)
+        @loan.out_at  = @loan.starts_at = Date.today
+        @loan.ends_at = ends_at
+        @loan.state_event = "checkout"
+        gon.default_return_date = ends_at.to_s(:js)
+      end
+
       # setup javascript data structures to make the date picker work
       gon.locations = kit.location_and_availability_record_for_datepicker
 

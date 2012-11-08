@@ -12,12 +12,14 @@ en:
       compact_date: "%Y-%m-%d"
       tabular: "%a %Y-%m-%d"
       db: "%Y-%m-%d %H:%M:%S"
+      verbose: "%A, %B %d, %Y %l:%M%p"
   date:
     formats:
       business_hour: "%-l:%M%P"
       compact_date: "%Y-%m-%d"
       tabular: "%a %Y-%m-%d"
       db: "%Y-%m-%d %H:%M:%S"
+      verbose: "%A, %B %d, %Y %l:%M%p"
  # :number=>"%Y%m%d%H%M%S",
  # :time=>"%H:%M",
  # :short=>"%d %b %H:%M",
@@ -34,6 +36,9 @@ en:
         default_checkout_length: 'Default Length'
       loan:
         component_model: 'Model'
+        starts_at: 'Pick Up Date'
+        ends_at: 'Return Date'
+        out_at: 'Checkout Date'
       split_component_model:
         component_models:
           id: "Model"
@@ -190,6 +195,9 @@ en:
       tombstoned:
         text: "Tombstoned"
         default_tooltip: "Show all tombstoned kits<br>(e.g. dead, missing, etc)"
+    status:
+      checked_out: "Checked Out"
+      available: "Available"
   loan:
     index:
       title: "Loans"
@@ -197,17 +205,45 @@ en:
       title: "Edit Loan %{id}"
     new:
       title: "New Loan"
-    not_checked_out: "Not checked out yet"
-    not_checked_in: 'Not checked in yet'
+    kit_select:
+      title: &kit_select_title "Select a Kit"
+    not_checked_out: ''
+    not_checked_in: ''
     show:
       title: "Loan #%{id}"
     state:
-      approved: "Approved"
-      canceled: "Canceled"
-      checked_in: "Checked In"
-      checked_out: "Checked Out"
-      rejected: "Rejected"
-      unapproved: "Unapproved"
+      approved: &loan_approved "Approved"
+      canceled: &loan_canceled "Canceled"
+      checked_in: &loan_checked_in "Checked In"
+      checked_out: &loan_checked_out "Checked Out"
+      rejected: &loan_rejected "Rejected"
+      pending: &loan_pending "Pending"
+    sidebar:
+      filters: "Loans Filters"
+      add:
+        default_tooltip: "Add a new loan"
+        denied_tooltip: "You don't have sufficient permissions to add a new loan"
+      all:
+        text: "All"
+        default_tooltip: "Show all loans"
+      approved:
+        text: *loan_approved
+        default_tooltip: "Show all approved loans"
+      canceled:
+        text: *loan_canceled
+        default_tooltip: "Show all canceled loans"
+      checked_in:
+        text: *loan_checked_in
+        default_tooltip: "Show all checked in loans"
+      checked_out:
+        text: *loan_checked_out
+        default_tooltip: "Show all checked out loans"
+      rejected:
+        text: *loan_rejected
+        default_tooltip: "Show all rejected loans"
+      pending:
+        text: *loan_pending
+        default_tooltip: "Show all pending loans"
   location:        
     index:
       title: "Locations"
@@ -220,6 +256,15 @@ en:
       add:
         default_tooltip: "Add a new location"
         denied_tooltip: "You don't have sufficient permissions to add a new location"
+  reservation:      
+    edit:
+      title: "Edit Reservation %{id}"
+    new:
+      title: "New Reservation"
+    show:
+      title: "Reservation %{id}"
+    kit_select:
+      title: *kit_select_title
   role:
     admin: "Administrator"
     attendant: "Attendant"
@@ -261,8 +306,13 @@ en:
       attendants:
         text: "Attendants"
         default_tooltip: "Show all attendants"
-    sidebar_title: "User Filters"
     status:
-      active: '&nbsp;'
-      disabled: '<a rel="tooltip" title="Disabled"><i class="icon-ban-circle  user-disabled"></i></a>'
-      suspended: '<a rel="tooltip" title="Suspended"><i class="icon-bolt user-suspended"></i></a>'
+      title: "Status"
+      active:
+        icon: '&nbsp;'
+      disabled:
+        icon: '<a rel="tooltip" title="Disabled"><i class="icon-ban-circle user-disabled"></i></a>'
+        text: '<i class="icon-ban-circle user-disabled"></i> This user is currently disabled'
+      suspended:
+        icon: '<a rel="tooltip" title="Suspended"><i class="icon-bolt user-suspended"></i></a>'
+        text: '<i class="icon-bolt user-suspended"></i> This user is currently suspended'

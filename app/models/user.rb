@@ -88,12 +88,20 @@ class User < ActiveRecord::Base
 
   ## Instance Methods ##
 
+  def disabled?
+    disabled == true
+  end
+
   def downcase_username
     username.downcase!
   end
 
   def signed_all_covenants?
     covenant_signatures.count == Covenant.count
+  end
+
+  def suspended?(reference_date = Date.today)
+    !suspended_until.nil? && suspended_until.to_date > reference_date
   end
 
   def to_s

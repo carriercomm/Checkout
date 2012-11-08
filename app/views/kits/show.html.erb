@@ -47,7 +47,7 @@
 
 <div class="form-actions">
   <%= link_to 'Back', kits_path, :class => 'btn'  %>
-  <%= link_to 'Check Out', new_kit_loan_path(@kit), :class => 'btn' if @kit.reservable?(current_user) %>
+  <%= link_to 'Check Out', new_kit_loan_path(@kit, state_event: 'checkout'), :class => 'btn' if @kit.reservable?(current_user) %>
   <%= link_to 'Reserve', new_kit_loan_path(@kit), :class => 'btn' if @kit.reservable?(current_user) %>
   <%= link_to('Edit', edit_kit_path(@kit), :class => 'btn btn-edit-kit') if can? :manage, Kit %>
   <%= link_to('Destroy', edit_kit_path(@kit), :method => :delete, :confirm => 'Are you sure? Note: this will not delete associated components, just the kit.', :class => 'btn btn-danger btn-delete-kit') if can? :manage, Kit %>

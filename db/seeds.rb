@@ -34,3 +34,6 @@ u.email    = 'admin@localhost'
 u.password = 'password'
 u.save!(:validate => false)
 u.add_role "admin"
+
+# there has to be a default checkout length otherwise it will break reservations
+AppConfig.instance.update_attributes(default_checkout_length: 2)

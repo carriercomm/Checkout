@@ -64,6 +64,12 @@ class Kit < ActiveRecord::Base
       .order("components.asset_tag ASC")
   end
 
+  # finds a specific asset tag
+  # not fuzzy like asset_tag_search
+  def self.find_by_asset_tag(asset_tag)
+    Component.find_by_asset_tag(asset_tag.to_s).try(:kit)
+  end
+
   def self.id_search(query)
     where("CAST(kits.id AS TEXT) LIKE ?", "%#{ query }%")
       .order("kits.id ASC")
@@ -92,7 +98,7 @@ class Kit < ActiveRecord::Base
 
   # TODO: add check for 'hold'
   def can_be_loaned_to?(client)
-    checkoutable && (client.has_role? "admin" || groups.map(&:users).flatten.include?(client))
+    client && checkoutable && (client.has_role? "admin" || groups.map(&:users).flatten.include?(client))
   end
 
   def checked_out?
@@ -106,12 +112,12 @@ class Kit < ActiveRecord::Base
   # equal to location.open_days minus days_reserved returns in format
   # [[month, day], [month, day], ...] for consumption by the
   # javascript date picker
-  def dates_checkoutable_for_datepicker(days_out = 90, excluded_loans = [])
+  def dates_checkoutable_for_datepicker(days_out = 90, *excluded_loans)
     return location.dates_open_for_datepicker(days_out) - dates_loaned_for_datepicker(days_out, excluded_loans)
   end
 
   # returns the dates this kit is loaned within the time range specified
-  def dates_loaned(days_out = 90, excluded_loans = [])
+  def dates_loaned(days_out = 90, *excluded_loans)
     dates = []
 
     # build up params for where clause
@@ -131,8 +137,14 @@ class Kit < ActiveRecord::Base
     return dates.uniq
   end
 
-  def dates_loaned_for_datepicker(days_out = 90, excluded_loans = [])
-    dates_loaned(days_out, excluded_loans).collect { |d| [d.month, d.day] }
+  def dates_loaned_for_datepicker(days_out = 90, *excluded_loans)
+    dates_loaned(days_out, excluded_loans).collect { |d| d.to_s(:js) }
+  end
+
+  def default_return_date(starts_at)
+    default       = AppConfig.instance.default_checkout_length
+    expected_time = (starts_at + default.days).to_time
+    location.next_date_open(expected_time)
   end
 
   # before_validation callback:
@@ -147,7 +159,7 @@ class Kit < ActiveRecord::Base
 
   # returns a record for this kit (without location info), to populate into
   # gon for the datepicker
-  def kit_record_for_datepicker(days_out = 90, excluded_loans = [])
+  def kit_record_for_datepicker(days_out = 90, *excluded_loans)
     {
       'kit_id' => id,
       'days_reservable' => dates_checkoutable_for_datepicker(days_out, excluded_loans)
@@ -155,7 +167,7 @@ class Kit < ActiveRecord::Base
   end
 
   # returns the full data structure to populate into gon for the datepicker
-  def location_and_availability_record_for_datepicker(days_out = 90, excluded_loans = [])
+  def location_and_availability_record_for_datepicker(days_out = 90, *excluded_loans)
     {
       location.id => {
         'kits' => [kit_record_for_datepicker(days_out, excluded_loans)],
@@ -166,7 +178,8 @@ class Kit < ActiveRecord::Base
 
   # returns all the loans that overlap with the range specified by the
   # start and end dates
-  def loans_between(start_date, end_date, excluded_loans = [])
+  def loans_between(start_date, end_date, *excluded_loans)
+    excluded_loans.flatten!
     sql = "((loans.starts_at BETWEEN :start AND :end) OR (loans.ends_at BETWEEN :start AND :end))"
 
     unless excluded_loans.empty?
@@ -188,7 +201,7 @@ class Kit < ActiveRecord::Base
     can_be_loaned_to? client
   end
 
-  def return_dates_for_datepicker(days_out = 90, excluded_loans = [])
+  def return_dates_for_datepicker(days_out = 90, *excluded_loans)
     return_dates = []
     next_loan_date = dates_loaned_for_datepicker(days_out, excluded_loans).first
 

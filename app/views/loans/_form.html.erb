@@ -7,8 +7,18 @@
       </div>
     <% end %>
 
-    <%= f.association :client, :as => :hidden %>
-    <%= f.input       :client, :readonly => true, :disabled => true %>
+    <% if can? :manage, @loan %>
+      <%= f.input :client_id,
+                  :input_html => {
+                      :class => 'select2-json-autocomplete select-user',
+                      :hidden => true,
+                      "data-text" => @loan.model.client,
+                      "data-ajax-url" => select2_users_path(:format => :json)
+                  } %>
+    <% else %>
+      <%= f.association :client, :as => :hidden %>
+      <%= f.input       :client, :readonly => true, :disabled => true %>
+    <% end %>
 
     <% if @loan.kit %>
       <%= f.association :kit, :as => :hidden %>
@@ -20,17 +30,14 @@
 
     <%= f.input :location, :collection => f.object.locations, :prompt => "Select a checkout location" %>
 
-    <%= f.input :starts_at, :as => :date_picker,
-        :label => 'Pick Up Date',
-        :input_html => {
-          :value => (f.object.starts_at.nil? ? nil : localize(f.object.starts_at, :format => "%Y-%m-%d"))
-        }  %>
+    <% if @loan.model.out_at %>
+      <%= f.input :out_at, :as => :hidden %>
+      <%= f.input :out_at, :as => :date_picker, :disabled => true %>
+    <% else %>
+      <%= f.input :starts_at, :as => :date_picker %>
+    <% end %>
 
-    <%= f.input :ends_at, :as => :date_picker,
-        :label => 'Return Date',
-        :input_html => {
-          :value => (f.object.ends_at.nil? ? nil : localize(f.object.ends_at, :format => "%Y-%m-%d"))
-        } %>
+    <%= f.input :ends_at, :as => :date_picker %>
     
     <div class="form-actions">
       <%= f.submit nil, :class => 'btn btn-primary' %>

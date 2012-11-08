@@ -90,7 +90,6 @@ class UsersController < ApplicationController
   def create
     p     = params[:user]
     @user = User.new
-    @user = UserDecorator.decorate(@user)
 
     # generate a random password
     @user.password        = Devise.friendly_token.first(6)
@@ -104,6 +103,8 @@ class UsersController < ApplicationController
 
     # TODO: this is possibly dangerous, is there a more manual way to handle it?
     @user.memberships_attributes = p[:memberships_attributes] if p[:memberships_attributes].present?
+
+    @user = UserDecorator.decorate(@user)
 
     respond_to do |format|
       if @user.save
@@ -123,7 +124,6 @@ class UsersController < ApplicationController
     p     = params[:user]
     # TODO: make modifying 'system' fail more elegantly
     @user = User.find(params[:id])
-    @user = UserDecorator.decorate(@user)
 
     @user.disabled        = p[:disabled]        if p[:disabled].present?
     @user.email           = p[:email]           if p[:email].present?
@@ -135,6 +135,8 @@ class UsersController < ApplicationController
 
     # TODO: this is possibly dangerous, is there a more manual way to handle it?
     @user.memberships_attributes = p[:memberships_attributes] if p[:memberships_attributes].present?
+
+    @user = UserDecorator.decorate(@user)
 
     respond_to do |format|
       if @user.save

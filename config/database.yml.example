@@ -2,8 +2,8 @@ pg: &pg
   adapter: postgresql
   host: localhost
   port: 5432
-  username: james
-  password:
+  username: 
+  password: 
   schema_search_path: public
   encoding: utf8
 
@@ -21,14 +21,3 @@ test:
 production:
   <<: *pg
   database: checkout
-
-# old database for migrating data
-legacy:
-  database: dbx2
-  reconnect: false
-  adapter: mysql2
-  encoding: utf8
-  pool: 5
-  username: webapp
-  password: webapp
-  socket: /tmp/mysql.sock

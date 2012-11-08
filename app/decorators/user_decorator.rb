@@ -5,12 +5,15 @@ class UserDecorator < ApplicationDecorator
   decorates_association :roles
 
   allows(:created_at,
+         :disabled?,
          :failed_attempts,
          :last_sign_in_at,
          :locked_at,
          :memberships,
+         :save,
          :sign_in_count,
          :suspension_count,
+         :suspended?,
          :to_s,
          :username)
 
@@ -31,7 +34,7 @@ class UserDecorator < ApplicationDecorator
 
   def description
     text = h.link_to(model.username, h.user_path(model))
-    text << " (#{ full_name })" unless full_name.empty?
+    text << " (#{ full_name })".html_safe if model.first_name && model.last_name
     text
   end
 
@@ -48,7 +51,10 @@ class UserDecorator < ApplicationDecorator
   end
 
   def full_name
-    "#{ model.first_name } #{ model.last_name }".squish
+    text = "#{ h.h(model.first_name) } #{ h.h(model.last_name) }".squish
+    h.content_tag("span", title: text) do
+      text
+    end
   end
 
   def last_name
@@ -82,13 +88,13 @@ class UserDecorator < ApplicationDecorator
     }
   end
 
-  def status
+  def status_icon
     if model.disabled
-      h.t("user.status.disabled").html_safe
-    elsif !model.suspended_until.nil? && model.suspended_until > Time.now
-      h.t("user.status.suspended").html_safe
+      h.t("user.status.disabled.icon").html_safe
+    elsif model.suspended?
+      h.t("user.status.suspended.icon").html_safe
     else
-      h.t("user.status.active").html_safe
+      h.t("user.status.active.icon").html_safe
     end
   end
 
@@ -105,6 +111,6 @@ class UserDecorator < ApplicationDecorator
   end
 
   def username
-    h.link_to(model.username, h.user_path(model))
+    h.link_to(model.username, h.user_path(model), :title=> model.username)
   end
 end

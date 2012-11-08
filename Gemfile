@@ -11,7 +11,7 @@ gem 'jquery-rails'              # jQuery javascript integration
 gem 'kaminari'                  # pagination
 gem 'pg'                        # postgres db driver
 gem 'mysql2'                    # mysql db driver
-gem 'nested_form', :git => 'git://github.com/ryanb/nested_form.git' # dynamic nested form helper
+gem 'nested_form'               # dynamic nested form helper
 gem 'rails', '3.2.8'            # rails
 gem 'rolify'                    # role management
 gem 'simple_form'               # form builder
@@ -24,7 +24,9 @@ gem 'thin'                      # web server
 group :assets do
   gem 'coffee-rails'            # coffee script integration
   gem 'jquery-ui-rails'         # jQuery UI libraries
+  gem "less-rails"              # CSS generator
   gem 'sass-rails'              # CSS generator
+  gem "therubyracer"            # LESS dependency (Twitter Bootstrap)
   gem 'twitter-bootstrap-rails' # CSS framework
   gem 'uglifier', '>= 1.0.3'
 end
@@ -35,6 +37,7 @@ group :development do
   gem 'ruby-graphviz', :require => 'graphviz'
   gem 'immigrant'               # migration generator for foreign keys
   gem "minitest-rails"          # minitest test framework
+  gem 'quiet_assets'            # stop the log diarrhea
   gem 'pry-rails'               # rails console on steroids
 end
 

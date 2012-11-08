@@ -1,22 +1,61 @@
 <% title t('loan.index.title') %>
-<table class="table table-striped">
+
+<% content_for :sidebar do %>
+  <li class="nav-header"><%= t(".actions") %></li>
+  <%= sidebar_link t('helpers.links.new'),
+                   new_loan_path,
+                   t('loan.sidebar.add.default_tooltip'),
+                   can?(:manage, Loan),
+                   t('loan.sidebar.add.denied_tooltip') %>
+  <li class="nav-header"><%= t("loan.sidebar.filters") %></li>
+  <%= sidebar_link t("loan.sidebar.all.text"),
+                    loans_path,
+                    t("loan.sidebar.all.default_tooltip") %>
+  <%= sidebar_link t("loan.sidebar.pending.text"),
+                    pending_loans_path(@forward_params),
+                    t("loan.sidebar.pending.default_tooltip") %>
+  <%= sidebar_link t("loan.sidebar.approved.text"),
+                    approved_loans_path(@forward_params),
+                    t("loan.sidebar.approved.default_tooltip") %>
+  <%= sidebar_link t("loan.sidebar.checked_out.text"),
+                    checked_out_loans_path(@forward_params),
+                    t("loan.sidebar.checked_out.default_tooltip") %>
+  <%= sidebar_link t("loan.sidebar.checked_in.text"),
+                    checked_in_loans_path(@forward_params),
+                    t("loan.sidebar.checked_in.default_tooltip") %>
+  <%= sidebar_link t("loan.sidebar.rejected.text"),
+                    rejected_loans_path(@forward_params),
+                    t("loan.sidebar.rejected.default_tooltip") %>
+  <%= sidebar_link t("loan.sidebar.canceled.text"),
+                    canceled_loans_path(@forward_params),
+                    t("loan.sidebar.canceled.default_tooltip") %>
+<% end %>
+
+<%= paginate @loans %>
+
+<table class="table table-striped index-view">
   <thead>
     <tr>
-      <th>Client</th>
-      <th>Kit</th>
-      <th>Start Date</th>
-      <th>End Date</th>
-      <th>Out Date</th>
-      <th>In Date</th>
-      <th>State</th>
-      <th>Actions</th>
+      <th width="14%" colspan="2">Client</th>
+      <th width="4%">Kit</th>
+      <th width="6%">Asset Tags</th>
+      <th>Kit Components</th>
+      <th width="10%">Start Date</th>
+      <th width="10%">End Date</th>
+      <th width="10%">Out Date</th>
+      <th width="10%">In Date</th>
+      <th width="10%">State</th>
+      <th width="6%">Actions</th>
     </tr>
   </thead>
   <tbody>
     <% @loans.each do |loan| %>
       <tr>
-        <td><%= loan.client %>
+        <td><%= loan.client.username %>
+        <td class="truncate"><%= loan.client.full_name %>
         <td><%= loan.kit %></td>
+        <td class="truncate"><%= loan.kit.asset_tags %></td>
+        <td class="truncate"><%= loan.kit.component_list %></td>
         <td><%= loan.starts_at %></td>
         <td><%= loan.ends_at %></td>
         <td><%= loan.out_at %></td>
@@ -56,5 +95,4 @@
   </tbody>
 </table>
 
-<%# TODO: this should feed into some sort of wizard - 1) select equipment, 2) select client, 3) new loan %>
-<%#= link_to 'New', new_loan_path, :class => 'btn btn-primary' %>
+<%= paginate @loans %>

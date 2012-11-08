@@ -4,11 +4,7 @@
   <%= f.input :first_name %>
   <%= f.input :last_name %>
   <%= f.association :covenants, :as => :check_boxes %>
-  <%= f.input :suspended_until, :as => :date_picker,
-    :input_html => {
-      :class => 'generic_datepicker',
-      :value => (f.object.suspended_until.nil? ? nil : localize(f.object.suspended_until, :format => "%Y-%m-%d"))
-    } %>
+  <%= f.input :suspended_until, :as => :date_picker %>
   <%= f.input :disabled, :as => :radio_buttons %>
 
   <%= f.association :roles, :as => :check_boxes %>

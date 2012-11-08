@@ -22,7 +22,7 @@
       <div class="field field-header span1">Missing</div>
       <div class="field field-header span2">Actions</div>
     </div><!-- // -->
-    <%= f.simple_fields_for :components %>
+    <%= f.fields_for :components %>
     <%= f.link_to_add raw("<i class='icon-plus-sign'></i> Add another component"), :components %>
   </div>
 

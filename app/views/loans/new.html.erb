@@ -1,2 +1,7 @@
-<% title(t('loan.new.title')) %>
+<% if @loan.out_at %>
+  <% title(t('loan.new.title')) %>
+<% else %>
+  <% title(t('reservation.new.title')) %>
+<% end %>
+
 <%= render :partial => 'form' %>

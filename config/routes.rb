@@ -14,7 +14,7 @@ Checkout::Application.routes.draw do
 
   devise_for :user
 
-  resource  :app_config, :only => [:show, :edit, :update]
+  resource :app_config, :only => [:show, :edit, :update]
   resources :brands do
     collection do
       ["checkoutable", "non_checkoutable"].each do |r|
@@ -55,10 +55,17 @@ Checkout::Application.routes.draw do
   resources :locations
   resources :models, as: "component_models", controller: "component_models" do
     collection &component_models_collection_routes
-    resources :loans, only: [:new]
+    resources :loans, only: [:reserve, :checkout]
   end
+  resources :reservations, except: [:index]
   resources :split_model, as:"split_component_models", controller:"split_component_models", only:[:new, :create]
-  resources :loans
+  resources :loans do
+    collection do
+      ["pending", "approved", "checked_out", "checked_in", "rejected", "canceled", "archived"].each do |r|
+        get r, to: "loans#index", filter: r
+      end
+    end
+  end
   resources :search, only: [:index]
   resources :users, except: [:destroy] do
     collection do

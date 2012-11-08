@@ -64,7 +64,7 @@ class Location < ActiveRecord::Base
   end
 
   def dates_open_for_datepicker(days_out = 90, date_start = Time.zone.now)
-    dates_open(days_out, date_start).collect { |d| [d.month, d.day] }
+    dates_open(days_out, date_start).collect { |d| d.to_s(:js) }
   end
 
   def dates_regular(days_out = 90, date_start = Time.zone.now)

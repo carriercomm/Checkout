@@ -14,7 +14,10 @@ class KitDecorator < ApplicationDecorator
          :to_key)
 
   def asset_tags
-    model.asset_tags.map(&:to_s).join(", ")
+    text = model.asset_tags.map(&:to_s).join(", ")
+    h.content_tag("span", title: text) do
+      text
+    end
   end
 
   def autocomplete_json(options={})
@@ -36,7 +39,10 @@ class KitDecorator < ApplicationDecorator
 
   # returns a string of comma delimited model names
   def component_list
-    component_models.map(&:to_s).join(", ")
+    text = component_models.map(&:to_s).join(", ")
+    h.content_tag("span", title: text) do
+      text
+    end
   end
 
   def cost
@@ -76,6 +82,10 @@ class KitDecorator < ApplicationDecorator
       :id   => model.id,
       :text => description
     }
+  end
+
+  def status
+    (model.checked_out?) ? h.t('kit.status.checked_out') : h.t('kit.status.available')
   end
 
   def to_s

@@ -135,3 +135,54 @@ class LegacyBundleItem < ActiveRecord::Base
   set_primary_key :bundle_id
   belongs_to :legacy_equipment, foreign_key: 'eq_uw_tag'
 end
+
+class LegacyReservation < ActiveRecord::Base
+  establish_connection :legacy
+  set_table_name 'reservation'
+  set_primary_key :res_id
+  has_one    :legacy_checkout, foreign_key: 'res_id'
+  belongs_to :legacy_equipment, foreign_key: 'eq_uw_tag'
+  belongs_to :legacy_user, foreign_key: 'client_id'
+
+  def self.create_indexes!
+    begin
+      connection.execute "CREATE INDEX index_reservation_on_res_id ON reservation (res_id)"
+    rescue Exception => e
+      puts e
+      puts "Nothing to worry about!"
+      puts
+    end
+  end
+
+  def self.nullify_bogus_values!
+    connection.execute "UPDATE reservation SET resdate_end = NULL WHERE resdate_end = 0000-00-00"
+  end
+
+end
+
+class LegacyCheckout < ActiveRecord::Base
+  establish_connection :legacy
+  set_table_name 'checkout'
+  set_primary_key :checkout_id
+  has_one    :legacy_reservation, foreign_key: 'res_id'
+  belongs_to :legacy_equipment, foreign_key: 'eq_uw_tag'
+  belongs_to :legacy_user, foreign_key: 'client_id'
+
+  def self.create_indexes!
+    begin
+      connection.execute "CREATE INDEX index_checkout_on_res_id ON checkout (res_id)"
+    rescue Exception => e
+      puts e
+      puts "Nothing to worry about!"
+      puts
+    end
+  end
+
+  def self.nullify_bogus_values!
+    connection.execute "UPDATE checkout SET res_id = NULL WHERE res_id = 0"
+    connection.execute "UPDATE checkout SET datedue = NULL WHERE datedue = 0000-00-00"
+    connection.execute "UPDATE checkout SET datein = NULL WHERE datein = 0000-00-00"
+    connection.execute("UPDATE checkout SET client_id = 'choffa' WHERE client_id = 'choffel'")
+  end
+
+end

@@ -55,9 +55,10 @@ class GroupsController < ApplicationController
     # INNER JOIN kits ON permissions.kit_id = kits.id
     # END_SQL
     @group = Group.includes(:kits).find(params[:id])
-    @group = GroupDecorator.decorate(@group)
     # TODO: figure out how to sort this in the database
     @memberships = @group.memberships.sort_by {|m| m.user.username}
+    # this has to come after creating @memberships
+    @group = GroupDecorator.decorate(@group)
   end
 
   # POST /groups
