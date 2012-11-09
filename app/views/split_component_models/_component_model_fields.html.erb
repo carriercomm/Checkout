@@ -1,8 +1,6 @@
 <% # TODO: merge this with the _form view of component_model %>
 <% # TODO: add modal dialogues for inline "new brand" and "new category" %>
-
-  <div class="well fields">
-
+  <div class="well">
     <% unless f.object == @component_model.model %>
       <%= f.link_to_remove t('split_component_model.edit.remove_component_model').html_safe, :class => 'danger pull-right' %>
       <div class="control-group boolean optional">

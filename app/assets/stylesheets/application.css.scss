@@ -17,6 +17,9 @@ a.disabled {
 a.danger {
   color:#F33;
 }
+td.action-buttons {
+  padding-left:0;
+}
 td.action-buttons,
 th.skinny-column {
   width: 1%;
@@ -44,9 +47,6 @@ i.user-suspended {
 }
 .return-date-warn a {
   border-color: orange !important;
-}
-table.index-view {
-  table-layout:fixed;
 }
 .truncate {
   white-space: nowrap;

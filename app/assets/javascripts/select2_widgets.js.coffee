@@ -32,6 +32,7 @@ jQuery ->
         results =
           results: data.items
           more: more
+        console.log(results)
         return results
     formatResult: formatAjaxResult
     formatSelection: formatAjaxSelection
@@ -53,10 +54,15 @@ jQuery ->
       # .addClass('select2-bound')
       # .select2(ajaxConfig)
       .bind 'change', (e) ->
+        # whenever this widget changes it's value, put the value into
+        # the data-text field so we can destroy and recreate the
+        # widget without losing the text
         me = $(this)
-        me.data("text", me.select2("data").text)
+        text = me.select2("data").text
+        if text and text != ""
+          me.data("text", me.select2("data").text)
       .each ->
-        $(this).select2($.extend(true, {}, ajaxConfig))    
+        $(this).select2($.extend(true, {}, ajaxConfig))
 
   # call it
   bindJsonAutocomplete()
@@ -66,19 +72,16 @@ jQuery ->
   # Tagged Field
   # 
 
+  $('.select2-tagged-field').select2()
+
+
+  #
+  # Nested Forms
+  # 
+
   # make sure the select2 widget binds to any new nested components added to the form
   $('form').bind 'nested:fieldAdded', ->
     bindJsonAutocomplete()
-    $('.select2-tagged-field')
-      .select2("destroy")
-      .select2()
+    $('.select2-tagged-field').select2("destroy")
+    $('.select2-tagged-field').select2()
 
-  $('.select2-tagged-field').select2()
-
-  #
-  # Form Switcher helper
-  #
-
-  $('form').bind 'form-switcher:existing-shown', (e) ->
-    debugger
-    $(e.target).find(".existing-component-model input.select-model").select2(ajaxConfig)

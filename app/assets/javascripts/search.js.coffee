@@ -8,7 +8,7 @@ jQuery ->
        .append( "<a>" + t + "</a>" )
        .appendTo( ul );
 
-  $(".navbar input").autocomplete(
+  $("#q").autocomplete(
     delay: 100
     minLength: 2
     source: (request, response) ->

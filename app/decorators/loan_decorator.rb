@@ -11,7 +11,7 @@ class LoanDecorator < ApplicationDecorator
   end
 
   def ends_at
-    coalesce(model.ends_at.try(:to_formatted_s, :tabular))
+    coalesce(h.l(model.ends_at, :format => :tabular))
   end
 
   def in_assistant
@@ -19,7 +19,11 @@ class LoanDecorator < ApplicationDecorator
   end
 
   def in_at
-    coalesce(model.in_at.try(:to_formatted_s, :tabular), h.t('loan.not_checked_in'))
+    if model.in_at
+      h.l(model.in_at, :format => :tabular)
+    else
+      coalesce(h.t('loan.not_checked_in'))
+    end
   end
 
   def late
@@ -31,15 +35,19 @@ class LoanDecorator < ApplicationDecorator
   end
 
   def out_at
-    coalesce(model.out_at.try(:to_formatted_s, :tabular), h.t('loan.not_checked_out'))
+    if model.out_at
+      h.l(model.out_at, :format => :tabular)
+    else
+      coalesce(h.t('loan.not_checked_out'))
+    end
   end
 
   def starts_at
-    coalesce(model.starts_at.try(:to_formatted_s, :tabular))
+    coalesce(h.l(model.starts_at, :format => :tabular))
   end
 
   def state
-    h.t("loan.state.#{ model.state }")
+    h.t("loan.state.#{ model.state }").html_safe
   end
 
 end

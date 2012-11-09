@@ -51,10 +51,7 @@ class UserDecorator < ApplicationDecorator
   end
 
   def full_name
-    text = "#{ h.h(model.first_name) } #{ h.h(model.last_name) }".squish
-    h.content_tag("span", title: text) do
-      text
-    end
+    @full_name ||= "#{ h.h(model.first_name) } #{ h.h(model.last_name) }".squish
   end
 
   def last_name
@@ -100,6 +97,12 @@ class UserDecorator < ApplicationDecorator
 
   def suspended_until
     localize_unless_nil(model.suspended_until, :format => :tabular)
+  end
+
+  def tabular_full_name
+    h.content_tag("div", title: full_name) do
+      full_name
+    end
   end
 
   def to_s

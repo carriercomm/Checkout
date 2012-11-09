@@ -14,10 +14,7 @@ class KitDecorator < ApplicationDecorator
          :to_key)
 
   def asset_tags
-    text = model.asset_tags.map(&:to_s).join(", ")
-    h.content_tag("span", title: text) do
-      text
-    end
+    @asset_tags ||= model.asset_tags.map(&:to_s).join(", ")
   end
 
   def autocomplete_json(options={})
@@ -50,7 +47,7 @@ class KitDecorator < ApplicationDecorator
   end
 
   def description
-    "[#{ asset_tags }] #{ component_list }".squish
+    "[#{ asset_tags }] #{ component_list }".squish.html_safe
   end
 
   def id
@@ -66,7 +63,9 @@ class KitDecorator < ApplicationDecorator
   end
 
   def linked_component_list
-    component_models.map(&:to_link).join(", ").html_safe
+    h.content_tag(:span, title: component_models.map(&:to_s).join(", ")) do
+      component_models.map(&:to_link).join(", ").html_safe
+    end
   end
 
   def location
@@ -86,6 +85,19 @@ class KitDecorator < ApplicationDecorator
 
   def status
     (model.checked_out?) ? h.t('kit.status.checked_out') : h.t('kit.status.available')
+  end
+
+  def tabular_asset_tags
+    h.content_tag("div", title: asset_tags) do
+      asset_tags
+    end
+  end
+
+  def tabular_component_list
+    text = component_models.map(&:to_s).join(", ")
+    h.content_tag("div", title: text) do
+      text
+    end
   end
 
   def to_s

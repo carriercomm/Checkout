@@ -19,8 +19,13 @@ class User < ActiveRecord::Base
   has_many :in_assists,   :foreign_key => "in_assistant_id",  :class_name => 'Loan'
   has_many :memberships,  :inverse_of => :user
   has_many :out_assists,  :foreign_key => "out_assistant_id", :class_name => 'Loan'
-  has_many :loans, :foreign_key => "client_id"
 
+  has_many :loans,        :foreign_key => "client_id" do
+    def build_from_component_model_id(component_model_id)
+      component_model = ComponentModel.checkoutable.includes(:kits => :location).find(component_model_id)
+      build(:component_model => component_model)
+    end
+  end
 
   ## Mass-assignable Attributes ##
 
@@ -65,7 +70,7 @@ class User < ActiveRecord::Base
   def self.find_for_database_authentication(warden_conditions)
     conditions = warden_conditions.dup
     login = conditions.delete(:login)
-    where(conditions).where(["lower(username) = :value OR lower(email) = :value", { :value => login.strip.downcase }]).first
+    where(conditions).where(["LOWER(username) = :value OR LOWER(email) = :value", { :value => login.strip.downcase }]).first
   end
 
   # returns an AREL which filters out users who are already in a
@@ -81,12 +86,20 @@ class User < ActiveRecord::Base
   end
 
   def self.username_search(query)
-      self.where("users.username LIKE ?", "%#{ query }%")
+      self.where("LOWER(users.username) LIKE ?", "%#{ query.downcase }%")
       .order("users.username ASC")
   end
 
 
   ## Instance Methods ##
+
+  def admin?
+    has_role?(:admin)
+  end
+
+  def attendant?
+    has_role?(:attendant?) || admin?
+  end
 
   def disabled?
     disabled == true
@@ -102,6 +115,10 @@ class User < ActiveRecord::Base
 
   def suspended?(reference_date = Date.today)
     !suspended_until.nil? && suspended_until.to_date > reference_date
+  end
+
+  def to_param
+    "#{ id } #{ username }".parameterize
   end
 
   def to_s

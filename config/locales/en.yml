@@ -212,12 +212,12 @@ en:
     show:
       title: "Loan #%{id}"
     state:
-      approved: &loan_approved "Approved"
-      canceled: &loan_canceled "Canceled"
-      checked_in: &loan_checked_in "Checked In"
-      checked_out: &loan_checked_out "Checked Out"
-      rejected: &loan_rejected "Rejected"
-      pending: &loan_pending "Pending"
+      approved: &loan_approved '<span class="label label-info">Approved</span>'
+      canceled: &loan_canceled '<span class="label">Canceled</span>'
+      checked_in: &loan_checked_in '<span class="label label-inverse">Checked In</span>'
+      checked_out: &loan_checked_out '<span class="label label-success">Checked Out</span>'
+      rejected: &loan_rejected '<span class="label label-important">Rejected</span>'
+      pending: &loan_pending '<span class="label label-warning">Pending</span>'
     sidebar:
       filters: "Loans Filters"
       add:

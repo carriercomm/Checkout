@@ -59,29 +59,22 @@ class LoansController < ApplicationController
 
     # do we have a specific kit to check out?
     if params[:kit_id].present?
-      kit   = Kit.includes(:location).find(params[:kit_id])
-      @loan = client.loans.build(:kit_id => kit.id)
+      @loan = client.loans.build(kit_id: params[:kit_id])
 
-      # TODO: move this into a model
+      # is this a reservation or checkout?
       if params[:state_event] && params[:state_event] == "checkout"
-        starts_at = Date.today
-        ends_at   = kit.default_return_date(starts_at)
-        @loan.out_at  = @loan.starts_at = Date.today
-        @loan.ends_at = ends_at
-        @loan.state_event = "checkout"
-        gon.default_return_date = ends_at.to_s(:js)
+        @loan.prefill_checkout
       end
 
       # setup javascript data structures to make the date picker work
-      gon.locations = kit.location_and_availability_record_for_datepicker
+      gon.locations = @loan.kit.location_and_availability_record_for_datepicker
 
     # do we have a general component_model to check out?
     elsif params[:component_model_id].present?
-      component_model = ComponentModel.checkoutable.includes(:kits => :location).find(params[:component_model_id])
-      @loan           = client.loans.build(:component_model => component_model)
+      @loan = client.loans.build_from_component_model_id(params[:component_model_id])
 
       # setup javascript data structures to make the date picker work
-      gon.locations   = component_model.locations_with_dates_checkoutable_for_datepicker
+      gon.locations = @loan.component_model.locations_with_dates_checkoutable_for_datepicker
     else
       flash[:error] = "Start by finding something to check out!"
       redirect_to component_models_path and return
@@ -139,16 +132,17 @@ class LoansController < ApplicationController
     end
   end
 
-  # DELETE /loans/1
-  # DELETE /loans/1.json
-  def destroy
-    @loan = Loan.find(params[:id])
-    @loan.destroy
+  # # DELETE /loans/1
+  # # DELETE /loans/1.json
+  # def destroy
+  #   @loan = Loan.find(params[:id])
 
-    respond_to do |format|
-      format.html { redirect_to loans_url }
-      format.json { head :no_content }
-    end
-  end
+  #   @loan.cancel
+
+  #   respond_to do |format|
+  #     format.html { redirect_to loans_url }
+  #     format.json { head :no_content }
+  #   end
+  # end
 
 end

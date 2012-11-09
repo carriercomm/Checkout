@@ -25,6 +25,7 @@
 //= require select2
 //= require select2_widgets
 //= require split_component_models
+//= require tables
 //= require titleCaps
 //= require twitter/bootstrap
 //= require user

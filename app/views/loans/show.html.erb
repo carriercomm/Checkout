@@ -2,41 +2,30 @@
 <% subtitle @loan.kit.component_list %>
 
 <dl class="dl-horizontal">
+  <dt>Status</dt>
+  <dd><%= @loan.state %></dd>
   <dt>Client</dt>
   <dd><%= @loan.client %></dd>
   <dt>Check Out Location</dt>
   <dd><%= @loan.location %></dd>
   <dt>Kit</dt>
   <dd><%= @loan.kit %></dd>
-  <dt>Check Out Day</dt>
+  <dt>Pick Up Day</dt>
   <dd><%= @loan.starts_at %></dd>
-  <dt>Check In Day</dt>
+  <dt>Return Day</dt>
   <dd><%= @loan.ends_at %></dd>
-  <dt>Status</dt>
-  <dd><%= @loan.state %></dd>
-
-  <% if @loan.model.approver %>
-    <dt>Approved By</dt>
-    <dd><%= @loan.approver %></dd>
-  <% end %>
-
-  <% if @loan.model.out_at %>
-    <dt>Checked Out At</dt>
-    <dd><%= @loan.out_at %></dd>
-    <dt>Checked Out By</dt>
-    <dd><%= @loan.out_assistant %></dd>
-  <% end %>
-
-  <% if @loan.model.in_at %>
-    <dt>Checked In At</dt>
-    <dd><%= @loan.in_at %></dd>
-    <dt>Checked In By</dt>
-    <dd><%= @loan.in_assistant %></dd>
-    <dt>Late</dt>
-    <dd><%= @loan.late %></dd>
-  <% end %>
-
-
+  <dt>Approved By</dt>
+  <dd><%= @loan.approver %></dd>
+  <dt>Checked Out</dt>
+  <dd><%= @loan.out_at %></dd>
+  <dt>Checked Out By</dt>
+  <dd><%= @loan.out_assistant %></dd>
+  <dt>Checked In</dt>
+  <dd><%= @loan.in_at %></dd>
+  <dt>Checked In By</dt>
+  <dd><%= @loan.in_assistant %></dd>
+  <dt>Late</dt>
+  <dd><%= @loan.late %></dd>
 </dl>
 
 <div class="form-actions">

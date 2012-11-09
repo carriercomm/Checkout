@@ -35,6 +35,10 @@ class Ability
       can :read, Kit
       can :read, Location
       can :read, Loan, :client_id => user.id
+      # https://github.com/ryanb/cancan/wiki/Defining-Abilities-with-Blocks
+      # can :update, Project, ["priority < ?", 3] do |project|
+      #   project.priority < 3
+      # end
     end
   end
 

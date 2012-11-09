@@ -154,6 +154,12 @@ class Loan < ActiveRecord::Base
     return kit.location.open_on?(self.starts_at)
   end
 
+  def prefill_checkout
+    self.starts_at = Date.today unless self.starts_at
+    self.ends_at   = kit.default_return_date(starts_at) unless self.ends_at
+    self.out_at    = Time.zone.now
+  end
+
   # set the starts_at datetime to the time the location opens
   def set_to_location_open_at!
     # get the first opening time on the day

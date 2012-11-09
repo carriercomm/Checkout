@@ -55,7 +55,7 @@ Checkout::Application.routes.draw do
   resources :locations
   resources :models, as: "component_models", controller: "component_models" do
     collection &component_models_collection_routes
-    resources :loans, only: [:reserve, :checkout]
+    resources :loans, only: [:new]
   end
   resources :reservations, except: [:index]
   resources :split_model, as:"split_component_models", controller:"split_component_models", only:[:new, :create]
@@ -65,6 +65,7 @@ Checkout::Application.routes.draw do
         get r, to: "loans#index", filter: r
       end
     end
+    match 'new/reservation', :action => 'reservation'
   end
   resources :search, only: [:index]
   resources :users, except: [:destroy] do

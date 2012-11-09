@@ -16,7 +16,7 @@ class BrandsController < ApplicationController
 
     respond_to do |format|
       format.html # index.html.erb
-      format.json { render json: { items: @brands, total: @total} }
+      format.json { render json: { items: @brands.map(&:model), total: @total} }
     end
   end
 

@@ -1,5 +1,9 @@
 <%= title @user.username %>
 <%= subtitle @user.full_name %>
+<% content_for :sidebar do %>
+  <li class="nav-header"><%= t(".actions") %></li>
+  <li><%= link_to 'Loans', user_loans_path(@user) %></li>
+<% end %>
 
 <% if @user.disabled? %>
   <div class="alert alert-warning">
@@ -37,6 +41,8 @@
   <dt><%= t('simple_form.labels.user.groups') %></dt>
   <dd><%= @user.groups_list("<br>") %></dd>
 </dl>
+
+
 
 <div class="form-actions">
   <%= link_to t('.back', :default => t("helpers.links.back")),

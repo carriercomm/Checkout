@@ -29,7 +29,7 @@
       <th>Model</th>
       <th>Description</th>
       <th>Count</th>
-      <th colspan="2">Actions</th>
+      <th colspan="3" class="skinny-column">Actions</th>
     </tr>
   </thead>
   <tbody>
@@ -40,10 +40,13 @@
         <td><%= cm.description %></td>
         <td><%= cm.kits.count %></td>
         <td class="action-buttons">
-          <%= link_to('Reserve', new_component_model_loan_path(:component_model_id => cm), :class => 'btn btn-mini') if cm.checkoutable? %>
+          <%= reserve_mini_button(cm) %>
         </td>
         <td class="action-buttons">
-          <%= link_to('Edit', edit_component_model_path(cm), :class => 'btn btn-mini btn-edit-component-model') if can? :manage, ComponentModel %>
+          <%= checkout_mini_button(cm) %>
+        </td>
+        <td class="action-buttons">
+          <%= edit_mini_button(cm) %>
         </td>
       </tr>
     <% end %>

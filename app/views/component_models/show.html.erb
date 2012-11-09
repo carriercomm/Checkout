@@ -43,7 +43,7 @@
           <td><%= kit.location %></td>
           <td>
             <% if kit.checkoutable? %>
-            <%= link_to 'Reserve', new_kit_loan_path(kit, :user_id => current_user), :class => 'btn btn-mini' %>
+            <%= link_to 'Reserve', new_kit_loan_path(kit), :class => 'btn btn-mini' %>
             <%= link_to 'Loans', kit_loans_path(kit), :class => 'btn btn-mini' %>
             <% end %>
           </td>

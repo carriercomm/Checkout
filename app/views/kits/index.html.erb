@@ -31,9 +31,9 @@
     <tr>
       <th>Kit ID</th>
       <th>Asset Tags</th>
-      <th>Components</th>
-      <th>Groups</th>
-      <th>Actions</th>
+      <th width="50%">Components</th>
+      <th width="50%">Groups</th>
+      <th colspan="4">Actions</th>
     </tr>
   </thead>
   <tbody>
@@ -43,10 +43,17 @@
         <td><%= kit.asset_tags %></td>
         <td><%= kit.linked_component_list %></td>
         <td><%= kit.linked_groups_list %></td>
-        <td>
-          <%= link_to('Reserve', new_loan_path(:kit_id => kit, :user_id => current_user), :class => 'btn btn-mini') %>
-          <%= link_to('Loans', kit_loans_path(kit), :class => 'btn btn-mini') %>
-          <%= link_to('Edit', edit_kit_path(kit), :class => 'btn btn-mini btn-edit-kit') if can? :manage, Kit %>
+        <td class="action-buttons">
+          <%= reserve_mini_button(kit) %>
+        </td>
+        <td class="action-buttons">
+          <%= checkout_mini_button(kit) %>
+        </td>
+        <td class="action-buttons">
+          <%= show_mini_button(kit, 'Loans') %>
+        </td>
+        <td class="action-buttons">
+          <%= edit_mini_button(kit) %>
         </td>
       </tr>
     <% end %>

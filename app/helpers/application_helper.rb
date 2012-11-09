@@ -72,4 +72,75 @@ module ApplicationHelper
     content_for(:title, page_title)
   end
 
+  def admin_link(object, content)
+    link_to(content, object) if current_user.admin?
+  end
+
+  def attendant_link(object, content)
+    link_to(content, object) if current_user.attendant?
+  end
+
+  def attendant_mini_button(object, content)
+    link_to(content, object, class: 'btn btn-mini') if current_user.attendant?
+  end
+
+  def checkout_mini_button(object)
+    if object.checkoutable? && current_user.attendant?
+      loan_mini_button(t('helpers.links.checkout'), object, a:'checkout')
+    end
+  end
+
+  def reserve_mini_button(object)
+    if object.checkoutable? && object.reservable?(current_user)
+      loan_mini_button(t('helpers.links.reserve'), object)
+    end
+  end
+
+  def show_link(object, content = t("helpers.links.show"))
+    link_to(content, object) if can?(:read, object)
+  end
+
+  def show_mini_button(object, content = t("helpers.links.show"))
+    link_to(content, object, class: 'btn btn-mini') if can?(:read, object)
+  end
+
+  def edit_link(object, content = t("helpers.links.edit"))
+    link_to(content, [:edit, object]) if can?(:update, object)
+  end
+
+  def edit_mini_button(object, content = t("helpers.links.edit"))
+    link_to(content, [:edit, object], class: 'btn btn-mini') if can?(:update, object)
+  end
+
+  def destroy_link(object, content = t("helpers.links.destroy"))
+    link_to(content, object, :method => :delete, :confirm => "Are you sure?") if can?(:destroy, object)
+  end
+
+  def create_link(object, content = t("helpers.links.new"))
+    if can?(:create, object)
+      object_class = (object.kind_of?(Class) ? object : object.class)
+      link_to(content, [:new, object_class.name.underscore.to_sym])
+    end
+  end
+
+  private
+
+  def loan_mini_button(text, object, options={})
+    path = String.new
+
+    case object.class.to_s
+    when "ComponentModel"
+      path = new_component_model_loan_path(object, options)
+    when "ComponentModelDecorator"
+      path = new_component_model_loan_path(object.model, options)
+    when "Kit"
+      path = new_kit_loan_path(object, options)
+    when "KitDecorator"
+      path = new_kit_loan_path(object.model, options)
+    else
+      raise "Expected an instance of Kit, KitDecorator, ComponentModel or ComponentModelDecorator, got: #{ object.class }"
+    end
+    link_to(text, path, :class => 'btn btn-mini')
+  end
+
 end

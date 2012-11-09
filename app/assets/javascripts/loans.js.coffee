@@ -10,7 +10,7 @@ jQuery ->
     $("#loan_kit").closest(".control-group").addClass("hidden")
 
 
-  if gon
+  if typeof gon != "undefined"
     # convert the dates_open and days_reservable from an array of
     # strings to properties of type date on the object. this makes it
     # simple to do constant-time lookup to see if the date exists
@@ -31,9 +31,10 @@ jQuery ->
           day = new Date(Date.parse(d))
           location.dates_open[day] = true
         
-    # check if we need to parse the suggested return day/month into a JS date
-    if gon.default_return_date and typeof gon.default_return_date == "string"
-      gon.default_return_date = new Date(Date.parse(gon.default_return_date))
+    # check if we need to snag the suggested return day/month from the form
+    if !gon.default_return_date
+      ends_at = $('#loan_ends_at').val()
+      gon.default_return_date = new Date(Date.parse(ends_at))
 
 
 
@@ -69,11 +70,10 @@ jQuery ->
     # fetch the location's open dates from gon
     location = if gon && gon.locations && active_location then gon.locations[active_location] else []
 
-    for date_open in location.dates_open
-      date_open = new Date(Date.parse(date_open))
-
-      # find the nearest open day which is either the approximate
-      # return date, or after it
+    # find the nearest open day which is either the approximate
+    # return date, or after it
+    for date_open, x of location.dates_open
+      date_open = new Date(date_open)
       if date_open >= ends_at
         ends_at = date_open
         # break out of the for loop, since we're done
@@ -120,7 +120,7 @@ jQuery ->
     selectOtherMonths: true,
     beforeShow: (input, inst) ->
       # grab the start date so we have a starting reference point
-      start_date  = $("#loan_starts_at").datepicker("getDate") || $("#loan_out_at").datepicker("getDate")
+      start_date  = $("#loan_starts_at").datepicker("getDate") || Date.parse($("#loan_out_at").val())
       return unless start_date
 
       # restrict the available return dates to on/after the start_date

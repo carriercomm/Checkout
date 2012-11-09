@@ -50,6 +50,7 @@ class ComponentModel < ActiveRecord::Base
   end
 
   # HACK HACK: this is just to appease nested_form, but this is a terrible hack.
+  #            this is being used by the split_component_model fake model
   def self.klass
     ComponentModel
   end
@@ -118,6 +119,11 @@ class ComponentModel < ActiveRecord::Base
     s = "#{ brand } #{ name }"
     s = s.truncate(45, omission: "", separator: " ") if s.length > 45
     self.autocomplete = self.class.normalize(s)
+  end
+
+  def reservable?(client)
+    kits.each { |k| return true if k.reservable?(client) }
+    return false
   end
 
   def training_required?

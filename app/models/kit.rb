@@ -60,7 +60,7 @@ class Kit < ActiveRecord::Base
   def self.asset_tag_search(query)
     includes(:components)
       .joins(:components)
-      .where("components.asset_tag LIKE ?", "%#{ query }%")
+      .where("LOWER(components.asset_tag) LIKE ?", "%#{ query.downcase }%")
       .order("components.asset_tag ASC")
   end
 
