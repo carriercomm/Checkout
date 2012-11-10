@@ -59,7 +59,8 @@ class UsersController < ApplicationController
   # GET /users/1
   # GET /users/1.json
   def show
-    @user = UserDecorator.decorate(User.includes(:roles).find(params[:id]))
+    @user = UserDecorator.decorate(User.includes(:roles, :trainings, :component_models, :groups, :memberships).find(params[:id]))
+    @trainings = TrainingDecorator.decorate(@user.trainings)
 
     respond_to do |format|
       format.html { render layout: 'sidebar' } # show.html.erb
@@ -103,6 +104,7 @@ class UsersController < ApplicationController
 
     # TODO: this is possibly dangerous, is there a more manual way to handle it?
     @user.memberships_attributes = p[:memberships_attributes] if p[:memberships_attributes].present?
+    @user.trainings_attributes   = p[:trainings_attributes]   if p[:trainings_attributes].present?
 
     @user = UserDecorator.decorate(@user)
 
@@ -135,6 +137,7 @@ class UsersController < ApplicationController
 
     # TODO: this is possibly dangerous, is there a more manual way to handle it?
     @user.memberships_attributes = p[:memberships_attributes] if p[:memberships_attributes].present?
+    @user.trainings_attributes   = p[:trainings_attributes]   if p[:trainings_attributes].present?
 
     @user = UserDecorator.decorate(@user)
 

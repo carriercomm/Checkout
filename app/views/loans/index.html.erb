@@ -33,7 +33,7 @@
 
 <%= paginate @loans %>
 
-<table class="table table-striped index-view">
+<table class="table table-striped">
   <thead>
     <tr>
       <th colspan="2">Client</th>
@@ -63,30 +63,16 @@
         <td><%= loan.state %></td>
         <td>
           <div class="btn-group">
-            <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+            <button class="btn dropdown-toggle" data-toggle="dropdown">
               <i class="icon-cog"></i>
               <span class="caret"></span>
-            </a>
+            </button>
             <ul class="dropdown-menu">
-              <li>
-                <%= link_to loan_path(loan) do %>
-                  <i class="icon-info-sign"></i>
-                  Show
-                <% end %>
-              </li>
-              <li>
-                <%= link_to edit_loan_path(loan)  do %>
-                  <i class="icon-pencil"></i>
-                  Edit
-                <% end %>
-              </li>
-              <li class="divider"></li>
-              <li>
-                <%= link_to loan_path(loan), :method => :delete, :confirm => 'Are you sure?' do %>
-                  <i class="icon-trash"></i>
-                  Delete
-                <% end %>
-              </li>
+              <li><%= show_link(loan) %></li>
+              <% if loan.approved? %>
+              <li><%= checkout_link(loan) %></li>
+              <% end %>
+              <li><%= edit_link(loan) %></li>
             </ul>
           </div>
         </td>

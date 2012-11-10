@@ -9,14 +9,25 @@
 
   <%= f.association :roles, :as => :check_boxes %>
 
+  <h2>Groups</h2>
   <div class="records row-fluid">
     <div class="fields field-headers row-fluid">
-      <div class="field field-header span6">Group</div>
-      <div class="field field-header span4">Expires At</div>
+      <div class="field field-header span6">Name</div>
+      <div class="field field-header span4">Expires</div>
       <div class="field field-header span2">Actions</div>
     </div>
-    <%= f.simple_fields_for :memberships, @user.memberships %>
+    <%= f.simple_fields_for :memberships, @user.model.memberships %>
     <%= f.link_to_add raw("<i class='icon-plus-sign'></i> Add another group"), :memberships %>
+  </div>
+
+  <h2>Training</h2>
+  <div class="records row-fluid">
+    <div class="fields field-headers row-fluid">
+      <div class="field field-header span10">Model</div>
+      <div class="field field-header span2">Actions</div>
+    </div>
+    <%= f.simple_fields_for :trainings, @user.model.trainings %>
+    <%= f.link_to_add raw("<i class='icon-plus-sign'></i> Add another model"), :trainings %>
   </div>
 
   <div class="form-actions">

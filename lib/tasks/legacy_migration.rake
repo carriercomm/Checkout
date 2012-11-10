@@ -416,6 +416,43 @@ namespace :dbx do
 
 
   desc 'migrate data from dbx'
+  task :training  => :environment do
+    require 'tasks/legacy_classes'
+
+    Training.delete_all
+
+    puts "Migrating training info..."
+    success_count = 0
+    error_count = 0
+
+    LegacyTraining.all.each do |lt|
+      c = Component.find_by_asset_tag(lt.eq_uw_tag.to_s)
+      u = User.find_by_username(lt.client_id.downcase.squish)
+      if c && u
+        unless c.component_model.training_required?
+          puts "\t Erroneous training record #{lt.special_id}: #{ lt.eq_uw_tag }"
+        end
+        begin
+          Training.create!(user: u, component_model: c.component_model)
+        rescue StandardError => e
+          error_count += 1
+          puts "\tError migrating #{lt.special_id}: #{ e }"
+#          puts e.backtrace
+        end
+        success_count += 1
+      else
+        puts "\tError migrating #{lt.special_id}: couldn't find component or user"
+        error_count += 1
+      end
+    end
+
+    puts "Successfully migrated #{ success_count } trainings"
+    puts "#{ error_count } errors"
+    puts
+
+  end
+
+  desc 'migrate data from dbx'
   task :res  => :environment do
     require 'tasks/legacy_classes'
 

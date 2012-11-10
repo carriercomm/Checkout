@@ -7,7 +7,7 @@ class Loan < ActiveRecord::Base
   state_machine :initial => :pending do
 
     event :approve do
-      transition [:building, :rejected, :pending] => :approved, :if => :valid?
+      transition [:rejected, :pending] => :approved, :if => :valid?
     end
 
     event :cancel do
@@ -38,6 +38,7 @@ class Loan < ActiveRecord::Base
     state :checked_out do
       validates_presence_of :out_assistant
       validates :out_at, :presence => true
+      validate :validate_client_has_proper_training
       validate :validate_client_signed_all_covenants
     end
 
@@ -210,6 +211,12 @@ class Loan < ActiveRecord::Base
   def validate_client_has_permission
     unless kit.can_be_loaned_to? client
       errors.add(:client, "does not have permission to check out this kit.")
+    end
+  end
+
+  def validate_client_has_proper_training
+    if kit.training_required?
+      errors.add(:client, "does not have proper training for this kit.")
     end
   end
 

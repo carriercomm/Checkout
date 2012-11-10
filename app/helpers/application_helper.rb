@@ -84,9 +84,28 @@ module ApplicationHelper
     link_to(content, object, class: 'btn btn-mini') if current_user.attendant?
   end
 
+  # TODO: DRY this up
+  def checkout_link(object)
+    if object.is_a?(LoanDecorator)
+      link_to(t('helpers.links.checkout'), [:edit, object.model], a:'checkout')
+    elsif object.is_a?(Loan)
+      link_to(t('helpers.links.checkout'), [:edit, object], a:'checkout')
+    else
+      if object.checkoutable? && current_user.attendant?
+        loan_link(t('helpers.links.checkout'), object, a:'checkout')
+      end
+    end
+  end
+
   def checkout_mini_button(object)
     if object.checkoutable? && current_user.attendant?
       loan_mini_button(t('helpers.links.checkout'), object, a:'checkout')
+    end
+  end
+
+  def reserve_link(object)
+    if object.checkoutable? && object.reservable?(current_user)
+      loan_link(t('helpers.links.reserve'), object)
     end
   end
 
@@ -125,6 +144,7 @@ module ApplicationHelper
 
   private
 
+  # TODO: DRY this up
   def loan_mini_button(text, object, options={})
     path = String.new
 
@@ -142,5 +162,24 @@ module ApplicationHelper
     end
     link_to(text, path, :class => 'btn btn-mini')
   end
+
+  def loan_link(text, object, options={})
+    path = String.new
+
+    case object.class.to_s
+    when "ComponentModel"
+      path = new_component_model_loan_path(object, options)
+    when "ComponentModelDecorator"
+      path = new_component_model_loan_path(object.model, options)
+    when "Kit"
+      path = new_kit_loan_path(object, options)
+    when "KitDecorator"
+      path = new_kit_loan_path(object.model, options)
+    else
+      raise "Expected an instance of Kit, KitDecorator, ComponentModel or ComponentModelDecorator, got: #{ object.class }"
+    end
+    link_to(text, path)
+  end
+
 
 end

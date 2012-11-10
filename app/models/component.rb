@@ -15,7 +15,7 @@ class Component < ActiveRecord::Base
   ## Associations ##
 
   belongs_to :component_model, :inverse_of => :components
-  belongs_to :kit,   :inverse_of => :components
+  belongs_to :kit,             :inverse_of => :components
 
 
   ## Validations ##

@@ -1,11 +1,9 @@
 <%= simple_form_for @loan.model, :html => { :class => 'form-horizontal' } do |f| %>
   <fieldset>
-    <% if @default_checkout_length %>
-      <div class="alert alert-info">
-        <button type="button" class="close" data-dismiss="alert">×</button>
-        <strong>Note:</strong> The default length of a checkout is <%= @default_checkout_length %> day(s), not including weekends and holidays. If you select a return date beyond <%= @default_checkout_length %> day(s), your reservation will require approval.
-      </div>
-    <% end %>
+    <div class="alert alert-info">
+      <button type="button" class="close" data-dismiss="alert">×</button>
+      <strong>Note:</strong> The default length of a checkout is <%= @default_checkout_length %> day(s), not including weekends and holidays. If you select a return date beyond <%= @default_checkout_length %> day(s), your reservation will require approval.
+    </div>
 
     <% if can? :manage, @loan %>
       <%= f.input :client_id,

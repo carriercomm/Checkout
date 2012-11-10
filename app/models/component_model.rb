@@ -10,9 +10,11 @@ class ComponentModel < ActiveRecord::Base
   ## Associations ##
 
   belongs_to :brand,      :inverse_of => :component_models
-  has_many   :components, :inverse_of => :component_model, :dependent => :destroy
-  has_many   :kits, :through => :components
   has_and_belongs_to_many :categories
+  has_many   :components, :inverse_of => :component_model, :dependent => :destroy
+  has_many   :kits,       :through => :components
+  has_many   :trainings,  :inverse_of => :component_model, :dependent => :destroy
+  has_many   :users,      :through => :trainings
 
 
   ## Validations ##

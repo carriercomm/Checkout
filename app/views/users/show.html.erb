@@ -2,6 +2,7 @@
 <%= subtitle @user.full_name %>
 <% content_for :sidebar do %>
   <li class="nav-header"><%= t(".actions") %></li>
+  <li><%= edit_link(@user) %></li>
   <li><%= link_to 'Loans', user_loans_path(@user) %></li>
 <% end %>
 
@@ -38,15 +39,22 @@
   <dd><%= @user.disabled %></dd>
   <dt><%= t('simple_form.labels.user.roles') %></dt>
   <dd><%= @user.roles_list("<br>") %></dd>
-  <dt><%= t('simple_form.labels.user.groups') %></dt>
-  <dd><%= @user.groups_list("<br>") %></dd>
 </dl>
 
+<h2><%= t('simple_form.labels.user.groups') %></h2>
+<table class="table table-striped">
+  <tr>
+    <th class="span6">Name</th>
+    <th class="span6">Expires</th>
+  </tr>
+  <%= render partial: 'membership', collection: @user.memberships %>
+</table>
 
-
-<div class="form-actions">
-  <%= link_to t('.back', :default => t("helpers.links.back")),
-              active_users_path, :class => 'btn'  %>
-  <%= link_to t('.edit', :default => t("helpers.links.edit")),
-              edit_user_path(@user), :class => 'btn' %>
-</div>
+<h2>Training</h2>
+<table class="table table-striped">
+  <tr>
+    <th class="span6">Model</th>
+    <th class="span6">Date</th>
+  </tr>
+  <%= render partial: 'trainings', collection: @trainings %>
+</table>

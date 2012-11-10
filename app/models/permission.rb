@@ -7,8 +7,8 @@ class Permission < ActiveRecord::Base
 
   ## Associations ##
 
-  belongs_to :group
-  belongs_to :kit
+  belongs_to :group, :inverse_of => :permissions
+  belongs_to :kit,   :inverse_of => :permissions
 
 
   ## Mass-assignable attributes ##

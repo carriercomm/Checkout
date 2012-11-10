@@ -186,3 +186,10 @@ class LegacyCheckout < ActiveRecord::Base
   end
 
 end
+
+class LegacyTraining < ActiveRecord::Base
+  establish_connection :legacy
+  set_table_name 'special_items'
+  set_primary_key :special_id
+  belongs_to :legacy_equipment, foreign_key: 'eq_uw_tag'
+end

@@ -2,7 +2,11 @@
 <% subtitle @kit.component_list %>
 <% content_for :sidebar do %>
   <li class="nav-header"><%= t(".actions") %></li>
-  <li><%= link_to 'Kit Loans', kit_loans_path(@kit) %></li>
+  <li><%= edit_link(@kit) %></li>
+  <li><%= destroy_link(@kit) %></li>
+  <li><%= link_to 'Check Out', new_kit_loan_path(@kit, state_event: 'checkout') if @kit.reservable?(current_user) %></li>
+  <li><%= link_to 'Reserve', new_kit_loan_path(@kit) if @kit.reservable?(current_user) %></li>
+  <li><%= link_to 'Show Kit Loans', kit_loans_path(@kit) %></li>
 <% end %>
 
 <div class="pull-right">
@@ -45,15 +49,6 @@
       <th width="span3">Serial Number</th>
       <th width="span1">Missing</th>
     </tr>
-  <%= render :partial => 'component', :collection =>  @kit.components %>
+  <%= render partial:'component', collection: @kit.components %>
   </tbody>
 </table>
-
-<div class="form-actions">
-  <%= link_to 'Back', kits_path, :class => 'btn'  %>
-  <%= link_to 'Check Out', new_kit_loan_path(@kit, state_event: 'checkout'), :class => 'btn' if @kit.reservable?(current_user) %>
-  <%= link_to 'Reserve', new_kit_loan_path(@kit), :class => 'btn' if @kit.reservable?(current_user) %>
-  <%= link_to('Edit', edit_kit_path(@kit), :class => 'btn btn-edit-kit') if can? :manage, Kit %>
-  <%= link_to('Destroy', edit_kit_path(@kit), :method => :delete, :confirm => 'Are you sure? Note: this will not delete associated components, just the kit.', :class => 'btn btn-danger btn-delete-kit') if can? :manage, Kit %>
-
-</div>

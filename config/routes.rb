@@ -10,6 +10,7 @@ Checkout::Application.routes.draw do
     ['checkoutable'].each do |r|
       get r, to: "component_models#index", filter: r
     end
+    get "select2"
   end
 
   devise_for :user
@@ -65,7 +66,9 @@ Checkout::Application.routes.draw do
         get r, to: "loans#index", filter: r
       end
     end
-    match 'new/reservation', :action => 'reservation'
+    member do
+      get 'checkout'
+    end
   end
   resources :search, only: [:index]
   resources :users, except: [:destroy] do

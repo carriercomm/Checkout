@@ -12,20 +12,22 @@ class User < ActiveRecord::Base
 
   ## Associations ##
 
-  has_many :approvals,    :foreign_key => "approver_id",      :class_name => 'Loan'
+  has_many :approvals,           :foreign_key => "approver_id",      :class_name => 'Loan'
+  has_many :component_models,    :through => :trainings
   has_many :covenant_signatures, :inverse_of => :user
-  has_many :covenants,    :through => :covenant_signatures
-  has_many :groups,       :through => :memberships
-  has_many :in_assists,   :foreign_key => "in_assistant_id",  :class_name => 'Loan'
-  has_many :memberships,  :inverse_of => :user
-  has_many :out_assists,  :foreign_key => "out_assistant_id", :class_name => 'Loan'
-
-  has_many :loans,        :foreign_key => "client_id" do
+  has_many :covenants,           :through => :covenant_signatures
+  has_many :groups,              :through => :memberships
+  has_many :in_assists,          :foreign_key => "in_assistant_id",  :class_name => 'Loan'
+  has_many :loans,               :foreign_key => "client_id" do
     def build_from_component_model_id(component_model_id)
       component_model = ComponentModel.checkoutable.includes(:kits => :location).find(component_model_id)
       build(:component_model => component_model)
     end
   end
+  has_many :memberships,         :inverse_of => :user
+  has_many :out_assists,         :foreign_key => "out_assistant_id", :class_name => 'Loan'
+  has_many :trainings,           :inverse_of => :user, :dependent => :destroy
+
 
   ## Mass-assignable Attributes ##
 
@@ -42,6 +44,9 @@ class User < ActiveRecord::Base
                                 :reject_if => proc { |attributes| attributes['group_id'].blank? },
                                 :allow_destroy=> true)
 
+  accepts_nested_attributes_for(:trainings,
+                                :reject_if => proc { |attributes| attributes['component_model_id'].blank? },
+                                :allow_destroy=> true)
 
   ## Virtual Attributes ##
 

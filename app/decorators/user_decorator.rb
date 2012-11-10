@@ -2,7 +2,9 @@ class UserDecorator < ApplicationDecorator
   decorates :user
   decorates_association :covenants
   decorates_association :groups
+  decorates_association :memberships
   decorates_association :roles
+  decorates_association :trainings
 
   allows(:created_at,
          :disabled?,

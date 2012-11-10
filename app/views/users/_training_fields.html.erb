@@ -1,0 +1,17 @@
+<% component_model = ComponentModelDecorator.decorate(f.object.component_model) unless f.object.new_record? %>
+<%= content_tag :div, f.error(:base), :class=>"alert alert-error span12" if f.error(:base) %>
+<div class="field span10">
+  <% if f.object.id.nil? %>
+    <%= f.input :component_model_id,
+                :wrapper => :tabular,
+                :input_html => {
+                    :class => 'select2-json-autocomplete select-component-model',
+                    :hidden => true,
+                    "data-ajax-url" => select2_component_models_path(:format => :json)
+                } %>
+  <% else %>
+    <%= component_model %>
+    <%= f.input :component_model_id, :as => :hidden, :wrapper => :tabular %>
+  <% end %>
+</div>
+<div class="field span2"><%= f.link_to_remove "Delete", :class => "btn btn-danger" %></div>

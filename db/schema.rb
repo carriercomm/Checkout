@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20121017012907) do
+ActiveRecord::Schema.define(:version => 20121109225259) do
 
   create_table "app_configs", :force => true do |t|
     t.integer  "default_checkout_length"
@@ -220,6 +220,16 @@ ActiveRecord::Schema.define(:version => 20121017012907) do
 
   add_index "roles", ["name", "resource_type", "resource_id"], :name => "index_roles_on_name_and_resource_type_and_resource_id"
   add_index "roles", ["name"], :name => "index_roles_on_name"
+
+  create_table "trainings", :force => true do |t|
+    t.integer  "component_model_id"
+    t.integer  "user_id"
+    t.datetime "created_at",         :null => false
+    t.datetime "updated_at",         :null => false
+  end
+
+  add_index "trainings", ["component_model_id"], :name => "index_trainings_on_component_model_id"
+  add_index "trainings", ["user_id", "component_model_id"], :name => "index_trainings_on_user_id_and_component_model_id", :unique => true
 
   create_table "users", :force => true do |t|
     t.string   "username",                                  :null => false

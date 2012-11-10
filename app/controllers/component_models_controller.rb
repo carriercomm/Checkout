@@ -24,6 +24,19 @@ class ComponentModelsController < ApplicationController
     end
   end
 
+  # TODO: add query param to constrain search to component_models which require training
+  # GET /component_models/select2.json
+  def select2
+    # find by name
+    component_models = ComponentModel.search(params["q"])
+    component_models = ComponentModelDecorator.decorate(component_models)
+
+    respond_to do |format|
+      #format.html # index.html.erb
+      format.json { render json: { items: component_models.map(&:select2_json)} }
+    end
+  end
+
   # GET /models/1
   # GET /models/1.json
   def show

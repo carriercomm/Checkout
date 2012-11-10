@@ -1,5 +1,6 @@
 class MembershipDecorator < ApplicationDecorator
   decorates :membership
+  decorates_association :group
   decorates_association :user
 
   def username
