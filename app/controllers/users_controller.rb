@@ -59,7 +59,7 @@ class UsersController < ApplicationController
   # GET /users/1
   # GET /users/1.json
   def show
-    @user = UserDecorator.decorate(User.includes(:roles, :trainings, :component_models, :groups, :memberships).find(params[:id]))
+    @user = UserDecorator.decorate(User.includes(:roles, :component_models, :groups, :memberships).find(params[:id]))
     @trainings = TrainingDecorator.decorate(@user.trainings)
 
     respond_to do |format|

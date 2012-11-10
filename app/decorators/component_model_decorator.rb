@@ -4,6 +4,8 @@ class ComponentModelDecorator < ApplicationDecorator
   decorates_association :categories
   decorates_association :components
   decorates_association :kits
+  decorates_association :trainings
+  decorates_association :users
 
   def autocomplete_json
     {

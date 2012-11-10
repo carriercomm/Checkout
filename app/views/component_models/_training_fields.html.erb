@@ -1,0 +1,22 @@
+<% user = UserDecorator.decorate(f.object.user) unless f.object.new_record? %>
+<%= content_tag :div, f.error(:base), :class=>"alert alert-error span12" if f.error(:base) %>
+<% if f.object.id.nil? %>
+  <div class="field span10">
+    <%= f.input :user_id,
+                :wrapper => :tabular,
+                :input_html => {
+                    :class => 'select2-json-autocomplete select-user',
+                    :hidden => true,
+                    "data-ajax-url" => select2_users_path(:format => :json)
+                } %>
+  </div>
+<% else %>
+  <div class="field span5">
+    <%= user.username %>
+    <%= f.input :user_id, :as => :hidden, :wrapper => :tabular %>
+  </div>
+  <div class="field span5">
+    <%= user.full_name %>
+  </div>
+<% end %>
+<div class="field span2"><%= f.link_to_remove "Delete", :class => "btn btn-danger" %></div>

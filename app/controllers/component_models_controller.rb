@@ -37,11 +37,14 @@ class ComponentModelsController < ApplicationController
     end
   end
 
+  # TODO: move this view to the sidebar layout
   # GET /models/1
   # GET /models/1.json
   def show
-    @component_model = ComponentModel.includes(:kits => :location).find(params[:id])
+    @component_model = ComponentModel.includes(:kits => [:location]).find(params[:id])
+    @trainings       = @component_model.trainings.includes(:user).where("users.disabled = ?", false).order("users.username")
     @component_model = ComponentModelDecorator.decorate(@component_model)
+    @trainings       = TrainingDecorator.decorate(@trainings)
 
     respond_to do |format|
       format.html
@@ -63,6 +66,7 @@ class ComponentModelsController < ApplicationController
   # GET /models/1/edit
   def edit
     @component_model = ComponentModelDecorator.find(params[:id])
+    @trainings       = @component_model.model.trainings.includes(:user).where("users.disabled = ?", false).order("users.username")
   end
 
   # POST /models

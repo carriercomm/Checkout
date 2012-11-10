@@ -30,7 +30,12 @@ class ComponentModel < ActiveRecord::Base
                   :category_ids,
                   :description,
                   :name,
+                  :trainings_attributes,
                   :training_required)
+
+  accepts_nested_attributes_for(:trainings,
+                                :reject_if => proc { |attributes| attributes['user_id'].blank? },
+                                :allow_destroy=> true)
 
   ## Class Methods ##
 

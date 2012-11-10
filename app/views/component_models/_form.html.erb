@@ -28,7 +28,7 @@
   </p>
 </div>
 
-<%= simple_form_for @component_model.model, :html => { :class => 'form-horizontal' } do |f| %>
+<%= simple_nested_form_for @component_model.model, :html => { :class => 'form-horizontal' } do |f| %>
   <%= f.input :brand_id, :label => "Brand", :required => true, :input_html => {
         :class          => 'select2-json-autocomplete',
         :hidden         => true,
@@ -51,6 +51,18 @@
     <!-- displays the categories/new_modal partial -->
     <a data-toggle="modal" href="#category_modal">New Category</a>
   </div>
+
+  <h2>Training</h2>
+  <div class="records row-fluid">
+    <div class="fields field-headers row-fluid">
+      <div class="field field-header span5">Username</div>
+      <div class="field field-header span5">Full Name</div>
+      <div class="field field-header span2">Actions</div>
+    </div>
+    <%= f.simple_fields_for :trainings, @trainings %>
+    <%= f.link_to_add raw("<i class='icon-plus-sign'></i> Add another user"), :trainings %>
+  </div>
+
   <div class="form-actions">
     <%= f.submit nil, :class => 'btn btn-primary' %>
     <%= link_to 'Cancel', component_models_path, :class => 'btn' %>
