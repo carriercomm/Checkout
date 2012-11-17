@@ -1,5 +1,20 @@
 <% title @component_model %>
 
+<% content_for :sidebar do %>
+  <li class="nav-header"><%= t(".actions") %></li>
+  <li><%= edit_link(@component_model) %></li>
+  <li><%= link_to 'Reserve', new_component_model_loan_path(@component_model) %></li>
+  <%= sidebar_link t('component_model.sidebar.split.text'),
+                   new_split_component_model_path("split_component_model[root_component_model_id]" => @component_model.id),
+                   t('component_model.sidebar.split.default_tooltip'),
+                   can?(:manage, ComponentModel),
+                   t('component_model.sidebar.split.denied_tooltip') %>
+  <li><%= link_to('Delete', component_model_path(@component_model),
+                :method => 'delete',
+                :confirm => 'Are you sure? This will also delete all the components associated with this model!') if can? :manage, ComponentModel %></li>
+
+<% end %>
+
 <dl class="dl-horizontal">
   <dt><%= t('simple_form.labels.component_model.description') %></dt>
   <dd><%= @component_model.description %></dd>
@@ -10,16 +25,7 @@
 </dl>
 
 <div class="form-actions">
-  <%= link_to 'Back', component_models_path, :class => 'btn'  %>
-  <%= link_to 'Reserve', new_component_model_loan_path(@component_model), :class => 'btn btn-primary' %>
-  <%= link_to('Edit', edit_component_model_path(@component_model), :class => 'btn btn-edit-component-model') if can? :manage, ComponentModel %>
-  <%= link_to('Split',
-                new_split_component_model_path("split_component_model[root_component_model_id]" => @component_model.id),
-                :class => 'btn btn-split-component-model') if can? :manage, ComponentModel %>
-  <%= link_to('Delete', component_model_path(@component_model),
-                :method => 'delete',
-                :confirm => 'Are you sure? This will also delete all the components associated with this model!',
-                :class => 'btn btn-danger btn-delete-component-model') if can? :manage, ComponentModel %>
+
 </div>
 
 <h2>Kits With This Model</h2>

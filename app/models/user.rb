@@ -1,5 +1,4 @@
 class User < ActiveRecord::Base
-
   ## Macros ##
 
   rolify
@@ -119,7 +118,7 @@ class User < ActiveRecord::Base
   end
 
   def suspended?(reference_date = Date.today)
-    !suspended_until.nil? && suspended_until.to_date > reference_date
+    !suspended_until.nil? && suspended_until.to_date > reference_date.to_date
   end
 
   def to_param

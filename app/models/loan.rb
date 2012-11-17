@@ -6,6 +6,13 @@ class Loan < ActiveRecord::Base
 
   state_machine :initial => :pending do
 
+    after_failure do |loan, transition|
+      puts "loan #{loan} failed to transition on #{transition.event}"
+      puts loan.inspect
+      puts transition.inspect
+      puts loan.errors.inspect
+    end
+
     event :approve do
       transition [:rejected, :pending] => :approved, :if => :valid?
     end
@@ -26,8 +33,15 @@ class Loan < ActiveRecord::Base
       transition :pending => :rejected
     end
 
+    event :unapprove do
+      approver_id = nil
+      transition [:approved, :pending] => :pending
+    end
+
     state :approved do
-      validates_presence_of :approver
+      # TODO: verify this check_approval callback doesn't need to be on other states
+      before_save :check_approval
+      validates :approver_id, :presence => true
     end
 
     state :checked_in do
@@ -43,13 +57,18 @@ class Loan < ActiveRecord::Base
     end
 
     state :pending do
-      before_save :auto_approve!
+      after_save :auto_approve!
       validate    :validate_open_on_starts_at
     end
 
   end
 
   ## Associations ##
+
+  # Ensure User is not scoped
+  def approver
+    User.unscoped { super }
+  end
 
   belongs_to :kit,           :inverse_of => :loans
   belongs_to :client,        :inverse_of => :loans,       :class_name => "User"
@@ -67,10 +86,12 @@ class Loan < ActiveRecord::Base
   validates_presence_of :location # not persisted, but it makes the controller/view simpler
   validates :starts_at,  :presence => true
   validates :ends_at,    :presence => true
-  validate  :validate_client_has_permission, :unless => :importing_legacy_records?
-  validate  :validate_kit_available,         :unless => :importing_legacy_records?
-  validate  :validate_kit_checkoutable,      :unless => :importing_legacy_records?
-  validate  :validate_open_on_ends_at,       :unless => :importing_legacy_records?
+  validate  :validate_client_has_permission,   :unless => :importing_legacy_records?
+  validate  :validate_client_is_not_disabled,  :unless => :importing_legacy_records?
+  validate  :validate_client_is_not_suspended, :unless => :importing_legacy_records?
+  validate  :validate_kit_available,           :unless => :importing_legacy_records?
+  validate  :validate_kit_checkoutable,        :unless => :importing_legacy_records?
+  validate  :validate_open_on_ends_at,         :unless => :importing_legacy_records?
 
 
   ## Virtual Attributes ##
@@ -90,9 +111,34 @@ class Loan < ActiveRecord::Base
   end
 =end
 
+  # this should only be called after validations have run
+  def auto_approve!
+    if pending? && within_default_length?
+      # the default scope excludes "system"
+      self.approver = User.unscoped.find_by_username("system")
+      approve
+      true
+    else
+      false
+    end
+  end
+
   def available_checkoutable_kits
     return nil if component_model.nil?
     component_model.available_checkoutable_kits(starts_at, ends_at, location)
+  end
+
+  # if this loan was auto_approved, make sure the checkout duration is
+  # still valid - rollback the state if necessary
+  def check_approval
+    # the default scope excludes "system"
+    system_user = User.unscoped.find_by_username("system")
+
+    if (self.approver.nil? || self.approver == system_user) && !within_default_length?
+      unapprove
+    end
+
+    true
   end
 
   # this should either be set via the component_model virtual
@@ -180,18 +226,6 @@ class Loan < ActiveRecord::Base
     return (ends_at.to_date <= next_date_open)
   end
 
-  # this should only be called after validations have run
-  def auto_approve!
-    if pending? && within_default_length?
-      # the default scope excludes "system"
-      self.approver = User.unscoped.find_by_username("system")
-      approve
-      true
-    else
-      false
-    end
-  end
-
   def kit_available?
     kit && !kit.loaned_between?(starts_at, ends_at, [self])
   end
@@ -202,9 +236,15 @@ class Loan < ActiveRecord::Base
 
   private
 
+  def validate_client_is_not_disabled
+    if client.disabled?
+      errors.add(:client, "is disabled.")
+    end
+  end
+
   def validate_client_is_not_suspended
-    if client.suspended?
-      errors.add(:client, "is suspended until #{ client.suspended_until }.")
+    if client.suspended?(self.starts_at)
+      errors.add(:client, "is suspended until #{ UserDecorator.decorate(client).suspended_until }.")
     end
   end
 

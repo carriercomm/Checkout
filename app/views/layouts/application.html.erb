@@ -16,11 +16,6 @@
     <![endif]-->
 
     <!-- Le styles -->
-    <style>
-      body {
-        padding-top: 60px; /* 60px to make the container go all the way to the bottom of the topbar */
-      }
-    </style>
     <%= stylesheet_link_tag "application", :media => "all" %>
 
     <!-- Le fav and touch icons -->
@@ -66,9 +61,7 @@
           </div><!--/.nav-collapse -->
         </div>
       </div>
-      <div class="container-fluid" style="background-color:#f2f2f2;padding:0.5em 20px;height:2.2em">
-
-      </div>
+      <!-- <div class="container-fluid" style="background-color:#f2f2f2;padding:0.5em 20px;height:2.2em"></div> -->
     </div>
 
     <div class="container-fluid">
@@ -88,12 +81,8 @@
       <!--   </div> -->
       <!-- </header> -->
 
-      <% flash.each do |name, msg| %>
-        <div class="alert alert-<%= name == :notice ? "success" : "error" %>">
-          <a class="close" data-dismiss="alert">×</a>
-          <%= msg %>
-        </div>
-      <% end %>
+      <%= bootstrap_flash %>
+
       <div class="row-fluid">
         <%= content_for?(:main) ? yield(:main) : yield %>
       </div><!--/row-->

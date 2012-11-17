@@ -98,7 +98,7 @@ class Kit < ActiveRecord::Base
 
   # TODO: add check for 'hold'
   def can_be_loaned_to?(client)
-    client && checkoutable && (client.has_role? "admin" || groups.map(&:users).flatten.include?(client))
+    client && checkoutable && (client.has_role?("admin") || groups.map(&:users).flatten.uniq.include?(client))
   end
 
   def checked_out?

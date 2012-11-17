@@ -136,6 +136,10 @@ en:
       checkoutable:
         text: "Checkoutable"
         default_tooltip: "Show all checkoutable models"
+      split:
+        text: 'Split'
+        default_tooltip: 'Split this model into two models'
+        denied_tooltip: "You don't have sufficient permission to split a model"
       # non_checkoutable:
       #   text: "Non Checkoutable"
       #   default_tooltip: "Show all non checkoutable models"

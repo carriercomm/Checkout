@@ -47,7 +47,7 @@ class ComponentModelsController < ApplicationController
     @trainings       = TrainingDecorator.decorate(@trainings)
 
     respond_to do |format|
-      format.html
+      format.html { render layout: 'sidebar' } # show.html.erb
     end
   end
 

@@ -103,13 +103,14 @@ class LoansController < ApplicationController
     @loan = Loan.new(params[:loan])
     @loan = LoanDecorator.decorate(@loan)
 
-    # TODO: validate training?
-
     respond_to do |format|
       if @loan.kit.nil? && @loan.component_model && @loan.location && @loan.starts_at && @loan.ends_at
         @kits = KitDecorator.decorate(@loan.available_checkoutable_kits)
         format.html { render :kit_select }
       elsif @loan.save
+        if @loan.pending?
+          flash[:error] = "Your reservation requires approval to be checked out for an extended period."
+        end
         format.html { redirect_to @loan, notice: 'Loan was successfully created.' }
       else
         logger.debug @loan.errors.inspect
@@ -125,8 +126,12 @@ class LoansController < ApplicationController
 
     respond_to do |format|
       if @loan.update_attributes(params[:loan])
+        if @loan.pending?
+          flash[:error] = "Your reservation requires approval to be checked out for an extended period."
+        end
         format.html { redirect_to @loan, notice: 'Loan was successfully updated.' }
       else
+        logger.debug @loan.errors.inspect
         format.html { render action: "edit" }
       end
     end

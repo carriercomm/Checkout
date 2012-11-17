@@ -6,13 +6,7 @@
     </div>
 
     <% if can? :manage, @loan %>
-      <%= f.input :client_id,
-                  :input_html => {
-                      :class => 'select2-json-autocomplete select-user',
-                      :hidden => true,
-                      "data-text" => @loan.model.client,
-                      "data-ajax-url" => select2_users_path(:format => :json)
-                  } %>
+      <%= f.input :client, :as => :ajax_association, :path => select2_users_path(:format => :json) %>
     <% else %>
       <%= f.association :client, :as => :hidden %>
       <%= f.input       :client, :readonly => true, :disabled => true %>
