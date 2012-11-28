@@ -11,4 +11,8 @@ class BrandDecorator < Draper::Base
     h.link_to(model.name, h.brand_path(model))
   end
 
+  def to_s
+    model.name
+  end
+
 end

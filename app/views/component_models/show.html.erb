@@ -9,7 +9,7 @@
                    t('component_model.sidebar.split.default_tooltip'),
                    can?(:manage, ComponentModel),
                    t('component_model.sidebar.split.denied_tooltip') %>
-  <li><%= link_to('Delete', component_model_path(@component_model),
+  <li><%#= link_to('Delete', component_model_path(@component_model),
                 :method => 'delete',
                 :confirm => 'Are you sure? This will also delete all the components associated with this model!') if can? :manage, ComponentModel %></li>
 
@@ -24,17 +24,14 @@
   <dd><%= @component_model.category_list %></dd>
 </dl>
 
-<div class="form-actions">
-
-</div>
-
 <h2>Kits With This Model</h2>
 <% if @component_model.kits.empty? %>
-  No kits for this model
+  <p>No kits for this model</p>
 <% else %>
   <table class="table table-striped">
     <thead>
       <tr>
+        <th>Kit ID</th>
         <th>Asset Tags</th>
         <th>Components</th>
         <th>Location</th>
@@ -44,7 +41,8 @@
     <tbody>
       <% @component_model.kits.each do |kit| %>
         <tr>
-          <td><%= link_to(kit.asset_tags, kit_path(kit)) %></td>
+          <td><%= link_to(kit.id, kit_path(kit)) %></td>
+          <td><%= kit.asset_tags %></td>
           <td><%= kit.component_list %></td>
           <td><%= kit.location %></td>
           <td>
@@ -59,21 +57,26 @@
   </table>
 <% end %>
 
-<h2>Training</h2>
-<div class="alert alert-info">
-  <button type="button" class="close" data-dismiss="alert">×</button>
-  <strong>Note:</strong> only showing active users below.
-</div>
-
-<table class="table table-striped">
-  <thead>
-    <tr>
-      <th>Username</th>
-      <th>Full Name</th>
-      <th>Date</th>
-    </tr>
-  </thead>
-  <tbody>
-    <%= render partial: 'training', collection: @trainings %>
-  </tbody>
-</table>
+<% if can?(:read, Training) && @component_model.training_required? %>
+  <h2>Training</h2>
+  <div class="alert alert-info">
+    <button type="button" class="close" data-dismiss="alert">×</button>
+    <strong>Note:</strong> only showing active users below.
+  </div>
+  <% if @trainings.empty? %>
+    <p>No one has been trained to use this model.</p>
+  <% else %>
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>Username</th>
+          <th>Full Name</th>
+          <th>Date</th>
+        </tr>
+      </thead>
+      <tbody>
+        <%= render partial: 'training', collection: @trainings %>
+      </tbody>
+    </table>
+  <% end %>
+<% end %>

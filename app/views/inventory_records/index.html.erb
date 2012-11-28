@@ -1,0 +1,45 @@
+<% title t('inventory_record.index.title') %>
+
+<% content_for :sidebar do %>
+  <li class="nav-header"><%= t(".actions") %></li>
+  <%= sidebar_link t('helpers.links.all'),
+                   inventory_records_path,
+                   t('inventory_record.sidebar.all.default_tooltip'),
+                   can?(:manage, InventoryRecord),
+                   t('inventory_record.sidebar.all.denied_tooltip') %>
+<% end %>
+
+<%= paginate @inventory_records %>
+
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>Date</th>
+      <th>Attendant</th>
+      <th>Status</th>
+      <th>Kit<br>ID</th>
+      <th>Component<br>ID</th>
+      <th>Asset Tag</th>
+      <th>Brand</th>
+      <th>Model</th>
+      <th>Loan</th>
+    </tr>
+  </thead>
+  <tbody>
+  <% @inventory_records.each do |inventory_record| %>
+    <tr class="<%= inventory_record.style %>">
+      <td><%= inventory_record.created_at %></td>
+      <td><%= inventory_record.attendant %></td>
+      <td><%= inventory_record.inventory_status %></td>
+      <td><%= link_to(inventory_record.component.kit.id, kit_path(inventory_record.component.kit)) %></td>
+      <td><%= inventory_record.component.id %></td>
+      <td><%= inventory_record.component.asset_tag %></td>
+      <td><%= inventory_record.component.component_model.brand %></td>
+      <td><%= inventory_record.component.component_model %></td>
+      <td><%= link_to(inventory_record.loan, loan_path(inventory_record.loan)) if inventory_record.loan %></td>
+    </tr>
+  <% end %>
+  </tbody>
+</table>
+
+<%= paginate @inventory_records %>

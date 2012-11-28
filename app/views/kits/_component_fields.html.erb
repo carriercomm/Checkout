@@ -27,9 +27,9 @@
               :label => false,
               :wrapper_html => { :class => 'table-form' } %>
 </div>
-<div class="field span1">
-  <%= f.input :missing,
-              :label => false,
-              :wrapper_html => { :class => 'table-form' } %>
+<div class="field span3">
+  <% unless f.object.new_record? %>
+    <%= component.current_status %>
+  <% end %>
 </div>
-<div class="field span2"><%= f.link_to_remove "Delete", :class => "btn btn-danger" %></div>
+<!-- <div class="field span2"><%#= f.link_to_remove "Delete", :class => "btn btn-danger" %></div> -->

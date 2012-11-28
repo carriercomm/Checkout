@@ -2,7 +2,7 @@ class Component < ActiveRecord::Base
 
   ## Macros ##
 
-  acts_as_list
+  acts_as_list :scope => :kit
   resourcify
   strip_attributes
 
@@ -14,9 +14,9 @@ class Component < ActiveRecord::Base
 
   ## Associations ##
 
-  belongs_to :component_model, :inverse_of => :components
-  belongs_to :kit,             :inverse_of => :components
-
+  belongs_to :component_model,   :inverse_of => :components
+  belongs_to :kit,               :inverse_of => :components
+  has_many   :inventory_records, :inverse_of => :component
 
   ## Validations ##
 
@@ -37,13 +37,16 @@ class Component < ActiveRecord::Base
                   :position,
                   :serial_number)
 
-
   ## Virtual attributes ##
 
   attr_reader :component_model_name
 
 
   ## Instance Methods ##
+
+  def latest_inventory_record
+    inventory_records.order("created_at DESC").limit(1).first
+  end
 
   def training_required?
     component_model.training_required?

@@ -77,6 +77,17 @@ class LegacyEquipment < ActiveRecord::Base
     connection.execute sql_statement
   end
 
+  def eq_removed
+    self.attributes["eq_removed"].to_i == 1
+  end
+
+  def eq_insured
+    self.attributes["eq_insured"].to_i == 1
+  end
+
+  def checkoutable
+    self.attributes["checkoutable"].to_i == 1
+  end
 end
 
 class LegacyCategory < ActiveRecord::Base
@@ -192,4 +203,10 @@ class LegacyTraining < ActiveRecord::Base
   set_table_name 'special_items'
   set_primary_key :special_id
   belongs_to :legacy_equipment, foreign_key: 'eq_uw_tag'
+end
+
+class LegacyInventory < ActiveRecord::Base
+  establish_connection :legacy
+  set_table_name 'inventory'
+  set_primary_key :inventory_id
 end

@@ -124,8 +124,9 @@ class UsersController < ApplicationController
   # PUT /users/1.json
   def update
     p     = params[:user]
-    # TODO: make modifying 'system' fail more elegantly
     @user = User.find(params[:id])
+
+    raise "Cannot change the system user" if @user == User.system_user
 
     @user.disabled        = p[:disabled]        if p[:disabled].present?
     @user.email           = p[:email]           if p[:email].present?

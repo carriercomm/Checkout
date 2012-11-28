@@ -44,8 +44,8 @@ class KitsController < ApplicationController
   # GET /kits/1
   # GET /kits/1.json
   def show
-    @kit = Kit.joins(:location, :budget, :components, :component_models => :brand)
-              .includes(:location, :budget, :components, :component_models => :brand)
+    @kit = Kit.joins(:location, :components, :component_models => :brand)
+              .includes([:location, :budget, :components, {:component_models => :brand}])
               .order("components.position ASC")
               .find(params[:id])
 

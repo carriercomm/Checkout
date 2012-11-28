@@ -46,6 +46,7 @@
           <th>Kit ID</th>
           <th>Asset Tag</th>
           <th>Components</th>
+          <th>Group Count</th>
           <th>Status</th>
         </tr>
       </thead>
@@ -55,6 +56,7 @@
           <td><%= kit.id %></td>
           <td><%= kit.asset_tags %></td>
           <td><%= kit.linked_component_list %></td>
+          <td><%= kit.groups.count %></td>
           <td><%= kit.status %></td>
           <td><%= link_to "Show Loans", kit_loans_path(kit), :class => 'btn btn-small' if can?(:read, Loan) %>
         </tr>

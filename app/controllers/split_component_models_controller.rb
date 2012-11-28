@@ -3,6 +3,7 @@ class SplitComponentModelsController < ApplicationController
   before_filter :setup_instances
 
   def new
+    # add a new model to the list to help streamline the user experience
     @split_component_model.component_models << ComponentModel.new
   end
 
@@ -19,11 +20,14 @@ class SplitComponentModelsController < ApplicationController
   private
 
   def setup_instances
-    # root_component_model_id = params[:split_component_model][:root_component_model_id].try(:to_i)
-    # @component_model       = ComponentModel.includes(:brand).find(root_component_model_id)
-    # @split_component_model = SplitComponentModel.new(root_component_model: @component_model)
+    # make sure the current user has the proper privileges to do this
+    authorize! :manage, ComponentModel
+
+    # create the virtual model which is just an array of component model instances
     @split_component_model = SplitComponentModel.new(params[:split_component_model])
-    @component_model       = ComponentModelDecorator.decorate(@split_component_model.root_component_model)
+
+    # grab the model we're trying to split
+    @component_model = ComponentModelDecorator.decorate(@split_component_model.root_component_model)
   end
 
 end

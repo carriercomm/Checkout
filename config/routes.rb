@@ -44,6 +44,7 @@ Checkout::Application.routes.draw do
   resources :covenants
   match 'dashboard' => 'dashboard#index'
   resources :groups
+  resources :inventory_records, only: [:index, :new, :create]
   resources :kits do
     collection do
       ['checkoutable', 'missing_components', 'non_checkoutable', 'tombstoned'].each do |r|
@@ -51,6 +52,9 @@ Checkout::Application.routes.draw do
       end
       get "select2"
     end
+    get "inventory/new"
+    get "inventory/create"
+    resources :inventory_records
     resources :loans, only: [:index, :new]
   end
   resources :locations

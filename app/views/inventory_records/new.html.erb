@@ -1,0 +1,26 @@
+<% title "New Kit #{ @kit.model.id } Inventory" %>
+
+<%= simple_nested_form_for(@attendant.model,
+                            :url => kit_inventory_records_path(@kit),
+                            :method => :post,
+                            :html => { :class => 'form-horizontal' }) do |f| %>
+  <h2>Components</h2>
+  <div class="records row-fluid">
+    <div class="fields field-headers row-fluid">
+      <div class="field field-header span2">Component<br>ID</div>
+      <div class="field field-header span2">Asset Tag</div>
+      <div class="field field-header span3">Brand</div>
+      <div class="field field-header span3">Model</div>
+      <div class="field field-header span2">Status</div>
+    </div>
+    <%= f.simple_fields_for :inventory_records, @inventory_records %>
+  </div>
+
+  <div class="form-actions">
+    <%= f.submit value: t('helpers.submit.inventory.create'), class: 'btn btn-primary' %>
+    <%= link_to 'Cancel', kit_path(@kit), :class => 'btn' %>
+  </div>
+<% end %>
+
+
+

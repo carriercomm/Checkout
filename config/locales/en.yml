@@ -53,7 +53,7 @@ en:
         description: 'Descriptions are a good place to put extensive technical specifications, and any special notes on usage.'
       kit:
         checkoutable: "'Yes' if you want the kit to be available in the loan system."
-        tombstoned: "'Yes' if this kit is missing/stolen/destroyed and never coming back."
+        tombstoned: "'Yes' if this kit is deaccessioned/missing/stolen/destroyed and never coming back."
       split_component_model:
         component_models:
           <<: *hints_component_model
@@ -63,11 +63,14 @@ en:
   helpers:
     links:
       new: "<i class='icon-plus-sign'></i> New"
+      all: "All"
     submit:
       component_model:
         update: "Update Model"
       split_component_model:
         create: "Split Model"
+      inventory:
+        create: 'Submit'
   app_config:
     show:
       title: 'App Configuration'
@@ -172,6 +175,13 @@ en:
         default_tooltip: "Add a new group"
         denied_tooltip: "You don't have sufficient permissions to add a new group"
     expires_at: "Expires"
+  inventory_record:  
+    index:
+      title: 'Inventory Records'
+    sidebar:
+      all:
+        default_tooltip: 'Show all inventory records'
+        denied_tooltip: "You don't have sufficient permissions to view inventory records"
   kit:
     index:
       title: "Kits"
@@ -187,15 +197,39 @@ en:
       all:
         text: "All"
         default_tooltip: "Show all kits"
+      checkout:
+        text: 'Check Out'
+        default_tooltip: 'Check out this kit'
+        denied_tooltip: "You don't sufficient permissions to check out this kit"
       checkoutable:
         text: "Checkoutable"
         default_tooltip: "Show all checkoutable kits"
+      edit:
+        text: 'Edit'
+        default_tooltip: 'Edit this kit'
+        denied_tooltip: "You don't sufficient permissions to edit this kit"
+      inventory_records:
+        text: 'History'
+        default_tooltip: 'View inventory records for this kit'
+        denied_tooltip: "You don't sufficient permissions to view inventory records for this kit"
+      loans:
+        text: 'Loans'
+        default_tooltip: 'View loans for this kit'
+        denied_tooltip: "You don't sufficient permissions to view loans for this kit"
       missing_components:
         text: "Missing Components"
         default_tooltip: "Show all kits with missing components (excluding tombstoned kits)"
+      new_inventory_records:
+        text: 'New'
+        default_tooltip: 'Create new inventory records for this kit'
+        denied_tooltip: "You don't sufficient permissions to create inventory records for this kit"
       non_checkoutable:
         text: "Non Checkoutable"
         default_tooltip: "Show all non checkoutable kits (excluding tombstoned kits)"
+      reserve:
+        text: 'Reserve'
+        default_tooltip: 'Reserve this kit'
+        denied_tooltip: "You don't sufficient permissions to reserve this kit"
       tombstoned:
         text: "Tombstoned"
         default_tooltip: "Show all tombstoned kits<br>(e.g. dead, missing, etc)"

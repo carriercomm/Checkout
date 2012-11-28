@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20121109225259) do
+ActiveRecord::Schema.define(:version => 20121120005739) do
 
   create_table "app_configs", :force => true do |t|
     t.integer  "default_checkout_length"
@@ -107,15 +107,13 @@ ActiveRecord::Schema.define(:version => 20121109225259) do
     t.integer  "component_model_id"
     t.string   "asset_tag"
     t.string   "serial_number"
-    t.boolean  "missing",            :default => false
     t.integer  "position"
-    t.datetime "created_at",                            :null => false
-    t.datetime "updated_at",                            :null => false
+    t.datetime "created_at",         :null => false
+    t.datetime "updated_at",         :null => false
   end
 
   add_index "components", ["asset_tag"], :name => "index_components_on_asset_tag", :unique => true
   add_index "components", ["kit_id"], :name => "index_parts_on_kit_id"
-  add_index "components", ["missing"], :name => "index_components_on_missing"
 
   create_table "covenant_signatures", :force => true do |t|
     t.integer  "user_id"
@@ -136,6 +134,23 @@ ActiveRecord::Schema.define(:version => 20121109225259) do
     t.text     "description"
     t.datetime "created_at",  :null => false
     t.datetime "updated_at",  :null => false
+  end
+
+  create_table "inventory_records", :force => true do |t|
+    t.integer  "component_id",        :null => false
+    t.integer  "loan_id"
+    t.integer  "attendant_id",        :null => false
+    t.datetime "created_at",          :null => false
+    t.datetime "updated_at",          :null => false
+    t.integer  "inventory_status_id", :null => false
+  end
+
+  add_index "inventory_records", ["attendant_id"], :name => "index_inventory_records_on_attendant_id"
+  add_index "inventory_records", ["component_id"], :name => "index_inventory_records_on_component_id"
+  add_index "inventory_records", ["loan_id"], :name => "index_inventory_records_on_loan_id"
+
+  create_table "inventory_statuses", :force => true do |t|
+    t.string "name"
   end
 
   create_table "kits", :force => true do |t|
@@ -267,6 +282,9 @@ ActiveRecord::Schema.define(:version => 20121109225259) do
 
   add_index "users_roles", ["user_id", "role_id"], :name => "index_users_roles_on_user_id_and_role_id"
 
+  add_foreign_key "business_days_business_hours", "business_days", :name => "business_days_business_hours_business_day_id_fk"
+  add_foreign_key "business_days_business_hours", "business_hours", :name => "business_days_business_hours_business_hour_id_fk"
+
   add_foreign_key "business_hour_exceptions", "locations", :name => "business_hour_exceptions_location_id_fk"
 
   add_foreign_key "business_hours", "locations", :name => "business_hours_location_id_fk"
@@ -282,6 +300,10 @@ ActiveRecord::Schema.define(:version => 20121109225259) do
   add_foreign_key "covenant_signatures", "covenants", :name => "covenant_signatures_covenant_id_fk"
   add_foreign_key "covenant_signatures", "users", :name => "covenant_signatures_user_id_fk"
 
+  add_foreign_key "inventory_records", "components", :name => "inventory_records_component_id_fk"
+  add_foreign_key "inventory_records", "loans", :name => "inventory_records_loan_id_fk"
+  add_foreign_key "inventory_records", "users", :name => "inventory_records_attendant_id_fk", :column => "attendant_id"
+
   add_foreign_key "kits", "budgets", :name => "kits_budget_id_fk"
   add_foreign_key "kits", "locations", :name => "kits_location_id_fk"
 
@@ -296,6 +318,9 @@ ActiveRecord::Schema.define(:version => 20121109225259) do
 
   add_foreign_key "permissions", "groups", :name => "permissions_group_id_fk"
   add_foreign_key "permissions", "kits", :name => "permissions_kit_id_fk"
+
+  add_foreign_key "trainings", "component_models", :name => "trainings_component_model_id_fk"
+  add_foreign_key "trainings", "users", :name => "trainings_user_id_fk"
 
   add_foreign_key "users_roles", "roles", :name => "users_roles_role_id_fk"
   add_foreign_key "users_roles", "users", :name => "users_roles_user_id_fk"

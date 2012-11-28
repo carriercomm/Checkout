@@ -70,12 +70,12 @@ class Loan < ActiveRecord::Base
     User.unscoped { super }
   end
 
-  belongs_to :kit,           :inverse_of => :loans
-  belongs_to :client,        :inverse_of => :loans,       :class_name => "User"
-  belongs_to :approver,      :inverse_of => :approvals,   :class_name => "User"
-  belongs_to :out_assistant, :inverse_of => :out_assists, :class_name => "User"
-  belongs_to :in_assistant,  :inverse_of => :in_assists,  :class_name => "User"
-
+  belongs_to :kit,               :inverse_of => :loans
+  belongs_to :client,            :inverse_of => :loans,       :class_name => "User"
+  belongs_to :approver,          :inverse_of => :approvals,   :class_name => "User"
+  belongs_to :out_assistant,     :inverse_of => :out_assists, :class_name => "User"
+  belongs_to :in_assistant,      :inverse_of => :in_assists,  :class_name => "User"
+  has_many   :inventory_records, :inverse_of => :loan
 
   ## Validations ##
 
@@ -114,8 +114,7 @@ class Loan < ActiveRecord::Base
   # this should only be called after validations have run
   def auto_approve!
     if pending? && within_default_length?
-      # the default scope excludes "system"
-      self.approver = User.unscoped.find_by_username("system")
+      self.approver = User.system_user
       approve
       true
     else
@@ -131,10 +130,7 @@ class Loan < ActiveRecord::Base
   # if this loan was auto_approved, make sure the checkout duration is
   # still valid - rollback the state if necessary
   def check_approval
-    # the default scope excludes "system"
-    system_user = User.unscoped.find_by_username("system")
-
-    if (self.approver.nil? || self.approver == system_user) && !within_default_length?
+    if (self.approver.nil? || self.approver == User.system_user) && !within_default_length?
       unapprove
     end
 

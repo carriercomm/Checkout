@@ -20,7 +20,7 @@ class Kit < ActiveRecord::Base
   has_many   :groups,           :through => :permissions, :order => "groups.name ASC"
   belongs_to :location,         :inverse_of => :kits
   has_many   :permissions,      :inverse_of => :kit
-  has_many   :loans,     :inverse_of => :kit
+  has_many   :loans,            :inverse_of => :kit
 
   accepts_nested_attributes_for :components, :reject_if => proc { |attributes| attributes['component_model_id'].blank? }, :allow_destroy=> true
 

@@ -31,19 +31,6 @@ class ComponentModelDecorator < ApplicationDecorator
     coalesce(model.description)
   end
 
-  def linked_branded_name
-    "#{ linked_brand } #{ linked_name }".html_safe
-  end
-
-  # TODO: delegate this to a BrandDecorator?
-  def linked_brand
-    h.link_to(brand_name, h.brand_path(model.brand))
-  end
-
-  def linked_name
-    h.link_to(model.name, h.component_model_path(model))
-  end
-
   def select2_json
     {
       :id   => id,
@@ -59,8 +46,12 @@ class ComponentModelDecorator < ApplicationDecorator
     h.link_to(to_s, h.component_model_path(model))
   end
 
-  def to_s
+  def to_branded_s
     "#{ brand_name } #{ model.name }"
+  end
+
+  def to_s
+    model.name
   end
 
 end

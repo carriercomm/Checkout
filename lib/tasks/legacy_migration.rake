@@ -89,7 +89,7 @@ namespace :dbx do
       end
     end
 
-    puts "Successfully migrated #{ success_count } brands"
+    puts "Successfully migrated #{ success_count } categories"
     puts "#{ error_count } errors"
     puts
 
@@ -207,6 +207,51 @@ namespace :dbx do
 
 
     #
+    # Migrate Locations
+    #
+
+    puts "Migrating locations and business hours..."
+
+    bd = BusinessDay.order("business_days.index").all.collect { |bd| bd.id }
+
+    LegacyLocation.all.each do |l|
+      location = Location.find_or_create_by_name(l.loc_name)
+      if location.name == "Raitt"
+        # M, W
+        attrs = {
+          :business_day_ids => [bd[1], bd[3]],
+          :open_hour   => 10,
+          :open_minute => 30,
+          :close_hour  => 13,
+          :close_minute => 20
+        }
+        location.business_hours.create(attrs)
+
+        # F
+        attrs[:business_day_ids] = [bd[5]]
+        attrs[:open_hour]    = 11
+        attrs[:open_minute]  = 30
+        attrs[:close_hour]   = 13
+        attrs[:close_minute] = 20
+        location.business_hours.create(attrs)
+
+      else
+        attrs = {
+          :business_day_ids => [bd[2], bd[4]],
+          :open_hour   => 10,
+          :open_minute => 00,
+          :close_hour  => 2,
+          :close_minute => 0
+        }
+        location.business_hours.create(attrs)
+      end
+    end
+
+    puts "Successfully migrated #{ Location.count } locations"
+    puts
+
+
+    #
     # Migrate Equipment
     #
 
@@ -253,13 +298,26 @@ namespace :dbx do
             serial_number      = le.eq_serial_num.try(:strip)
             cost               = (le.eq_cost == 0) ? nil : le.eq_cost
             insured            = le.eq_insured
-            missing            = le.eq_removed
             checkoutable       = le.checkoutable
 
             component.component_model = model_obj
-            component.missing         = missing
             component.serial_number   = serial_number
             component.created_at      = le.eq_date_entered
+
+            # create an accession record
+            accession_record = InventoryRecord.new
+            accession_record.inventory_status = InventoryStatus.find_by_name("accessioned")
+            accession_record.created_at = component.created_at
+            accession_record.attendant = User.system_user
+            component.inventory_records << accession_record
+
+            if le.eq_removed
+              # create a deaccession record
+              inventory_record = InventoryRecord.new
+              inventory_record.inventory_status = InventoryStatus.find_by_name("deaccessioned")
+              inventory_record.attendant = User.system_user
+              component.inventory_records << inventory_record
+            end
 
             kit                = Kit.new
             kit.budget         = budget
@@ -267,7 +325,7 @@ namespace :dbx do
             kit.cost           = cost
             kit.insured        = insured
             kit.location       = Location.find_or_create_by_name(le.legacy_location.loc_name)
-            kit.tombstoned     = missing
+            kit.tombstoned     = le.eq_removed
 
             kit.components << component
 
@@ -429,9 +487,6 @@ namespace :dbx do
       c = Component.find_by_asset_tag(lt.eq_uw_tag.to_s)
       u = User.find_by_username(lt.client_id.downcase.squish)
       if c && u
-        unless c.component_model.training_required?
-          puts "\t Erroneous training record #{lt.special_id}: #{ lt.eq_uw_tag }"
-        end
         begin
           Training.create!(user: u, component_model: c.component_model)
         rescue StandardError => e
@@ -491,7 +546,22 @@ namespace :dbx do
           l = Loan.new
           l.importing = true
           l.starts_at = r.resdate
-          l.ends_at   = r.resdate_end || kit.default_return_date(l.starts_at)
+          if r.resdate_end.nil?
+            l.ends_at = kit.default_return_date(l.starts_at)
+            if l.ends_at.nil?
+              puts "screwed up"
+              d = AppConfig.instance.default_checkout_length
+              puts d.to_s
+              puts l.starts_at.inspect
+              expected_time = (l.starts_at + d.days).to_time
+              puts expected_time
+              puts kit.location.inspect
+              puts kit.location.next_date_open(expected_time).inspect
+              exit
+            end
+          else
+            l.ends_at = r.resdate_end
+          end
           l.client    = client
           l.kit       = kit
 
@@ -547,6 +617,7 @@ namespace :dbx do
         rescue StandardError => e
           error_count += 1
           puts "\tError migrating #{r.res_id}: #{ e }"
+          puts e.backtrace
         end
       end
     end
@@ -616,51 +687,58 @@ namespace :dbx do
     puts
 
   end
+
+  desc 'migrate inventory data from dbx'
+  task :inventory  => :environment do
+    require 'tasks/legacy_classes'
+
+    puts "Migrating inventory records..."
+    success_count = 0
+    error_count   = 0
+
+    inventoried = InventoryStatus.find_by_name("inventoried")
+
+    InventoryRecord.where("inventory_status_id = ?", inventoried.id).delete_all
+
+    LegacyInventory.all.each do |li|
+      ir = InventoryRecord.new
+      ir.component = Component.find_by_asset_tag(li.eq_uw_tag.to_s)
+      ir.inventory_status = inventoried
+      ir.created_at = li.date_inventoried
+      ir.attendant = User.find_by_username(li.staff_id)
+
+      if ir.save
+        success_count += 1
+      else
+        puts "--------"
+        puts "\tError migrating #{li.inventory_id}:"
+        puts "\t\t #{ li.inspect }"
+        puts "\t\t #{ ir.inspect }"
+        ir.errors.messages.each {|k,v| puts "\t\t#{ k.to_s.titleize } #{ v }" }
+        error_count += 1
+      end
+    end
+
+    puts "Successfully migrated #{ success_count } of #{ LegacyInventory.count.to_s } inventory records"
+    puts "#{ error_count } errors"
+    puts
+
+  end
+
 end
+
 
 namespace :db do
   desc "drop, create, schema load"
-  task :rebuild => ["db:drop", "db:create", "db:schema:load", "db:seed"]
+  task :rebuild => ["db:drop", "db:create", "db:schema:load", "db:migrate", "db:seed"]
 
   desc "drop, create, schema load, dbx:migrate"
-  task :repop => ["db:rebuild", "dbx:migrate", "db:seed_dev"]
+  task :repop => ["db:rebuild", "dbx:migrate", "dbx:training", "dbx:res", "dbx:inventory", "db:seed_dev"]
 
   desc "loads some fake data, helpful for development"
   task :seed_dev => :environment do
 
-    bd = BusinessDay.order("business_days.index").all.collect { |bd| bd.id }
-
-    Location.all.each_with_index do |l,idx|
-      if idx % 2  == 0
-        # morning hours
-        attrs = {
-          :business_day_ids => [bd[1], bd[3], bd[5]],
-          :open_hour   => 9,
-          :open_minute => 30,
-          :close_hour  => 12,
-          :close_minute => 15
-        }
-        l.business_hours.create(attrs)
-
-        # afternoon hours
-        attrs[:open_hour]    = 13
-        attrs[:open_minute]  = 00
-        attrs[:close_hour]   = 17
-        attrs[:close_minute] = 00
-        l.business_hours.create(attrs)
-
-      else
-        attrs = {
-          :business_day_ids => [bd[2], bd[4]],
-          :open_hour   => 10,
-          :open_minute => 00,
-          :close_hour  => 2,
-          :close_minute => 0
-        }
-        l.business_hours.create(attrs)
-      end
-    end
-
+    # add some random business hour exceptions
     BusinessHour.all.each do |x|
       open_days = x.open_occurrences
       open_days.each_with_index do |y, idx|

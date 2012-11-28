@@ -37,3 +37,8 @@ u.add_role "admin"
 
 # there has to be a default checkout length otherwise it will break reservations
 AppConfig.instance.update_attributes(default_checkout_length: 2)
+
+InventoryStatus.create!(:index => 1, :name => 'accessioned')
+InventoryStatus.create!(:index => 2, :name => 'inventoried')
+InventoryStatus.create!(:index => 3, :name => 'missing')
+InventoryStatus.create!(:index => 4, :name => 'deaccessioned')

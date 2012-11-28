@@ -11,20 +11,21 @@ class User < ActiveRecord::Base
 
   ## Associations ##
 
-  has_many :approvals,           :foreign_key => "approver_id",      :class_name => 'Loan'
+  has_many :approvals,           :foreign_key => "approver_id", :class_name => 'Loan', :inverse_of => :approver
   has_many :component_models,    :through => :trainings
   has_many :covenant_signatures, :inverse_of => :user
   has_many :covenants,           :through => :covenant_signatures
   has_many :groups,              :through => :memberships
-  has_many :in_assists,          :foreign_key => "in_assistant_id",  :class_name => 'Loan'
-  has_many :loans,               :foreign_key => "client_id" do
+  has_many :in_assists,          :foreign_key => "in_assistant_id", :class_name => 'Loan', :inverse_of => :in_assistant
+  has_many :inventory_records,   :foreign_key => "attendant_id"
+  has_many :loans,               :foreign_key => "client_id", :inverse_of => :client do
     def build_from_component_model_id(component_model_id)
       component_model = ComponentModel.checkoutable.includes(:kits => :location).find(component_model_id)
       build(:component_model => component_model)
     end
   end
   has_many :memberships,         :inverse_of => :user
-  has_many :out_assists,         :foreign_key => "out_assistant_id", :class_name => 'Loan'
+  has_many :out_assists,         :foreign_key => "out_assistant_id", :class_name => 'Loan', :inverse_of => :out_assistant
   has_many :trainings,           :inverse_of => :user, :dependent => :destroy
 
 
@@ -38,6 +39,10 @@ class User < ActiveRecord::Base
                   :password_confirmation,
                   :remember_me,
                   :username)
+
+  accepts_nested_attributes_for(:inventory_records,
+                                :reject_if => proc { |attributes| attributes['component_id'].blank? || attributes['inventory_status_id'].blank? },
+                                :allow_destroy=> false)
 
   accepts_nested_attributes_for(:memberships,
                                 :reject_if => proc { |attributes| attributes['group_id'].blank? },
@@ -89,6 +94,10 @@ class User < ActiveRecord::Base
     where("users.id NOT IN (?)", user_ids)
   end
 
+  def self.system_user
+    self.unscoped.find_by_username('system')
+  end
+
   def self.username_search(query)
       self.where("LOWER(users.username) LIKE ?", "%#{ query.downcase }%")
       .order("users.username ASC")
@@ -111,6 +120,16 @@ class User < ActiveRecord::Base
 
   def downcase_username
     username.downcase!
+  end
+
+  def new_inventory_records(kit)
+    components = kit.is_a?(Draper::Base) ? kit.model.components : kit.components
+    components.map do |c|
+      ir = InventoryRecord.new
+      ir.attendant = self
+      ir.component = c
+      ir
+    end
   end
 
   def signed_all_covenants?

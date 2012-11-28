@@ -12,7 +12,7 @@ gem 'kaminari'                  # pagination
 gem 'pg'                        # postgres db driver
 gem 'mysql2'                    # mysql db driver
 gem 'nested_form'               # dynamic nested form helper
-gem 'rails', '3.2.8'            # rails
+gem 'rails', '3.2.9'            # rails
 gem 'rolify'                    # role management
 gem 'simple_form'               # form builder
 gem 'state_machine'             # support for mixing in state machine behavior to models

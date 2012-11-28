@@ -2,11 +2,38 @@
 <% subtitle @kit.component_list %>
 <% content_for :sidebar do %>
   <li class="nav-header"><%= t(".actions") %></li>
-  <li><%= edit_link(@kit) %></li>
-  <li><%= destroy_link(@kit) %></li>
-  <li><%= link_to 'Check Out', new_kit_loan_path(@kit, state_event: 'checkout') if @kit.reservable?(current_user) %></li>
-  <li><%= link_to 'Reserve', new_kit_loan_path(@kit) if @kit.reservable?(current_user) %></li>
-  <li><%= link_to 'Show Kit Loans', kit_loans_path(@kit) %></li>
+  <%= sidebar_link t('kit.sidebar.checkout.text'),
+                   new_kit_loan_path(@kit, state_event: 'checkout'),
+                   t('kit.sidebar.checkout.default_tooltip'),
+                   @kit.reservable?(current_user),
+                   t('kit.sidebar.checkout.denied_tooltip') %>
+  <%= sidebar_link t('kit.sidebar.reserve.text'),
+                   new_kit_loan_path(@kit),
+                   t('kit.sidebar.reserve.default_tooltip'),
+                   @kit.reservable?(current_user),
+                   t('kit.sidebar.reserve.denied_tooltip') %>
+  <%= sidebar_link t('kit.sidebar.loans.text'),
+                   kit_loans_path(@kit),
+                   t('kit.sidebar.loans.default_tooltip'),
+                   @kit.reservable?(current_user),
+                   t('kit.sidebar.loans.denied_tooltip') %>
+  <%= sidebar_link t('kit.sidebar.edit.text'),
+                   edit_kit_path(@kit),
+                   t('kit.sidebar.edit.default_tooltip'),
+                   can?(:manage, @kit),
+                   t('kit.sidebar.edit.denied_tooltip') %>
+
+  <li class="nav-header">Inventory</li>
+  <%= sidebar_link t('kit.sidebar.inventory_records.text'),
+                   kit_inventory_records_path(@kit),
+                   t('kit.sidebar.inventory_records.default_tooltip'),
+                   can?(:read, InventoryRecord),
+                   t('kit.sidebar.inventory_records.denied_tooltip') %>
+  <%= sidebar_link t('kit.sidebar.new_inventory_records.text'),
+                   new_kit_inventory_record_path(@kit),
+                   t('kit.sidebar.new_inventory_records.default_tooltip'),
+                   can?(:manage, InventoryRecord),
+                   t('kit.sidebar.new_inventory_records.denied_tooltip') %>
 <% end %>
 
 <div class="pull-right">
@@ -41,14 +68,16 @@
 
 <h2>Components</h2>
 <table class="table table-striped">
-  <tbody>
+  <thead>
     <tr>
       <th width="span2">Brand</th>
       <th width="span3">Model</th>
       <th width="span3">Asset Tag</th>
       <th width="span3">Serial Number</th>
-      <th width="span1">Missing</th>
+      <th width="span1">Status</th>
     </tr>
-  <%= render partial:'component', collection: @kit.components %>
+  </thead>
+  <tbody>
+    <%= render partial:'component', collection: @kit.components %>
   </tbody>
 </table>
