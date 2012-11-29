@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20121120005739) do
+ActiveRecord::Schema.define(:version => 20121129201724) do
 
   create_table "app_configs", :force => true do |t|
     t.integer  "default_checkout_length"
@@ -204,8 +204,9 @@ ActiveRecord::Schema.define(:version => 20121120005739) do
     t.integer  "group_id"
     t.integer  "user_id"
     t.date     "expires_at"
-    t.datetime "created_at", :null => false
-    t.datetime "updated_at", :null => false
+    t.datetime "created_at",                    :null => false
+    t.datetime "updated_at",                    :null => false
+    t.boolean  "supervisor", :default => false
   end
 
   add_index "memberships", ["group_id"], :name => "index_memberships_on_group_id"

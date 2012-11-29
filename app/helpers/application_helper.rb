@@ -103,6 +103,13 @@ module ApplicationHelper
     end
   end
 
+  def inventory_shortcuts
+    links = InventoryStatusDecorator.all.map do |is|
+      "<a href='#' class='inventory_record_shortcut' data-value='#{ is.id }'>#{ is.name }</a>"
+    end
+    links.join(", ").html_safe
+  end
+
   def reserve_link(object)
     if object.checkoutable? && object.reservable?(current_user)
       loan_link(t('helpers.links.reserve'), object)

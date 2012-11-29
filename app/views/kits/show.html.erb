@@ -8,7 +8,7 @@
                    @kit.reservable?(current_user),
                    t('kit.sidebar.checkout.denied_tooltip') %>
   <%= sidebar_link t('kit.sidebar.reserve.text'),
-                   new_kit_loan_path(@kit),
+                   new_kit_reservation_path(@kit),
                    t('kit.sidebar.reserve.default_tooltip'),
                    @kit.reservable?(current_user),
                    t('kit.sidebar.reserve.denied_tooltip') %>

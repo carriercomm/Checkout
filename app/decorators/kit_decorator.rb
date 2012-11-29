@@ -36,7 +36,7 @@ class KitDecorator < ApplicationDecorator
 
   # returns a string of comma delimited model names
   def component_list
-    text = component_models.map(&:to_s).join(", ")
+    text = component_models.map(&:to_branded_s).join(", ")
     h.content_tag("span", title: text) do
       text
     end

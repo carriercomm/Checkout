@@ -4,7 +4,9 @@
                             :url => kit_inventory_records_path(@kit),
                             :method => :post,
                             :html => { :class => 'form-horizontal' }) do |f| %>
-  <h2>Components</h2>
+  <div id="inventory_records_shortcuts" class="hidden">
+    <p>Mark all records: <%= inventory_shortcuts %></p>
+  </div>
   <div class="records row-fluid">
     <div class="fields field-headers row-fluid">
       <div class="field field-header span2">Component<br>ID</div>

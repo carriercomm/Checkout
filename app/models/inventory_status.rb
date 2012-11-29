@@ -14,4 +14,9 @@ class InventoryStatus < ActiveRecord::Base
 
   attr_accessible :name
 
+
+  def self.value_symbols
+    all.map(&:id).map(&:to_s).map(&:to_sym)
+  end
+
 end

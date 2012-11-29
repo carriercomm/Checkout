@@ -60,6 +60,13 @@ en:
       user:
         disabled: "Prevent this client from logging in"
         suspended_until: "Suspend this client's checkout privileges until a specified date"
+    options:
+      inventory_records:
+        inventory_status:
+          '1': &inventory_status_accessioned 'Accessioned'   
+          '2': &inventory_status_inventoried 'Inventoried'
+          '3': &inventory_status_missing 'Missing'
+          '4': &inventory_status_deaccessioned 'Deaccessioned'
   helpers:
     links:
       new: "<i class='icon-plus-sign'></i> New"
@@ -182,6 +189,11 @@ en:
       all:
         default_tooltip: 'Show all inventory records'
         denied_tooltip: "You don't have sufficient permissions to view inventory records"
+  inventory_status:
+    accessioned: *inventory_status_accessioned
+    deaccessioned: *inventory_status_deaccessioned
+    inventoried: *inventory_status_inventoried
+    missing: *inventory_status_missing
   kit:
     index:
       title: "Kits"

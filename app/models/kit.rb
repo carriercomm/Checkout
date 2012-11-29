@@ -112,12 +112,16 @@ class Kit < ActiveRecord::Base
   # equal to location.open_days minus days_reserved returns in format
   # [[month, day], [month, day], ...] for consumption by the
   # javascript date picker
-  def dates_checkoutable_for_datepicker(days_out = 90, *excluded_loans)
-    return location.dates_open_for_datepicker(days_out) - dates_loaned_for_datepicker(days_out, excluded_loans)
+  def pickup_dates_for_datepicker(days_out = 90, *excluded_loans)
+    excluded_loans.flatten!
+    return location.dates_open_for_datepicker(days_out) - loan_blackout_dates_for_datepicker(days_out, excluded_loans)
   end
 
-  # returns the dates this kit is loaned within the time range specified
-  def dates_loaned(days_out = 90, *excluded_loans)
+  # returns the dates this kit is loaned within the time range
+  # specified - not including the end date, since the
+  # thing should be on the shelf at some point on those days
+  def loan_blackout_dates(days_out = 90, *excluded_loans)
+    excluded_loans.flatten!
     dates = []
 
     # build up params for where clause
@@ -129,16 +133,17 @@ class Kit < ActiveRecord::Base
       starts_at = r.starts_at.to_date
       ends_at   = r.ends_at.to_date
 
-      # add a day for every day in the range
-      (starts_at..ends_at).each do |date|
+      # add a day for every day in the range (except the end date)
+      (starts_at...ends_at).each do |date|
         dates << date
       end
     end
     return dates.uniq
   end
 
-  def dates_loaned_for_datepicker(days_out = 90, *excluded_loans)
-    dates_loaned(days_out, excluded_loans).collect { |d| d.to_s(:js) }
+  def loan_blackout_dates_for_datepicker(days_out = 90, *excluded_loans)
+    excluded_loans.flatten!
+    loan_blackout_dates(days_out, excluded_loans).collect { |d| d.to_s(:js) }
   end
 
   def default_return_date(starts_at)
@@ -157,21 +162,40 @@ class Kit < ActiveRecord::Base
     return true
   end
 
+  # returns the start dates for each loan
+  # def hard_return_dates_for_datepicker(days_out = 90, *excluded_loans)
+  #   excluded_loans.flatten!
+  #   dates = []
+
+  #   # build up params for where clause
+  #   start_range = Time.now.at_beginning_of_day
+  #   end_range   = start_range + days_out.days
+
+  #   # iterate over the set of loans in this range
+  #   loans_between(start_range, end_range, excluded_loans).all.each do |r|
+  #     dates << r.starts_at.to_date
+  #   end
+  #   dates.uniq!
+
+  #   return dates.collect { |d| d.to_s(:js) }
+  # end
+
   # returns a record for this kit (without location info), to populate into
   # gon for the datepicker
   def kit_record_for_datepicker(days_out = 90, *excluded_loans)
+    excluded_loans.flatten!
     {
       'kit_id' => id,
-      'days_reservable' => dates_checkoutable_for_datepicker(days_out, excluded_loans)
+      'pickup_dates' => pickup_dates_for_datepicker(days_out, excluded_loans)
     }
   end
 
   # returns the full data structure to populate into gon for the datepicker
   def location_and_availability_record_for_datepicker(days_out = 90, *excluded_loans)
+    excluded_loans.flatten!
     {
       location.id => {
-        'kits' => [kit_record_for_datepicker(days_out, excluded_loans)],
-        'dates_open' => return_dates_for_datepicker(days_out, excluded_loans)
+        'kits' => [kit_record_for_datepicker(days_out, excluded_loans)]
       }
     }
   end
@@ -201,19 +225,20 @@ class Kit < ActiveRecord::Base
     can_be_loaned_to? client
   end
 
-  def return_dates_for_datepicker(days_out = 90, *excluded_loans)
-    return_dates = []
-    next_loan_date = dates_loaned_for_datepicker(days_out, excluded_loans).first
+  # def return_dates_for_datepicker(days_out = 90, *excluded_loans)
+  #   excluded_loans.flatten!
+  #   return_dates = []
+  #   next_loan_date = dates_loaned_for_datepicker(days_out, excluded_loans).first
 
-    # iterate over the dates, adding them to the return dates, until
-    # we get to the next return date
-    location.dates_open_for_datepicker(days_out).each do |date|
-      return_dates << date
-      break if date == next_loan_date
-    end
+  #   # iterate over the dates, adding them to the return dates, until
+  #   # we get to the next return date
+  #   location.dates_open_for_datepicker(days_out).each do |date|
+  #     return_dates << date
+  #     break if date == next_loan_date
+  #   end
 
-    return_dates
-  end
+  #   return_dates
+  # end
 
   # custom validator
   def should_have_at_least_one_component

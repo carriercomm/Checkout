@@ -1,24 +1,26 @@
 <% user = UserDecorator.decorate(f.object.user) unless f.object.new_record? %>
 
-<%= content_tag :div, f.error(:base), :class=>"alert alert-error span12" if f.error(:base) %>
-<div class="field span6">
-  <% if f.object.id.nil? %>
-    <%= f.input :user_id,
-                :wrapper => :tabular,
-                :input_html => {
-                    :class => 'select2-json-autocomplete select-user',
-                    :hidden => true,
-                    "data-ajax-url" => select2_users_path(:format => :json, :group_id =>  @group.id)
-                } %>
-  <% else %>
-    <%= user.username %>
-    <%= f.input :user_id, :as => :hidden %>
-  <% end %>
+<%= content_tag :div, f.error(:base), :class=>"alert alert-error span12 row-fluid" if f.error(:base) %>
+<div class="row-fluid">
+  <div class="field span6">
+    <% if f.object.id.nil? %>
+      <%= f.input :user_id,
+                  :wrapper => :tabular,
+                  :input_html => {
+                      :class => 'select2-json-autocomplete select-user',
+                      :hidden => true,
+                      "data-ajax-url" => select2_users_path(:format => :json, :group_id =>  @group.id)
+                  } %>
+    <% else %>
+      <%= user.username %>
+      <%= f.input :user_id, :as => :hidden %>
+    <% end %>
+  </div>
+  <div class="field span2">
+    <%= f.input :expires_at, :as => :date_picker, :wrapper => :tabular %>
+  </div>
+  <div class="field span2">
+    <%= f.input :supervisor, :wrapper => :tabular %>
+  </div>
+  <div class="field span2"><%= f.link_to_remove "Delete", :class => "btn btn-danger" %></div>
 </div>
-<div class="field span4">
-  <%= f.input :expires_at,
-              :as => :date_picker,
-              :wrapper => :tabular %>
-</div>
-<div class="field span2"><%= f.link_to_remove "Delete", :class => "btn btn-danger" %></div>
-

@@ -14,5 +14,5 @@
   <%= component.component_model %>
 </div>
 <div class="field span2">
-  <%= f.association :inventory_status, :wrapper => :tabular %>
+  <%= f.association :inventory_status, :collection => InventoryStatus.value_symbols, :wrapper => :tabular %>
 </div>

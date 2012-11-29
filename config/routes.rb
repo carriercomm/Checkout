@@ -56,13 +56,14 @@ Checkout::Application.routes.draw do
     get "inventory/create"
     resources :inventory_records
     resources :loans, only: [:index, :new]
+    resources :reservations
   end
   resources :locations
   resources :models, as: "component_models", controller: "component_models" do
     collection &component_models_collection_routes
     resources :loans, only: [:new]
   end
-  resources :reservations, except: [:index]
+  resources :reservations, :except => [:index]
   resources :split_model, as:"split_component_models", controller:"split_component_models", only:[:new, :create]
   resources :loans do
     collection do

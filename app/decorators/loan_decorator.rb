@@ -10,6 +10,20 @@ class LoanDecorator < ApplicationDecorator
     coalesce(model.approver)
   end
 
+  def cancel_path
+    if model.out_at
+      h.loan_path(model)
+    elsif model.starts_at
+      h.reservation_path(model)
+    elsif model.kit
+      h.kit_path(model.kit)
+    elsif model.component_model
+      h.component_model_path(model.component_model)
+    else
+      h.component_models_path
+    end
+  end
+
   def ends_at
     coalesce(h.l(model.ends_at, :format => :tabular))
   end

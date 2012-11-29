@@ -15,7 +15,8 @@
           <th class="skinny-column">Status</th>
           <th>Username</th>
           <th>Email</th>
-          <th>Membership Expires</th>
+          <th>Membership<br>Expires</th>
+          <th>Group<br>Supervisor</th>
         </tr>
       </thead>
       <tbody>
@@ -25,6 +26,7 @@
             <td><%= link_to m.user.username, user_path(m.user) %></td>
             <td><%= m.user.email %></td>
             <td><%= m.expires_at %></td>
+            <td><%= m.supervisor %></td>
           </tr>
         <% end %>
       </tbody>

@@ -5,7 +5,8 @@
   <div class="records row-fluid">
     <div class="fields field-headers row-fluid">
       <div class="field field-header span6">Username</div>
-      <div class="field field-header span4">Expires At</div>
+      <div class="field field-header span2">Expires At</div>
+      <div class="field field-header span2">Group<br>Supervisor</div>
       <div class="field field-header span2">Actions</div>
     </div>
     <%= f.simple_fields_for :memberships, @memberships %>
@@ -26,6 +27,6 @@
   <div class="form-actions">
     <%= f.button :submit, :class => 'btn-primary' %>
     <%= link_to t('.cancel', :default => t("helpers.links.cancel")),
-                groups_path, :class => 'btn' %>
+                group_path(@group.model), :class => 'btn' %>
   </div>
 <% end %>

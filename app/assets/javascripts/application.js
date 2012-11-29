@@ -17,6 +17,7 @@
 //= require jquery_nested_form
 //= require jquery_ujs
 //= require datepicker
+//= require inventory_records
 //= require modal_forms
 //= require models
 //= require parts
