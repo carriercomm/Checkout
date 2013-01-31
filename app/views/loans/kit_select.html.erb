@@ -6,7 +6,7 @@
     <%= f.input       :location_id,  :as => :hidden, :input_html => { :value => f.object.location.id } %>
     <%= f.input       :starts_at, :as => :hidden %>
     <%= f.input       :ends_at,   :as => :hidden %>
-    <%= f.association :kit,       :as => :radio_buttons, :collection => @kits, :label_method => :description, :value_method => :raw_id %>
+    <%= f.association :kit,       :as => :radio_buttons, :collection => @kits, :label_method => :description, :value_method => :id %>
 
     <div class="form-actions">
       <%= f.submit nil, :class => 'btn btn-primary' %>

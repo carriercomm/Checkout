@@ -1,0 +1,3 @@
+class PermissionsDecorator < CollectionDecorator
+
+end

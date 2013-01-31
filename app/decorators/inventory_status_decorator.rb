@@ -3,7 +3,7 @@ class InventoryStatusDecorator < ApplicationDecorator
   decorates_association :inventory_record
 
   def name
-    h.t("inventory_status.#{model.name}")
+    h.t("inventory_status.#{source.name}")
   end
 
   def to_s

@@ -1,0 +1,3 @@
+class InvetoryStatusesDecorator < CollectionDecorator
+
+end

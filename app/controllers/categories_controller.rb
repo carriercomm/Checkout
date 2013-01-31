@@ -6,8 +6,10 @@ class CategoriesController < ApplicationController
   # GET /categories
   # GET /categories.json
   def index
-    @categories = Category.order("LOWER(name) ASC").page(params[:page]).per(params[:page_limit])
-    @categories = CategoryDecorator.decorate(@categories)
+    @categories = Category.order("LOWER(name) ASC")
+      .page(params[:page])
+      .per(params[:page_limit])
+      .decorate
 
     respond_to do |format|
       format.html # index.html.erb
@@ -27,7 +29,7 @@ class CategoriesController < ApplicationController
   # GET /categories/1
   # GET /categories/1.json
   def show
-    @category = CategoryDecorator.find(params[:id])
+    @category = Category.find(params[:id]).decorate
 
     respond_to do |format|
       format.html # show.html.erb
@@ -38,8 +40,7 @@ class CategoriesController < ApplicationController
   # GET /categories/new
   # GET /categories/new.json
   def new
-    @category = Category.new
-    @category = CategoryDecorator.decorate(@category)
+    @category = Category.new.decorate
 
     respond_to do |format|
       format.html # new.html.erb
@@ -49,17 +50,17 @@ class CategoriesController < ApplicationController
 
   # GET /categories/1/edit
   def edit
-    @category = CategoryDecorator.find(params[:id])
+    @category = Category.find(params[:id]).decorate
   end
 
   # POST /categories
   # POST /categories.json
   def create
     @category = Category.new(params[:category])
-    @category = CategoryDecorator.decorate(@category)
 
     respond_to do |format|
       if @category.save
+        @category = @category.decorate
         format.html { redirect_to @category, notice: 'Category was successfully created.' }
         format.json { render json: @category, status: :created, location: @category }
       else
@@ -72,13 +73,15 @@ class CategoriesController < ApplicationController
   # PUT /categories/1
   # PUT /categories/1.json
   def update
-    @category = CategoryDecorator.find(params[:id])
+    @category = Category.find(params[:id])
 
     respond_to do |format|
       if @category.update_attributes(params[:category])
+        @category = @category.decorate
         format.html { redirect_to @category, notice: 'Category was successfully updated.' }
         # format.json { head :no_content }
       else
+        @category = @category.decorate
         format.html { render action: "edit" }
         # format.json { render json: @category.errors, status: :unprocessable_entity }
       end

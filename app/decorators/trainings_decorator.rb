@@ -1,0 +1,3 @@
+class TrainingsDecorator < CollectionDecorator
+
+end

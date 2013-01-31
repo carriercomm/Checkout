@@ -7,16 +7,20 @@
   <div id="inventory_records_shortcuts" class="hidden">
     <p>Mark all records: <%= inventory_shortcuts %></p>
   </div>
-  <div class="records row-fluid">
-    <div class="fields field-headers row-fluid">
-      <div class="field field-header span2">Component<br>ID</div>
-      <div class="field field-header span2">Asset Tag</div>
-      <div class="field field-header span3">Brand</div>
-      <div class="field field-header span3">Model</div>
-      <div class="field field-header span2">Status</div>
-    </div>
-    <%= f.simple_fields_for :inventory_records, @inventory_records %>
-  </div>
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>Component<br>ID</th>
+        <th>Asset Tag</th>
+        <th>Brand</th>
+        <th>Model</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      <%= f.simple_fields_for :inventory_records, @inventory_records, wrapper: false %>
+    </tbody>
+  </table>
 
   <div class="form-actions">
     <%= f.submit value: t('helpers.submit.inventory.create'), class: 'btn btn-primary' %>

@@ -3,6 +3,7 @@ class InventoryRecordDecorator < ApplicationDecorator
   decorates_association :component
   decorates_association :inventory_status
   decorates_association :loan
+  delegate :empty?, :id
 
   def style
     case inventory_status_id
@@ -18,7 +19,7 @@ class InventoryRecordDecorator < ApplicationDecorator
   end
 
   def created_at
-    h.l(model.created_at, :format => :tabular)
+    h.l(source.created_at, :format => :tabular)
   end
 
 end

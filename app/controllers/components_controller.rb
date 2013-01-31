@@ -74,10 +74,11 @@ class ComponentsController < ApplicationController
   # PUT /admin/components/1
   # PUT /admin/components/1.json
   def update
-    @component = ComponentDecorator.find(params[:id])
+    @component = Component.find(params[:id])
 
     respond_to do |format|
       if @component.update_attributes(params[:component])
+        @component = @component.decorate
         # format.html { redirect_to component_path(@component), notice: 'Component was successfully updated.' }
         format.js
       else

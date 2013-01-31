@@ -1,0 +1,3 @@
+class InventoryRecordsDecorator < CollectionDecorator
+
+end

@@ -6,32 +6,34 @@ class KitDecorator < ApplicationDecorator
   decorates_association :groups
   decorates_association :loans
 
-  allows(:budget_id,
-         :checkoutable?,
-         :location_id,
-         :primary_component,
-         :reservable?,
-         :to_key)
+  delegate(:budget_id,
+           :checkoutable?,
+           :count,
+           :id,
+           :location_id,
+           :primary_component,
+           :reservable?,
+           :to_key)
 
   def asset_tags
-    @asset_tags ||= model.asset_tags.map(&:to_s).join(", ")
+    @asset_tags ||= source.asset_tags.map(&:to_s).join(", ")
   end
 
   def autocomplete_json(options={})
-    q     = options.delete(:q)
-    raise self.inspect if q.nil?
-    regexp = Regexp.quote(q)
-    at    = model.asset_tags.select {|at| /#{regexp}/ =~ at }
-    label = "[#{ at.join(", ") }] #{ component_list }".squish
+    # q     = options.delete(:q)
+    # raise self.inspect if q.nil?
+    # regexp = Regexp.quote(q)
+    # at    = source.asset_tags.select {|at| /#{regexp}/ =~ at }
+    # label = "[#{ at.join(", ") }] #{ component_list }".squish
 
     {
-      :label => label,
-      :value => h.url_for(model)
+      :label => to_autocomplete_s,
+      :value => h.url_for(source)
     }
   end
 
   def checkoutable
-    to_yes_no(model.checkoutable)
+    to_yes_no(source.checkoutable)
   end
 
   # returns a string of comma delimited model names
@@ -43,15 +45,11 @@ class KitDecorator < ApplicationDecorator
   end
 
   def cost
-    h.number_to_currency(model.cost)
+    coalesce(h.number_to_currency(source.cost))
   end
 
   def description
     "[#{ asset_tags }] #{ component_list }".squish.html_safe
-  end
-
-  def id
-    h.link_to(model.id, h.kit_path(model))
   end
 
   def linked_groups_list
@@ -59,7 +57,7 @@ class KitDecorator < ApplicationDecorator
   end
 
   def insured
-    to_yes_no(model.insured)
+    to_yes_no(source.insured)
   end
 
   def linked_component_list
@@ -69,22 +67,18 @@ class KitDecorator < ApplicationDecorator
   end
 
   def location
-    coalesce(model.location)
-  end
-
-  def raw_id
-    model.id
+    coalesce(source.location)
   end
 
   def select2_json
     {
-      :id   => model.id,
-      :text => description
+      :id   => source.id,
+      :text => to_select2_s
     }
   end
 
   def status
-    (model.checked_out?) ? h.t('kit.status.checked_out') : h.t('kit.status.available')
+    (source.checked_out?) ? h.t('kit.status.checked_out') : h.t('kit.status.available')
   end
 
   def tabular_asset_tags
@@ -100,16 +94,28 @@ class KitDecorator < ApplicationDecorator
     end
   end
 
+  def to_autocomplete_s
+    @autocomplete_s ||= "#{ source.id } | #{ asset_tags } | #{ source.components.map(&:component_model).map(&:to_branded_s).join(", ") }".squish
+  end
+
+  def to_link
+    h.link_to(source.id, h.kit_path(source))
+  end
+
+  def to_select2_s
+    to_autocomplete_s
+  end
+
   def to_s
-    h.link_to(model.id, h.kit_path(model))
+    h.link_to(source.id, h.kit_path(source))
   end
 
   def tombstoned
-    to_yes_no(model.tombstoned)
+    to_yes_no(source.tombstoned)
   end
 
   def training_required
-    to_yes_no(model.training_required?)
+    to_yes_no(source.training_required?)
   end
 
 end

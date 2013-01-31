@@ -1,7 +1,9 @@
+@import "bootstrap";
+@import "font-awesome";
 @import "jquery.ui.datepicker";
 @import "jquery.ui.autocomplete";
 @import "select2";
-@import "bootstrap_and_overrides";
+@import "bootstrap_overrides";
 
 .help-block {
   font-style:italic;

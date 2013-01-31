@@ -1,0 +1,3 @@
+class ComponentsDecorator < CollectionDecorator
+
+end

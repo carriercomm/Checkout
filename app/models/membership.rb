@@ -14,6 +14,7 @@ class Membership < ActiveRecord::Base
 
   attr_accessible(:expires_at,
                   :group_id,
+                  :supervisor,
                   :user_id)
 
   validates :group_id, :presence => true

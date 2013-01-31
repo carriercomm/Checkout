@@ -31,7 +31,7 @@
       <td><%= inventory_record.created_at %></td>
       <td><%= inventory_record.attendant %></td>
       <td><%= inventory_record.inventory_status %></td>
-      <td><%= link_to(inventory_record.component.kit.id, kit_path(inventory_record.component.kit)) %></td>
+      <td><%= inventory_record.component.kit.to_link %></td>
       <td><%= inventory_record.component.id %></td>
       <td><%= inventory_record.component.asset_tag %></td>
       <td><%= inventory_record.component.component_model.brand %></td>

@@ -1,0 +1,3 @@
+class KitsDecorator < CollectionDecorator
+
+end

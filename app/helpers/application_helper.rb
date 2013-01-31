@@ -20,7 +20,7 @@ module ApplicationHelper
   def sidebar_link(text, path, default_tooltip = "", condition = true, failure_tooltip = nil, options = {})
     # setup the base options for the tooltip
     link_opts = {
-      :rel   => "tooltip",
+      "rel"            => "tooltip",
       "data-placement" => "right"
     }
 
@@ -31,12 +31,12 @@ module ApplicationHelper
     li_opts[:class] = "active" if current_page?(path)
 
     if condition
-      link_opts[:title] = default_tooltip unless default_tooltip.blank?
+      link_opts['data-title'] = default_tooltip unless default_tooltip.blank?
       content_tag :li, li_opts do
         link_to raw(text), path, link_opts.merge(options)
       end
     else
-      link_opts[:title] = failure_tooltip unless failure_tooltip.blank?
+      link_opts['data-title'] = failure_tooltip unless failure_tooltip.blank?
       link_opts[:class] = "disabled"
       link_opts[:onclick] = "return false;"
       content_tag :li do
@@ -123,7 +123,12 @@ module ApplicationHelper
   end
 
   def show_link(object, content = t("helpers.links.show"))
-    link_to(content, object) if can?(:read, object)
+    object = object.model if object.is_a? Draper::Base
+    if (can?(:show, object) || can?(:read, object))
+      link_to(content, object)
+    else
+      content
+    end
   end
 
   def show_mini_button(object, content = t("helpers.links.show"))

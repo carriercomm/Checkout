@@ -1,0 +1,3 @@
+class RolesDecorator < CollectionDecorator
+
+end

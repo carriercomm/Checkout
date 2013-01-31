@@ -1,29 +1,48 @@
-<%= simple_nested_form_for @group.model, :html => { :class => 'form-horizontal' } do |f| %>
+<%= simple_nested_form_for @group.source, :html => { :class => 'form-horizontal form-table' } do |f| %>
+  <%= f.error_notification :message => 'Please review the problems below' %>
   <%= f.input :name %>
   <%= f.input :description %>
   <h2>Members</h2>
-  <div class="records row-fluid">
-    <div class="fields field-headers row-fluid">
-      <div class="field field-header span6">Username</div>
-      <div class="field field-header span2">Expires At</div>
-      <div class="field field-header span2">Group<br>Supervisor</div>
-      <div class="field field-header span2">Actions</div>
-    </div>
-    <%= f.simple_fields_for :memberships, @memberships %>
-    <%= f.link_to_add raw("<i class='icon-plus-sign'></i> Add another user"), :memberships %>
-  </div>
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>Username</th>
+        <th>Expires At</th>
+        <th>Group<br>Supervisor</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <%= f.fields_for :memberships, @memberships, wrapper: false %>
+      <tr>
+        <td colspan="4">
+          <%= f.link_to_add raw("<i class='icon-plus-sign'></i> Add another user"), :memberships %>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
   <h2>Kits</h2>
-  <div class="records row-fluid">
-    <div class="fields field-headers row-fluid">
-      <div class="field field-header span1">Kit ID</div>
-      <div class="field field-header span2">Asset Tags</div>
-      <div class="field field-header span4">Components</div>
-      <div class="field field-header span3">Expires At</div>
-      <div class="field field-header span2">Actions</div>
-    </div>
-    <%= f.simple_fields_for :permissions %>
-    <%= f.link_to_add raw("<i class='icon-plus-sign'></i> Add another kit"), :permissions %>
-  </div>
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <td>Kit ID</td>
+        <td>Asset Tags</td>
+        <td>Components</td>
+        <td>Expires At</td>
+        <td>Actions</td>
+      </tr>
+    </thead>
+    <tbody>
+      <%= f.fields_for :permissions, wrapper: false %>
+      <tr>
+        <td colspan="5">
+          <%= f.link_to_add raw("<i class='icon-plus-sign'></i> Add another kit"), :permissions %>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
   <div class="form-actions">
     <%= f.button :submit, :class => 'btn-primary' %>
     <%= link_to t('.cancel', :default => t("helpers.links.cancel")),

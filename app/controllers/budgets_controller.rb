@@ -6,8 +6,9 @@ class BudgetsController < ApplicationController
   # GET /budgets
   # GET /budgets.json
   def index
-    @budgets = Budget.order("budgets.starts_at DESC, budgets.number ASC").page(params[:page])
-    @budgets = BudgetDecorator.decorate(@budgets)
+    @budgets = Budget.order("budgets.starts_at DESC, budgets.number ASC")
+      .page(params[:page])
+      .decorate
 
     respond_to do |format|
       format.html # index.html.erb
@@ -18,7 +19,7 @@ class BudgetsController < ApplicationController
   # GET /budgets/1
   # GET /budgets/1.json
   def show
-    @budget = BudgetDecorator.find(params[:id])
+    @budget = Budget.find(params[:id]).decorate
 
     respond_to do |format|
       format.html # show.html.erb
@@ -29,8 +30,7 @@ class BudgetsController < ApplicationController
   # GET /budgets/new
   # GET /budgets/new.json
   def new
-    @budget = Budget.new
-    @budget = BudgetDecorator.decorate(@budget)
+    @budget = Budget.new.decorate
 
     respond_to do |format|
       format.html # new.html.erb
@@ -40,18 +40,17 @@ class BudgetsController < ApplicationController
 
   # GET /budgets/1/edit
   def edit
-    @budget = Budget.find(params[:id])
-    @budget = BudgetDecorator.decorate(@budget)
+    @budget = Budget.find(params[:id]).decorate
   end
 
   # POST /budgets
   # POST /budgets.json
   def create
     @budget = Budget.new(params[:budget])
-    @budget = BudgetDecorator.decorate(@budget)
 
     respond_to do |format|
       if @budget.save
+        @budget = @budget.decorate
         format.html { redirect_to @budget, notice: 'Budget was successfully created.' }
         format.json { render json: @budget, status: :created, budget: @budget }
       else
@@ -65,13 +64,14 @@ class BudgetsController < ApplicationController
   # PUT /budgets/1.json
   def update
     @budget = Budget.find(params[:id])
-    @budget = BudgetDecorator.decorate(@budget)
 
     respond_to do |format|
       if @budget.update_attributes(params[:budget])
+        @budget = @budget.decorate
         format.html { redirect_to @budget, notice: 'Budget was successfully updated.' }
         # format.json { head :no_content }
       else
+        @budget = @budget.decorate
         format.html { render action: "edit" }
         # format.json { render json: @budget.errors, status: :unprocessable_entity }
       end

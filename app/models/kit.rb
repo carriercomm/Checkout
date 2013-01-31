@@ -248,7 +248,7 @@ class Kit < ActiveRecord::Base
   end
 
   def to_s
-    id.to_s
+    "#{ id.to_s } | #{asset_tags.join(", ")} | #{ components.map(&:component_model).map(&:to_branded_s).join(", ") }"
   end
 
   # custom validator

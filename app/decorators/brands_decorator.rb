@@ -1,0 +1,3 @@
+class BrandsDecorator < CollectionDecorator
+
+end

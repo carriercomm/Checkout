@@ -7,61 +7,61 @@ class LoanDecorator < ApplicationDecorator
   decorates_association :out_assistant
 
   def approver
-    coalesce(model.approver)
+    coalesce(source.approver)
   end
 
   def cancel_path
-    if model.out_at
-      h.loan_path(model)
-    elsif model.starts_at
-      h.reservation_path(model)
-    elsif model.kit
-      h.kit_path(model.kit)
-    elsif model.component_model
-      h.component_model_path(model.component_model)
+    if source.out_at
+      h.loan_path(source)
+    elsif source.starts_at
+      h.reservation_path(source)
+    elsif source.kit
+      h.kit_path(source.kit)
+    elsif source.component_model
+      h.component_model_path(source.component_model)
     else
       h.component_models_path
     end
   end
 
   def ends_at
-    coalesce(h.l(model.ends_at, :format => :tabular))
+    coalesce(h.l(source.ends_at, :format => :tabular))
   end
 
   def in_assistant
-    coalesce(model.in_assistant)
+    coalesce(source.in_assistant)
   end
 
   def in_at
-    if model.in_at
-      h.l(model.in_at, :format => :tabular)
+    if source.in_at
+      h.l(source.in_at, :format => :tabular)
     else
       coalesce(h.t('loan.not_checked_in'))
     end
   end
 
   def late
-    to_yes_no(model.late)
+    to_yes_no(source.late)
   end
 
   def out_assistant
-    coalesce(model.out_assistant)
+    coalesce(source.out_assistant)
   end
 
   def out_at
-    if model.out_at
-      h.l(model.out_at, :format => :tabular)
+    if source.out_at
+      h.l(source.out_at, :format => :tabular)
     else
       coalesce(h.t('loan.not_checked_out'))
     end
   end
 
   def starts_at
-    coalesce(h.l(model.starts_at, :format => :tabular))
+    coalesce(h.l(source.starts_at, :format => :tabular))
   end
 
   def state
-    h.t("loan.state.#{ model.state }").html_safe
+    h.t("loan.state.#{ source.state }").html_safe
   end
 
 end

@@ -4,24 +4,24 @@ class ComponentDecorator < ApplicationDecorator
   decorates_association :kit
   decorates_association :inventory_records
 
-  allows :asset_tag, :serial_number, :update_attributes
+  delegate :asset_tag, :id, :serial_number
 
   def current_status
-    ir = model.latest_inventory_record
+    ir = source.latest_inventory_record
 
     if !!ir
-      InventoryRecordDecorator.decorate(ir).inventory_status.name
+      ir.decorate.inventory_status.name
     else
       h.t('inventory_status.unknown')
     end
   end
 
   def missing
-    to_yes_no(model.missing)
+    to_yes_no(source.missing)
   end
 
   def to_link
-    h.link_to("#{ component_model.brand } #{ component_model }", h.component_path(model))
+    h.link_to("#{ component_model.brand } #{ component_model }", h.component_path(source))
   end
 
   def to_s

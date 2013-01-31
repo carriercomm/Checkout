@@ -3,20 +3,22 @@ class MembershipDecorator < ApplicationDecorator
   decorates_association :group
   decorates_association :user
 
+  delegate :persisted?, :id
+
   def expires_at
-    if model.expires_at.nil?
+    if source.expires_at.nil?
       return "Never"
     else
-      return localize_unless_nil(model.expires_at, :format => :tabular)
+      return localize_unless_nil(source.expires_at, :format => :tabular)
     end
   end
 
   def username
-    model.user.username
+    source.user.username
   end
 
   def supervisor
-    to_yes_no(model.supervisor)
+    to_yes_no(source.supervisor)
   end
 
 end

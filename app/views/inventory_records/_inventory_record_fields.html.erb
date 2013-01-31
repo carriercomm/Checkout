@@ -1,18 +1,20 @@
 <% component = ComponentDecorator.decorate(f.object.component) %>
 
-<div class="field span2">
-  <%= component.id %>
-  <%= f.input :component_id, :as => :hidden %>
-</div>
-<div class="field span2">
-  <%= component.asset_tag %>
-</div>
-<div class="field span3">
-  <%= component.component_model.brand %>
-</div>
-<div class="field span3">
-  <%= component.component_model %>
-</div>
-<div class="field span2">
-  <%= f.association :inventory_status, :collection => InventoryStatus.value_symbols, :wrapper => :tabular %>
-</div>
+<tr class="fields">
+  <td>
+    <%= component.id %>
+    <%= f.input :component_id, :as => :hidden, :wrapper => :tabular %>
+  </td>
+  <td>
+    <%= component.asset_tag %>
+  </td>
+  <td>
+    <%= component.component_model.brand %>
+  </td>
+  <td>
+    <%= component.component_model %>
+  </td>
+  <td>
+    <%= f.association :inventory_status, :collection => InventoryStatus.value_symbols, :wrapper => :tabular %>
+  </td>
+</tr>

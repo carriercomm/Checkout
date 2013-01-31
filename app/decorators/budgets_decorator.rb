@@ -1,0 +1,3 @@
+class BudgetsDecorator < CollectionDecorator
+
+end

@@ -1,0 +1,3 @@
+class CovenantsDecorator < CollectionDecorator
+
+end

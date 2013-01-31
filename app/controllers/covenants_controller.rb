@@ -6,8 +6,9 @@ class CovenantsController < ApplicationController
   # GET /covenants
   # GET /covenants.json
   def index
-    @covenants = Covenant.page(params[:page]).per(params[:page_limit])
-    @covenants = CovenantDecorator.decorate(@covenants)
+    @covenants = Covenant.page(params[:page])
+      .per(params[:page_limit])
+      .decorate
 
     respond_to do |format|
       format.html # index.html.erb
@@ -18,7 +19,7 @@ class CovenantsController < ApplicationController
   # GET /covenants/1
   # GET /covenants/1.json
   def show
-    @covenant = CovenantDecorator.find(params[:id])
+    @covenant = Covenant.find(params[:id]).decorate
 
     respond_to do |format|
       format.html # show.html.erb
@@ -29,8 +30,7 @@ class CovenantsController < ApplicationController
   # GET /covenants/new
   # GET /covenants/new.json
   def new
-    @covenant = Covenant.new
-    @covenant = CovenantDecorator.decorate(@covenant)
+    @covenant = Covenant.new.decorate
 
     respond_to do |format|
       format.html # new.html.erb
@@ -40,17 +40,17 @@ class CovenantsController < ApplicationController
 
   # GET /covenants/1/edit
   def edit
-    @covenant = CovenantDecorator.find(params[:id])
+    @covenant = Covenant.find(params[:id]).decorate
   end
 
   # POST /covenants
   # POST /covenants.json
   def create
     @covenant = Covenant.new(params[:covenant])
-    @covenant = CovenantDecorator.decorate(@covenant)
 
     respond_to do |format|
       if @covenant.save
+        @covenant = @covenant.decorate
         format.html { redirect_to @covenant, notice: 'Covenant was successfully created.' }
         format.json { render json: @covenant, status: :created, location: @covenant }
       else
@@ -63,13 +63,15 @@ class CovenantsController < ApplicationController
   # PUT /covenants/1
   # PUT /covenants/1.json
   def update
-    @covenant = CovenantDecorator.find(params[:id])
+    @covenant = Covenant.find(params[:id])
 
     respond_to do |format|
       if @covenant.update_attributes(params[:covenant])
+        @covenant = @covenant.decorate
         format.html { redirect_to @covenant, notice: 'Covenant was successfully updated.' }
         format.json { head :no_content }
       else
+        @covenant = @covenant.decorate
         format.html { render action: "edit" }
         format.json { render json: @covenant.errors, status: :unprocessable_entity }
       end

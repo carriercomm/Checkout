@@ -1,0 +1,3 @@
+class LoansDecorator < CollectionDecorator
+
+end

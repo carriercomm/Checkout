@@ -4,7 +4,7 @@ class TrainingDecorator < ApplicationDecorator
   decorates_association :user
 
   def created_at
-    localize_unless_nil(model.created_at, :format => :tabular)
+    localize_unless_nil(source.created_at, :format => :tabular)
   end
 
 end

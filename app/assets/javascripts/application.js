@@ -12,15 +12,16 @@
 //
 //= require jquery
 //= require bootstrap
+//= require bootstrap_defaults
+//= require jquery.ui.autocomplete
 //= require jquery.ui.datepicker
-//= require jquery-ui
 //= require jquery_nested_form
+//= require jquery_nested_form_util
 //= require jquery_ujs
 //= require datepicker
 //= require inventory_records
 //= require modal_forms
 //= require models
-//= require parts
 //= require loans
 //= require search
 //= require select2
@@ -28,5 +29,5 @@
 //= require split_component_models
 //= require tables
 //= require titleCaps
-//= require twitter/bootstrap
 //= require user
+

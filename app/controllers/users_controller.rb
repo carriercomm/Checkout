@@ -24,8 +24,9 @@ class UsersController < ApplicationController
 
     # get a total (used by the select2 widget) before we apply pagination
     @total = @users.count
-    @users = @users.page(params[:page]).per(params[:page_limit])
-    @users = UserDecorator.decorate(@users)
+    @users = @users.page(params[:page])
+      .per(params[:page_limit])
+      .decorate
 
     respond_to do |format|
       format.html # index.html.erb
@@ -48,7 +49,7 @@ class UsersController < ApplicationController
     total = users.count
 
     # grab the first 10
-    users = UserDecorator.decorate(users.limit(10))
+    users = users.limit(10).decorate
 
     respond_to do |format|
       #format.html # index.html.erb

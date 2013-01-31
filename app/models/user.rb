@@ -136,6 +136,10 @@ class User < ActiveRecord::Base
     covenant_signatures.count == Covenant.count
   end
 
+  def supervisor?(group)
+    !memberships.where(group_id: group.id, supervisor: true).empty?
+  end
+
   def suspended?(reference_date = Date.today)
     !suspended_until.nil? && suspended_until.to_date > reference_date.to_date
   end

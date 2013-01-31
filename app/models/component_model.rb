@@ -137,12 +137,16 @@ class ComponentModel < ActiveRecord::Base
     training_required
   end
 
+  def to_branded_s
+    "#{ brand } #{ name }"
+  end
+
   def to_s
     name
   end
 
   def to_param
-    "#{ id } #{ brand } #{ name }".parameterize
+    "#{ id } #{ to_branded_s }".parameterize
   end
 
   def unavailable_checkoutable_kits(starts_at, ends_at, location = nil)

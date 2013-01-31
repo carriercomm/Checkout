@@ -7,15 +7,17 @@ class ComponentModelDecorator < ApplicationDecorator
   decorates_association :trainings
   decorates_association :users
 
+  delegate :id, :name
+
   def autocomplete_json
     {
       :label => to_s,
-      :value => h.url_for(model)
+      :value => h.url_for(source)
     }
   end
 
   def brand_name
-    model.brand.to_s
+    source.brand.to_s
   end
 
   def category_list
@@ -24,11 +26,11 @@ class ComponentModelDecorator < ApplicationDecorator
   end
 
   def component_count
-    model.components.count
+    source.components.count
   end
 
   def description
-    coalesce(model.description)
+    coalesce(source.description)
   end
 
   def select2_json
@@ -39,19 +41,19 @@ class ComponentModelDecorator < ApplicationDecorator
   end
 
   def training_required
-    to_yes_no(model.training_required)
+    to_yes_no(source.training_required)
   end
 
   def to_link
-    h.link_to(to_s, h.component_model_path(model))
+    h.link_to(to_s, h.component_model_path(source))
   end
 
   def to_branded_s
-    "#{ brand_name } #{ model.name }"
+    "#{ brand_name } #{ source.name }"
   end
 
   def to_s
-    model.name
+    source.name
   end
 
 end

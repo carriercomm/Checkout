@@ -1,26 +1,18 @@
-<% user = UserDecorator.decorate(f.object.user) unless f.object.new_record? %>
-
-<%= content_tag :div, f.error(:base), :class=>"alert alert-error span12 row-fluid" if f.error(:base) %>
-<div class="row-fluid">
-  <div class="field span6">
+<tr class="fields">
+  <td>
+    <%= f.input :id, :as => :hidden, :wrapper => :tabular %>
     <% if f.object.id.nil? %>
-      <%= f.input :user_id,
-                  :wrapper => :tabular,
-                  :input_html => {
-                      :class => 'select2-json-autocomplete select-user',
-                      :hidden => true,
-                      "data-ajax-url" => select2_users_path(:format => :json, :group_id =>  @group.id)
-                  } %>
+      <%= f.input :user, :as => :ajax_association, :wrapper => :tabular, :path => select2_users_path(:format => :json, :group_id =>  @group.id) %>
     <% else %>
-      <%= user.username %>
-      <%= f.input :user_id, :as => :hidden %>
+      <%= f.association :user, :as => :hidden, :wrapper => :tabular %>
+      <%= f.object.user.username %>
     <% end %>
-  </div>
-  <div class="field span2">
+  </td>
+  <td>
     <%= f.input :expires_at, :as => :date_picker, :wrapper => :tabular %>
-  </div>
-  <div class="field span2">
+  </td>
+  <td>
     <%= f.input :supervisor, :wrapper => :tabular %>
-  </div>
-  <div class="field span2"><%= f.link_to_remove "Delete", :class => "btn btn-danger" %></div>
-</div>
+  </td>
+  <td><%= f.link_to_remove "Delete", :class => "btn btn-danger" %></td>
+</tr>

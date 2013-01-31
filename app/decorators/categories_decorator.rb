@@ -1,0 +1,3 @@
+class CategoriesDecorator < CollectionDecorator
+
+end

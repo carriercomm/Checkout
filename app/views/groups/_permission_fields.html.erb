@@ -1,30 +1,25 @@
 <% kit = KitDecorator.decorate(f.object.kit) unless f.object.new_record? %>
-<%= content_tag :div, f.error(:base), :class=>"alert alert-error span12" if f.error(:base) %>
-
-<% if f.object.new_record? %>
-  <div class="field span7">
-    <%= f.input :kit_id,
-                :wrapper => :tabular,
-                :input_html => {
-                    :class => 'select2-json-autocomplete select-kit',
-                    :hidden => true,
-                    "data-ajax-url" => select2_kits_path(:format => :json, :group_id =>  @group.id)
-                } %>
-  </div>
-<% else %>
-  <div class="field span1">
-    <%= kit.id %>
-    <%= f.input :kit_id, :as => :hidden %>
-  </div>
-  <div class="field span2">
-    <%= kit.asset_tags %>
-  </div>
-  <div class="field span4"><%= kit.component_list %></div>
-<% end %>
-
-  <div class="field span3">
-    <%= f.input :expires_at,
-                :as => :date_picker,
-                :wrapper => :tabular %>
-  </div>
-  <div class="field span2"><%= f.link_to_remove "Delete", :class => "btn btn-danger" %></div>
+<tr class="fields">
+  <% if f.object.new_record? %>
+    <td colspan="3">
+      <%= f.input :kit,
+                  :as => :ajax_association,  
+                  :wrapper => :tabular,
+                  :path => select2_kits_path(:format => :json, :group_id =>  @group.id) %>
+    </td>
+  <% else %>
+    <td>
+      <%= kit.to_link %>
+      <%= f.input :kit_id, :as => :hidden %>
+    </td>
+    <td>
+      <%= kit.asset_tags %>
+    </td>
+    <td><%= kit.component_list %></td>
+  <% end %>
+  <td>
+    <%= f.input :id, :as => :hidden, :wrapper => :tabular %>
+    <%= f.input :expires_at, :as => :date_picker, :wrapper => :tabular %>
+  </td>
+  <td><%= f.link_to_remove "Delete", :class => "btn btn-danger" %></td>
+</tr>

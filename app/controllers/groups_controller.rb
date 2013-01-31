@@ -1,14 +1,12 @@
 class GroupsController < ApplicationController
 
-  # use CanCan to authorize this resource
-  authorize_resource
-
   # GET /groups
   # GET /groups.json
   def index
     @groups = Group
+    authorize!(:index, Group)
     apply_scopes_and_pagination
-    @groups = GroupDecorator.decorate(@groups)
+    @groups = @groups.decorate
 
     respond_to do |format|
       format.html # index.html.erb
@@ -20,11 +18,11 @@ class GroupsController < ApplicationController
   # GET /groups/1.json
   def show
     @group = Group.includes(:kits).find(params[:id].to_i)
-    @group = GroupDecorator.decorate(@group)
+    authorize!(:show, @group)
+    @group = @group.decorate
 
     # TODO: figure out how to sort this in the database
     @memberships = @group.memberships.sort_by {|m| m.username}
-    @memberships = MembershipDecorator.decorate(@memberships)
 
     respond_to do |format|
       format.html # show.html.erb
@@ -36,7 +34,8 @@ class GroupsController < ApplicationController
   # GET /groups/new.json
   def new
     @group = Group.new
-    @group = GroupDecorator.decorate(@group)
+    authorize!(:create, @group)
+    @group = @group.decorate
 
     respond_to do |format|
       format.html # new.html.erb
@@ -55,20 +54,22 @@ class GroupsController < ApplicationController
     # INNER JOIN kits ON permissions.kit_id = kits.id
     # END_SQL
     @group = Group.includes(:kits).find(params[:id])
+    authorize!(:update, @group)
     # TODO: figure out how to sort this in the database
-    @memberships = @group.memberships.sort_by {|m| m.user.username}
-    # this has to come after creating @memberships
-    @group = GroupDecorator.decorate(@group)
+    @memberships = @group.memberships.sort_by { |m| m.user.username }
+    # this has to come after creating @memberships, so @memberships is not decorated
+    @group = @group.decorate
   end
 
   # POST /groups
   # POST /groups.json
   def create
     @group = Group.new(params[:group])
-    @group = GroupDecorator.decorate(@group)
+    authorize!(:create, @group)
 
     respond_to do |format|
       if @group.save
+        @group = @group.decorate
         format.html { redirect_to @group, notice: 'Group was successfully created.' }
         # format.json { render json: @group, status: :created, location: @group }
       else
@@ -81,13 +82,16 @@ class GroupsController < ApplicationController
   # PUT /groups/1
   # PUT /groups/1.json
   def update
-    @group = GroupDecorator.find(params[:id])
+    @group = Group.find(params[:id])
+    authorize!(:update, @group)
 
     respond_to do |format|
       if @group.update_attributes(params[:group])
+        @group = @group.decorate
         format.html { redirect_to @group, notice: 'Group was successfully updated.' }
         # format.json { head :no_content }
       else
+        @group = @group.decorate
         format.html { render action: "edit" }
         # format.json { render json: @group.errors, status: :unprocessable_entity }
       end
@@ -110,9 +114,11 @@ class GroupsController < ApplicationController
 
   def apply_scopes_and_pagination
     scope_by_user
+
     @groups = @groups.includes(:kits, :users)
       .where(["memberships.expires_at IS NULL OR memberships.expires_at > ?", Date.today])
-      .order("groups.name").page(params[:page])
+      .order("groups.name")
+      .page(params[:page])
   end
 
   def scope_by_user

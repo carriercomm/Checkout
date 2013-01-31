@@ -1,4 +1,4 @@
-class ApplicationDecorator < Draper::Base
+class ApplicationDecorator < Draper::Decorator
 
   def localize_unless_nil(*args)
     #Avoid I18n::ArgumentError for nil values

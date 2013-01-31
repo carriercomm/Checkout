@@ -8,7 +8,7 @@ class KitsController < ApplicationController
   def index
     @kits = Kit
     apply_scopes_and_pagination
-    @kits = KitDecorator.decorate(@kits)
+    @kits = @kits.decorate
 
     respond_to do |format|
       format.html # index.html.erb
@@ -30,10 +30,7 @@ class KitsController < ApplicationController
     total = asset_tags.count + ids.count
 
     # actually do the query, and concatenate the results
-    kits = [asset_tags.limit(10), ids.limit(10)].flatten
-
-    # dress 'em up
-    kits = KitDecorator.decorate(kits)
+    kits = [asset_tags.limit(10).decorate, ids.limit(10).decorate].flatten
 
     respond_to do |format|
       #format.html # index.html.erb
@@ -45,11 +42,10 @@ class KitsController < ApplicationController
   # GET /kits/1.json
   def show
     @kit = Kit.joins(:location, :components, :component_models => :brand)
-              .includes([:location, :budget, :components, {:component_models => :brand}])
-              .order("components.position ASC")
-              .find(params[:id])
-
-    @kit = KitDecorator.decorate(@kit)
+      .includes([:location, :budget, :components, {:component_models => :brand}])
+      .order("components.position ASC")
+      .find(params[:id])
+      .decorate
 
     respond_to do |format|
       format.html { render layout: 'sidebar' } # show.html.erb
@@ -60,8 +56,10 @@ class KitsController < ApplicationController
   # GET /kits/new
   # GET /kits/new.json
   def new
-    @kit = KitDecorator.decorate(Kit.new)
+    @kit = Kit.new
     @kit.components.build
+    @kit = @kit.decorate
+    @budgets = Budget.active.decorate
 
     respond_to do |format|
       format.html # new.html.erb
@@ -71,13 +69,14 @@ class KitsController < ApplicationController
 
   # GET /kits/1/edit
   def edit
-    @kit = KitDecorator.find(params[:id])
+    @kit = Kit.find(params[:id]).decorate
+    @budgets = Budget.active.decorate
   end
 
   # POST /kits
   # POST /kits.json
   def create
-    @kit = KitDecorator.decorate(Kit.new(params[:kit]))
+    @kit = Kit.new(params[:kit])
 
     respond_to do |format|
       kit_saved = @kit.save
@@ -87,6 +86,7 @@ class KitsController < ApplicationController
       end
 
       if kit_saved
+        @kit = @kit.decorate
         format.html { redirect_to @kit, notice: 'Kit was successfully created.' }
         # format.json { render json: @kit, status: :created, location: @kit }
       else
@@ -108,7 +108,7 @@ class KitsController < ApplicationController
         flash[:warning] = "Kit cannot be tombstoned and checkoutable, so it was forced to be non-checkoutable."
       end
 
-      @kit = KitDecorator.decorate(@kit)
+      @kit = @kit.decorate
 
       if kit_updated
         format.html { redirect_to @kit, notice: 'Kit was successfully updated.' }
@@ -139,7 +139,9 @@ class KitsController < ApplicationController
     scope_by_brand
     scope_by_budget
     scope_by_category
-    @kits = @kits.joins(:component_models => :brand).order("brands.name, component_models.name").page(params[:page])
+    @kits = @kits.joins(:component_models => :brand)
+      .order("brands.name, component_models.name")
+      .page(params[:page])
   end
 
   def scope_by_filter_params

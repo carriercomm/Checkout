@@ -1,4 +1,4 @@
-<%= simple_form_for @budget.model, :html => { :class => 'form-horizontal' } do |f| %>
+<%= simple_form_for @budget.source, :html => { :class => 'form-horizontal' } do |f| %>
   <%= f.input :number %>
   <%= f.input :name %>
   <%= f.input :starts_at, :include_blank => true %>

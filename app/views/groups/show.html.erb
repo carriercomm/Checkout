@@ -55,7 +55,7 @@
       <tbody>
         <% @group.kits.each do |kit| %>
         <tr>
-          <td><%= kit.id %></td>
+          <td><%= kit.to_link %></td>
           <td><%= kit.asset_tags %></td>
           <td><%= kit.linked_component_list %></td>
           <td><%= kit.groups.count %></td>

@@ -1,0 +1,3 @@
+class MembershipsDecorator < CollectionDecorator
+
+end

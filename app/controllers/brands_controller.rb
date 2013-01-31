@@ -14,6 +14,8 @@ class BrandsController < ApplicationController
 
     apply_pagination
 
+    @brands = @brands.decorate
+
     respond_to do |format|
       format.html # index.html.erb
       format.json { render json: { items: @brands.map(&:model), total: @total} }
@@ -22,8 +24,10 @@ class BrandsController < ApplicationController
 
   # TODO: is this being used? move it to a collection route on the index action
   def checkoutable
-    @brands = Brand.order("brands.name ASC").having_checkoutable_kits.page(params[:page])
-    @brands = BrandDecorator.decorate(@brands)
+    @brands = Brand.order("brands.name ASC")
+      .having_checkoutable_kits
+      .page(params[:page])
+      .decorate
 
     respond_to do |format|
       format.html { render :action => 'index' }
@@ -34,8 +38,9 @@ class BrandsController < ApplicationController
   # GET /brands/1
   # GET /brands/1.json
   def show
-    @brand = Brand.includes(:component_models).find(params[:id])
-    @brand = BrandDecorator.decorate(@brand)
+    @brand = Brand.includes(:component_models)
+      .find(params[:id])
+      .decorate
 
     respond_to do |format|
       format.html # show.html.erb
@@ -46,8 +51,7 @@ class BrandsController < ApplicationController
   # GET /brands/new
   # GET /brands/new.json
   def new
-    @brand = Brand.new
-    @brand = BrandDecorator.decorate(@brand)
+    @brand = Brand.new.decorate
 
     respond_to do |format|
       format.html # new.html.erb
@@ -57,17 +61,17 @@ class BrandsController < ApplicationController
 
   # GET /brands/1/edit
   def edit
-    @brand = BrandDecorator.find(params[:id])
+    @brand = Brand.find(params[:id]).decorate
   end
 
   # POST /brands
   # POST /brands.json
   def create
     @brand = Brand.new(params[:brand])
-    @brand = BrandDecorator.decorate(@brand)
 
     respond_to do |format|
       if @brand.save
+        @brand = @brand.decorate
         format.html { redirect_to @brand, notice: 'Brand was successfully created.' }
         format.json { render json: @brand, status: :created, location: @brand }
       else
@@ -80,13 +84,15 @@ class BrandsController < ApplicationController
   # PUT /brands/1
   # PUT /brands/1.json
   def update
-    @brand = BrandDecorator.find(params[:id])
+    @brand = Brand.find(params[:id])
 
     respond_to do |format|
       if @brand.update_attributes(params[:brand])
+        @brand = @brand.decorate
         format.html { redirect_to @brand, notice: 'Brand was successfully updated.' }
         # format.json { head :no_content }
       else
+        @brand = @brand.decorate
         format.html { render action: "edit" }
         # format.json { render json: @brand.errors, status: :unprocessable_entity }
       end
@@ -117,7 +123,6 @@ class BrandsController < ApplicationController
 
   def apply_pagination
     @brands = @brands.page(params[:page]).per(params[:page_limit])
-    @brands = BrandDecorator.decorate(@brands)
   end
 
   def apply_scopes_and_pagination

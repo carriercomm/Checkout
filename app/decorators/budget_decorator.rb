@@ -1,30 +1,29 @@
 class BudgetDecorator < ApplicationDecorator
   decorates :budget
-
-  allows :ends_at, :starts_at, :name, :number
+  delegate :ends_at, :name, :number, :starts_at
 
   def display_date
-    if !!model.starts_at && !!model.ends_at
-      return "#{ model.starts_at.year }-#{ model.ends_at.year }"
+    if !!source.starts_at && !!source.ends_at
+      return "#{ source.starts_at.year }-#{ source.ends_at.year }"
     else
       return "Unknown"
     end
   end
 
   def ends_at
-    coalesce(model.ends_at)
+    coalesce(source.ends_at)
   end
 
   def starts_at
-    coalesce(model.starts_at)
+    coalesce(source.starts_at)
   end
 
   def name
-    coalesce(model.name)
+    coalesce(source.name)
   end
 
   def number
-    coalesce(model.number)
+    coalesce(source.number)
   end
 
   def to_s

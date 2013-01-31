@@ -17,13 +17,19 @@ class Permission < ActiveRecord::Base
 
   validates_presence_of :group
   validates_presence_of :kit
-  validates :kit_id, :uniqueness => { :scope => :group_id }
+  validate :validate_unique_kit_per_group
 
   # TODO: this is just lazy... what is this decorator doing in here?
   # Figure out how to use decorated models with Simple Form.
   def data_text
     return if new_record?
     KitDecorator.decorate(kit).description
+  end
+
+  def validate_unique_kit_per_group
+    if self.class.exists?(:kit_id => kit_id, :group_id => group_id)
+      errors.add :kit, 'already exists in this group'
+    end
   end
 
 end

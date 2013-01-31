@@ -41,7 +41,7 @@
     <tbody>
       <% @component_model.kits.each do |kit| %>
         <tr>
-          <td><%= link_to(kit.id, kit_path(kit)) %></td>
+          <td><%= kit.to_link %></td>
           <td><%= kit.asset_tags %></td>
           <td><%= kit.component_list %></td>
           <td><%= kit.location %></td>

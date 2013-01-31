@@ -15,10 +15,28 @@
 <% end %>
 
 <dl class="dl-horizontal">
-  <dt>Missing Components</dt>
-  <dd><%= @missing_components.to_s %></dd>
   <dt>Orphaned Components</dt>
   <dd><%= @orphaned_components.to_s %></dd>
   <dt>Empty Kits</dt>
   <dd><%= @empty_kits.to_s %></dd>
 </dl>
+
+<% unless @missing_inventory_records.empty? %>
+  <h2>Missing Components</h2>
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>Kit</th>
+        <th>Brand</th>
+        <th>Model</th>
+        <th>Asset Tag</th>
+        <th>Serial Number</th>
+        <th>Status</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      <%= render partial:'inventory_record', collection: @missing_inventory_records %>
+    </tbody>
+  </table>
+<% end %>

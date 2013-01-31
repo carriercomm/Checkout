@@ -16,7 +16,7 @@ class ComponentModelsController < ApplicationController
 
     apply_pagination
 
-    @component_models = ComponentModelDecorator.decorate(@component_models)
+    @component_models = @component_models.decorate
 
     respond_to do |format|
       format.html
@@ -28,8 +28,7 @@ class ComponentModelsController < ApplicationController
   # GET /component_models/select2.json
   def select2
     # find by name
-    component_models = ComponentModel.search(params["q"])
-    component_models = ComponentModelDecorator.decorate(component_models)
+    component_models = ComponentModel.search(params["q"]).decorate
 
     respond_to do |format|
       #format.html # index.html.erb
@@ -41,10 +40,15 @@ class ComponentModelsController < ApplicationController
   # GET /models/1
   # GET /models/1.json
   def show
-    @component_model = ComponentModel.includes(:kits => [:location]).find(params[:id])
-    @trainings       = @component_model.trainings.includes(:user).where("users.disabled = ?", false).order("users.username")
-    @component_model = ComponentModelDecorator.decorate(@component_model)
-    @trainings       = TrainingDecorator.decorate(@trainings)
+    @component_model = ComponentModel.includes(:kits => [:location])
+      .find(params[:id])
+      .decorate
+
+    @trainings       = @component_model.trainings
+      .includes(:user)
+      .where("users.disabled = ?", false)
+      .order("users.username")
+      .decorate
 
     respond_to do |format|
       format.html { render layout: 'sidebar' } # show.html.erb
@@ -54,9 +58,8 @@ class ComponentModelsController < ApplicationController
   # GET /models/new
   # GET /models/new.json
   def new
-    @component_model = ComponentModel.new
-    @component_model = ComponentModelDecorator.decorate(@component_model)
-    @component_model.brand = Brand.find_by_name("Generic")
+    brand = Brand.find_by_name("Generic")
+    @component_model = ComponentModel.new(brand: brand).decorate
 
     respond_to do |format|
       format.html
@@ -65,18 +68,21 @@ class ComponentModelsController < ApplicationController
 
   # GET /models/1/edit
   def edit
-    @component_model = ComponentModelDecorator.find(params[:id])
-    @trainings       = @component_model.model.trainings.includes(:user).where("users.disabled = ?", false).order("users.username")
+    @component_model = ComponentModel.find(params[:id]).decorate
+    @trainings       = @component_model.trainings
+      .includes(:user)
+      .where("users.disabled = ?", false)
+      .order("users.username")
   end
 
   # POST /models
   # POST /models.json
   def create
     @component_model = ComponentModel.new(params[:component_model])
-    @component_model = ComponentModelDecorator.decorate(@component_model)
 
     respond_to do |format|
       if @component_model.save
+        @component_model = @component_model.decorate
         format.html { redirect_to @component_model, notice: 'Model was successfully created.' }
         # format.json { render json: @component_model, status: :created, location: @component_model }
       else
@@ -89,13 +95,15 @@ class ComponentModelsController < ApplicationController
   # PUT /models/1
   # PUT /models/1.json
   def update
-    @component_model = ComponentModelDecorator.find(params[:id])
+    @component_model = ComponentModel.find(params[:id])
 
     respond_to do |format|
       if @component_model.update_attributes(params[:component_model])
+        @component_model = @component_model.decorate
         format.html { redirect_to @component_model, notice: 'Model was successfully updated.' }
         # format.json { head :no_content }
       else
+        @component_model = @component_model.decorate
         format.html { render action: "edit" }
         # format.json { render json: @component_model.errors, status: :unprocessable_entity }
       end

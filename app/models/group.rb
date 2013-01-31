@@ -8,9 +8,11 @@ class Group < ActiveRecord::Base
   ## Associations ##
 
   has_many :memberships, :inverse_of => :group
-  has_many :users, :through => :memberships, :order => "users.username ASC"
   has_many :permissions, :inverse_of => :group, :dependent => :destroy
-  has_many :kits, :through => :permissions
+
+  has_many :kits,  :through => :permissions
+  has_many :users, :through => :memberships, :order => "users.username ASC"
+
 
   ## Mass-assignable Attributes ##
 
@@ -34,8 +36,8 @@ class Group < ActiveRecord::Base
   #
   # I added a unique index to the each table to enforce this at the DB
   # level, but it throws ugly errors
-  validates_associated :memberships
-  validates_associated :permissions
+  # validates_associated :memberships
+  # validates_associated :permissions
 
   def to_param
     "#{ id } #{ name }".parameterize

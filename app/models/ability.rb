@@ -24,7 +24,7 @@ class Ability
       can :manage, Permission
       can :read,   Role
       can :manage, Training
-      can :manage, User, [:username, :email, :first_name, :last_name]
+      can :manage, User     # TODO: restrict this to certain attributes [:username, :email, :first_name, :last_name]
       can :read,   User
     else
       can :read, Brand
@@ -33,9 +33,12 @@ class Ability
       can :read, Category
       can :read, Component
       can :read, ComponentModel
+      can [:show, :edit, :update], Group, :memberships => { user_id: user.id, supervisor: true }
       can :read, Kit
       can :read, Location
       can :read, Loan, :client_id => user.id
+      cannot :read, User
+      can :read, User, :id => user.id
       # https://github.com/ryanb/cancan/wiki/Defining-Abilities-with-Blocks
       # can :update, Project, ["priority < ?", 3] do |project|
       #   project.priority < 3
