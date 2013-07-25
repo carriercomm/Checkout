@@ -29,13 +29,13 @@ class Kit < ActiveRecord::Base
 
   validates_presence_of :location
   validate :should_have_at_least_one_component
-  validate :tombstoned_should_not_be_checkoutable
+  validate :tombstoned_should_not_be_circulating
 
 
   ## Mass-assignable attributes ##
 
   attr_accessible(:budget_id,
-                  :checkoutable,
+                  :circulating,
                   :components_attributes,
                   :cost,
                   :insured,
@@ -44,14 +44,14 @@ class Kit < ActiveRecord::Base
 
   ## Virtual Attributes ##
 
-  attr_reader :forced_not_checkoutable
+  attr_reader :forced_not_circulating
 
 
   ## Named scopes ##
 
-  scope :checkoutable,       where("kits.tombstoned = ? AND kits.checkoutable = ?", false, true)
+  scope :circulating,       where("kits.tombstoned = ? AND kits.circulating = ?", false, true)
   scope :missing_components, joins(:components).where("kits.tombstoned = ? AND components.missing = ?", false, true)
-  scope :non_checkoutable,   where("kits.tombstoned = ? AND kits.checkoutable = ?", false, false)
+  scope :non_circulating,   where("kits.tombstoned = ? AND kits.circulating = ?", false, false)
   scope :tombstoned,         where("kits.tombstoned = ?", true)
 
 
@@ -96,25 +96,95 @@ class Kit < ActiveRecord::Base
     return at.compact
   end
 
+  def available?(start_date, end_date, *excluded_loans)
+    circulating? && !loaned_between?(start_date, end_date, excluded_loans.flatten)
+  end
+
   # TODO: add check for 'hold'
-  def can_be_loaned_to?(client)
-    client && checkoutable && (client.has_role?("admin") || groups.map(&:users).flatten.uniq.include?(client))
+  def permissions_include?(client)
+    client && circulating? && (client.admin? || groups.map(&:users).flatten.uniq.include?(client))
   end
 
   def checked_out?
     loans.where("loans.out_at < ? AND loans.ends_at > ?", Date.today, Date.today).count > 0
   end
 
-  def checkoutable?
-    return checkoutable && !tombstoned
+  def circulating?
+    return circulating && !tombstoned
   end
 
-  # equal to location.open_days minus days_reserved returns in format
-  # [[month, day], [month, day], ...] for consumption by the
-  # javascript date picker
-  def pickup_dates_for_datepicker(days_out = 90, *excluded_loans)
+  def default_return_date(starts_at)
+    default       = AppConfig.instance.default_checkout_length
+    expected_time = (starts_at + default.days).to_time
+    location.next_date_open(expected_time)
+  end
+
+  def first_available_date
+    nexts = []
+    schedules_of_availability.each do |s|
+      # should today be included?
+      if s.occurring_between?(Time.zone.now, Time.zone.now.end_of_day)
+        ref_time = Time.zone.now.at_beginning_of_day
+      else
+        ref_time = Time.zone.now
+      end
+      nexts << s.next_occurrence(ref_time)
+    end
+    nexts.sort.first
+  end
+
+  # before_validation callback:
+  # ensure that anything tombstoned is not circulating
+  def handle_tombstoned
+    if tombstoned && circulating
+      self.circulating = false
+      @forced_not_circulating = true
+    end
+    return true
+  end
+
+  # returns the start dates for each loan
+  # def hard_return_dates_for_datepicker(days_out = 90, *excluded_loans)
+  #   excluded_loans.flatten!
+  #   dates = []
+
+  #   # build up params for where clause
+  #   start_range = Time.now.at_beginning_of_day
+  #   end_range   = start_range + days_out.days
+
+  #   # iterate over the set of loans in this range
+  #   loans_between(start_range, end_range, excluded_loans).all.each do |r|
+  #     dates << r.starts_at.to_date
+  #   end
+  #   dates.uniq!
+
+  #   return dates.collect { |d| d.to_s(:js) }
+  # end
+
+  # returns a record for this kit (without location info), to populate into
+  # gon for the datepicker
+  def kit_record_for_datepicker(days_out = 90, *excluded_loans)
     excluded_loans.flatten!
-    return location.dates_open_for_datepicker(days_out) - loan_blackout_dates_for_datepicker(days_out, excluded_loans)
+    {
+      'kit_id' => id,
+      'pickup_dates' => pickup_times_for_datepicker(days_out, excluded_loans)
+    }
+  end
+
+  # returns all the loans that overlap with the range specified by the
+  # start and end dates
+  def loans_between(start_date, end_date, *excluded_loans)
+    excluded_loans.flatten!
+    sql = "((loans.starts_at BETWEEN :start AND :end) OR (loans.ends_at BETWEEN :start AND :end))"
+
+    unless excluded_loans.empty?
+      sql << " AND loans.id NOT IN (:ids)"
+    end
+
+    loans.where(sql,
+              :start => start_date,
+              :end => end_date,
+              :ids => excluded_loans.map(&:id))
   end
 
   # returns the dates this kit is loaned within the time range
@@ -146,48 +216,8 @@ class Kit < ActiveRecord::Base
     loan_blackout_dates(days_out, excluded_loans).collect { |d| d.to_s(:js) }
   end
 
-  def default_return_date(starts_at)
-    default       = AppConfig.instance.default_checkout_length
-    expected_time = (starts_at + default.days).to_time
-    location.next_date_open(expected_time)
-  end
-
-  # before_validation callback:
-  # ensure that anything tombstoned is not checkoutable
-  def handle_tombstoned
-    if tombstoned && checkoutable
-      self.checkoutable = false
-      @forced_not_checkoutable = true
-    end
-    return true
-  end
-
-  # returns the start dates for each loan
-  # def hard_return_dates_for_datepicker(days_out = 90, *excluded_loans)
-  #   excluded_loans.flatten!
-  #   dates = []
-
-  #   # build up params for where clause
-  #   start_range = Time.now.at_beginning_of_day
-  #   end_range   = start_range + days_out.days
-
-  #   # iterate over the set of loans in this range
-  #   loans_between(start_range, end_range, excluded_loans).all.each do |r|
-  #     dates << r.starts_at.to_date
-  #   end
-  #   dates.uniq!
-
-  #   return dates.collect { |d| d.to_s(:js) }
-  # end
-
-  # returns a record for this kit (without location info), to populate into
-  # gon for the datepicker
-  def kit_record_for_datepicker(days_out = 90, *excluded_loans)
-    excluded_loans.flatten!
-    {
-      'kit_id' => id,
-      'pickup_dates' => pickup_dates_for_datepicker(days_out, excluded_loans)
-    }
+  def loaned_between?(start_date, end_date, excluded_loans)
+    !loans_between(start_date, end_date, excluded_loans).empty?
   end
 
   # returns the full data structure to populate into gon for the datepicker
@@ -200,24 +230,32 @@ class Kit < ActiveRecord::Base
     }
   end
 
-  # returns all the loans that overlap with the range specified by the
-  # start and end dates
-  def loans_between(start_date, end_date, *excluded_loans)
+  # equal to location.open_days minus days_reserved returns in format
+  # [[month, day], [month, day], ...] for consumption by the
+  # javascript date picker
+  def pickup_times_for_datepicker(days_out = 90, *excluded_loans)
     excluded_loans.flatten!
-    sql = "((loans.starts_at BETWEEN :start AND :end) OR (loans.ends_at BETWEEN :start AND :end))"
-
-    unless excluded_loans.empty?
-      sql << " AND loans.id NOT IN (:ids)"
-    end
-
-    loans.where(sql,
-              :start => start_date,
-              :end => end_date,
-              :ids => excluded_loans.map(&:id))
+    times = pickup_times(days_out, excluded_loans)
+    times.map! { |d| d.to_s(:js) }
+    return times
   end
 
-  def loaned_between?(start_date, end_date, excluded_loans)
-    !loans_between(start_date, end_date, excluded_loans).empty?
+  def pickup_times(days_out = 90, *excluded_loans)
+    excluded_loans.flatten!
+    occurrences = []
+
+    schedules_of_availability(excluded_loans).each do |s|
+      # should today be included?
+      if s.occurring_between?(Time.zone.now, Time.zone.now.end_of_day)
+        end_time = Time.zone.now.at_beginning_of_day + days_out.days
+      else
+        end_time = Time.zone.now.end_of_day + days_out.days
+      end
+      occurrences.concat(s.occurrences(end_time))
+    end
+
+    occurrences.map!(&:to_time).sort!
+    return occurrences
   end
 
   # move this to an alias
@@ -240,6 +278,29 @@ class Kit < ActiveRecord::Base
   #   return_dates
   # end
 
+  def schedules_of_availability(*excluded_loans)
+    lbd = loan_blackout_dates(365, excluded_loans)
+
+    schedules = location.schedules
+
+    schedules.each do |s|
+      lbd.each do |date|
+        if s.occurs_on?(date)
+          year   = date.year
+          month  = date.month
+          day    = date.day
+          hour   = s.start_time.hour
+          minute = s.start_time.min
+          except = Time.zone.local(year, month, day, hour, minute)
+          s.add_exception_time(except)
+        end
+      end
+    end
+
+    return schedules
+
+  end
+
   # custom validator
   def should_have_at_least_one_component
     if components.length < 1
@@ -252,9 +313,9 @@ class Kit < ActiveRecord::Base
   end
 
   # custom validator
-  def tombstoned_should_not_be_checkoutable
-    if tombstoned && checkoutable
-      errors[:base] << "Kit cannot be tombstoned AND checkoutable"
+  def tombstoned_should_not_be_circulating
+    if tombstoned && circulating
+      errors[:base] << "Kit cannot be tombstoned AND circulating"
     end
   end
 

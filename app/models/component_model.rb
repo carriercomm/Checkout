@@ -39,8 +39,8 @@ class ComponentModel < ActiveRecord::Base
 
   ## Class Methods ##
 
-  def self.checkoutable
-    joins(:kits).where("kits.tombstoned = ? AND kits.checkoutable = ?", false, true).uniq
+  def self.circulating
+    joins(:kits).where("kits.tombstoned = ? AND kits.circulating = ?", false, true).uniq
   end
 
   # TODO: implement this
@@ -69,10 +69,10 @@ class ComponentModel < ActiveRecord::Base
     components.map(&:asset_tag)
   end
 
-  def available_checkoutable_kits(starts_at, ends_at, location = nil)
-    all_kits         = checkoutable_kits.includes(:loans).order("loans.ends_at ASC")
+  def available_circulating_kits(starts_at, ends_at, location = nil)
+    all_kits         = circulating_kits.includes(:loans).order("loans.ends_at ASC")
     all_kits         = all_kits.where("location_id = ?", location.id) if location
-    unavailable_kits = unavailable_checkoutable_kits(starts_at, ends_at, location)
+    unavailable_kits = unavailable_circulating_kits(starts_at, ends_at, location)
 
     return all_kits - unavailable_kits
   end
@@ -84,22 +84,22 @@ class ComponentModel < ActiveRecord::Base
     locations.select { |l| l.business_hours.count > 0 }
   end
 
-  def checkoutable?
-    kits.checkoutable.count > 0
+  def circulating?
+    kits.circulating.count > 0
   end
 
-  def checkoutable_kits
-    kits.checkoutable.uniq
+  def circulating_kits
+    kits.circulating.uniq
   end
 
   # TODO: test this returns a JSON object with the available checkout
   # days for each kit (for pick up days), dates open (for return
   # days), grouped by location. Consumed by the javascript date picker
-  def locations_with_dates_checkoutable_for_datepicker(days_out = 90)
+  def locations_with_dates_circulating_for_datepicker(days_out = 90)
     locations = {}
 
     # roll up the kits, with their location and dates reservable
-    checkoutable_kits.each do |kit|
+    circulating_kits.each do |kit|
       loc_id = kit.location.id
 
       # initialize this location if it doesn't exist
@@ -111,10 +111,10 @@ class ComponentModel < ActiveRecord::Base
       locations[loc_id]['kits'] << kit.kit_record_for_datepicker(days_out)
     end
 
-    # roll up the locations and their dates open
-    locations.keys.each do |i|
-      locations[i]['dates_open'] = Location.find(i).dates_open_for_datepicker(days_out)
-    end
+    # # roll up the locations and their dates open
+    # locations.keys.each do |i|
+    #   locations[i]['dates_open'] = Location.find(i).dates_open_for_datepicker(days_out)
+    # end
 
     return locations
   end
@@ -149,8 +149,8 @@ class ComponentModel < ActiveRecord::Base
     "#{ id } #{ to_branded_s }".parameterize
   end
 
-  def unavailable_checkoutable_kits(starts_at, ends_at, location = nil)
-    q = checkoutable_kits.loaned_between(starts_at, ends_at)
+  def unavailable_circulating_kits(starts_at, ends_at, location = nil)
+    q = circulating_kits.loaned_between(starts_at, ends_at)
     q = q.where("location_id = ?", location.id) if location
     return q
   end

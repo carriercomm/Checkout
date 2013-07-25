@@ -12,7 +12,7 @@ class InventoryStatus < ActiveRecord::Base
 
   ## Mass-assignable Attributes ##
 
-  attr_accessible :name
+  attr_accessible :index, :name
 
 
   def self.value_symbols

@@ -39,12 +39,12 @@ class Brand < ActiveRecord::Base
     joins(:component_models => :kits).where("kits.tombstoned = ?", true).uniq
   end
 
-  def self.not_having_checkoutable_kits
-    joins(:component_models => :kits).where("kits.checkoutable = ?", false).uniq
+  def self.not_having_circulating_kits
+    joins(:component_models => :kits).where("kits.circulating = ?", false).uniq
   end
 
-  def self.having_checkoutable_kits
-    joins(:component_models => :kits).where("kits.tombstoned = ? AND kits.checkoutable = ?", false, true).uniq
+  def self.having_circulating_kits
+    joins(:component_models => :kits).where("kits.tombstoned = ? AND kits.circulating = ?", false, true).uniq
   end
 
 

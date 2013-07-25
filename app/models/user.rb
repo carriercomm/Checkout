@@ -20,7 +20,7 @@ class User < ActiveRecord::Base
   has_many :inventory_records,   :foreign_key => "attendant_id"
   has_many :loans,               :foreign_key => "client_id", :inverse_of => :client do
     def build_from_component_model_id(component_model_id)
-      component_model = ComponentModel.checkoutable.includes(:kits => :location).find(component_model_id)
+      component_model = ComponentModel.circulating.includes(:kits => :location).find(component_model_id)
       build(:component_model => component_model)
     end
   end

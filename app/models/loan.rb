@@ -7,11 +7,21 @@ class Loan < ActiveRecord::Base
   state_machine :initial => :pending do
 
     after_failure do |loan, transition|
-      puts "loan #{loan} failed to transition on #{transition.event}"
-      puts loan.inspect
-      puts transition.inspect
-      puts loan.errors.inspect
+      logger.debug "loan #{loan} failed to transition on #{transition.event}"
+      logger.debug loan.inspect
+      logger.debug transition.inspect
+      logger.debug loan.errors.inspect
     end
+
+    before_transition :any => :pending do |loan, transition|
+      logger.debug "--- transitioning to pending"
+      loan.write_attribute(:ends_at, nil)
+      loan.write_attribute(:approver_id, nil)
+    end
+
+    # before_transition :any => :pending do |loan, transition|
+    #   loan.auto_approve!
+    # end
 
     event :approve do
       transition [:rejected, :pending] => :approved, :if => :valid?
@@ -34,7 +44,6 @@ class Loan < ActiveRecord::Base
     end
 
     event :unapprove do
-      approver_id = nil
       transition [:approved, :pending] => :pending
     end
 
@@ -57,8 +66,9 @@ class Loan < ActiveRecord::Base
     end
 
     state :pending do
-      after_save :auto_approve!
-      validate    :validate_open_on_starts_at
+      before_validation :autofill_ends_at!
+      after_save        :auto_approve!
+      validate          :validate_open_on_starts_at
     end
 
   end
@@ -77,6 +87,10 @@ class Loan < ActiveRecord::Base
   belongs_to :in_assistant,      :inverse_of => :in_assists,  :class_name => "User"
   has_many   :inventory_records, :inverse_of => :loan
 
+  ## Callbacks ##
+
+  #before_validation :
+
   ## Validations ##
 
   # NOTE: additional state-dependent validations defined in the state machine above
@@ -84,53 +98,46 @@ class Loan < ActiveRecord::Base
   validates_presence_of :client
   validates_presence_of :kit
   validates_presence_of :location # not persisted, but it makes the controller/view simpler
-  validates :starts_at,  :presence => true
-  validates :ends_at,    :presence => true
+  validates :starts_at, :presence => true
+  validates :ends_at,   :presence => true
   validate  :validate_client_has_permission,   :unless => :importing_legacy_records?
   validate  :validate_client_is_not_disabled,  :unless => :importing_legacy_records?
   validate  :validate_client_is_not_suspended, :unless => :importing_legacy_records?
   validate  :validate_kit_available,           :unless => :importing_legacy_records?
-  validate  :validate_kit_checkoutable,        :unless => :importing_legacy_records?
+  validate  :validate_kit_circulating,         :unless => :importing_legacy_records?
   validate  :validate_open_on_ends_at,         :unless => :importing_legacy_records?
-
+  validate  :validate_start_at_before_ends_at, :unless => :importing_legacy_records?
 
   ## Virtual Attributes ##
 
-  attr_writer :component_model, :component_model_id, :location_id
+  attr_writer   :component_model, :component_model_id, :location_id
   attr_accessor :importing
 
   ## Instance Methods ##
 
-=begin
-  def adjust_starts_at
-    set_to_location_open_at!
-  end
-
-  def adjust_ends_at
-    set_to_location_close_at!
-  end
-=end
-
   # this should only be called after validations have run
   def auto_approve!
     if pending? && within_default_length?
+      logger.debug "---- AUTO APPROVING"
       self.approver = User.system_user
       approve
-      true
-    else
-      false
     end
+    nil
   end
 
-  def available_checkoutable_kits
+  def autofill_ends_at!
+    self.ends_at = default_return_date
+  end
+
+  def available_circulating_kits
     return nil if component_model.nil?
-    component_model.available_checkoutable_kits(starts_at, ends_at, location)
+    component_model.available_circulating_kits(starts_at, ends_at, location)
   end
 
   # if this loan was auto_approved, make sure the checkout duration is
   # still valid - rollback the state if necessary
   def check_approval
-    if (self.approver.nil? || self.approver == User.system_user) && !within_default_length?
+    if ((self.approver.nil? || self.approver == User.system_user) && !within_default_length?)
       unapprove
     end
 
@@ -150,8 +157,22 @@ class Loan < ActiveRecord::Base
     @component_model_id ||= component_model.try(:id)
   end
 
+  def default_return_date
+    default        = AppConfig.instance.default_checkout_length
+    expected_time  = (self.starts_at + default.days).to_time.getlocal
+    location.next_time_open(expected_time)
+  end
+
   def importing_legacy_records?
     importing && (ends_at < Time.zone.now)
+  end
+
+  def kit_available?
+    kit && kit.available?(starts_at, ends_at, self)
+  end
+
+  def kit_circulating?
+    kit && kit.circulating?
   end
 
   # this should either be set via the attr_writer :location, or
@@ -203,34 +224,25 @@ class Loan < ActiveRecord::Base
     self.out_at    = Time.zone.now
   end
 
-  # set the starts_at datetime to the time the location opens
-  def set_to_location_open_at!
-    # get the first opening time on the day
-    self.starts_at = kit.location.opens_at(self.starts_at)
-  end
+  def starts_at=(time)
+    if time.is_a? String
+      write_attribute(:starts_at, Time.zone.parse(time))
+    else
+      write_attribute(:starts_at, time.to_time)
+    end
 
-  # set the ends_at datetime to the time the location closes
-  def set_to_location_close_at!
-    self.ends_at = kit.location.closes_at(self.ends_at)
+    if !new_record? && self.starts_at_changed?
+      unapprove
+    end
+    self
   end
 
   def within_default_length?
-    default        = AppConfig.instance.default_checkout_length
-    expected_time  = (starts_at + default.days).to_time
-    next_date_open = location.next_date_open(expected_time)
-
-    return (ends_at.to_date <= next_date_open)
+    raise "Start and end dates must be defined" unless starts_at && ends_at
+    return (ends_at <= default_return_date)
   end
 
-  def kit_available?
-    kit && !kit.loaned_between?(starts_at, ends_at, [self])
-  end
-
-  def kit_checkoutable?
-    kit && kit.checkoutable?
-  end
-
-  private
+private
 
   def validate_client_is_not_disabled
     if client.disabled?
@@ -245,7 +257,7 @@ class Loan < ActiveRecord::Base
   end
 
   def validate_client_has_permission
-    unless kit.can_be_loaned_to? client
+    unless kit.permissions_include? client
       errors.add(:client, "does not have permission to check out this kit.")
     end
   end
@@ -264,13 +276,13 @@ class Loan < ActiveRecord::Base
 
   def validate_kit_available
     unless kit_available?
-      errors.add(:kit, "is already loaned out for some (or all) of the reqested dates.")
+      errors.add(:starts_at, "kit is already loaned out for some (or all) of the reqested dates.")
     end
   end
 
-  def validate_kit_checkoutable
-    unless kit_checkoutable?
-      errors.add(:kit, "is not checkoutable. Choose another kit.")
+  def validate_kit_circulating
+    unless kit_circulating?
+      errors.add(:kit, "is not circulating. Choose another kit.")
     end
   end
 
@@ -283,6 +295,12 @@ class Loan < ActiveRecord::Base
   def validate_open_on_starts_at
     unless open_on_starts_at?
       errors.add(:starts_at, "must be on a day with valid checkout hours")
+    end
+  end
+
+  def validate_start_at_before_ends_at
+    unless starts_at < ends_at
+      errors.add(:starts_at, "must come before the return date")
     end
   end
 
