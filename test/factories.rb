@@ -77,31 +77,30 @@ FactoryGirl.define do
 
   factory :kit do
     budget
-    checkoutable false
+    circulating false
     cost 47
     insured false
     tombstoned false
 
-    trait :tombstoned do
-      tombstoned true
-    end
-
-    trait :checkoutable do
-      checkoutable true
+    trait :circulating do
+      circulating true
     end
 
     trait :insured do
       insured true
     end
 
-    factory :checkoutable_kit, :traits => [:checkoutable]
-    factory :checkoutable_kit_with_location, :traits => [:checkoutable] do
+    trait :location do
       location
     end
 
-    factory :kit_with_location do
-      location
+    trait :tombstoned do
+      tombstoned true
     end
+
+    factory :circulating_kit, :traits => [:circulating]
+    factory :circulating_kit_with_location, :traits => [:circulating, :location]
+    factory :kit_with_location, :traits => [:location]
   end
 
   factory :location do
@@ -109,6 +108,13 @@ FactoryGirl.define do
       n      = FactoryGirl.generate :id
       l.name = "#{n } Electric Avenue"
     end
+
+    factory :location_with_business_hours do
+      after_create do |l|
+        l.business_hours << create(:business_hour_with_business_day)
+      end
+    end
+
   end
 
   factory :permission do
@@ -118,7 +124,7 @@ FactoryGirl.define do
 
   factory :loan do
     starts_at Date.today - 1.day
-    ends_at   Date.today + 1.day
+    #ends_at   Date.today + 1.day
   end
 
   factory :role do
@@ -126,13 +132,22 @@ FactoryGirl.define do
   end
 
   factory :user do
-    sequence(:username) { |u| "user#{n}" }
+    sequence(:username) { |n| "user#{n}" }
     email { "#{username}@example.com".downcase }
     password "password"
 
-    factory :user_with_role do
-      role
+    factory :admin_user do
+      after(:build) do |u|
+        u.roles << Role.find_by_name("admin")
+      end
     end
+
+    factory :attendant_user do
+      after(:build) do |u|
+        u.roles << Role.find_by_name("attendant")
+      end
+    end
+
   end
 
 end

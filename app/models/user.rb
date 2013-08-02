@@ -16,7 +16,7 @@ class User < ActiveRecord::Base
   has_many :covenant_signatures, :inverse_of => :user
   has_many :covenants,           :through => :covenant_signatures
   has_many :groups,              :through => :memberships
-  has_many :in_assists,          :foreign_key => "in_assistant_id", :class_name => 'Loan', :inverse_of => :in_assistant
+  has_many :in_assists,          :foreign_key => "in_attendant_id", :class_name => 'Loan', :inverse_of => :in_attendant
   has_many :inventory_records,   :foreign_key => "attendant_id"
   has_many :loans,               :foreign_key => "client_id", :inverse_of => :client do
     def build_from_component_model_id(component_model_id)
@@ -25,7 +25,7 @@ class User < ActiveRecord::Base
     end
   end
   has_many :memberships,         :inverse_of => :user
-  has_many :out_assists,         :foreign_key => "out_assistant_id", :class_name => 'Loan', :inverse_of => :out_assistant
+  has_many :out_assists,         :foreign_key => "out_attendant_id", :class_name => 'Loan', :inverse_of => :out_attendant
   has_many :trainings,           :inverse_of => :user, :dependent => :destroy
 
 

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20121129201724) do
+ActiveRecord::Schema.define(:version => 20130802045747) do
 
   create_table "app_configs", :force => true do |t|
     t.integer  "default_checkout_length"
@@ -156,15 +156,15 @@ ActiveRecord::Schema.define(:version => 20121129201724) do
   create_table "kits", :force => true do |t|
     t.integer  "location_id"
     t.integer  "budget_id"
-    t.boolean  "tombstoned",   :default => false
-    t.boolean  "checkoutable", :default => false
+    t.boolean  "tombstoned",  :default => false
+    t.boolean  "circulating", :default => false
     t.decimal  "cost"
-    t.boolean  "insured",      :default => false
-    t.datetime "created_at",                      :null => false
-    t.datetime "updated_at",                      :null => false
+    t.boolean  "insured",     :default => false
+    t.datetime "created_at",                     :null => false
+    t.datetime "updated_at",                     :null => false
   end
 
-  add_index "kits", ["checkoutable"], :name => "index_kits_on_checkoutable"
+  add_index "kits", ["circulating"], :name => "index_kits_on_circulating"
   add_index "kits", ["location_id"], :name => "index_kits_on_location_id"
 
   create_table "loans", :force => true do |t|
@@ -174,24 +174,25 @@ ActiveRecord::Schema.define(:version => 20121129201724) do
     t.datetime "ends_at"
     t.datetime "out_at"
     t.datetime "in_at"
-    t.integer  "out_assistant_id"
-    t.integer  "in_assistant_id"
-    t.boolean  "late",             :default => false
+    t.integer  "out_attendant_id"
+    t.integer  "in_attendant_id"
+    t.boolean  "late",               :default => false
     t.text     "request_note"
     t.integer  "approver_id"
     t.text     "approval_note"
-    t.datetime "created_at",                          :null => false
-    t.datetime "updated_at",                          :null => false
-    t.string   "state"
+    t.datetime "created_at",                            :null => false
+    t.datetime "updated_at",                            :null => false
+    t.string   "workflow_state"
+    t.boolean  "autofilled_ends_at", :default => false
   end
 
   add_index "loans", ["approver_id"], :name => "index_reservations_on_approver_id"
   add_index "loans", ["client_id"], :name => "index_reservations_on_client_id"
   add_index "loans", ["ends_at", "in_at", "late"], :name => "index_reservations_on_ends_at_and_in_at_and_late"
   add_index "loans", ["ends_at"], :name => "index_reservations_on_ends_at"
-  add_index "loans", ["in_assistant_id"], :name => "index_reservations_on_in_assistant_id"
+  add_index "loans", ["in_attendant_id"], :name => "index_reservations_on_in_assistant_id"
   add_index "loans", ["kit_id"], :name => "index_reservations_on_kit_id"
-  add_index "loans", ["out_assistant_id"], :name => "index_reservations_on_out_assistant_id"
+  add_index "loans", ["out_attendant_id"], :name => "index_reservations_on_out_assistant_id"
   add_index "loans", ["starts_at", "out_at"], :name => "index_reservations_on_starts_at_and_out_at"
 
   create_table "locations", :force => true do |t|
@@ -236,6 +237,15 @@ ActiveRecord::Schema.define(:version => 20121129201724) do
 
   add_index "roles", ["name", "resource_type", "resource_id"], :name => "index_roles_on_name_and_resource_type_and_resource_id"
   add_index "roles", ["name"], :name => "index_roles_on_name"
+
+  create_table "settings", :force => true do |t|
+    t.string   "var",        :null => false
+    t.text     "value"
+    t.datetime "created_at", :null => false
+    t.datetime "updated_at", :null => false
+  end
+
+  add_index "settings", ["var"], :name => "index_settings_on_var"
 
   create_table "trainings", :force => true do |t|
     t.integer  "component_model_id"
@@ -311,8 +321,8 @@ ActiveRecord::Schema.define(:version => 20121129201724) do
   add_foreign_key "loans", "kits", :name => "reservations_kit_id_fk"
   add_foreign_key "loans", "users", :name => "reservations_approver_id_fk", :column => "approver_id"
   add_foreign_key "loans", "users", :name => "reservations_client_id_fk", :column => "client_id"
-  add_foreign_key "loans", "users", :name => "reservations_in_assistant_id_fk", :column => "in_assistant_id"
-  add_foreign_key "loans", "users", :name => "reservations_out_assistant_id_fk", :column => "out_assistant_id"
+  add_foreign_key "loans", "users", :name => "reservations_in_assistant_id_fk", :column => "in_attendant_id"
+  add_foreign_key "loans", "users", :name => "reservations_out_assistant_id_fk", :column => "out_attendant_id"
 
   add_foreign_key "memberships", "groups", :name => "groups_users_group_id_fk"
   add_foreign_key "memberships", "users", :name => "groups_users_user_id_fk"

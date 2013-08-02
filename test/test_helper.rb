@@ -1,17 +1,15 @@
 ENV["RAILS_ENV"] = "test"
 require File.expand_path("../../config/environment", __FILE__)
-require "rails/test_help"
-require "minitest/rails"
-
-require "minitest/autorun"
 require "minitest/rails"
 require "capybara/rspec/matchers"
 require "minitest/rails/capybara"
 require "minitest-metadata"
 require "minitest/pride"
+require "#{Rails.root}/db/seeds.rb"
 
 # Capybara.javascript_driver = :webkit_debug
-DatabaseCleaner.strategy = :transaction
+#DatabaseCleaner.strategy = :transaction
+DatabaseCleaner.strategy = :truncation
 Warden.test_mode!
 
 class MiniTest::Spec
@@ -52,7 +50,7 @@ end
 
 class ActiveSupport::TestCase
   # Setup all fixtures in test/fixtures/*.(yml|csv) for all tests in alphabetical order.
-  fixtures :all
+  # fixtures :all
 
   # Add more helper methods to be used by all tests here...
 end

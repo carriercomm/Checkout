@@ -97,7 +97,7 @@ class Kit < ActiveRecord::Base
   end
 
   def available?(start_date, end_date, *excluded_loans)
-    circulating? && !loaned_between?(start_date, end_date, excluded_loans.flatten)
+    circulating? && loans.with_lost_state.empty? && !loaned_between?(start_date, end_date, excluded_loans.flatten)
   end
 
   # TODO: add check for 'hold'
@@ -114,7 +114,7 @@ class Kit < ActiveRecord::Base
   end
 
   def default_return_date(starts_at)
-    default       = AppConfig.instance.default_checkout_length
+    default       = Settings.default_checkout_duration
     expected_time = (starts_at + default.days).to_time
     location.next_date_open(expected_time)
   end

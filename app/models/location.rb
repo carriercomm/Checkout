@@ -107,6 +107,9 @@ class Location < ActiveRecord::Base
   # finds the closest open date on, or after, the time passed
   def next_time_open(time = Time.zone.now)
     nexts = []
+
+    time = time.to_time
+
     schedules.each do |s|
       # should today be included?
       if s.occurring_between?(time, time.end_of_day)

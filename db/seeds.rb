@@ -6,39 +6,37 @@
 #   cities = City.create([{ name: 'Chicago' }, { name: 'Copenhagen' }])
 #   Mayor.create(name: 'Emanuel', city: cities.first)
 
-BusinessDay.create!(:index => 0, :name => 'Sunday')
-BusinessDay.create!(:index => 1, :name => 'Monday')
-BusinessDay.create!(:index => 2, :name => 'Tuesday')
-BusinessDay.create!(:index => 3, :name => 'Wednesday')
-BusinessDay.create!(:index => 4, :name => 'Thursday')
-BusinessDay.create!(:index => 5, :name => 'Friday')
-BusinessDay.create!(:index => 6, :name => 'Saturday')
+BusinessDay.where(:index => 0, :name => 'Sunday'   ).first_or_create
+BusinessDay.where(:index => 1, :name => 'Monday'   ).first_or_create
+BusinessDay.where(:index => 2, :name => 'Tuesday'  ).first_or_create
+BusinessDay.where(:index => 3, :name => 'Wednesday').first_or_create
+BusinessDay.where(:index => 4, :name => 'Thursday' ).first_or_create
+BusinessDay.where(:index => 5, :name => 'Friday'   ).first_or_create
+BusinessDay.where(:index => 6, :name => 'Saturday' ).first_or_create
 
-Role.create!(:name => 'admin')
-Role.create!(:name => 'attendant')
+admin = Role.where(:name => 'admin').first_or_create
+Role.where(:name => 'attendant').first_or_create
 
 # these users skip validations because they have invalid email
 # addresses. We don't want to inadvertantly send email out into the
 # world.
 
-u = User.new
-u.username = 'system'
-u.email    = 'system@localhost'
-u.password = Devise.friendly_token.first(8)
-u.disabled = true
-u.save!(:validate => false)
+User.unscoped.where(username: 'system').first_or_initialize do |u|
+  u.username = 'system'
+  u.email    = 'system@localhost'
+  u.password = Devise.friendly_token.first(8)
+  u.disabled = true
+  u.save!(:validate => false)
+end
 
-u = User.new
-u.username = 'admin'
-u.email    = 'admin@localhost'
-u.password = 'password'
-u.save!(:validate => false)
-u.add_role "admin"
+User.where(username: 'admin').first_or_initialize do |u|
+  u.email    = 'admin@localhost'
+  u.password = 'password'
+  u.roles   << admin
+  u.save!(:validate => false)
+end
 
-# there has to be a default checkout length otherwise it will break reservations
-AppConfig.instance.update_attributes(default_checkout_length: 2)
-
-InventoryStatus.create!(:index => 1, :name => 'accessioned')
-InventoryStatus.create!(:index => 2, :name => 'inventoried')
-InventoryStatus.create!(:index => 3, :name => 'missing')
-InventoryStatus.create!(:index => 4, :name => 'deaccessioned')
+InventoryStatus.where(:id => 1, :name => 'accessioned'  ).first_or_create
+InventoryStatus.where(:id => 2, :name => 'inventoried'  ).first_or_create
+InventoryStatus.where(:id => 3, :name => 'missing'      ).first_or_create
+InventoryStatus.where(:id => 4, :name => 'deaccessioned').first_or_create

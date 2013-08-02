@@ -5,7 +5,7 @@ class Ability
     if user.has_role? :admin
       can :manage, :all
     elsif user.has_role? :attendant
-      can :read,   AppConfig
+      can :read,   Settings
       can :manage, Brand
       can :read,   Budget
       can :manage, BusinessDay

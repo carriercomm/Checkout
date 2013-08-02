@@ -21,7 +21,6 @@ module Autocomplete
       s = s.gsub("&", " AND ")
       s = s.gsub(/[^A-Z0-9 ]/, " ")
       s = s.squish
-      s = " #{s}"
       s
     end
 
