@@ -48,8 +48,8 @@ class Component < ActiveRecord::Base
     inventory_records.order("created_at DESC").limit(1).first
   end
 
-  def training_required?
-    component_model.training_required?
+  def training_required?(user = nil)
+    component_model.training_required?(user)
   end
 
   private

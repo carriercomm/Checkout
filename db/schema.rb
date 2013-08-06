@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130802045747) do
+ActiveRecord::Schema.define(:version => 20130806030021) do
 
   create_table "app_configs", :force => true do |t|
     t.integer  "default_checkout_length"
@@ -184,6 +184,7 @@ ActiveRecord::Schema.define(:version => 20130802045747) do
     t.datetime "updated_at",                            :null => false
     t.string   "workflow_state"
     t.boolean  "autofilled_ends_at", :default => false
+    t.datetime "lost_at"
   end
 
   add_index "loans", ["approver_id"], :name => "index_reservations_on_approver_id"
@@ -235,7 +236,7 @@ ActiveRecord::Schema.define(:version => 20130802045747) do
     t.datetime "updated_at",    :null => false
   end
 
-  add_index "roles", ["name", "resource_type", "resource_id"], :name => "index_roles_on_name_and_resource_type_and_resource_id"
+  add_index "roles", ["name", "resource_type", "resource_id"], :name => "index_roles_on_name_and_resource_type_and_resource_id", :unique => true
   add_index "roles", ["name"], :name => "index_roles_on_name"
 
   create_table "settings", :force => true do |t|
@@ -245,7 +246,7 @@ ActiveRecord::Schema.define(:version => 20130802045747) do
     t.datetime "updated_at", :null => false
   end
 
-  add_index "settings", ["var"], :name => "index_settings_on_var"
+  add_index "settings", ["var"], :name => "index_settings_on_var", :unique => true
 
   create_table "trainings", :force => true do |t|
     t.integer  "component_model_id"
@@ -291,7 +292,7 @@ ActiveRecord::Schema.define(:version => 20130802045747) do
     t.integer "role_id"
   end
 
-  add_index "users_roles", ["user_id", "role_id"], :name => "index_users_roles_on_user_id_and_role_id"
+  add_index "users_roles", ["user_id", "role_id"], :name => "index_users_roles_on_user_id_and_role_id", :unique => true
 
   add_foreign_key "business_days_business_hours", "business_days", :name => "business_days_business_hours_business_day_id_fk"
   add_foreign_key "business_days_business_hours", "business_hours", :name => "business_days_business_hours_business_hour_id_fk"

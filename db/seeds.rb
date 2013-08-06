@@ -14,7 +14,8 @@ BusinessDay.where(:index => 4, :name => 'Thursday' ).first_or_create
 BusinessDay.where(:index => 5, :name => 'Friday'   ).first_or_create
 BusinessDay.where(:index => 6, :name => 'Saturday' ).first_or_create
 
-admin = Role.where(:name => 'admin').first_or_create
+admin    = Role.where(:name => 'admin').first_or_create
+approver = Role.where(:name => 'approver').first_or_create
 Role.where(:name => 'attendant').first_or_create
 
 # these users skip validations because they have invalid email
@@ -26,13 +27,14 @@ User.unscoped.where(username: 'system').first_or_initialize do |u|
   u.email    = 'system@localhost'
   u.password = Devise.friendly_token.first(8)
   u.disabled = true
+  u.add_role :approver
   u.save!(:validate => false)
 end
 
 User.where(username: 'admin').first_or_initialize do |u|
   u.email    = 'admin@localhost'
   u.password = 'password'
-  u.roles   << admin
+  u.add_role :admin
   u.save!(:validate => false)
 end
 

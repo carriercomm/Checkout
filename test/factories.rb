@@ -138,13 +138,25 @@ FactoryGirl.define do
 
     factory :admin_user do
       after(:build) do |u|
-        u.roles << Role.find_by_name("admin")
+        admin_role = Role.find_by_name("admin")
+        raise "missing admin role" unless admin_role
+        u.roles << admin_role
+      end
+    end
+
+    factory :approver_user do
+      after(:build) do |u|
+        approver_role = Role.find_by_name("approver")
+        raise "missing approver role" unless approver_role
+        u.roles << approver_role
       end
     end
 
     factory :attendant_user do
       after(:build) do |u|
-        u.roles << Role.find_by_name("attendant")
+        attendant_role = Role.find_by_name("attendant")
+        raise "missing attendant role" unless attendant_role
+        u.roles << attendant_role
       end
     end
 

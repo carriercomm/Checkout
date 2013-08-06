@@ -128,13 +128,20 @@ class ComponentModel < ActiveRecord::Base
     self.autocomplete = self.class.normalize(s)
   end
 
+  def requires_client_training?(client)
+    return !trainings.include?(user) if training_required
+    false
+  end
+
   def reservable?(client)
     kits.each { |k| return true if k.reservable?(client) }
     return false
   end
 
+  # NOTE: this is possibly a confusing overload
+  #       maybe break this up into 2 separate methods?
   def training_required?
-    training_required
+    return training_required
   end
 
   def to_branded_s

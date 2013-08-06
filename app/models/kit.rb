@@ -258,6 +258,11 @@ class Kit < ActiveRecord::Base
     return occurrences
   end
 
+  def requires_client_training?(client)
+    component_models.where(training_required: true).each { |c| return true if c.requires_client_training?(client) }
+    false
+  end
+
   # move this to an alias
   def reservable?(client)
     can_be_loaned_to? client
@@ -319,16 +324,8 @@ class Kit < ActiveRecord::Base
     end
   end
 
-  # TODO: test this
   def training_required?
-    @training_required ||= uncached_training_required?
-  end
-
-  def uncached_training_required?
-    components.each do |c|
-      return true if c.training_required?
-    end
-    return false
+    !component_models.where(training_required: true).empty?
   end
 
 end

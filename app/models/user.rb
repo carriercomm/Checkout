@@ -110,8 +110,12 @@ class User < ActiveRecord::Base
     has_role?(:admin)
   end
 
+  def approver?
+    has_role?(:approver)
+  end
+
   def attendant?
-    has_role?(:attendant?) || admin?
+    has_role?(:attendant) || admin?
   end
 
   def disabled?
