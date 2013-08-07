@@ -65,7 +65,20 @@ describe Loan do
   # ends_at should be the next available check in day after the default checkout duration (taking holidays and weekends in to account)
 
   it "should automatically select a kit based on component_model in the approval transition" do
+    test_group
+    starts_at = test_kit.location.next_time_open.to_datetime
+    loan      = FactoryGirl.build(:loan, kit: test_kit, client: test_user, starts_at: starts_at)
+    test_kit.circulating = true
 
+    assert test_kit.circulating?,  "kit should be circulating"
+    assert test_kit.valid?,        "kit should be valid"
+    assert test_user.valid?,       "user should be valid"
+    refute loan.kit.nil?,          "loan should have a kit"
+    refute loan.kit.location.nil?, "kit should have a location"
+    assert loan.ends_at.nil?,      "ends_at should be nil"
+    refute loan.starts_at.nil?,    "starts_at should not be nil"
+    assert loan.pending?,          "loan should be in a pending state"
+    assert loan.valid?,            "loan should be valid\n#{loan.errors.inspect}"
   end
 
   it "should not transition to approved when non-default duration and/or invalid approval" do
@@ -143,10 +156,14 @@ describe Loan do
   end
 
   it "should transition to checked_out when checked out by an attendant" do
+    inventoried = InventoryStatus.find_by_name("present")
     out_attendant = FactoryGirl.create(:attendant_user)
     valid_loan.approve!
     assert valid_loan.approved?,     "loan should be approved"
     assert out_attendant.attendant?, "out_attendant should have attendant role"
+    valid_loan.check_out!(out_attendant)
+    assert valid_loan.halted?,        "should not have halted transition to checked_out unless components were inventoried: #{valid_loan.halted_because.to_s}"
+    valid_loan.check_out_inventory_records = valid_loan.build_check_out_inventory_records(out_attendant, inventoried)
     valid_loan.check_out!(out_attendant)
     refute valid_loan.halted?,       "should have transitioned to checked_out: #{valid_loan.halted_because.to_s}"
     assert valid_loan.checked_out?,  "Check out by attendant should have worked"
@@ -156,10 +173,13 @@ describe Loan do
   end
 
   it "should transition to checked_out when checked out by an admin" do
+    inventoried = InventoryStatus.find_by_name("present")
     out_attendant = FactoryGirl.create(:admin_user)
     valid_loan.approve!
     assert valid_loan.approved?,     "loan should be approved"
     assert out_attendant.attendant?, "out_attendant should have attendant role"
+    valid_loan.check_out!(out_attendant)
+    valid_loan.check_out_inventory_records = valid_loan.build_check_out_inventory_records(out_attendant, inventoried)
     valid_loan.check_out!(out_attendant)
     refute valid_loan.halted?,       "should have transitioned to checked_out: #{valid_loan.halted_because.to_s}"
     assert valid_loan.checked_out?,  "Check out by attendant should have worked"
@@ -178,10 +198,15 @@ describe Loan do
   end
 
   it "should transition to checked_in when checked in by an attendant" do
-    attendant = FactoryGirl.create(:attendant_user)
+    inventoried = InventoryStatus.find_by_name("present")
+    attendant   = FactoryGirl.create(:attendant_user)
     valid_loan.approve!
     assert valid_loan.approved?,     "loan should be approved"
+    valid_loan.check_out_inventory_records = valid_loan.build_check_out_inventory_records(attendant, inventoried)
     valid_loan.check_out!(attendant)
+    valid_loan.check_in!(attendant)
+    assert valid_loan.halted?,       "should not have halted transition to checked_out unless components were inventoried: #{valid_loan.halted_because.to_s}"
+    valid_loan.check_in_inventory_records = valid_loan.build_check_in_inventory_records(attendant, inventoried)
     valid_loan.check_in!(attendant)
     refute valid_loan.halted?,       "should have transitioned to checked_in: #{valid_loan.halted_because.to_s}"
     assert valid_loan.checked_in?,  "Check in by attendant should have worked"
@@ -215,45 +240,63 @@ describe Loan do
 
   end
 
-  it "should not allow illegal transitions" do
+  it "should not allow illegal transitions from pending" do
     assert valid_loan.pending?, "loan should be pending"
+    assert valid_loan.valid?, "pending loan should be valid"
     assert_raises(Workflow::NoTransitionAllowed) { valid_loan.check_in!  }
     assert_raises(Workflow::NoTransitionAllowed) { valid_loan.check_out! }
     assert_raises(Workflow::NoTransitionAllowed) { valid_loan.mark_lost! }
     assert_raises(Workflow::NoTransitionAllowed) { valid_loan.resubmit!  }
     assert_raises(Workflow::NoTransitionAllowed) { valid_loan.unapprove! }
+  end
 
-    canceled_loan = valid_loan.dup
-    canceled_loan.cancel!
-    assert_raises(Workflow::NoTransitionAllowed) { canceled_loan.approve!   }
-    assert_raises(Workflow::NoTransitionAllowed) { canceled_loan.cancel!    }
-    assert_raises(Workflow::NoTransitionAllowed) { canceled_loan.check_in!  }
-    assert_raises(Workflow::NoTransitionAllowed) { canceled_loan.check_out! }
-    assert_raises(Workflow::NoTransitionAllowed) { canceled_loan.mark_lost! }
-    assert_raises(Workflow::NoTransitionAllowed) { canceled_loan.resubmit!  }
-    assert_raises(Workflow::NoTransitionAllowed) { canceled_loan.unapprove! }
+  it "should not allow illegal transitions from pending" do
+    assert valid_loan.pending?, "loan should be pending"
+    valid_loan.cancel!
+    assert valid_loan.valid?, "canceled loan should be valid\n#{ valid_loan.errors.inspect }"
+    assert_raises(Workflow::NoTransitionAllowed) { valid_loan.approve!   }
+    assert_raises(Workflow::NoTransitionAllowed) { valid_loan.cancel!    }
+    assert_raises(Workflow::NoTransitionAllowed) { valid_loan.check_in!  }
+    assert_raises(Workflow::NoTransitionAllowed) { valid_loan.check_out! }
+    assert_raises(Workflow::NoTransitionAllowed) { valid_loan.mark_lost! }
+    assert_raises(Workflow::NoTransitionAllowed) { valid_loan.resubmit!  }
+    assert_raises(Workflow::NoTransitionAllowed) { valid_loan.unapprove! }
+  end
 
-    declined_loan = valid_loan.dup
-    declined_loan.decline!
-    assert_raises(Workflow::NoTransitionAllowed) { declined_loan.approve!   }
-    assert_raises(Workflow::NoTransitionAllowed) { declined_loan.cancel!    }
-    assert_raises(Workflow::NoTransitionAllowed) { declined_loan.check_in!  }
-    assert_raises(Workflow::NoTransitionAllowed) { declined_loan.check_out! }
-    assert_raises(Workflow::NoTransitionAllowed) { declined_loan.mark_lost! }
-    assert_raises(Workflow::NoTransitionAllowed) { declined_loan.unapprove! }
+  it "should not allow illegal transitions from declined" do
+    assert valid_loan.pending?, "loan should be pending"
+    valid_loan.decline!
+    assert valid_loan.valid?, "valid loan should be valid\n#{ valid_loan.errors.inspect }"
+    assert_raises(Workflow::NoTransitionAllowed) { valid_loan.approve!   }
+    assert_raises(Workflow::NoTransitionAllowed) { valid_loan.cancel!    }
+    assert_raises(Workflow::NoTransitionAllowed) { valid_loan.check_in!  }
+    assert_raises(Workflow::NoTransitionAllowed) { valid_loan.check_out! }
+    assert_raises(Workflow::NoTransitionAllowed) { valid_loan.mark_lost! }
+    assert_raises(Workflow::NoTransitionAllowed) { valid_loan.unapprove! }
 
-    declined_loan.resubmit!
-    assert declined_loan.pending?, "a declined loan should become pending after resubmit"
+    valid_loan.resubmit!
+    assert valid_loan.pending?, "a declined loan should become pending after resubmit"
+    assert valid_loan.valid?, "resubmitted loan should be valid\n#{ valid_loan.errors.inspect }"
+  end
 
+  it "should not allow illegal transitions from approved, check_out, lost, or check_in" do
     valid_loan.approve!
+    assert valid_loan.valid?, "approved loan should be valid\n#{ valid_loan.errors.inspect }"
     assert_raises(Workflow::NoTransitionAllowed) { valid_loan.approve!   }
     assert_raises(Workflow::NoTransitionAllowed) { valid_loan.check_in!  }
     assert_raises(Workflow::NoTransitionAllowed) { valid_loan.mark_lost! }
     assert_raises(Workflow::NoTransitionAllowed) { valid_loan.resubmit!  }
 
-    attendant = FactoryGirl.build(:attendant_user)
+    inventoried = InventoryStatus.find_by_name("present")
+    attendant   = FactoryGirl.create(:attendant_user)
+
+    valid_loan.check_out_inventory_records = valid_loan.build_check_out_inventory_records(attendant, inventoried)
     valid_loan.check_out!(attendant)
+    refute valid_loan.halted?, "transition should not have halted: #{ valid_loan.halted_because }"
     assert valid_loan.checked_out?, "loan should be checked out"
+    valid_loan.valid?
+    assert valid_loan.valid?, "checked out loan should be valid\n#{ valid_loan.errors.inspect }"
+
     assert_raises(Workflow::NoTransitionAllowed) { valid_loan.approve!   }
     assert_raises(Workflow::NoTransitionAllowed) { valid_loan.cancel!    }
     assert_raises(Workflow::NoTransitionAllowed) { valid_loan.check_out! }
@@ -262,6 +305,7 @@ describe Loan do
 
     valid_loan.mark_lost!
     assert valid_loan.lost?, "loan should be lost"
+    assert valid_loan.valid?, "lost loan should be valid\n#{ valid_loan.errors.inspect }"
     assert_raises(Workflow::NoTransitionAllowed) { valid_loan.approve!   }
     assert_raises(Workflow::NoTransitionAllowed) { valid_loan.cancel!    }
     assert_raises(Workflow::NoTransitionAllowed) { valid_loan.check_out! }
@@ -270,7 +314,12 @@ describe Loan do
     assert_raises(Workflow::NoTransitionAllowed) { valid_loan.unapprove! }
 
     valid_loan.check_in!(attendant)
-    assert valid_loan.checked_in?, "loan should be checked in"
+    assert valid_loan.halted?, "loan should have halted on transition to checked_in: #{ valid_loan.halted_because }"
+    valid_loan.check_in_inventory_records = valid_loan.build_check_in_inventory_records(attendant, inventoried)
+    valid_loan.check_in!(attendant)
+    refute valid_loan.halted?,     "loan should have transitioned to checked_in: #{ valid_loan.halted_because }"
+    assert valid_loan.checked_in?, "loan should be checked in\n#{ valid_loan.errors.inspect }"
+    assert valid_loan.valid?, "checked in loan should be valid\n#{ valid_loan.errors.inspect }"
     assert_raises(Workflow::NoTransitionAllowed) { valid_loan.approve!   }
     assert_raises(Workflow::NoTransitionAllowed) { valid_loan.cancel!    }
     assert_raises(Workflow::NoTransitionAllowed) { valid_loan.check_in!  }

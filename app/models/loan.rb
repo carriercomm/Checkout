@@ -1,3 +1,5 @@
+require 'awesome_print'
+
 class Loan < ActiveRecord::Base
 
   ## Macros ##
@@ -43,44 +45,49 @@ class Loan < ActiveRecord::Base
     User.unscoped { super }
   end
 
-  belongs_to :kit,               :inverse_of => :loans
-  belongs_to :client,            :inverse_of => :loans,       :class_name => "User"
-  belongs_to :approver,          :inverse_of => :approvals,   :class_name => "User"
-  belongs_to :out_attendant,     :inverse_of => :out_assists,  :class_name => "User"
-  belongs_to :in_attendant,      :inverse_of => :in_assists,   :class_name => "User"
-  has_many   :inventory_records, :inverse_of => :loan
+  belongs_to :kit,                         :inverse_of => :loans
+  belongs_to :client,                      :inverse_of => :loans,       :class_name => "User"
+  belongs_to :approver,                    :inverse_of => :approvals,   :class_name => "User"
+  belongs_to :out_attendant,               :inverse_of => :out_assists, :class_name => "User"
+  belongs_to :in_attendant,                :inverse_of => :in_assists,  :class_name => "User"
+  has_many   :check_out_inventory_records, :inverse_of => :loan
+  has_many   :check_in_inventory_records,  :inverse_of => :loan
 
   ## Validations ##
 
-  validates :approver,          :associated => true,    :unless => [:pending?, :declined?, :checked_in?]
-  validates :approver_id,       :presence   => true,    :unless => [:pending?, :declined?, :checked_in?]
+  validates :approver,          :associated => true,    :if => [:approved?, :checked_out?, :lost?]
+  validates :approver_id,       :presence   => true,    :if => [:approved?, :checked_out?, :lost?]
+  validates :check_in_inventory_records,  :associated => true, :if => :checked_in?
+  validates :check_out_inventory_records, :associated => true, :if => :checked_out?
   validates :client,            :associated => true
   validates :client_id,         :presence   => true
-  validates :ends_at,           :presence   => true,    :unless => [:pending?, :checked_in?]
+  validates :ends_at,           :presence   => true,    :if     => [:approved?, :checked_out?, :lost?]
   validates :in_at,             :presence   => true,    :if     => :checked_in?
   validates :in_attendant,      :associated => true,    :if     => :checked_in?
   validates :in_attendant_id,   :presence   => true,    :if     => :checked_in?
-  validates :kit,               :associated => true
-  validates :kit_id,            :presence   => true
+  validates :kit,               :associated => true,    :unless => :canceled?
+  validates :kit_id,            :presence   => true,    :unless => :canceled?
   validates :out_at,            :presence   => true,    :if     => :checked_out?
   validates :out_attendant,     :associated => true,    :if     => :checked_out?
   validates :out_attendant_id,  :presence   => true,    :if     => :checked_out?
-  validates :starts_at,         :presence   => true,    :unless => :checked_in?
-  validate  :validate_approver_has_approver_role,       :unless => [:pending?, :declined?, :checked_in?]
-  validate  :validate_client_has_permission,            :unless => :checked_in?
-  validate  :validate_client_has_proper_training,       :if     => :checked_out?
-  validate  :validate_client_is_not_disabled,           :unless => :checked_in?
-  validate  :validate_client_is_not_suspended,          :unless => :checked_in?
-  validate  :validate_client_signed_all_covenants,      :if     => :checked_out?
-  validate  :validate_kit_available,                    :unless => :checked_in?
-  validate  :validate_kit_circulating,                  :unless => :checked_in?
+  validates :starts_at,         :presence   => true,    :unless => [:checked_in?, :canceled?]
+  validate  :validate_approver_has_approver_role,       :unless => [:pending?, :declined?, :checked_in?, :canceled?]
+  validate  :validate_check_out_components_inventoried, :if     => :checked_out?
+  validate  :validate_check_in_components_inventoried,  :if     => [:checked_in?, :lost?]
+  validate  :validate_client_has_permission,            :unless => [:checked_in?, :canceled?]
+  validate  :validate_client_has_proper_training,       :if     => [:checked_out?, :canceled?]
+  validate  :validate_client_is_not_disabled,           :unless => [:checked_in?, :canceled?]
+  validate  :validate_client_is_not_suspended,          :unless => [:checked_in?, :canceled?]
+  validate  :validate_client_signed_all_covenants,      :if     => [:checked_out?, :canceled?]
+  validate  :validate_kit_available,                    :unless => [:checked_in?, :canceled?]
+  validate  :validate_kit_circulating,                  :unless => [:checked_in?, :canceled?]
   validate  :validate_open_on_starts_at,                :if     => :pending?
-  validate  :validate_open_on_ends_at,                  :unless => [:pending?, :checked_in?]
+  validate  :validate_open_on_ends_at,                  :unless => [:pending?, :checked_in?, :canceled?]
   validate  :validate_in_attendant_has_proper_roles,    :if     => :checked_in?
   validate  :validate_in_attendant_is_not_client,       :if     => :checked_in?
   validate  :validate_out_attendant_has_proper_roles,   :if     => :checked_out?
   validate  :validate_out_attendant_is_not_client,      :if     => :checked_out?
-  validate  :validate_start_at_before_ends_at,          :unless => [:pending?, :checked_in?]
+  validate  :validate_start_at_before_ends_at,          :unless => [:pending?, :checked_in?, :canceled?]
 
   ## Virtual Attributes ##
 
@@ -107,6 +114,14 @@ class Loan < ActiveRecord::Base
 
   def autofilled_ends_at?
     autofilled_ends_at
+  end
+
+  def build_check_in_inventory_records(attendant = nil, inventory_status = nil)
+    kit.components.collect {|c| CheckInInventoryRecord.new(component: c, loan: self, attendant: attendant, inventory_status: inventory_status)}
+  end
+
+  def build_check_out_inventory_records(attendant = nil, inventory_status = nil)
+    kit.components.collect {|c| CheckOutInventoryRecord.new(component: c, loan: self, attendant: attendant, inventory_status: inventory_status)}
   end
 
   def default_return_date
@@ -201,6 +216,20 @@ private
     self.in_at = Time.zone.now.to_datetime
     halt "In attendant must have the 'attendant' role"            unless in_attendant_has_proper_roles?
     halt "In attendant can not check in equipment to themselves"  unless in_attendant_is_not_the_client?
+    halt "All components must be inventoried before check in"     unless check_in_components_inventoried?
+  end
+
+  def check_in_components_inventoried?
+    ensure_presence(kit)
+    in_recs = check_in_inventory_records.map(&:component).sort
+    comps   = kit.components.sort
+    # puts "======"
+    # puts "in"
+    # ap in_recs
+    # puts "comps"
+    # ap comps
+    # puts "======"
+    (in_recs == comps)
   end
 
   def check_out(out_attendant)
@@ -208,6 +237,12 @@ private
     self.out_at = Time.zone.now.to_datetime
     halt "Out attendant must have the 'attendant' role"            unless out_attendant_has_proper_roles?
     halt "Out attendant can not check out equipment to themselves" unless out_attendant_is_not_the_client?
+    halt "All components must be inventoried before check out"     unless check_out_components_inventoried?
+  end
+
+  def check_out_components_inventoried?
+    ensure_presence(kit)
+    (check_out_inventory_records.map(&:component).sort == kit.components.sort)
   end
 
   def client_is_disabled?
@@ -300,6 +335,20 @@ private
     return unless approver
     unless approver_has_approval_role?
       errors.add(:approver, "must have 'approver' role.")
+    end
+  end
+
+  def validate_check_in_components_inventoried
+    return unless kit
+    unless check_in_components_inventoried?
+      errors[:base] << "All components must be inventoried at the time of check in"
+    end
+  end
+
+  def validate_check_out_components_inventoried
+    return unless kit
+    unless check_out_components_inventoried?
+      errors[:base] << "All components must be inventoried at the time of check out"
     end
   end
 

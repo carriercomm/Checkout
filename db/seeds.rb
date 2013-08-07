@@ -38,7 +38,8 @@ User.where(username: 'admin').first_or_initialize do |u|
   u.save!(:validate => false)
 end
 
-InventoryStatus.where(:id => 1, :name => 'accessioned'  ).first_or_create
-InventoryStatus.where(:id => 2, :name => 'inventoried'  ).first_or_create
-InventoryStatus.where(:id => 3, :name => 'missing'      ).first_or_create
-InventoryStatus.where(:id => 4, :name => 'deaccessioned').first_or_create
+InventoryStatus.delete_all
+InventoryStatus.create!(:id => 1, :name => 'accessioned'  )
+InventoryStatus.create!(:id => 2, :name => 'present'      )
+InventoryStatus.create!(:id => 3, :name => 'missing'      )
+InventoryStatus.create!(:id => 4, :name => 'deaccessioned')

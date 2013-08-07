@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130806030021) do
+ActiveRecord::Schema.define(:version => 20130807014607) do
 
   create_table "app_configs", :force => true do |t|
     t.integer  "default_checkout_length"
@@ -143,11 +143,12 @@ ActiveRecord::Schema.define(:version => 20130806030021) do
     t.datetime "created_at",          :null => false
     t.datetime "updated_at",          :null => false
     t.integer  "inventory_status_id", :null => false
+    t.string   "type"
   end
 
   add_index "inventory_records", ["attendant_id"], :name => "index_inventory_records_on_attendant_id"
   add_index "inventory_records", ["component_id"], :name => "index_inventory_records_on_component_id"
-  add_index "inventory_records", ["loan_id"], :name => "index_inventory_records_on_loan_id"
+  add_index "inventory_records", ["loan_id", "component_id", "type"], :name => "index_inventory_records_on_loan_id_and_component_id_and_type", :unique => true
 
   create_table "inventory_statuses", :force => true do |t|
     t.string "name"

@@ -10,6 +10,11 @@ class InventoryStatus < ActiveRecord::Base
   has_many :inventory_records, :inverse_of => :inventory_status
 
 
+  ## Validations ##
+
+  validates :name, :uniqueness => true
+
+
   ## Mass-assignable Attributes ##
 
   attr_accessible :index, :name
