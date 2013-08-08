@@ -5,7 +5,6 @@ class Brand < ActiveRecord::Base
   #
 
   include Autocomplete
-  resourcify
   strip_attributes
 
 

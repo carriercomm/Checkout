@@ -1,13 +1,8 @@
 class InventoryStatus < ActiveRecord::Base
 
-  ## Macros ##
-
-  rolify
-
-
   ## Associations ##
 
-  has_many :inventory_records, :inverse_of => :inventory_status
+  has_many :inventory_details, :inverse_of => :inventory_status
 
 
   ## Validations ##

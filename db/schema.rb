@@ -11,16 +11,10 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130807014607) do
-
-  create_table "app_configs", :force => true do |t|
-    t.integer  "default_checkout_length"
-    t.datetime "created_at",              :null => false
-    t.datetime "updated_at",              :null => false
-  end
+ActiveRecord::Schema.define(:version => 20130808214408) do
 
   create_table "brands", :force => true do |t|
-    t.string   "name"
+    t.string   "name",         :null => false
     t.string   "autocomplete", :null => false
     t.datetime "created_at",   :null => false
     t.datetime "updated_at",   :null => false
@@ -31,7 +25,7 @@ ActiveRecord::Schema.define(:version => 20130807014607) do
 
   create_table "budgets", :force => true do |t|
     t.string   "number"
-    t.string   "name"
+    t.string   "name",       :null => false
     t.date     "starts_at"
     t.date     "ends_at"
     t.datetime "created_at", :null => false
@@ -46,8 +40,8 @@ ActiveRecord::Schema.define(:version => 20130807014607) do
   end
 
   create_table "business_days_business_hours", :force => true do |t|
-    t.integer "business_day_id"
-    t.integer "business_hour_id"
+    t.integer "business_day_id",  :null => false
+    t.integer "business_hour_id", :null => false
   end
 
   create_table "business_hour_exceptions", :force => true do |t|
@@ -72,7 +66,7 @@ ActiveRecord::Schema.define(:version => 20130807014607) do
   add_index "business_hours", ["location_id"], :name => "index_business_hours_on_location_id"
 
   create_table "categories", :force => true do |t|
-    t.string   "name"
+    t.string   "name",         :null => false
     t.string   "autocomplete", :null => false
     t.text     "description"
     t.datetime "created_at",   :null => false
@@ -82,8 +76,8 @@ ActiveRecord::Schema.define(:version => 20130807014607) do
   add_index "categories", ["name"], :name => "index_categories_on_name"
 
   create_table "categories_component_models", :id => false, :force => true do |t|
-    t.integer "category_id"
-    t.integer "component_model_id"
+    t.integer "category_id",        :null => false
+    t.integer "component_model_id", :null => false
   end
 
   add_index "categories_component_models", ["category_id", "component_model_id"], :name => "index_categories_models_on_category_id_and_model_id"
@@ -104,10 +98,10 @@ ActiveRecord::Schema.define(:version => 20130807014607) do
 
   create_table "components", :force => true do |t|
     t.integer  "kit_id"
-    t.integer  "component_model_id"
+    t.integer  "component_model_id", :null => false
     t.string   "asset_tag"
     t.string   "serial_number"
-    t.integer  "position"
+    t.integer  "position",           :null => false
     t.datetime "created_at",         :null => false
     t.datetime "updated_at",         :null => false
   end
@@ -116,8 +110,8 @@ ActiveRecord::Schema.define(:version => 20130807014607) do
   add_index "components", ["kit_id"], :name => "index_parts_on_kit_id"
 
   create_table "covenant_signatures", :force => true do |t|
-    t.integer  "user_id"
-    t.integer  "covenant_id"
+    t.integer  "user_id",     :null => false
+    t.integer  "covenant_id", :null => false
     t.datetime "created_at",  :null => false
     t.datetime "updated_at",  :null => false
   end
@@ -130,32 +124,42 @@ ActiveRecord::Schema.define(:version => 20130807014607) do
   end
 
   create_table "groups", :force => true do |t|
-    t.string   "name"
+    t.string   "name",        :null => false
     t.text     "description"
     t.datetime "created_at",  :null => false
     t.datetime "updated_at",  :null => false
   end
 
-  create_table "inventory_records", :force => true do |t|
+  create_table "inventory_details", :force => true do |t|
     t.integer  "component_id",        :null => false
-    t.integer  "loan_id"
-    t.integer  "attendant_id",        :null => false
+    t.integer  "inventory_status_id", :null => false
+    t.integer  "inventory_record_id", :null => false
     t.datetime "created_at",          :null => false
     t.datetime "updated_at",          :null => false
-    t.integer  "inventory_status_id", :null => false
-    t.string   "type"
   end
 
-  add_index "inventory_records", ["attendant_id"], :name => "index_inventory_records_on_attendant_id"
-  add_index "inventory_records", ["component_id"], :name => "index_inventory_records_on_component_id"
-  add_index "inventory_records", ["loan_id", "component_id", "type"], :name => "index_inventory_records_on_loan_id_and_component_id_and_type", :unique => true
+  add_index "inventory_details", ["component_id", "inventory_record_id"], :name => "index_comp_inv_rec_on_component_id_and_inventory_record_id", :unique => true
+  add_index "inventory_details", ["inventory_record_id"], :name => "index_component_inventory_records_on_inventory_record_id"
+  add_index "inventory_details", ["inventory_status_id"], :name => "index_component_inventory_records_on_inventory_status_id"
+
+  create_table "inventory_records", :force => true do |t|
+    t.integer  "attendant_id", :null => false
+    t.integer  "kit_id",       :null => false
+    t.integer  "loan_id"
+    t.string   "type",         :null => false
+    t.datetime "created_at",   :null => false
+    t.datetime "updated_at",   :null => false
+  end
+
+  add_index "inventory_records", ["attendant_id"], :name => "index_inventory_records_on_attendant_id", :unique => true
+  add_index "inventory_records", ["loan_id", "type"], :name => "index_inventory_records_on_loan_id_and_type", :unique => true
 
   create_table "inventory_statuses", :force => true do |t|
-    t.string "name"
+    t.string "name", :null => false
   end
 
   create_table "kits", :force => true do |t|
-    t.integer  "location_id"
+    t.integer  "location_id",                    :null => false
     t.integer  "budget_id"
     t.boolean  "tombstoned",  :default => false
     t.boolean  "circulating", :default => false
@@ -169,43 +173,39 @@ ActiveRecord::Schema.define(:version => 20130807014607) do
   add_index "kits", ["location_id"], :name => "index_kits_on_location_id"
 
   create_table "loans", :force => true do |t|
-    t.integer  "client_id"
-    t.integer  "kit_id"
-    t.datetime "starts_at"
-    t.datetime "ends_at"
+    t.string   "workflow_state",                        :null => false
+    t.integer  "client_id",                             :null => false
+    t.integer  "kit_id",                                :null => false
+    t.datetime "starts_at",                             :null => false
+    t.datetime "ends_at",                               :null => false
+    t.boolean  "autofilled_ends_at", :default => false
     t.datetime "out_at"
+    t.datetime "lost_at"
     t.datetime "in_at"
-    t.integer  "out_attendant_id"
-    t.integer  "in_attendant_id"
     t.boolean  "late",               :default => false
     t.text     "request_note"
     t.integer  "approver_id"
     t.text     "approval_note"
     t.datetime "created_at",                            :null => false
     t.datetime "updated_at",                            :null => false
-    t.string   "workflow_state"
-    t.boolean  "autofilled_ends_at", :default => false
-    t.datetime "lost_at"
   end
 
   add_index "loans", ["approver_id"], :name => "index_reservations_on_approver_id"
   add_index "loans", ["client_id"], :name => "index_reservations_on_client_id"
   add_index "loans", ["ends_at", "in_at", "late"], :name => "index_reservations_on_ends_at_and_in_at_and_late"
   add_index "loans", ["ends_at"], :name => "index_reservations_on_ends_at"
-  add_index "loans", ["in_attendant_id"], :name => "index_reservations_on_in_assistant_id"
   add_index "loans", ["kit_id"], :name => "index_reservations_on_kit_id"
-  add_index "loans", ["out_attendant_id"], :name => "index_reservations_on_out_assistant_id"
   add_index "loans", ["starts_at", "out_at"], :name => "index_reservations_on_starts_at_and_out_at"
 
   create_table "locations", :force => true do |t|
-    t.string   "name"
+    t.string   "name",       :null => false
     t.datetime "created_at", :null => false
     t.datetime "updated_at", :null => false
   end
 
   create_table "memberships", :force => true do |t|
-    t.integer  "group_id"
-    t.integer  "user_id"
+    t.integer  "group_id",                      :null => false
+    t.integer  "user_id",                       :null => false
     t.date     "expires_at"
     t.datetime "created_at",                    :null => false
     t.datetime "updated_at",                    :null => false
@@ -217,8 +217,8 @@ ActiveRecord::Schema.define(:version => 20130807014607) do
   add_index "memberships", ["user_id"], :name => "index_memberships_on_user_id"
 
   create_table "permissions", :force => true do |t|
-    t.integer  "group_id"
-    t.integer  "kit_id"
+    t.integer  "group_id",        :null => false
+    t.integer  "kit_id",          :null => false
     t.date     "expires_at"
     t.date     "exclusive_until"
     t.datetime "created_at",      :null => false
@@ -230,7 +230,7 @@ ActiveRecord::Schema.define(:version => 20130807014607) do
   add_index "permissions", ["kit_id"], :name => "index_permissions_on_kit_id"
 
   create_table "roles", :force => true do |t|
-    t.string   "name"
+    t.string   "name",          :null => false
     t.integer  "resource_id"
     t.string   "resource_type"
     t.datetime "created_at",    :null => false
@@ -250,8 +250,8 @@ ActiveRecord::Schema.define(:version => 20130807014607) do
   add_index "settings", ["var"], :name => "index_settings_on_var", :unique => true
 
   create_table "trainings", :force => true do |t|
-    t.integer  "component_model_id"
-    t.integer  "user_id"
+    t.integer  "component_model_id", :null => false
+    t.integer  "user_id",            :null => false
     t.datetime "created_at",         :null => false
     t.datetime "updated_at",         :null => false
   end
@@ -289,8 +289,8 @@ ActiveRecord::Schema.define(:version => 20130807014607) do
   add_index "users", ["username"], :name => "index_users_on_username", :unique => true
 
   create_table "users_roles", :id => false, :force => true do |t|
-    t.integer "user_id"
-    t.integer "role_id"
+    t.integer "user_id", :null => false
+    t.integer "role_id", :null => false
   end
 
   add_index "users_roles", ["user_id", "role_id"], :name => "index_users_roles_on_user_id_and_role_id", :unique => true
@@ -313,7 +313,11 @@ ActiveRecord::Schema.define(:version => 20130807014607) do
   add_foreign_key "covenant_signatures", "covenants", :name => "covenant_signatures_covenant_id_fk"
   add_foreign_key "covenant_signatures", "users", :name => "covenant_signatures_user_id_fk"
 
-  add_foreign_key "inventory_records", "components", :name => "inventory_records_component_id_fk"
+  add_foreign_key "inventory_details", "components", :name => "component_inventory_records_component_id_fk"
+  add_foreign_key "inventory_details", "inventory_records", :name => "component_inventory_records_inventory_record_id_fk"
+  add_foreign_key "inventory_details", "inventory_statuses", :name => "component_inventory_records_inventory_status_id_fk"
+
+  add_foreign_key "inventory_records", "kits", :name => "inventory_records_kit_id_fk"
   add_foreign_key "inventory_records", "loans", :name => "inventory_records_loan_id_fk"
   add_foreign_key "inventory_records", "users", :name => "inventory_records_attendant_id_fk", :column => "attendant_id"
 
@@ -323,8 +327,6 @@ ActiveRecord::Schema.define(:version => 20130807014607) do
   add_foreign_key "loans", "kits", :name => "reservations_kit_id_fk"
   add_foreign_key "loans", "users", :name => "reservations_approver_id_fk", :column => "approver_id"
   add_foreign_key "loans", "users", :name => "reservations_client_id_fk", :column => "client_id"
-  add_foreign_key "loans", "users", :name => "reservations_in_assistant_id_fk", :column => "in_attendant_id"
-  add_foreign_key "loans", "users", :name => "reservations_out_assistant_id_fk", :column => "out_attendant_id"
 
   add_foreign_key "memberships", "groups", :name => "groups_users_group_id_fk"
   add_foreign_key "memberships", "users", :name => "groups_users_user_id_fk"

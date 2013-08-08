@@ -2,7 +2,6 @@ class Budget < ActiveRecord::Base
 
   ## Macros ##
 
-  resourcify
   strip_attributes
 
 

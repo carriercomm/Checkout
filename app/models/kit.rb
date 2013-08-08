@@ -2,7 +2,6 @@ class Kit < ActiveRecord::Base
 
   ## Macros ##
 
-  resourcify
   strip_attributes
 
 
@@ -13,14 +12,15 @@ class Kit < ActiveRecord::Base
 
   ## Associations ##
 
-  belongs_to :budget,           :inverse_of => :kits
-  has_many   :clients,          :through => :loans
-  has_many   :component_models, :through => :components, :order => "component_models.name ASC"
-  has_many   :components,       :inverse_of => :kit
-  has_many   :groups,           :through => :permissions, :order => "groups.name ASC"
-  belongs_to :location,         :inverse_of => :kits
-  has_many   :permissions,      :inverse_of => :kit
-  has_many   :loans,            :inverse_of => :kit
+  belongs_to :budget,            :inverse_of => :kits
+  has_many   :clients,           :through    => :loans
+  has_many   :component_models,  :through    => :components,  :order => "component_models.name ASC"
+  has_many   :components,        :inverse_of => :kit
+  has_many   :groups,            :through    => :permissions, :order => "groups.name ASC"
+  has_many   :inventory_records, :inverse_of => :kit
+  belongs_to :location,          :inverse_of => :kits
+  has_many   :permissions,       :inverse_of => :kit
+  has_many   :loans,             :inverse_of => :kit
 
   accepts_nested_attributes_for :components, :reject_if => proc { |attributes| attributes['component_model_id'].blank? }, :allow_destroy=> true
 

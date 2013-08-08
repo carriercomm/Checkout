@@ -1,11 +1,12 @@
-require 'awesome_print'
-
 class Loan < ActiveRecord::Base
+
+  ## Mixins ##
+
+  include Workflow
 
   ## Macros ##
 
   resourcify
-  include Workflow
 
   workflow do
     # pending has to come first so it will be the starting state by convention
@@ -40,7 +41,8 @@ class Loan < ActiveRecord::Base
 
   ## Associations ##
 
-  # Ensure User is not scoped
+  # Ensure User is not scoped - we typically hide the "system" user,
+  # but loan approvals are the main use for the "system" user
   def approver
     User.unscoped { super }
   end
@@ -48,28 +50,26 @@ class Loan < ActiveRecord::Base
   belongs_to :kit,                         :inverse_of => :loans
   belongs_to :client,                      :inverse_of => :loans,       :class_name => "User"
   belongs_to :approver,                    :inverse_of => :approvals,   :class_name => "User"
-  belongs_to :out_attendant,               :inverse_of => :out_assists, :class_name => "User"
-  belongs_to :in_attendant,                :inverse_of => :in_assists,  :class_name => "User"
-  has_many   :check_out_inventory_records, :inverse_of => :loan
-  has_many   :check_in_inventory_records,  :inverse_of => :loan
+  has_one    :check_out_inventory_record,  :inverse_of => :loan
+  has_one    :check_in_inventory_record,   :inverse_of => :loan
 
   ## Validations ##
 
   validates :approver,          :associated => true,    :if => [:approved?, :checked_out?, :lost?]
   validates :approver_id,       :presence   => true,    :if => [:approved?, :checked_out?, :lost?]
-  validates :check_in_inventory_records,  :associated => true, :if => :checked_in?
-  validates :check_out_inventory_records, :associated => true, :if => :checked_out?
+  validates :check_in_inventory_record,  :associated => true, :if => :checked_in?
+  validates :check_out_inventory_record, :associated => true, :if => :checked_out?
   validates :client,            :associated => true
   validates :client_id,         :presence   => true
   validates :ends_at,           :presence   => true,    :if     => [:approved?, :checked_out?, :lost?]
   validates :in_at,             :presence   => true,    :if     => :checked_in?
-  validates :in_attendant,      :associated => true,    :if     => :checked_in?
-  validates :in_attendant_id,   :presence   => true,    :if     => :checked_in?
+  # validates :in_attendant,      :associated => true,    :if     => :checked_in?
+  # validates :in_attendant_id,   :presence   => true,    :if     => :checked_in?
   validates :kit,               :associated => true,    :unless => :canceled?
   validates :kit_id,            :presence   => true,    :unless => :canceled?
   validates :out_at,            :presence   => true,    :if     => :checked_out?
-  validates :out_attendant,     :associated => true,    :if     => :checked_out?
-  validates :out_attendant_id,  :presence   => true,    :if     => :checked_out?
+  # validates :out_attendant,     :associated => true,    :if     => :checked_out?
+  # validates :out_attendant_id,  :presence   => true,    :if     => :checked_out?
   validates :starts_at,         :presence   => true,    :unless => [:checked_in?, :canceled?]
   validate  :validate_approver_has_approver_role,       :unless => [:pending?, :declined?, :checked_in?, :canceled?]
   validate  :validate_check_out_components_inventoried, :if     => :checked_out?
@@ -83,10 +83,10 @@ class Loan < ActiveRecord::Base
   validate  :validate_kit_circulating,                  :unless => [:checked_in?, :canceled?]
   validate  :validate_open_on_starts_at,                :if     => :pending?
   validate  :validate_open_on_ends_at,                  :unless => [:pending?, :checked_in?, :canceled?]
-  validate  :validate_in_attendant_has_proper_roles,    :if     => :checked_in?
-  validate  :validate_in_attendant_is_not_client,       :if     => :checked_in?
-  validate  :validate_out_attendant_has_proper_roles,   :if     => :checked_out?
-  validate  :validate_out_attendant_is_not_client,      :if     => :checked_out?
+  # validate  :validate_in_attendant_has_proper_roles,    :if     => :checked_in?
+  # validate  :validate_in_attendant_is_not_client,       :if     => :checked_in?
+  # validate  :validate_out_attendant_has_proper_roles,   :if     => :checked_out?
+  # validate  :validate_out_attendant_is_not_client,      :if     => :checked_out?
   validate  :validate_start_at_before_ends_at,          :unless => [:pending?, :checked_in?, :canceled?]
 
   ## Virtual Attributes ##
@@ -116,13 +116,25 @@ class Loan < ActiveRecord::Base
     autofilled_ends_at
   end
 
-  def build_check_in_inventory_records(attendant = nil, inventory_status = nil)
-    kit.components.collect {|c| CheckInInventoryRecord.new(component: c, loan: self, attendant: attendant, inventory_status: inventory_status)}
+  def build_check_in_inventory_record_with_inventory_details(attendant = nil, inventory_status = nil)
+    build_check_in_inventory_record_without_inventory_details(loan: self, kit: kit, attendant: attendant)
+    unless kit.nil?
+      check_in_inventory_record.initialize_inventory_details(inventory_status)
+    end
+    check_in_inventory_record
   end
 
-  def build_check_out_inventory_records(attendant = nil, inventory_status = nil)
-    kit.components.collect {|c| CheckOutInventoryRecord.new(component: c, loan: self, attendant: attendant, inventory_status: inventory_status)}
+  alias_method_chain :build_check_in_inventory_record, :inventory_details
+
+  def build_check_out_inventory_record_with_inventory_details(attendant = nil, inventory_status = nil)
+    build_check_out_inventory_record_without_inventory_details(loan: self, kit: kit, attendant: attendant)
+    unless kit.nil?
+      check_out_inventory_record.initialize_inventory_details(inventory_status)
+    end
+    check_out_inventory_record
   end
+
+  alias_method_chain :build_check_out_inventory_record, :inventory_details
 
   def default_return_date
     return nil unless kit
@@ -211,38 +223,38 @@ private
     approver.approver?
   end
 
-  def check_in(in_attendant)
-    self.in_attendant = in_attendant
+  # this is a callback which is invoked when check_in! is called
+  def check_in
     self.in_at = Time.zone.now.to_datetime
-    halt "In attendant must have the 'attendant' role"            unless in_attendant_has_proper_roles?
-    halt "In attendant can not check in equipment to themselves"  unless in_attendant_is_not_the_client?
     halt "All components must be inventoried before check in"     unless check_in_components_inventoried?
+
+    # TODO: move this up into the authorization layer
+    #halt "In attendant must have the 'attendant' role"            unless in_attendant_has_proper_roles?
+    #halt "In attendant can not check in equipment to themselves"  unless in_attendant_is_not_the_client?
   end
 
   def check_in_components_inventoried?
     ensure_presence(kit)
-    in_recs = check_in_inventory_records.map(&:component).sort
-    comps   = kit.components.sort
-    # puts "======"
-    # puts "in"
-    # ap in_recs
-    # puts "comps"
-    # ap comps
-    # puts "======"
-    (in_recs == comps)
+    return false unless check_in_inventory_record
+    inventoried_component_ids = check_in_inventory_record.inventory_details.map(&:component_id)
+    (inventoried_component_ids == kit.component_ids.sort)
   end
 
-  def check_out(out_attendant)
-    self.out_attendant = out_attendant
+  # this is a callback which is invoked when check_out! is called
+  def check_out
     self.out_at = Time.zone.now.to_datetime
-    halt "Out attendant must have the 'attendant' role"            unless out_attendant_has_proper_roles?
-    halt "Out attendant can not check out equipment to themselves" unless out_attendant_is_not_the_client?
     halt "All components must be inventoried before check out"     unless check_out_components_inventoried?
+
+    # TODO: move this up into the authorization layer
+    # halt "Out attendant must have the 'attendant' role"            unless out_attendant_has_proper_roles?
+    # halt "Out attendant can not check out equipment to themselves" unless out_attendant_is_not_the_client?
   end
 
   def check_out_components_inventoried?
     ensure_presence(kit)
-    (check_out_inventory_records.map(&:component).sort == kit.components.sort)
+    return false unless check_out_inventory_record
+    inventoried_component_ids = check_out_inventory_record.inventory_details.map(&:component_id)
+    (inventoried_component_ids == kit.component_ids.sort)
   end
 
   def client_is_disabled?
@@ -265,16 +277,16 @@ private
     client.signed_all_covenants?
   end
 
-  def in_attendant_has_proper_roles?
-    ensure_presence(in_attendant)
-    in_attendant.attendant?
-  end
-
-  def in_attendant_is_not_the_client?
-    ensure_presence(client)
-    ensure_presence(in_attendant)
-    (in_attendant != client) || in_attendant.admin?
-  end
+  # TODO: move this up into the authorization layer
+  # def in_attendant_has_proper_roles?
+  #   ensure_presence(in_attendant)
+  #   in_attendant.attendant?
+  # end
+  # def in_attendant_is_not_the_client?
+  #   ensure_presence(client)
+  #   ensure_presence(in_attendant)
+  #   (in_attendant != client) || in_attendant.admin?
+  # end
 
   def kit_available?
     ensure_presence(kit)
@@ -310,16 +322,16 @@ private
     kit.requires_client_training?(client)
   end
 
-  def out_attendant_has_proper_roles?
-    ensure_presence(out_attendant)
-    out_attendant.attendant?
-  end
-
-  def out_attendant_is_not_the_client?
-    ensure_presence(client)
-    ensure_presence(out_attendant)
-    (out_attendant != client) || out_attendant.admin?
-  end
+  # TODO: move this up into the authorization layer
+  # def out_attendant_has_proper_roles?
+  #   ensure_presence(out_attendant)
+  #   out_attendant.attendant?
+  # end
+  # def out_attendant_is_not_the_client?
+  #   ensure_presence(client)
+  #   ensure_presence(out_attendant)
+  #   (out_attendant != client) || out_attendant.admin?
+  # end
 
   def ready_for_approval?
     approver && (((approver == User.system_user) && within_default_length?) || (approver.approver? && ends_at && client && kit && starts_at))
@@ -415,33 +427,31 @@ private
     end
   end
 
-  def validate_in_attendant_has_proper_roles
-    return unless in_attendant
-    unless in_attendant_has_proper_roles?
-      errors.add(:in_attendant, "must be an attendant or admin)")
-    end
-  end
-
-  def validate_in_attendant_is_not_client
-    return unless in_attendant
-    unless in_attendant_is_not_the_client?
-      errors.add(:in_attendant, "cannot check in items to themselves unless they are an admin")
-    end
-  end
-
-  def validate_out_attendant_has_proper_roles
-    return unless out_attendant
-    unless out_attendant_has_proper_roles?
-      errors.add(:out_attendant, "must be an attendant or admin")
-    end
-  end
-
-  def validate_out_attendant_is_not_client
-    return unless out_attendant && client
-    unless out_attendant_is_not_the_client?
-      errors.add(:out_attendant, "cannot check out items to themselves unless they are an admin")
-    end
-  end
+  # TODO: move this up into the authorization layer
+  # def validate_in_attendant_has_proper_roles
+  #   return unless in_attendant
+  #   unless in_attendant_has_proper_roles?
+  #     errors.add(:in_attendant, "must be an attendant or admin)")
+  #   end
+  # end
+  # def validate_in_attendant_is_not_client
+  #   return unless in_attendant
+  #   unless in_attendant_is_not_the_client?
+  #     errors.add(:in_attendant, "cannot check in items to themselves unless they are an admin")
+  #   end
+  # end
+  # def validate_out_attendant_has_proper_roles
+  #   return unless out_attendant
+  #   unless out_attendant_has_proper_roles?
+  #     errors.add(:out_attendant, "must be an attendant or admin")
+  #   end
+  # end
+  # def validate_out_attendant_is_not_client
+  #   return unless out_attendant && client
+  #   unless out_attendant_is_not_the_client?
+  #     errors.add(:out_attendant, "cannot check out items to themselves unless they are an admin")
+  #   end
+  # end
 
   def validate_start_at_before_ends_at
     return unless starts_at && ends_at

@@ -3,7 +3,6 @@ class ComponentModel < ActiveRecord::Base
   ## Macros ##
 
   include Autocomplete
-  resourcify
   strip_attributes
 
 

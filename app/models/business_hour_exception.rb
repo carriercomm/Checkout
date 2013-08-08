@@ -1,10 +1,5 @@
 class BusinessHourException < ActiveRecord::Base
 
-  ## Macros ##
-
-  resourcify
-
-
   ## Associations ##
 
   belongs_to :location, :inverse_of => :business_hour_exceptions

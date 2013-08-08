@@ -2,7 +2,6 @@ class Location < ActiveRecord::Base
 
   ## Macros ##
 
-  resourcify
   strip_attributes
 
 

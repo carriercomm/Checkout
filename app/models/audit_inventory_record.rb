@@ -1,0 +1,3 @@
+class AuditInventoryRecord < InventoryRecord
+
+end

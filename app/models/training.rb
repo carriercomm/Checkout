@@ -2,7 +2,6 @@ class Training < ActiveRecord::Base
 
   ## Macros ##
 
-  resourcify
   strip_attributes
 
 

@@ -1,9 +1,8 @@
 class Category < ActiveRecord::Base
 
-  ## Macros ##
+  ## Mixins ##
 
   include Autocomplete
-  resourcify
 
   ## Associations ##
 

@@ -2,7 +2,6 @@ class Group < ActiveRecord::Base
 
   ## Macros ##
 
-  resourcify
   strip_attributes
 
   ## Associations ##
