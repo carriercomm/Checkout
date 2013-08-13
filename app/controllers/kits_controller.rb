@@ -81,8 +81,8 @@ class KitsController < ApplicationController
     respond_to do |format|
       kit_saved = @kit.save
 
-      if @kit.forced_not_checkoutable
-        flash[:warning] = "Kit cannot be tombstoned and checkoutable, so it was forced to be non-checkoutable."
+      if @kit.forced_not_circulating
+        flash[:warning] = "Kit cannot be tombstoned and circulating, so it was forced to be non-circulating."
       end
 
       if kit_saved
@@ -104,8 +104,8 @@ class KitsController < ApplicationController
     respond_to do |format|
       kit_updated = @kit.update_attributes(params[:kit])
 
-      if @kit.forced_not_checkoutable
-        flash[:warning] = "Kit cannot be tombstoned and checkoutable, so it was forced to be non-checkoutable."
+      if @kit.forced_not_circulating
+        flash[:warning] = "Kit cannot be tombstoned and circulating, so it was forced to be non-circulating."
       end
 
       @kit = @kit.decorate
@@ -146,9 +146,9 @@ class KitsController < ApplicationController
 
   def scope_by_filter_params
     case params["filter"]
-    when "checkoutable"       then @kits = @kits.checkoutable
+    when "circulating"       then @kits = @kits.circulating
     when "missing_components" then @kits = @kits.missing_components
-    when "non_checkoutable"   then @kits = @kits.non_checkoutable
+    when "non_circulating"   then @kits = @kits.non_circulating
     when "tombstoned"         then @kits = @kits.tombstoned
     end
   end

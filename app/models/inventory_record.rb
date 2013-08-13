@@ -3,17 +3,18 @@ class InventoryRecord < ActiveRecord::Base
   ## Associations ##
 
   belongs_to :attendant,         :inverse_of => :inventory_records, :class_name => "User"
-  has_many   :inventory_details, :inverse_of => :inventory_record
-  has_many   :components,        :through    => :inventory_details
+  has_many   :inventory_details, :inverse_of => :inventory_record,  :dependent  => :destroy
+  has_many   :components,        :through    => :inventory_details, :before_add => [:reconcile_component_with_kit]
   belongs_to :kit,               :inverse_of => :inventory_records
   belongs_to :loan,              :inverse_of => :inventory_records
+
 
   ## Validations ##
 
   validates :attendant_id, :presence => true
+  validates :kit_id,       :presence => true
   validates :type,         :presence => true
   validate  :validate_attendant_has_proper_roles
-
 
   ## Mass-assignable Attributes ##
 
@@ -29,10 +30,28 @@ class InventoryRecord < ActiveRecord::Base
 
   # scope :currently_missing, current.where(:inventory_status_id => 3)
 
-  def initialize_inventory_details(inventory_status = nil)
+  def autofill_kit
+    return if kit || components.empty?
+    kits = components.map {|c| c.kit }
+    kit  = kits.uniq
+  end
+
+  def initialize_inventory_details(missing = nil)
     raise "kit cannot be nil" if kit.nil?
     kit.components.map do |c|
-      inventory_details.build(component: c, inventory_status: inventory_status)
+      inventory_details.build(component: c, missing: missing)
+    end
+  end
+
+  private
+
+  def reconcile_component_with_kit(component)
+    if kit.nil?
+      self.kit = component.kit
+    else
+      unless kit == component.kit
+        raise InventoryRecord::MismatchingKitException.new("Can't add a component with a mismatching kit")
+      end
     end
   end
 

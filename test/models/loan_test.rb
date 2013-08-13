@@ -82,7 +82,7 @@ describe Loan do
   end
 
   it "should not transition to approved when non-default duration and/or invalid approval" do
-    time = valid_loan.starts_at + Settings.default_checkout_duration + 10.days
+    time = valid_loan.starts_at + Settings.default_check_out_duration + 10.days
     time = Time.local(time.year, time.month, time.day, time.hour, time.min, time.sec)
     valid_loan.ends_at = valid_loan.kit.location.next_time_open(time)
     assert valid_loan.valid?,   "loan should still be valid in the pending state"

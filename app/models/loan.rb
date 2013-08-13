@@ -48,10 +48,10 @@ class Loan < ActiveRecord::Base
   end
 
   belongs_to :kit,                         :inverse_of => :loans
-  belongs_to :client,                      :inverse_of => :loans,       :class_name => "User"
-  belongs_to :approver,                    :inverse_of => :approvals,   :class_name => "User"
-  has_one    :check_out_inventory_record,  :inverse_of => :loan
-  has_one    :check_in_inventory_record,   :inverse_of => :loan
+  belongs_to :client,                      :inverse_of => :loans,     :class_name => "User"
+  belongs_to :approver,                    :inverse_of => :approvals, :class_name => "User"
+  has_one    :check_out_inventory_record,  :inverse_of => :loan,      :dependent => :destroy
+  has_one    :check_in_inventory_record,   :inverse_of => :loan,      :dependent => :destroy
 
   ## Validations ##
 
@@ -126,10 +126,10 @@ class Loan < ActiveRecord::Base
 
   alias_method_chain :build_check_in_inventory_record, :inventory_details
 
-  def build_check_out_inventory_record_with_inventory_details(attendant = nil, inventory_status = nil)
+  def build_check_out_inventory_record_with_inventory_details(attendant = nil)
     build_check_out_inventory_record_without_inventory_details(loan: self, kit: kit, attendant: attendant)
     unless kit.nil?
-      check_out_inventory_record.initialize_inventory_details(inventory_status)
+      check_out_inventory_record.initialize_inventory_details
     end
     check_out_inventory_record
   end
@@ -138,7 +138,7 @@ class Loan < ActiveRecord::Base
 
   def default_return_date
     return nil unless kit
-    default = Settings.default_checkout_duration
+    default = Settings.default_check_out_duration
     time    = (self.starts_at + default.days)
     time    = Time.local(time.year, time.month, time.day, time.hour, time.min, time.sec)
     location.next_time_open(time).to_datetime
@@ -158,7 +158,6 @@ class Loan < ActiveRecord::Base
     ends_at
   end
 
-
   def on_pending_entry(state, event, args=nil)
     if autofilled_ends_at
       write_attribute(:ends_at, nil)
@@ -172,6 +171,7 @@ class Loan < ActiveRecord::Base
   # Overriding Workflow's default active_record behavior:
   # We might move through several states in a given controller action,
   # so avoid the database roundtrip. Call save explicitly to persist.
+  # TODO: make this method private (after import is done)
   def persist_workflow_state(new_state)
     write_attribute self.class.workflow_column, new_state.to_s
   end

@@ -13,20 +13,20 @@
   <%= sidebar_link t("brand.sidebar.all.text"),
                    brands_path,
                    t("brand.sidebar.all.default_tooltip") %>
-  <%= sidebar_link t("brand.sidebar.checkoutable.text"),
-                   checkoutable_brands_path,
-                   t("brand.sidebar.checkoutable.default_tooltip") %>
-  <%= sidebar_link t("brand.sidebar.non_checkoutable.text"),
-                   non_checkoutable_brands_path,
-                   t("brand.sidebar.non_checkoutable.default_tooltip") %>
+  <%= sidebar_link t("brand.sidebar.circulating.text"),
+                   circulating_brands_path,
+                   t("brand.sidebar.circulating.default_tooltip") %>
+  <%= sidebar_link t("brand.sidebar.non_circulating.text"),
+                   non_circulating_brands_path,
+                   t("brand.sidebar.non_circulating.default_tooltip") %>
 <% end %>
 
-<% if params[:filter] && params[:filter] == "non_checkoutable" %>
+<% if params[:filter] && params[:filter] == "non_circulating" %>
 <div class="alert alert-info">
   <button type="button" class="close" data-dismiss="alert">×</button>
-  <strong>Note!</strong> This list of "non-checkoutable" brands only
+  <strong>Note!</strong> This list of "non-circulating" brands only
   means these brands have kits in them that are not
-  checkoutable. They may also have kits which <em>are</em> checkoutable.
+  circulating. They may also have kits which <em>are</em> circulating.
 </div>
 <% end %>
 

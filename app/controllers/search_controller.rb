@@ -18,6 +18,7 @@ class SearchController < ApplicationController
     if can? :read, Kit
       kits = Kit.asset_tag_search(q).limit(20).decorate
       kits.concat(Kit.id_search(q).limit(20).decorate)
+      kits.uniq!
       results.concat(kits.map { |k| k.autocomplete_json(q: q) })
     end
 

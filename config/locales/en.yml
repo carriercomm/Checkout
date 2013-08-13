@@ -32,8 +32,10 @@ en:
  # :tabular=>"%a %Y-%m-%d"}
   simple_form:
     labels:
-      app_config:
-        default_checkout_length: 'Default Length'
+      settings:
+        default_check_out_duration: 'Default Check Out Duration'
+        attendants_can_self_check_out: 'Attendants May Self-Check-Out'
+        clients_can_see_equipment_outside_their_groups: 'Clients May See Equipment Outside Their Groups'
       loan:
         component_model: 'Model'
         starts_at: 'Pick Up Date'
@@ -46,13 +48,15 @@ en:
         password_confirmation: 'Password Confirmation'
         suspension_count: "Suspensions"
     hints:
-      app_config:
-        default_checkout_length: 'Standard checkout length (in days). A blank value will allow users<br>to check out items indefinitely without additional approval.'
+      settings:
+        default_check_out_duration: 'Standard checkout length (in days).'
+        attendants_can_self_check_out: 'Whether attendants have the ability to check out equipment to themselves'
+        clients_can_see_equipment_outside_their_groups: 'Whether clients can see equipment in the system for which they do not have permissions'
       component_model: &hints_component_model
         name: 'Good model names should include specs, revisions, and model numbers (e.g. Mac Mini, 2.3GHz dual-core i5, 2GB RAM, 500GB HD)'
         description: 'Descriptions are a good place to put extensive technical specifications, and any special notes on usage.'
       kit:
-        checkoutable: "'Yes' if you want the kit to be available in the loan system."
+        circulating: "'Yes' if you want the kit to be available in the loan system."
         tombstoned: "'Yes' if this kit is deaccessioned/missing/stolen/destroyed and never coming back."
       split_component_model:
         component_models:
@@ -63,7 +67,7 @@ en:
     options:
       inventory_records:
         inventory_status:
-          '1': &inventory_status_accessioned 'Accessioned'   
+          '1': &inventory_status_accessioned 'Accessioned'
           '2': &inventory_status_inventoried 'Inventoried'
           '3': &inventory_status_missing 'Missing'
           '4': &inventory_status_deaccessioned 'Deaccessioned'
@@ -78,11 +82,6 @@ en:
         create: "Split Model"
       inventory:
         create: 'Submit'
-  app_config:
-    show:
-      title: 'App Configuration'
-    edit:
-      title: 'Edit App Configuration'
   brand:
     index:
       title: "Brands"
@@ -98,12 +97,12 @@ en:
       all:
         text: "All"
         default_tooltip: "Show all brands"
-      checkoutable:
-        text: "Checkoutable"
-        default_tooltip: "Show brands with checkoutable kits"
-      non_checkoutable:
-        text: "Non Checkoutable"
-        default_tooltip: "Show brands with non checkoutable kits"
+      circulating:
+        text: "Circulating"
+        default_tooltip: "Show brands with circulating kits"
+      non_circulating:
+        text: "Non Circulating"
+        default_tooltip: "Show brands with non circulating kits"
   budget:
     index:
       title: "Budgets"
@@ -143,16 +142,16 @@ en:
       all:
         text: "All"
         default_tooltip: "Show all models"
-      checkoutable:
-        text: "Checkoutable"
-        default_tooltip: "Show all checkoutable models"
+      circulating:
+        text: "Circulating"
+        default_tooltip: "Show all circulating models"
       split:
         text: 'Split'
         default_tooltip: 'Split this model into two models'
         denied_tooltip: "You don't have sufficient permission to split a model"
-      # non_checkoutable:
-      #   text: "Non Checkoutable"
-      #   default_tooltip: "Show all non checkoutable models"
+      # non_circulating:
+      #   text: "Non Circulating"
+      #   default_tooltip: "Show all non circulating models"
   component_model_splitter:
     edit:
       title: "Split Model"
@@ -177,12 +176,25 @@ en:
       title: "New Group"
     edit:
       title: "Edit Group"
+    expires_at: "Expires"
     sidebar:
+      filters: "Group Filters"
       add:
         default_tooltip: "Add a new group"
         denied_tooltip: "You don't have sufficient permissions to add a new group"
-    expires_at: "Expires"
-  inventory_record:  
+      all:
+        text: "All"
+        default_tooltip: "Show all groups"
+      active:
+        text: "Active"
+        default_tooltip: "Show all active groups"
+      expired:
+        text: "Expired"
+        default_tooltip: "Show all expired groups"
+      empty:
+        text: "Empty"
+        default_tooltip: "Show all groups with zero users or zero kits"
+  inventory_record:
     index:
       title: 'Inventory Records'
     sidebar:
@@ -200,7 +212,7 @@ en:
     edit:
       title: "Edit Kit %{name}"
     new:
-      title: "New Kit"      
+      title: "New Kit"
     sidebar:
       filters: "Kits Filters"
       add:
@@ -213,9 +225,9 @@ en:
         text: 'Check Out'
         default_tooltip: 'Check out this kit'
         denied_tooltip: "You don't sufficient permissions to check out this kit"
-      checkoutable:
-        text: "Checkoutable"
-        default_tooltip: "Show all checkoutable kits"
+      circulating:
+        text: "Circulating"
+        default_tooltip: "Show all circulating kits"
       edit:
         text: 'Edit'
         default_tooltip: 'Edit this kit'
@@ -235,9 +247,9 @@ en:
         text: 'New'
         default_tooltip: 'Create new inventory records for this kit'
         denied_tooltip: "You don't sufficient permissions to create inventory records for this kit"
-      non_checkoutable:
-        text: "Non Checkoutable"
-        default_tooltip: "Show all non checkoutable kits (excluding tombstoned kits)"
+      non_circulating:
+        text: "Non Circulating"
+        default_tooltip: "Show all non circulating kits (excluding tombstoned kits)"
       reserve:
         text: 'Reserve'
         default_tooltip: 'Reserve this kit'
@@ -294,7 +306,7 @@ en:
       pending:
         text: *loan_pending
         default_tooltip: "Show all pending loans"
-  location:        
+  location:
     index:
       title: "Locations"
     edit:
@@ -306,7 +318,7 @@ en:
       add:
         default_tooltip: "Add a new location"
         denied_tooltip: "You don't have sufficient permissions to add a new location"
-  reservation:      
+  reservation:
     edit:
       title: "Edit Reservation %{id}"
     new:
@@ -318,6 +330,14 @@ en:
   role:
     admin: "Administrator"
     attendant: "Attendant"
+  settings:
+    show:
+      title: 'Appplication Settings'
+    edit:
+      title: 'Edit Appplication Settings'
+    table:
+      name: 'Name'
+      valud: 'Value'
   split_component_model:
     edit:
       add_new_component_model: "<i class='icon-plus-sign'></i> Add a new model"

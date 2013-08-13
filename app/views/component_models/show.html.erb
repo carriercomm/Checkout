@@ -1,4 +1,4 @@
-<% title @component_model %>
+<% title component_model %>
 
 <% content_for :sidebar do %>
   <li class="nav-header"><%= t(".actions") %></li>
@@ -17,11 +17,11 @@
 
 <dl class="dl-horizontal">
   <dt><%= t('simple_form.labels.component_model.description') %></dt>
-  <dd><%= @component_model.description %></dd>
+  <dd><%= component_model.description %></dd>
   <dt><%= t('simple_form.labels.component_model.training_required') %></dt>
-  <dd><%= @component_model.training_required %></dd>
+  <dd><%= component_model.training_required %></dd>
   <dt><%= t('simple_form.labels.component_model.categories') %></dt>
-  <dd><%= @component_model.category_list %></dd>
+  <dd><%= component_model.category_list %></dd>
 </dl>
 
 <h2>Kits With This Model</h2>
@@ -39,15 +39,15 @@
       </tr>
     </thead>
     <tbody>
-      <% @component_model.kits.each do |kit| %>
+      <% component_model.kits.each do |kit| %>
         <tr>
           <td><%= kit.to_link %></td>
           <td><%= kit.asset_tags %></td>
           <td><%= kit.component_list %></td>
           <td><%= kit.location %></td>
           <td>
-            <% if kit.checkoutable? %>
-            <%= link_to 'Reserve', new_kit_loan_path(kit), :class => 'btn btn-mini' %>
+            <% if kit.circulating? %>
+            <%= link_to 'Reserve', new_kit_reservation_path(kit), :class => 'btn btn-mini' %>
             <%= link_to 'Loans', kit_loans_path(kit), :class => 'btn btn-mini' %>
             <% end %>
           </td>

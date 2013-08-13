@@ -37,9 +37,3 @@ User.where(username: 'admin').first_or_initialize do |u|
   u.add_role :admin
   u.save!(:validate => false)
 end
-
-InventoryStatus.delete_all
-InventoryStatus.create!(:id => 1, :name => 'accessioned'  )
-InventoryStatus.create!(:id => 2, :name => 'present'      )
-InventoryStatus.create!(:id => 3, :name => 'missing'      )
-InventoryStatus.create!(:id => 4, :name => 'deaccessioned')

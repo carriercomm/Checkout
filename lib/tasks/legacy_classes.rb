@@ -85,7 +85,7 @@ class LegacyEquipment < ActiveRecord::Base
     self.attributes["eq_insured"].to_i == 1
   end
 
-  def checkoutable
+  def circulating
     self.attributes["checkoutable"].to_i == 1
   end
 end

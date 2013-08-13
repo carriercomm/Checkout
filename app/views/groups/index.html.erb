@@ -1,12 +1,17 @@
 <% title t('group.index.title') %>
 
 <% content_for :sidebar do %>
-      <li class="nav-header"><%= t(".actions") %></li>
-      <%= sidebar_link(t('helpers.links.new'),
-                       new_group_path,
-                       t('group.sidebar.add.default_tooltip'),
-                       can?(:manage, Group),
-                       t('group.sidebar.add.denied_tooltip')) %>
+  <li class="nav-header"><%= t(".actions") %></li>
+  <%= sidebar_link(t('helpers.links.new'),
+                   new_group_path,
+                   t('group.sidebar.add.default_tooltip'),
+                   can?(:manage, Group),
+                   t('group.sidebar.add.denied_tooltip')) %>
+  <li class="nav-header"><%= t("user.sidebar.filters") %></li>
+  <%= sidebar_link t("group.sidebar.all.text"),     groups_path,         t("group.sidebar.all.default_tooltip") %>
+  <%= sidebar_link t("group.sidebar.active.text"),  active_groups_path,  t("group.sidebar.active.default_tooltip") %>
+  <%= sidebar_link t("group.sidebar.expired.text"), expired_groups_path, t("group.sidebar.expired.default_tooltip") %>
+  <%= sidebar_link t("group.sidebar.empty.text"),   empty_groups_path,   t("group.sidebar.empty.default_tooltip") %>
 <% end %>
 
 <%= paginate @groups %>
@@ -22,12 +27,12 @@
     </tr>
   </thead>
   <tbody>
-    <% @groups.each do |group| %>
+    <% groups.each_with_index do |group, idx| %>
       <tr>
         <td><%= link_to group.name, group_path(group) %></td>
         <td><%= group.description %></td>
-        <td><%= group.users.count %></td>
-        <td><%= group.kits.count %></td>
+        <td><%= group.num_users %></td>
+        <td><%= group.num_kits %></td>
         <td>
           <%= link_to t('.edit', :default => t("helpers.links.edit")),
                       edit_group_path(group), :class => 'btn btn-mini' if can? :manage, group %>

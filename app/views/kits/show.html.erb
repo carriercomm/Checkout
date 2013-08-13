@@ -45,8 +45,8 @@
   <dd><%= @kit.location %></dd>
   <dt>Training Required</dt>
   <dd><%= @kit.training_required %></dd>
-  <dt>Checkoutable</dt>
-  <dd><%= @kit.checkoutable %></dd>
+  <dt>Circulating</dt>
+  <dd><%= @kit.circulating %></dd>
   <dt>Tombstoned</dt>
   <dd><%= @kit.tombstoned %></dd>
   <% if can? :manage, @kit %>
@@ -56,7 +56,7 @@
     <dd><%= @kit.cost %></dd>
     <dt>Insured</dt>
     <dd><%= @kit.insured %></dd>
-  <% end %>  
+  <% end %>
 </dl>
 
 <% unless @kit.groups.empty? %>

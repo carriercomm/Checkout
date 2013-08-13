@@ -12,12 +12,12 @@
   <%= sidebar_link t("component_model.sidebar.all.text"),
                    component_models_path,
                    t("component_model.sidebar.all.default_tooltip") %>
-  <%= sidebar_link t("component_model.sidebar.checkoutable.text"),
-                   checkoutable_component_models_path,
-                   t("component_model.sidebar.checkoutable.default_tooltip") %>
-  <%#= sidebar_link t("component_model.sidebar.non_checkoutable.text"),
-                   non_checkoutable_component_models_path,
-                   t("component_model.sidebar.non_checkoutable.default_tooltip") %>
+  <%= sidebar_link t("component_model.sidebar.circulating.text"),
+                   circulating_component_models_path,
+                   t("component_model.sidebar.circulating.default_tooltip") %>
+  <%#= sidebar_link t("component_model.sidebar.non_circulating.text"),
+                   non_circulating_component_models_path,
+                   t("component_model.sidebar.non_circulating.default_tooltip") %>
 <% end %>
 
 <%= paginate @component_models %>

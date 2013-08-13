@@ -28,12 +28,12 @@
   </p>
 </div>
 
-<%= simple_nested_form_for @component_model.model, :html => { :class => 'form-horizontal' } do |f| %>
+<%= simple_nested_form_for @component_model, :html => { :class => 'form-horizontal' } do |f| %>
   <%= f.input :brand_id, :label => "Brand", :required => true, :input_html => {
         :class          => 'select2-json-autocomplete',
         :hidden         => true,
         "data-ajax-url" => brands_path(:format => :json),
-        "data-text"     => f.object.try(:brand).try(:name)        
+        "data-text"     => f.object.try(:brand).try(:name)
       } %>
   <div class="controls control-action">
     <!-- displays the brands/new_modal partial -->

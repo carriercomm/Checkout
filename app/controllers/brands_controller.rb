@@ -23,9 +23,9 @@ class BrandsController < ApplicationController
   end
 
   # TODO: is this being used? move it to a collection route on the index action
-  def checkoutable
+  def circulating
     @brands = Brand.order("brands.name ASC")
-      .having_checkoutable_kits
+      .having_circulating_kits
       .page(params[:page])
       .decorate
 
@@ -140,8 +140,8 @@ class BrandsController < ApplicationController
 
   def scope_by_filter_params
     case params[:filter]
-    when "checkoutable"     then @brands = @brands.having_checkoutable_kits
-    when "non_checkoutable" then @brands = @brands.not_having_checkoutable_kits
+    when "circulating"     then @brands = @brands.having_circulating_kits
+    when "non_circulating" then @brands = @brands.not_having_circulating_kits
     end
   end
 

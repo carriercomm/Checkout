@@ -10,12 +10,12 @@
                    :class=>'btn-new') %>
   <li class="nav-header"><%= t("kit.sidebar.filters") %></li>
   <%= sidebar_link t("kit.sidebar.all.text"), kits_path, t("kit.sidebar.all.default_tooltip") %>
-  <%= sidebar_link(t("kit.sidebar.checkoutable.text"),
-                   checkoutable_kits_path,
-                   t("kit.sidebar.checkoutable.default_tooltip")) %>
-  <%= sidebar_link(t("kit.sidebar.non_checkoutable.text"),
-                   non_checkoutable_kits_path,
-                   t("kit.sidebar.non_checkoutable.default_tooltip")) %>
+  <%= sidebar_link(t("kit.sidebar.circulating.text"),
+                   circulating_kits_path,
+                   t("kit.sidebar.circulating.default_tooltip")) %>
+  <%= sidebar_link(t("kit.sidebar.non_circulating.text"),
+                   non_circulating_kits_path,
+                   t("kit.sidebar.non_circulating.default_tooltip")) %>
   <%= sidebar_link(t("kit.sidebar.missing_components.text"),
                    missing_components_kits_path,
                    t("kit.sidebar.missing_components.default_tooltip")) %>

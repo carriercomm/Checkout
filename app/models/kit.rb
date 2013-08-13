@@ -100,11 +100,6 @@ class Kit < ActiveRecord::Base
     circulating? && loans.with_lost_state.empty? && !loaned_between?(start_date, end_date, excluded_loans.flatten)
   end
 
-  # TODO: add check for 'hold'
-  def permissions_include?(client)
-    client && circulating? && (client.admin? || groups.map(&:users).flatten.uniq.include?(client))
-  end
-
   def checked_out?
     loans.where("loans.out_at < ? AND loans.ends_at > ?", Date.today, Date.today).count > 0
   end
@@ -114,9 +109,10 @@ class Kit < ActiveRecord::Base
   end
 
   def default_return_date(starts_at)
-    default       = Settings.default_checkout_duration
-    expected_time = (starts_at + default.days).to_time
-    location.next_date_open(expected_time)
+    default = Settings.default_check_out_duration
+    time    = (starts_at + default.days)
+    time    = Time.local(time.year, time.month, time.day, time.hour, time.min, time.sec)
+    location.next_time_open(time).to_datetime
   end
 
   def first_available_date
@@ -230,6 +226,11 @@ class Kit < ActiveRecord::Base
     }
   end
 
+  # TODO: add check for 'hold'
+  def permissions_include?(client)
+    client && circulating? && (client.admin? || groups.map(&:users).flatten.uniq.include?(client))
+  end
+
   # equal to location.open_days minus days_reserved returns in format
   # [[month, day], [month, day], ...] for consumption by the
   # javascript date picker
@@ -263,10 +264,7 @@ class Kit < ActiveRecord::Base
     false
   end
 
-  # move this to an alias
-  def reservable?(client)
-    can_be_loaned_to? client
-  end
+  alias_method :reservable?, :permissions_include?
 
   # def return_dates_for_datepicker(days_out = 90, *excluded_loans)
   #   excluded_loans.flatten!

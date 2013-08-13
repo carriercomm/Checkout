@@ -12,6 +12,7 @@
 //
 //= require jquery
 //= require bootstrap
+//= require bootstrap-collapse
 //= require bootstrap_defaults
 //= require jquery.ui.autocomplete
 //= require jquery.ui.datepicker
@@ -30,4 +31,3 @@
 //= require tables
 //= require titleCaps
 //= require user
-

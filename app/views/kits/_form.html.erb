@@ -4,8 +4,8 @@
     <!-- displays the location/new_modal partial -->
     <a data-toggle="modal" href="#location_modal">New Location</a>
   </div>
-  <%= f.input :checkoutable, :as => :radio_buttons %>
-  <%= f.association :budget, :collection => @budgets, :label_method => :to_s, :prompt => 'Select budget' %>  
+  <%= f.input :circulating, :as => :radio_buttons %>
+  <%= f.association :budget, :collection => @budgets, :label_method => :to_s, :prompt => 'Select budget' %>
   <div class="controls control-action">
     <!-- displays the budget/new_modal partial -->
     <a data-toggle="modal" href="#budget_modal">New Budget</a>

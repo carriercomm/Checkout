@@ -17,43 +17,44 @@ class UserDecorator < ApplicationDecorator
 
   def autocomplete_json(options={})
     {
-      :label => username,
-      :value => h.url_for(source)
+      :label => object.username,
+      :value => h.url_for(object),
+      :category => h.t("user.index.title").html_safe
     }
   end
 
   def created_at
-    localize_unless_nil(source.created_at, :format => :db)
+    localize_unless_nil(object.created_at, :format => :db)
   end
 
   def current_sign_in_at
-    localize_unless_nil(source.current_sign_in_at, :format => :db)
+    localize_unless_nil(object.current_sign_in_at, :format => :db)
   end
 
   def description
-    text = h.link_to(source.username, h.user_path(source))
-    text << " (#{ full_name })".html_safe if source.first_name && source.last_name
+    text = h.link_to(object.username, h.user_path(object))
+    text << " (#{ full_name })".html_safe if object.first_name && object.last_name
     text
   end
 
   def disabled
-    to_yes_no(source.disabled)
+    to_yes_no(object.disabled)
   end
 
   def email
-    h.mail_to(source.email)
+    h.mail_to(object.email)
   end
 
   def first_name
-    coalesce(source.first_name)
+    coalesce(object.first_name)
   end
 
   def full_name
-    @full_name ||= "#{ h.h(source.first_name) } #{ h.h(source.last_name) }".squish
+    @full_name ||= "#{ h.h(object.first_name) } #{ h.h(object.last_name) }".squish
   end
 
   def last_name
-    coalesce(source.last_name)
+    coalesce(object.last_name)
   end
 
   def groups_list(separator = ", ")
@@ -62,31 +63,31 @@ class UserDecorator < ApplicationDecorator
   end
 
   def last_sign_in_at
-    localize_unless_nil(source.current_sign_in_at, :format => :db)
+    localize_unless_nil(object.current_sign_in_at, :format => :db)
   end
 
   def locked_at
-    localize_unless_nil(source.locked_at, :format => :db)
+    localize_unless_nil(object.locked_at, :format => :db)
   end
 
   def roles_list(separator = ", ")
-    return "&nbsp;".html_safe if source.roles.empty?
+    return "&nbsp;".html_safe if object.roles.empty?
     separator.html_safe
-    role_names = source.roles.collect {|r| h.t("role.#{ r.name }") }
+    role_names = object.roles.collect {|r| h.t("role.#{ r.name }") }
     role_names.join(separator).html_safe
   end
 
   def select2_json
     {
-      :id   => source.id,
-      :text => source.to_s
+      :id   => object.id,
+      :text => object.to_s
     }
   end
 
   def status_icon
-    if source.disabled
+    if object.disabled
       h.t("user.status.disabled.icon").html_safe
-    elsif source.suspended?
+    elsif object.suspended?
       h.t("user.status.suspended.icon").html_safe
     else
       h.t("user.status.active.icon").html_safe
@@ -94,7 +95,7 @@ class UserDecorator < ApplicationDecorator
   end
 
   def suspended_until
-    localize_unless_nil(source.suspended_until, :format => :tabular)
+    localize_unless_nil(object.suspended_until, :format => :tabular)
   end
 
   def tabular_full_name
@@ -107,11 +108,15 @@ class UserDecorator < ApplicationDecorator
     description
   end
 
+  def to_select2_s
+    object.username
+  end
+
   def updated_at
-    localize_unless_nil(source.updated_at, :format => :db)
+    localize_unless_nil(object.updated_at, :format => :db)
   end
 
   def username
-    h.link_to(source.username, h.user_path(source), :title=> source.username)
+    h.link_to(object.username, h.user_path(object), :title=> object.username)
   end
 end

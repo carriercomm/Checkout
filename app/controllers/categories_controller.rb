@@ -3,13 +3,21 @@ class CategoriesController < ApplicationController
   # use CanCan to authorize this resource
   authorize_resource
 
+  decorates_assigned :category
+  decorates_assigned :categories
+
   # GET /categories
   # GET /categories.json
   def index
-    @categories = Category.order("LOWER(name) ASC")
-      .page(params[:page])
-      .per(params[:page_limit])
-      .decorate
+    if Settings.clients_can_see_equipment_outside_their_groups || current_user.admin?
+      @categories = Category.order("LOWER(name) ASC")
+        .page(params[:page])
+        .per(params[:page_limit])
+    else
+      @categories = Category.with_loanable_equipment_for(current_user)
+        .page(params[:page])
+        .per(params[:page_limit])
+    end
 
     respond_to do |format|
       format.html # index.html.erb
@@ -29,7 +37,7 @@ class CategoriesController < ApplicationController
   # GET /categories/1
   # GET /categories/1.json
   def show
-    @category = Category.find(params[:id]).decorate
+    @category = Category.find(params[:id])
 
     respond_to do |format|
       format.html # show.html.erb
@@ -40,7 +48,7 @@ class CategoriesController < ApplicationController
   # GET /categories/new
   # GET /categories/new.json
   def new
-    @category = Category.new.decorate
+    @category = Category.new
 
     respond_to do |format|
       format.html # new.html.erb
@@ -50,7 +58,7 @@ class CategoriesController < ApplicationController
 
   # GET /categories/1/edit
   def edit
-    @category = Category.find(params[:id]).decorate
+    @category = Category.find(params[:id])
   end
 
   # POST /categories
@@ -60,7 +68,6 @@ class CategoriesController < ApplicationController
 
     respond_to do |format|
       if @category.save
-        @category = @category.decorate
         format.html { redirect_to @category, notice: 'Category was successfully created.' }
         format.json { render json: @category, status: :created, location: @category }
       else
@@ -77,11 +84,9 @@ class CategoriesController < ApplicationController
 
     respond_to do |format|
       if @category.update_attributes(params[:category])
-        @category = @category.decorate
         format.html { redirect_to @category, notice: 'Category was successfully updated.' }
         # format.json { head :no_content }
       else
-        @category = @category.decorate
         format.html { render action: "edit" }
         # format.json { render json: @category.errors, status: :unprocessable_entity }
       end

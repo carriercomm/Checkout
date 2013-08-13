@@ -1,5 +1,14 @@
 namespace :dbx do
 
+  desc 'fetch a current snapshot of the database from ovid'
+  task :fetch => :environment do
+    `ssh dxarts@ovid.u.washington.edu '~/bin/mysqldump_dbx'`
+    file = `ssh dxarts@ovid.u.washington.edu '~/bin/latest_dbx_backup_file_name'`
+    Dir.chdir("#{Rails.root}/db") do
+      `scp dxarts@ovid.u.washington.edu:#{file.chomp} .`
+    end
+  end
+
   desc 'reload the dbx db from a sql backup'
   task :reload => :environment do
     files = Dir.glob("#{Rails.root}/db/dbx*.sql.gz")
@@ -217,31 +226,23 @@ namespace :dbx do
     LegacyLocation.all.each do |l|
       location = Location.find_or_create_by_name(l.loc_name)
       if location.name == "Raitt"
-        # M, W
+        # M
         attrs = {
-          :business_day_ids => [bd[1], bd[3]],
-          :open_hour   => 10,
-          :open_minute => 30,
+          :business_day_ids => [bd[1]],
+          :open_hour   => 12,
+          :open_minute => 45,
           :close_hour  => 13,
-          :close_minute => 20
+          :close_minute => 00
         }
         location.business_hours.create(attrs)
 
-        # F
-        attrs[:business_day_ids] = [bd[5]]
-        attrs[:open_hour]    = 11
-        attrs[:open_minute]  = 30
-        attrs[:close_hour]   = 13
-        attrs[:close_minute] = 20
-        location.business_hours.create(attrs)
-
-      else
+        # W, F
         attrs = {
-          :business_day_ids => [bd[2], bd[4]],
-          :open_hour   => 10,
-          :open_minute => 00,
-          :close_hour  => 2,
-          :close_minute => 0
+          :business_day_ids => [bd[3], bd[5]],
+          :open_hour   => 12,
+          :open_minute => 45,
+          :close_hour  => 13,
+          :close_minute => 30
         }
         location.business_hours.create(attrs)
       end
@@ -298,34 +299,22 @@ namespace :dbx do
             serial_number      = le.eq_serial_num.try(:strip)
             cost               = (le.eq_cost == 0) ? nil : le.eq_cost
             insured            = le.eq_insured
-            checkoutable       = le.checkoutable
-
-            component.component_model = model_obj
-            component.serial_number   = serial_number
-            component.created_at      = le.eq_date_entered
-
-            # create an accession record
-            accession_record = InventoryRecord.new
-            accession_record.inventory_status = InventoryStatus.find_by_name("accessioned")
-            accession_record.created_at = component.created_at
-            accession_record.attendant = User.system_user
-            component.inventory_records << accession_record
-
-            if le.eq_removed
-              # create a deaccession record
-              inventory_record = InventoryRecord.new
-              inventory_record.inventory_status = InventoryStatus.find_by_name("deaccessioned")
-              inventory_record.attendant = User.system_user
-              component.inventory_records << inventory_record
-            end
+            circulating       = le.circulating
 
             kit                = Kit.new
             kit.budget         = budget
-            kit.checkoutable   = checkoutable
+            kit.circulating   = circulating
             kit.cost           = cost
             kit.insured        = insured
             kit.location       = Location.find_or_create_by_name(le.legacy_location.loc_name)
             kit.tombstoned     = le.eq_removed
+
+            component.component_model = model_obj
+            component.serial_number   = serial_number
+            component.accessioned_at  = le.eq_date_entered
+            if le.eq_removed
+              component.deaccessioned_at = Time.local(1900, 1, 1, 0, 0, 0).to_datetime
+            end
 
             kit.components << component
 
@@ -373,11 +362,57 @@ namespace :dbx do
     success_count = 0
     error_count   = 0
 
-    current_user = ["jehughes", "bgrace", "mtm5", "coupe", "maja08", "karpen", "pampin", "hana21", "steliosm", "varchaus", "rtwomey", "annabelc", "mtrainor", "tivon", "peberger", "ozubko", "shawnx", "mones", "joshp", "ganter", "blake", "mwatras", "hraikes", "hugosg", "trebacze", "mem5", "jimified", "marcinp", "chesnd", "swlcomp"]
+    current_user = [
+      "abocci92",
+      "annabelc",
+      "bgrace",
+      "blake",
+      "chesnd",
+      "coupe",
+      "chjr12",
+      "dennshah",
+      "ganter",
+      "hana21",
+      "hbbenard",
+      "hhodge",
+      "hraikes",
+      "hugosg",
+      "jakel",
+      "jarmick",
+      "jehughes",
+      "jimified",
+      "joelong",
+      "joshp",
+      "karpen",
+      "laxxx",
+      "maja08",
+      "marcinp",
+      "masseyjw",
+      "mem5",
+      "mones",
+      "mtm5",
+      "mtrainor",
+      "mwatras",
+      "ozubko",
+      "pampin",
+      "peberger",
+      "pragyakc",
+      "rtwomey",
+      "sjp89",
+      "steliosm",
+      "swlcomp",
+      "tivon",
+      "trebacze",
+      "varchaus",
+      "vine",
+      "xddingyi",
+      "wub",
+      "zweberc"
+    ]
 
-    admins = ["jehughes", "bgrace", "mtm5", "coupe", "karpen", "pampin", "trebacze", "shawnx"]
+    admins     = ["jehughes", "bgrace", "mtm5", "coupe", "karpen", "pampin", "trebacze"]
 
-    attendants = ["maja08", "hana21", "steliosm", "varchaus", "rtwomey", "annabelc", "mtrainor", "tivon", "joshp", "hraikes", "hugosg", "mem5", "jimified", "marcinp", "chesnd", "swlcomp"]
+    attendants = ["joelong", "swlcomp", "jarmick"]
 
     LegacyUser.all.each do |lu|
       begin
@@ -488,7 +523,7 @@ namespace :dbx do
       u = User.find_by_username(lt.client_id.downcase.squish)
       if c && u
         begin
-          Training.create!(user: u, component_model: c.component_model)
+          Training.first_or_create!(user: u, component_model: c.component_model)
         rescue StandardError => e
           error_count += 1
           puts "\tError migrating #{lt.special_id}: #{ e }"
@@ -496,7 +531,7 @@ namespace :dbx do
         end
         success_count += 1
       else
-        puts "\tError migrating #{lt.special_id}: couldn't find component or user"
+        puts "\tError migrating #{lt.special_id}: couldn't find component (#{lt.eq_uw_tag.to_s }) or user (#{lt.client_id})"
         error_count += 1
       end
     end
@@ -511,7 +546,8 @@ namespace :dbx do
   task :res  => :environment do
     require 'tasks/legacy_classes'
 
-    Loan.delete_all
+    puts "Clearing out loans table..."
+    Loan.destroy_all
 
     #
     # Migrate Checkouts/Reservations
@@ -526,13 +562,29 @@ namespace :dbx do
     # Clean up the database a bit
     #
 
+    puts "Cleaning up dirty data..."
     LegacyCheckout.nullify_bogus_values!
     LegacyCheckout.create_indexes!
     LegacyReservation.nullify_bogus_values!
     LegacyReservation.create_indexes!
 
+    staff_group = Group.find_by_name("DX-STAFF")
+    LegacyReservation.includes(:legacy_checkout).pluck(:eq_uw_tag).uniq.each do |tag|
+      k = Kit.find_by_asset_tag(tag)
+      if k
+        unless k.groups.include?(staff_group)
+          staff_group.kits << k
+        end
+      else
+        puts "-- Couldn't find asset tag: #{ tag }"
+      end
+    end
+    staff_group.save!
+
     system_approver = User.unscoped.find_by_username("system")
 
+
+    puts "Importing reservations..."
     LegacyReservation.includes(:legacy_checkout).find_in_batches do |batch|
       batch.each do |r|
         begin
@@ -544,23 +596,22 @@ namespace :dbx do
           raise "couldn't find kit: #{ r.eq_uw_tag }" if kit.nil?
 
           l = Loan.new
-          l.importing = true
           l.starts_at = r.resdate
           if r.resdate_end.nil?
             l.ends_at = kit.default_return_date(l.starts_at)
             if l.ends_at.nil?
               puts "screwed up"
-              d = AppConfig.instance.default_checkout_length
+              d = Settings.default_check_out_duration
               puts d.to_s
               puts l.starts_at.inspect
               expected_time = (l.starts_at + d.days).to_time
               puts expected_time
               puts kit.location.inspect
-              puts kit.location.next_date_open(expected_time).inspect
+              puts kit.location.next_time_open(expected_time).inspect
               exit
             end
           else
-            l.ends_at = r.resdate_end
+            l.ends_at = kit.location.next_time_open(r.resdate_end.to_time)
           end
           l.client    = client
           l.kit       = kit
@@ -569,26 +620,42 @@ namespace :dbx do
           unless c.nil?
             staffout_id     = c.staffout_id.downcase.gsub(/[^a-z0-9]/, "").strip
             staffin_id      = c.staffin_id.downcase.gsub(/[^a-z0-9]/, "").strip
-            out_assistant   = User.find_by_username(staffout_id)
-            in_assistant    = User.find_by_username(staffin_id)
+            out_attendant   = User.find_by_username(staffout_id)
+            in_attendant    = User.find_by_username(staffin_id)
 
             l.out_at        = c.dateout     unless c.dateout.nil?
-            l.ends_at       = c.datedue || kit.default_return_date(l.starts_at) if l.ends_at.nil?
+            l.ends_at       = kit.location.next_time_open(c.datedue.to_time) || kit.default_return_date(l.starts_at) if l.ends_at.nil?
             l.in_at         = c.datein      unless c.datein.nil?
-            l.out_assistant = out_assistant unless out_assistant.nil?
-            l.in_assistant  = in_assistant  unless in_assistant.nil?
+
+            if out_attendant
+              unless out_attendant.attendant?
+                out_attendant.add_role(:attendant)
+              end
+              l.build_check_out_inventory_record(out_attendant)
+              l.check_out_inventory_record.inventory_details.each {|x| x.missing = false }
+            end
+
+            if in_attendant
+              unless in_attendant.attendant?
+                in_attendant.add_role(:attendant)
+              end
+              l.build_check_in_inventory_record(in_attendant)
+              l.check_in_inventory_record.inventory_details.each {|x| x.missing = false }
+            end
           end
 
-          if l.in_assistant
-            l.state = "checked_in"
-          elsif l.out_assistant
-            l.state = "checked_out"
+          if in_attendant
+            l.persist_workflow_state "checked_in"
+          elsif out_attendant
+            l.persist_workflow_state "checked_out"
+            l.client.update_attributes!(disabled: false) if l.client.disabled?
           elsif l.starts_at
             if l.starts_at >= Date.today
-              l.state = "approved"
+              l.persist_workflow_state "approved"
               l.approver = system_approver
+              l.client.update_attributes!(disabled: false) if l.client.disabled?
             else
-              l.state = "canceled"
+              l.persist_workflow_state "canceled"
             end
           end
 
@@ -597,21 +664,18 @@ namespace :dbx do
             if r.legacy_checkout
               checkout_success_count += 1
             end
-            unless l.valid?
-              puts "--------"
-              puts "\tError migrating #{r.res_id}:"
-              puts "\t\t #{ l.inspect }"
-              puts "\t\t #{ r.inspect }"
-              puts "\t\t #{ c.inspect }"
-              l.errors.messages.each {|k,v| puts "\t\t#{ k.to_s.titleize } #{ v }" }
-            end
           else
-            puts "--------"
-            puts "\tError migrating #{r.res_id}:"
-            puts "\t\t #{ l.inspect }"
-            puts "\t\t #{ r.inspect }"
-            puts "\t\t #{ c.inspect }"
-            l.errors.messages.each {|k,v| puts "\t\t#{ k.to_s.titleize } #{ v }" }
+            puts "-- RESERVATION ERROR: #{r.res_id}"
+            puts "\t#{ l.inspect }\n"
+            if l.check_out_inventory_record
+              puts "\t#{ l.check_out_inventory_record.inspect }\n"
+            end
+            if l.check_in_inventory_record
+              puts "\t#{ l.check_in_inventory_record.inspect }\n"
+            end
+            puts "\t#{ r.inspect }\n"
+            puts "\t#{ c.inspect }\n"
+            l.errors.messages.each {|k,v| puts "\t#{ k.to_s.titleize } #{ v }" }
             error_count += 1
           end
         rescue StandardError => e
@@ -621,6 +685,8 @@ namespace :dbx do
         end
       end
     end
+
+    puts "Importing check outs..."
 
     # migrate the checkouts that didn't have a reservation
     # some of these have a reservation id, but no corresponding reservation record
@@ -635,37 +701,61 @@ namespace :dbx do
           kit = Kit.find_by_asset_tag(c.eq_uw_tag)
           raise "couldn't find kit: #{ c.eq_uw_tag }" if kit.nil?
 
-          out_assistant = User.find_by_username(c.staffout_id)
-          in_assistant  = User.find_by_username(c.staffin_id)
+          out_attendant = User.find_by_username(c.staffout_id)
+          in_attendant  = User.find_by_username(c.staffin_id)
 
           l = Loan.new
-          l.importing     = true
           l.client        = client
           l.kit           = kit
+          unless kit.permissions_include?(client)
+            dxstaff = Group.find(2)
+            if client.groups.include?(dxstaff) && !kit.groups.include?(dxstaff)
+              kit.groups << dxstaff
+              kit.save
+            end
+          end
           l.starts_at     = c.dateout
-          l.ends_at       = c.datedue || kit.default_return_date(l.starts_at)
+          if c.datedue.nil?
+            l.ends_at = kit.default_return_date(l.starts_at)
+          else
+            l.ends_at = kit.location.next_time_open(c.datedue)
+          end
           l.out_at        = c.dateout     unless c.dateout.nil?
           l.in_at         = c.datein      unless c.datein.nil?
-          l.out_assistant = out_assistant unless out_assistant.nil?
-          l.in_assistant  = in_assistant  unless in_assistant.nil?
 
-          if l.in_assistant
-            l.state = "checked_in"
-          elsif l.out_assistant
-            l.state = "checked_out"
+          if out_attendant
+            unless out_attendant.attendant?
+              out_attendant.add_role(:attendant)
+            end
+            l.build_check_out_inventory_record(out_attendant)
+            l.check_out_inventory_record.inventory_details.each {|x| x.missing = false }
+          end
+
+          if in_attendant
+            unless in_attendant.attendant?
+              in_attendant.add_role(:attendant)
+            end
+            l.build_check_in_inventory_record(in_attendant)
+            l.check_in_inventory_record.inventory_details.each {|x| x.missing = false }
+          end
+
+          if in_attendant
+            l.persist_workflow_state "checked_in"
+          elsif out_attendant
+            l.persist_workflow_state "checked_out"
           else
             raise "Couldn't determine what state this checkout should be in: #{ c.checkout_id }"
           end
 
-          if l.save
+          saved = false
+          if l.in_at
+            saved = l.save(validate: false)
+          else
+            saved = l.save
+          end
+
+          if saved
             checkout_success_count += 1
-            unless l.valid?
-              puts "--------"
-              puts "\tError migrating #{c.checkout_id}:"
-              puts "\t\t #{ l.inspect }"
-              puts "\t\t #{ c.inspect }"
-              l.errors.messages.each {|k,v| puts "\t\t#{ k.to_s.titleize } #{ v }" }
-            end
           else
             puts "--------"
             puts "\tError migrating #{c.checkout_id}:"
@@ -696,16 +786,16 @@ namespace :dbx do
     success_count = 0
     error_count   = 0
 
-    inventoried = InventoryStatus.find_by_name("inventoried")
-
-    InventoryRecord.where("inventory_status_id = ?", inventoried.id).delete_all
+    AuditInventoryRecord.destroy_all
 
     LegacyInventory.all.each do |li|
-      ir = InventoryRecord.new
-      ir.component = Component.find_by_asset_tag(li.eq_uw_tag.to_s)
-      ir.inventory_status = inventoried
-      ir.created_at = li.date_inventoried
-      ir.attendant = User.find_by_username(li.staff_id)
+      ir                  = AuditInventoryRecord.new
+      ir.created_at       = li.date_inventoried
+      ir.attendant        = User.find_by_username(li.staff_id)
+      inv_det = InventoryDetail.new
+      inv_det.component = Component.find_by_asset_tag(li.eq_uw_tag.to_s)
+      inv_det.missing   = false
+      ir.inventory_details << inv_det
 
       if ir.save
         success_count += 1
@@ -729,7 +819,10 @@ end
 
 
 namespace :db do
-  desc "drop, create, schema load"
+  desc "fetch a current snapshot of dbx and do a full import into a fresh checkout db"
+  task :mirror_dbx => ["dbx:fetch", "dbx:reload", "db:repop"]
+
+  desc "drop, create, schema load, migrate (if needed), seed"
   task :rebuild => ["db:drop", "db:create", "db:schema:load", "db:migrate", "db:seed"]
 
   desc "drop, create, schema load, dbx:migrate"

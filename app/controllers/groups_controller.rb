@@ -1,12 +1,14 @@
 class GroupsController < ApplicationController
 
+  decorates_assigned :group
+  decorates_assigned :groups
+
   # GET /groups
   # GET /groups.json
   def index
     @groups = Group
     authorize!(:index, Group)
     apply_scopes_and_pagination
-    @groups = @groups.decorate
 
     respond_to do |format|
       format.html # index.html.erb
@@ -19,7 +21,6 @@ class GroupsController < ApplicationController
   def show
     @group = Group.includes(:kits).find(params[:id].to_i)
     authorize!(:show, @group)
-    @group = @group.decorate
 
     # TODO: figure out how to sort this in the database
     @memberships = @group.memberships.sort_by {|m| m.username}
@@ -35,7 +36,6 @@ class GroupsController < ApplicationController
   def new
     @group = Group.new
     authorize!(:create, @group)
-    @group = @group.decorate
 
     respond_to do |format|
       format.html # new.html.erb
@@ -58,7 +58,6 @@ class GroupsController < ApplicationController
     # TODO: figure out how to sort this in the database
     @memberships = @group.memberships.sort_by { |m| m.user.username }
     # this has to come after creating @memberships, so @memberships is not decorated
-    @group = @group.decorate
   end
 
   # POST /groups
@@ -69,7 +68,6 @@ class GroupsController < ApplicationController
 
     respond_to do |format|
       if @group.save
-        @group = @group.decorate
         format.html { redirect_to @group, notice: 'Group was successfully created.' }
         # format.json { render json: @group, status: :created, location: @group }
       else
@@ -87,7 +85,6 @@ class GroupsController < ApplicationController
 
     respond_to do |format|
       if @group.update_attributes(params[:group])
-        @group = @group.decorate
         format.html { redirect_to @group, notice: 'Group was successfully updated.' }
         # format.json { head :no_content }
       else
@@ -114,12 +111,23 @@ class GroupsController < ApplicationController
 
   def apply_scopes_and_pagination
     scope_by_user
-
-    @groups = @groups.includes(:kits, :users)
-      .where(["memberships.expires_at IS NULL OR memberships.expires_at > ?", Date.today])
-      .order("groups.name")
-      .page(params[:page])
+    apply_filters
+    @groups = @groups.order("groups.name").page(params[:page])
   end
+
+  def apply_filters
+    case params["filter"]
+    when "active"
+      @groups = @groups.active_with_kit_and_user_counts
+    when "empty"
+      @groups = @groups.empty_with_kit_and_user_counts
+    when "expired"
+      @groups = @groups.expired_with_kit_and_user_counts
+    else
+      @groups = @groups.all_with_kit_and_user_counts
+    end
+  end
+
 
   def scope_by_user
     @groups = @groups.users(params["user_id"]) if params["user_id"].present?

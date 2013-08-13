@@ -7,7 +7,7 @@ class KitDecorator < ApplicationDecorator
   decorates_association :loans
 
   delegate(:budget_id,
-           :checkoutable?,
+           :circulating?,
            :count,
            :id,
            :location_id,
@@ -28,12 +28,13 @@ class KitDecorator < ApplicationDecorator
 
     {
       :label => to_autocomplete_s,
-      :value => h.url_for(source)
+      :value => h.url_for(source),
+      :category => h.t("kit.index.title").html_safe
     }
   end
 
-  def checkoutable
-    to_yes_no(source.checkoutable)
+  def circulating
+    to_yes_no(source.circulating)
   end
 
   # returns a string of comma delimited model names

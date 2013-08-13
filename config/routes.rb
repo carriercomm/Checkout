@@ -1,13 +1,20 @@
 Checkout::Application.routes.draw do
 
-  root to: 'component_models#index', filter: "checkoutable"
+  root to: 'categories#index'
 
   # TODO: trim down these routes
   # TODO: move most of these added collection routes to params, so they can act as facets
 
+  namespace :admin do
+    # Directs /admin/dashboard/* to Admin::DashboardController
+    # (app/controllers/admin/dashboard_controller.rb)
+    match 'dashboard' => 'dashboard#index'
+  end
+
+
   # extra collection routes used on 'component_models' resource
   component_models_collection_routes = Proc.new do
-    ['checkoutable'].each do |r|
+    ['circulating'].each do |r|
       get r, to: "component_models#index", filter: r
     end
     get "select2"
@@ -15,10 +22,9 @@ Checkout::Application.routes.draw do
 
   devise_for :user
 
-  resource :app_config, :only => [:show, :edit, :update]
   resources :brands do
     collection do
-      ["checkoutable", "non_checkoutable"].each do |r|
+      ["circulating", "non_circulating"].each do |r|
         get r, to: "brands#index", filter: r
       end
     end
@@ -43,11 +49,18 @@ Checkout::Application.routes.draw do
   resources :components
   resources :covenants
   match 'dashboard' => 'dashboard#index'
-  resources :groups
+  resources :groups do
+    collection do
+      ['active', 'empty', 'expired'].each do |r|
+        get r, to: "groups#index", filter: r
+      end
+      get "select2"
+    end
+  end
   resources :inventory_records, only: [:index, :new, :create]
   resources :kits do
     collection do
-      ['checkoutable', 'missing_components', 'non_checkoutable', 'tombstoned'].each do |r|
+      ['circulating', 'missing_components', 'non_circulating', 'tombstoned'].each do |r|
         get r, to: "kits#index", filter: r
       end
       get "select2"
@@ -62,6 +75,7 @@ Checkout::Application.routes.draw do
   resources :models, as: "component_models", controller: "component_models" do
     collection &component_models_collection_routes
     resources :loans, only: [:new]
+    resources :reservations, :except => [:index]
   end
   resources :reservations, :except => [:index]
   resources :split_model, as:"split_component_models", controller:"split_component_models", only:[:new, :create]
@@ -76,6 +90,7 @@ Checkout::Application.routes.draw do
     end
   end
   resources :search, only: [:index]
+  resource :settings, :only => [:show, :edit, :update]
   resources :users, except: [:destroy] do
     collection do
       ["active", "disabled", "suspended", "admins", "attendants"].each do |r|

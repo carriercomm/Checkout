@@ -1,67 +1,70 @@
 class LoanDecorator < ApplicationDecorator
   decorates :loan
-  decorates_association :approver
-  decorates_association :client
-  decorates_association :in_assistant
+  decorates_association :approver,      with: UserDecorator
+  decorates_association :client,        with: UserDecorator
+  decorates_association :in_attendant,  with: UserDecorator
   decorates_association :kit
-  decorates_association :out_assistant
+  decorates_association :location
+  decorates_association :out_attendant, with: UserDecorator
+
+  delegate :approved?
 
   def approver
-    coalesce(source.approver)
+    coalesce(object.approver)
   end
 
   def cancel_path
-    if source.out_at
-      h.loan_path(source)
-    elsif source.starts_at
-      h.reservation_path(source)
-    elsif source.kit
-      h.kit_path(source.kit)
-    elsif source.component_model
-      h.component_model_path(source.component_model)
+    if object.out_at
+      h.loan_path(object)
+    elsif (object.starts_at && object.id)
+      h.reservation_path(object)
+    elsif object.kit
+      h.kit_path(object.kit)
+    elsif object.component_model
+      h.component_model_path(object.component_model)
     else
       h.component_models_path
     end
   end
 
   def ends_at
-    coalesce(h.l(source.ends_at, :format => :tabular))
+    coalesce(h.l(object.ends_at, :format => :tabular))
   end
 
-  def in_assistant
-    coalesce(source.in_assistant)
+  def in_attendant
+    coalesce(object.in_attendant)
   end
 
   def in_at
-    if source.in_at
-      h.l(source.in_at, :format => :tabular)
+    if object.in_at
+      h.l(object.in_at, :format => :tabular)
     else
       coalesce(h.t('loan.not_checked_in'))
     end
   end
 
   def late
-    to_yes_no(source.late)
+    to_yes_no(object.late)
   end
 
-  def out_assistant
-    coalesce(source.out_assistant)
+  def out_attendant
+    coalesce(object.out_attendant)
   end
 
   def out_at
-    if source.out_at
-      h.l(source.out_at, :format => :tabular)
+    if object.out_at
+      h.l(object.out_at, :format => :tabular)
     else
       coalesce(h.t('loan.not_checked_out'))
     end
   end
 
   def starts_at
-    coalesce(h.l(source.starts_at, :format => :tabular))
+    coalesce(h.l(object.starts_at, :format => :tabular))
   end
 
   def state
-    h.t("loan.state.#{ source.state }").html_safe
+    h.t("loan.state.#{ object.state }").html_safe
   end
 
 end

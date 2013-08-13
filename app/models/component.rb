@@ -8,6 +8,7 @@ class Component < ActiveRecord::Base
 
   ## Callbacks ##
 
+  before_create     :autofill_accessioned_at
   before_validation :upcase_serial_number
 
 
@@ -33,7 +34,6 @@ class Component < ActiveRecord::Base
 
   attr_accessible(:asset_tag,
                   :kit_id,
-                  :missing,
                   :component_model_id,
                   :position,
                   :serial_number)
@@ -50,6 +50,10 @@ class Component < ActiveRecord::Base
   end
 
   private
+
+  def autofill_accessioned_at
+    accessioned_at = Time.zone.now.to_datetime unless accessioned_at
+  end
 
   def upcase_serial_number
     serial_number.upcase! unless serial_number.nil?

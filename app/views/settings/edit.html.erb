@@ -1,0 +1,37 @@
+<% title t('settings.edit.title') %>
+<%= form_tag(settings_path, method: 'put') do %>
+  <fieldset>
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th><%= t('settings.table.name') %></th>
+          <th><%= t('settings.table.value') %></th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><%= label(:default_check_out_duration, t("simple_form.labels.settings.default_check_out_duration")) %></td>
+          <td><%= text_field_tag(:default_check_out_duration, @default_check_out_duration, class:"input-small")  %></td>
+          <td><span class="help-block"><%= raw(t('simple_form.hints.settings.default_check_out_duration')) %></span></td>
+        </tr>
+        <tr>
+          <td><%= label(:clients_can_see_equipment_outside_their_groups, t("simple_form.labels.settings.clients_can_see_equipment_outside_their_groups")) %></td>
+          <td><%= check_box_tag(:clients_can_see_equipment_outside_their_groups, true, @clients_can_see_equipment_outside_their_groups)  %></td>
+          <td><span class="help-block"><%= raw(t('simple_form.hints.settings.clients_can_see_equipment_outside_their_groups')) %></span></td>
+        </tr>
+        <tr>
+          <td><%= label(:attendants_can_self_check_out, t("simple_form.labels.settings.attendants_can_self_check_out")) %></td>
+          <td><%= check_box_tag(:attendants_can_self_check_out, true, @attendants_can_self_check_out)  %></td>
+          <td><span class="help-block"><%= raw(t('simple_form.hints.settings.attendants_can_self_check_out')) %></span></td>
+        </tr>
+      </tbody>
+    </table>
+  </fieldset>
+
+  <div class="form-actions">
+    <%= submit_tag("Submit", :class => 'btn btn-primary') %>
+    <%= link_to t('.cancel', :default => t("helpers.links.cancel")),
+                settings_path, :class => 'btn' %>
+  </div>
+<% end %>

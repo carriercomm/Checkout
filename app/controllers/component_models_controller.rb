@@ -1,5 +1,7 @@
 class ComponentModelsController < ApplicationController
 
+  decorates_assigned :component_model
+
   # use CanCan to authorize this resource, we have to do it manually
   # due to some weird routing/resource issue I can't figure out
   before_filter :authorize_read, :only => [:index, :show]
@@ -42,9 +44,8 @@ class ComponentModelsController < ApplicationController
   def show
     @component_model = ComponentModel.includes(:kits => [:location])
       .find(params[:id])
-      .decorate
 
-    @trainings       = @component_model.trainings
+    @trainings = @component_model.trainings
       .includes(:user)
       .where("users.disabled = ?", false)
       .order("users.username")
@@ -59,7 +60,7 @@ class ComponentModelsController < ApplicationController
   # GET /models/new.json
   def new
     brand = Brand.find_by_name("Generic")
-    @component_model = ComponentModel.new(brand: brand).decorate
+    @component_model = ComponentModel.new(brand: brand)
 
     respond_to do |format|
       format.html
@@ -68,11 +69,12 @@ class ComponentModelsController < ApplicationController
 
   # GET /models/1/edit
   def edit
-    @component_model = ComponentModel.find(params[:id]).decorate
+    @component_model = ComponentModel.find(params[:id])
     @trainings       = @component_model.trainings
       .includes(:user)
       .where("users.disabled = ?", false)
       .order("users.username")
+      .decorate
   end
 
   # POST /models
@@ -82,7 +84,6 @@ class ComponentModelsController < ApplicationController
 
     respond_to do |format|
       if @component_model.save
-        @component_model = @component_model.decorate
         format.html { redirect_to @component_model, notice: 'Model was successfully created.' }
         # format.json { render json: @component_model, status: :created, location: @component_model }
       else
@@ -99,11 +100,9 @@ class ComponentModelsController < ApplicationController
 
     respond_to do |format|
       if @component_model.update_attributes(params[:component_model])
-        @component_model = @component_model.decorate
         format.html { redirect_to @component_model, notice: 'Model was successfully updated.' }
         # format.json { head :no_content }
       else
-        @component_model = @component_model.decorate
         format.html { render action: "edit" }
         # format.json { render json: @component_model.errors, status: :unprocessable_entity }
       end
@@ -151,7 +150,7 @@ class ComponentModelsController < ApplicationController
 
   def scope_by_filter_params
     case params[:filter]
-    when "checkoutable"     then @component_models = @component_models.checkoutable
+    when "circulating"     then @component_models = @component_models.circulating
     end
   end
 
@@ -170,4 +169,3 @@ class ComponentModelsController < ApplicationController
     end
   end
 end
-

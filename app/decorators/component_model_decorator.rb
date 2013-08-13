@@ -7,12 +7,13 @@ class ComponentModelDecorator < ApplicationDecorator
   decorates_association :trainings
   decorates_association :users
 
-  delegate :id, :name
+  delegate :id, :name, :circulating?, :reservable?
 
   def autocomplete_json
     {
       :label => to_s,
-      :value => h.url_for(source)
+      :value => h.url_for(source),
+      :category => h.t("component_model.index.title").html_safe
     }
   end
 

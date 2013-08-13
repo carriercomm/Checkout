@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130808214408) do
+ActiveRecord::Schema.define(:version => 20130808231957) do
 
   create_table "brands", :force => true do |t|
     t.string   "name",         :null => false
@@ -25,7 +25,7 @@ ActiveRecord::Schema.define(:version => 20130808214408) do
 
   create_table "budgets", :force => true do |t|
     t.string   "number"
-    t.string   "name",       :null => false
+    t.string   "name"
     t.date     "starts_at"
     t.date     "ends_at"
     t.datetime "created_at", :null => false
@@ -104,6 +104,8 @@ ActiveRecord::Schema.define(:version => 20130808214408) do
     t.integer  "position",           :null => false
     t.datetime "created_at",         :null => false
     t.datetime "updated_at",         :null => false
+    t.datetime "accessioned_at"
+    t.datetime "deaccessioned_at"
   end
 
   add_index "components", ["asset_tag"], :name => "index_components_on_asset_tag", :unique => true
@@ -131,16 +133,15 @@ ActiveRecord::Schema.define(:version => 20130808214408) do
   end
 
   create_table "inventory_details", :force => true do |t|
-    t.integer  "component_id",        :null => false
-    t.integer  "inventory_status_id", :null => false
-    t.integer  "inventory_record_id", :null => false
-    t.datetime "created_at",          :null => false
-    t.datetime "updated_at",          :null => false
+    t.integer  "component_id",                           :null => false
+    t.integer  "inventory_record_id",                    :null => false
+    t.datetime "created_at",                             :null => false
+    t.datetime "updated_at",                             :null => false
+    t.boolean  "missing",             :default => false, :null => false
   end
 
   add_index "inventory_details", ["component_id", "inventory_record_id"], :name => "index_comp_inv_rec_on_component_id_and_inventory_record_id", :unique => true
   add_index "inventory_details", ["inventory_record_id"], :name => "index_component_inventory_records_on_inventory_record_id"
-  add_index "inventory_details", ["inventory_status_id"], :name => "index_component_inventory_records_on_inventory_status_id"
 
   create_table "inventory_records", :force => true do |t|
     t.integer  "attendant_id", :null => false
@@ -151,12 +152,8 @@ ActiveRecord::Schema.define(:version => 20130808214408) do
     t.datetime "updated_at",   :null => false
   end
 
-  add_index "inventory_records", ["attendant_id"], :name => "index_inventory_records_on_attendant_id", :unique => true
+  add_index "inventory_records", ["attendant_id"], :name => "index_inventory_records_on_attendant_id"
   add_index "inventory_records", ["loan_id", "type"], :name => "index_inventory_records_on_loan_id_and_type", :unique => true
-
-  create_table "inventory_statuses", :force => true do |t|
-    t.string "name", :null => false
-  end
 
   create_table "kits", :force => true do |t|
     t.integer  "location_id",                    :null => false
@@ -315,7 +312,6 @@ ActiveRecord::Schema.define(:version => 20130808214408) do
 
   add_foreign_key "inventory_details", "components", :name => "component_inventory_records_component_id_fk"
   add_foreign_key "inventory_details", "inventory_records", :name => "component_inventory_records_inventory_record_id_fk"
-  add_foreign_key "inventory_details", "inventory_statuses", :name => "component_inventory_records_inventory_status_id_fk"
 
   add_foreign_key "inventory_records", "kits", :name => "inventory_records_kit_id_fk"
   add_foreign_key "inventory_records", "loans", :name => "inventory_records_loan_id_fk"
