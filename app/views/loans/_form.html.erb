@@ -1,4 +1,4 @@
-<%= simple_form_for @loan.model, :html => { :class => 'form-horizontal' } do |f| %>
+<%= simple_form_for @loan, :html => { :class => 'form-horizontal' } do |f| %>
   <fieldset>
     <div class="alert alert-info">
       <button type="button" class="close" data-dismiss="alert">×</button>
@@ -15,21 +15,21 @@
     <% if @loan.kit %>
       <%= f.association :kit, :as => :hidden %>
       <%= f.input       :kit, :readonly => true, :disabled => true %>
-    <% else %>  
+    <% else %>
       <%= f.input :component_model_id, :as => :hidden %>
       <%= f.input :component_model, :disabled => true %>
     <% end %>
 
     <%= f.input :location, :collection => f.object.locations, :prompt => "Select a checkout location" %>
 
-    <% if @loan.model.out_at %>
+    <% if @loan.out_at %>
       <%= f.input :out_at, :as => :hidden %>
       <%= f.input :out_at, :as => :date_picker, :disabled => true %>
     <% else %>
       <%= f.input :starts_at, :as => :date_picker %>
     <% end %>
 
-    <%= f.input :ends_at, :as => :date_picker %>
+    <%#= f.input :ends_at, :as => :date_picker %>
 
     <div class="form-actions">
       <%= f.submit nil, :class => 'btn btn-primary' %>

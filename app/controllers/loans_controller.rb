@@ -3,6 +3,9 @@ class LoansController < ApplicationController
   # use CanCan to authorize this resource
   authorize_resource
 
+  decorates_assigned :loan
+  decorates_assigned :loans
+
   # GET /loans
   # GET /loans.json
   def index
@@ -35,7 +38,6 @@ class LoansController < ApplicationController
     end
 
     @loans = @loans.order("loans.starts_at DESC").page(params[:page])
-    @loans = LoanDecorator.decorate(@loans)
 
     respond_to do |format|
       format.html # index.html.erb
@@ -45,7 +47,7 @@ class LoansController < ApplicationController
   # GET /loans/1
   # GET /loans/1.json
   def show
-    @loan = LoanDecorator.find(params[:id])
+    @loan = Loan.find(params[:id])
 
     respond_to do |format|
       format.html # show.html.erb
@@ -74,16 +76,14 @@ class LoansController < ApplicationController
       @loan = client.loans.build_from_component_model_id(params[:component_model_id])
 
       # setup javascript data structures to make the date picker work
-      gon.locations = @loan.component_model.locations_with_dates_checkoutable_for_datepicker
+      gon.locations = @loan.component_model.locations_with_dates_circulating_for_datepicker
     else
       flash[:error] = "Start by finding something to check out!"
       redirect_to component_models_path and return
     end
 
-    @loan = LoanDecorator.decorate(@loan)
-
     # stuff the default checkout length into the gon object if it's available
-    @default_checkout_length = AppConfig.instance.default_checkout_length
+    @default_checkout_length = Settings.default_checkout_length
     gon.default_checkout_length = @default_checkout_length
 
     respond_to do |format|
@@ -93,19 +93,22 @@ class LoansController < ApplicationController
 
   # GET /loans/1/edit
   def edit
-    @loan = LoanDecorator.find(params[:id])
-    gon.locations = @loan.model.kit.location_and_availability_record_for_datepicker(90, @loan)
+    @loan = Loan.find(params[:id])
+    # stuff the default checkout length into the gon object if it's available
+    @default_checkout_length = Settings.default_checkout_length
+    gon.default_checkout_length = @default_checkout_length
+
+    gon.locations = @loan.kit.location_and_availability_record_for_datepicker(90, @loan)
   end
 
   # POST /loans
   # POST /loans.json
   def create
     @loan = Loan.new(params[:loan])
-    @loan = LoanDecorator.decorate(@loan)
 
     respond_to do |format|
       if @loan.kit.nil? && @loan.component_model && @loan.location && @loan.starts_at && @loan.ends_at
-        @kits = KitDecorator.decorate(@loan.available_checkoutable_kits)
+        @kits = KitDecorator.decorate(@loan.available_circulating_kits)
         format.html { render :kit_select }
       elsif @loan.save
         if @loan.pending?
@@ -122,7 +125,7 @@ class LoansController < ApplicationController
   # PUT /loans/1
   # PUT /loans/1.json
   def update
-    @loan = LoanDecorator.find(params[:id])
+    @loan = Loan.find(params[:id])
 
     respond_to do |format|
       if @loan.update_attributes(params[:loan])

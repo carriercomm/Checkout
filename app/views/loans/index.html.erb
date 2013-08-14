@@ -36,7 +36,7 @@
 <table class="table table-striped">
   <thead>
     <tr>
-      <th colspan="2">Client</th>
+      <th>Client</th>
       <th>Kit</th>
       <th>Asset Tags</th>
       <th>Kit Components</th>
@@ -49,10 +49,9 @@
     </tr>
   </thead>
   <tbody>
-    <% @loans.each do |loan| %>
+    <% loans.each do |loan| %>
       <tr>
         <td><%= loan.client.username %></td>
-        <td class="ellipsize"><%= loan.client.tabular_full_name %></div></td>
         <td><%= loan.kit %></td>
         <td class="ellipsize"><%= loan.kit.tabular_asset_tags %></td>
         <td class="ellipsize"><%= loan.kit.tabular_component_list %></td>

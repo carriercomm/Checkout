@@ -1,32 +1,31 @@
-<% title t('loan.show.title', :id => @loan.model.id) %>
-<% subtitle @loan.kit.component_list %>
+<% title t('loan.show.title', :id => @loan.id) %>
+<% subtitle loan.kit.component_list %>
 
 <dl class="dl-horizontal">
   <dt>Status</dt>
-  <dd><%= @loan.state %></dd>
+  <dd><%= loan.state %></dd>
   <dt>Client</dt>
-  <dd><%= @loan.client %></dd>
+  <dd><%= loan.client %></dd>
   <dt>Check Out Location</dt>
-  <dd><%= @loan.location %></dd>
+  <dd><%= loan.location %></dd>
   <dt>Kit</dt>
-  <dd><%= @loan.kit %></dd>
+  <dd><%= loan.kit %></dd>
   <dt>Pick Up Day</dt>
-  <dd><%= @loan.starts_at %></dd>
+  <dd><%= loan.starts_at %></dd>
   <dt>Return Day</dt>
-  <dd><%= @loan.ends_at %></dd>
+  <dd><%= loan.ends_at %></dd>
   <dt>Approved By</dt>
-  <dd><%= @loan.approver %></dd>
+  <dd><%= loan.approver %></dd>
   <dt>Checked Out</dt>
-  <dd><%= @loan.out_at %></dd>
-  <dt>Checked Out By</dt>
-  <dd><%= @loan.out_assistant %></dd>
+  <dd><%= loan.out_at %></dd>
   <dt>Checked In</dt>
-  <dd><%= @loan.in_at %></dd>
-  <dt>Checked In By</dt>
-  <dd><%= @loan.in_assistant %></dd>
+  <dd><%= loan.in_at %></dd>
   <dt>Late</dt>
-  <dd><%= @loan.late %></dd>
+  <dd><%= loan.late %></dd>
 </dl>
+
+<%= render partial: 'inventory_records/inventory_record', object: loan.check_out_inventory_record %>
+<%= render partial: 'inventory_records/inventory_record', object: loan.check_in_inventory_record %>
 
 <div class="form-actions">
   <%= link_to 'Back', loans_path, :class => 'btn'  %>

@@ -17,6 +17,7 @@ class Ability
       can :read,   Covenant
       can :read,   CovenantSignature
       can :manage, Group
+      can :manage, InventoryRecord
       can :manage, Kit
       can :manage, Loan
       can :manage, Location

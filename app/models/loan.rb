@@ -116,20 +116,22 @@ class Loan < ActiveRecord::Base
     autofilled_ends_at
   end
 
-  def build_check_in_inventory_record_with_inventory_details(attendant = nil, inventory_status = nil)
-    build_check_in_inventory_record_without_inventory_details(loan: self, kit: kit, attendant: attendant)
+  def build_check_in_inventory_record_with_inventory_details(options = {})
+    missing = options.delete(:missing)
+    build_check_in_inventory_record_without_inventory_details(options.merge(loan: self, kit: kit))
     unless kit.nil?
-      check_in_inventory_record.initialize_inventory_details(inventory_status)
+      check_in_inventory_record.initialize_inventory_details(missing)
     end
     check_in_inventory_record
   end
 
   alias_method_chain :build_check_in_inventory_record, :inventory_details
 
-  def build_check_out_inventory_record_with_inventory_details(attendant = nil)
-    build_check_out_inventory_record_without_inventory_details(loan: self, kit: kit, attendant: attendant)
+  def build_check_out_inventory_record_with_inventory_details(options = {})
+    missing = options.delete(:missing)
+    build_check_out_inventory_record_without_inventory_details(options.merge(loan: self, kit: kit))
     unless kit.nil?
-      check_out_inventory_record.initialize_inventory_details
+      check_out_inventory_record.initialize_inventory_details(missing)
     end
     check_out_inventory_record
   end

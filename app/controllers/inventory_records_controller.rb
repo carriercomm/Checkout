@@ -3,17 +3,21 @@ class InventoryRecordsController < ApplicationController
   # use CanCan to authorize this resource
   authorize_resource
 
+  decorates_assigned :kit
+  decorates_assigned :attendant
+  decorates_assigned :inventory_record
+  decorates_assigned :inventory_records
+
   # GET /inventory_records
   # GET /inventory_records.json
   def index
     if params[:kit_id]
-      @inventory_records = InventoryRecord.joins(:component).where("components.kit_id = ?", params[:kit_id])
+      @inventory_records = Kit.find(params[:kit_id].to_i).inventory_records
     else
       @inventory_records = InventoryRecord
     end
 
     @inventory_records = @inventory_records.order('inventory_records.created_at DESC').page(params[:page]).per(params[:page_limit])
-    @inventory_records = InventoryRecordDecorator.decorate(@inventory_records)
 
     respond_to do |format|
       format.html # index.html.erb
@@ -35,9 +39,10 @@ class InventoryRecordsController < ApplicationController
   # GET /inventory_records/new
   # GET /inventory_records/new.json
   def new
-    @kit = KitDecorator.find(params[:kit_id])
-    @attendant = UserDecorator.decorate(current_user)
-    @inventory_records = current_user.new_inventory_records(@kit)
+    @kit = Kit.find(params[:kit_id])
+    @attendant = current_user
+    @inventory_record = @kit.build_inventory_record(kit: @kit, attendant: @attendant)
+    @inventory_record.initialize_inventory_details
 
     respond_to do |format|
       format.html # new.html.erb
@@ -53,8 +58,9 @@ class InventoryRecordsController < ApplicationController
   # POST /inventory_records
   # POST /inventory_records.json
   def create
-    @kit = KitDecorator.find(params[:kit_id])
-    @attendant = UserDecorator.decorate(current_user)
+    @kit = Kit.find(params[:kit_id])
+    @attendant = current_user
+    raise params.inspect
     @inventory_records = []
     success = true
 

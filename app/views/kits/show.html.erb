@@ -67,17 +67,4 @@
 <% end %>
 
 <h2>Components</h2>
-<table class="table table-striped">
-  <thead>
-    <tr>
-      <th width="span2">Brand</th>
-      <th width="span3">Model</th>
-      <th width="span3">Asset Tag</th>
-      <th width="span3">Serial Number</th>
-      <th width="span1">Status</th>
-    </tr>
-  </thead>
-  <tbody>
-    <%= render partial:'component', collection: @kit.components %>
-  </tbody>
-</table>
+<%= render partial: 'components/component_list', object: @kit.components %>

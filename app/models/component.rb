@@ -45,6 +45,10 @@ class Component < ActiveRecord::Base
 
   ## Instance Methods ##
 
+  def current_inventory_detail
+    inventory_details.order("inventory_record_id DESC").limit(1).first
+  end
+
   def training_required?(user = nil)
     component_model.training_required?(user)
   end

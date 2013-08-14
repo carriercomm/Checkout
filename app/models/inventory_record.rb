@@ -1,4 +1,5 @@
 class InventoryRecord < ActiveRecord::Base
+  class MismatchingKitException < Exception; end
 
   ## Associations ##
 
@@ -8,6 +9,7 @@ class InventoryRecord < ActiveRecord::Base
   belongs_to :kit,               :inverse_of => :inventory_records
   belongs_to :loan,              :inverse_of => :inventory_records
 
+  accepts_nested_attributes_for :inventory_details, :reject_if => proc { |attributes| attributes['component_id'].blank? }, :allow_destroy=> true
 
   ## Validations ##
 
@@ -50,7 +52,7 @@ class InventoryRecord < ActiveRecord::Base
       self.kit = component.kit
     else
       unless kit == component.kit
-        raise InventoryRecord::MismatchingKitException.new("Can't add a component with a mismatching kit")
+        raise MismatchingKitException.new("Can't add a component with a mismatching kit")
       end
     end
   end

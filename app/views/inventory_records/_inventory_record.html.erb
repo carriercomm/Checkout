@@ -1,0 +1,13 @@
+<h2><%= inventory_record.type %></h2>
+<dl class="dl-horizontal">
+<dt>Attendant</dt>
+<dd><%= inventory_record.attendant %></dd>
+<dt>Kit</dt>
+<dd><%= inventory_record.kit.to_link %></dd>
+<dt>Loan</dt>
+<dd><%= inventory_record.loan.to_link %></dd>
+<dt>Date</dt>
+<dd><%= inventory_record.created_at %></dd>
+</dl>
+
+<%= render partial: 'components/component_list', object: inventory_record.components %>

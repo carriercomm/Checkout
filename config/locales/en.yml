@@ -194,18 +194,22 @@ en:
       empty:
         text: "Empty"
         default_tooltip: "Show all groups with zero users or zero kits"
+  inventory_detail:
+    missing:
+      'true': "Missing"
+      'false': "Present"
+      unknown: "Unknown"
   inventory_record:
+    type:
+      check_in: "Check In Inventory"
+      check_out: "Check Out Inventory"
+      audit: "Inventory Audit"
     index:
       title: 'Inventory Records'
     sidebar:
       all:
         default_tooltip: 'Show all inventory records'
         denied_tooltip: "You don't have sufficient permissions to view inventory records"
-  inventory_status:
-    accessioned: *inventory_status_accessioned
-    deaccessioned: *inventory_status_deaccessioned
-    inventoried: *inventory_status_inventoried
-    missing: *inventory_status_missing
   kit:
     index:
       title: "Kits"

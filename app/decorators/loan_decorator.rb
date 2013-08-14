@@ -1,11 +1,13 @@
 class LoanDecorator < ApplicationDecorator
   decorates :loan
   decorates_association :approver,      with: UserDecorator
+  decorates_association :check_in_inventory_record
+  decorates_association :check_out_inventory_record
   decorates_association :client,        with: UserDecorator
-  decorates_association :in_attendant,  with: UserDecorator
+  #decorates_association :in_attendant,  with: UserDecorator
   decorates_association :kit
   decorates_association :location
-  decorates_association :out_attendant, with: UserDecorator
+  #decorates_association :out_attendant, with: UserDecorator
 
   delegate :approved?
 
@@ -31,9 +33,9 @@ class LoanDecorator < ApplicationDecorator
     coalesce(h.l(object.ends_at, :format => :tabular))
   end
 
-  def in_attendant
-    coalesce(object.in_attendant)
-  end
+  # def in_attendant
+  #   coalesce(object.in_attendant)
+  # end
 
   def in_at
     if object.in_at
@@ -47,9 +49,9 @@ class LoanDecorator < ApplicationDecorator
     to_yes_no(object.late)
   end
 
-  def out_attendant
-    coalesce(object.out_attendant)
-  end
+  # def out_attendant
+  #   coalesce(object.out_attendant)
+  # end
 
   def out_at
     if object.out_at
@@ -64,7 +66,11 @@ class LoanDecorator < ApplicationDecorator
   end
 
   def state
-    h.t("loan.state.#{ object.state }").html_safe
+    h.t("loan.state.#{ object.current_state }").html_safe
+  end
+
+  def to_link
+    h.link_to(object.id.to_s, h.loan_path(object))
   end
 
 end

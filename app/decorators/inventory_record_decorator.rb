@@ -1,22 +1,10 @@
 class InventoryRecordDecorator < ApplicationDecorator
   decorates :inventory_record
-  decorates_association :component
-  decorates_association :inventory_status
+  decorates_association :attendant, with: UserDecorator
+  decorates_association :components
+  decorates_association :inventory_details
+  decorates_association :kit
   decorates_association :loan
-  delegate :empty?, :id
-
-  def style
-    case inventory_status_id
-    when 2
-      ".info"    # accessioned
-    when 3
-      ".success" # inventoried
-    when 4
-      ".error"   # missing
-    else
-      ""
-    end
-  end
 
   def created_at
     h.l(source.created_at, :format => :tabular)

@@ -62,6 +62,7 @@
                 <li><%= link_to "Budgets", budgets_path if can? :read, Budget %></li>
                 <li><%= link_to "Covenants", covenants_path  if can? :manage, Covenant %></li>
                 <li><%= link_to "Groups", active_groups_path if can? :manage, Group %></li>
+                <li><%= link_to "Inventory", inventory_records_path if can? :manage, InventoryRecord %></li>
                 <li><%= link_to("Users", active_users_path) if can? :manage, User %></li>
               <% end %>
             </ul>

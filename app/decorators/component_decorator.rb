@@ -2,22 +2,19 @@ class ComponentDecorator < ApplicationDecorator
   decorates :component
   decorates_association :component_model
   decorates_association :kit
-  decorates_association :inventory_records
+  decorates_association :inventory_details
 
   delegate :asset_tag, :id, :serial_number
 
-  def current_status
-    ir = source.latest_inventory_record
-
-    if !!ir
-      ir.decorate.inventory_status.name
+  def disposition
+    case object.current_inventory_detail.missing
+    when true
+      return h.t('inventory_detail.missing.true')
+    when false
+      return h.t('inventory_detail.missing.false')
     else
-      h.t('inventory_status.unknown')
+      return h.t('inventory_detail.missing.unknown')
     end
-  end
-
-  def missing
-    to_yes_no(source.missing)
   end
 
   def to_link

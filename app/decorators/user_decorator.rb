@@ -105,7 +105,7 @@ class UserDecorator < ApplicationDecorator
   end
 
   def to_s
-    description
+    username
   end
 
   def to_select2_s
@@ -117,6 +117,6 @@ class UserDecorator < ApplicationDecorator
   end
 
   def username
-    h.link_to(object.username, h.user_path(object), :title=> object.username)
+    h.link_to(object.username, h.user_path(object), rel: "tooltip", title: full_name)
   end
 end

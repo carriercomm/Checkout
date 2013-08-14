@@ -12,15 +12,18 @@ class Kit < ActiveRecord::Base
 
   ## Associations ##
 
-  belongs_to :budget,            :inverse_of => :kits
-  has_many   :clients,           :through    => :loans
-  has_many   :component_models,  :through    => :components,  :order => "component_models.name ASC"
-  has_many   :components,        :inverse_of => :kit
-  has_many   :groups,            :through    => :permissions, :order => "groups.name ASC"
-  has_many   :inventory_records, :inverse_of => :kit
-  belongs_to :location,          :inverse_of => :kits
-  has_many   :permissions,       :inverse_of => :kit
-  has_many   :loans,             :inverse_of => :kit
+  has_many   :audit_inventory_records,     :inverse_of => :kit
+  belongs_to :budget,                      :inverse_of => :kits
+  has_many   :check_in_inventory_records,  :inverse_of => :kit
+  has_many   :check_out_inventory_records, :inverse_of => :kit
+  has_many   :clients,                     :through    => :loans
+  has_many   :component_models,            :through    => :components,  :order => "component_models.name ASC"
+  has_many   :components,                  :inverse_of => :kit,         :order => "components.position ASC",  :include => [:component_model => :brand]
+  has_many   :groups,                      :through    => :permissions, :order => "groups.name ASC"
+  has_many   :inventory_records,           :inverse_of => :kit
+  belongs_to :location,                    :inverse_of => :kits
+  has_many   :permissions,                 :inverse_of => :kit
+  has_many   :loans,                       :inverse_of => :kit
 
   accepts_nested_attributes_for :components, :reject_if => proc { |attributes| attributes['component_model_id'].blank? }, :allow_destroy=> true
 
@@ -107,6 +110,22 @@ class Kit < ActiveRecord::Base
   def circulating?
     return circulating && !tombstoned
   end
+
+  # def components_denormalized
+  #   select_sql = "components.*, inventory_details.missing"
+  #   joins_sql  = <<-END_SQL
+  #   left join inventory_details on components.id = inventory_details.component_id
+  #   inner join (
+  #               select max(id) as max_id
+  #               from inventory_records
+  #               where inventory_records.kit_id = #{ self.id }
+  #               ) AS t1 ON inventory_details.inventory_record_id = t1.max_id
+  #   inner join component_models on components.component_model_id = component_models.id
+  #   inner join brands on component_models.brand_id = brands.id
+  #   END_SQL
+
+  #   components.select(select_sql).joins(joins_sql)
+  # end
 
   def default_return_date(starts_at)
     default = Settings.default_check_out_duration

@@ -412,7 +412,7 @@ namespace :dbx do
 
     admins     = ["jehughes", "bgrace", "mtm5", "coupe", "karpen", "pampin", "trebacze"]
 
-    attendants = ["joelong", "swlcomp", "jarmick"]
+    attendants = ["joelong", "swlcomp", "jarmick", "furr"]
 
     LegacyUser.all.each do |lu|
       begin
@@ -547,7 +547,9 @@ namespace :dbx do
     require 'tasks/legacy_classes'
 
     puts "Clearing out loans table..."
-    Loan.destroy_all
+    InventoryDetail.delete_all
+    InventoryRecord.delete_all
+    Loan.delete_all
 
     #
     # Migrate Checkouts/Reservations
@@ -631,16 +633,16 @@ namespace :dbx do
               unless out_attendant.attendant?
                 out_attendant.add_role(:attendant)
               end
-              l.build_check_out_inventory_record(out_attendant)
-              l.check_out_inventory_record.inventory_details.each {|x| x.missing = false }
+              l.build_check_out_inventory_record(attendant: out_attendant, missing: false)
+              l.check_out_inventory_record.created_at = l.out_at
             end
 
             if in_attendant
               unless in_attendant.attendant?
                 in_attendant.add_role(:attendant)
               end
-              l.build_check_in_inventory_record(in_attendant)
-              l.check_in_inventory_record.inventory_details.each {|x| x.missing = false }
+              l.build_check_in_inventory_record(attendant: in_attendant, missing: false)
+              l.check_in_inventory_record.created_at = l.in_at
             end
           end
 
@@ -727,16 +729,16 @@ namespace :dbx do
             unless out_attendant.attendant?
               out_attendant.add_role(:attendant)
             end
-            l.build_check_out_inventory_record(out_attendant)
-            l.check_out_inventory_record.inventory_details.each {|x| x.missing = false }
+            l.build_check_out_inventory_record(attendant: out_attendant, missing: false)
+            l.check_out_inventory_record.created_at = l.out_at
           end
 
           if in_attendant
             unless in_attendant.attendant?
               in_attendant.add_role(:attendant)
             end
-            l.build_check_in_inventory_record(in_attendant)
-            l.check_in_inventory_record.inventory_details.each {|x| x.missing = false }
+            l.build_check_in_inventory_record(attendant: in_attendant, missing: false)
+            l.check_in_inventory_record.created_at = l.in_at
           end
 
           if in_attendant
@@ -789,13 +791,13 @@ namespace :dbx do
     AuditInventoryRecord.destroy_all
 
     LegacyInventory.all.each do |li|
-      ir                  = AuditInventoryRecord.new
-      ir.created_at       = li.date_inventoried
-      ir.attendant        = User.find_by_username(li.staff_id)
-      inv_det = InventoryDetail.new
-      inv_det.component = Component.find_by_asset_tag(li.eq_uw_tag.to_s)
-      inv_det.missing   = false
-      ir.inventory_details << inv_det
+      component     = Component.find_by_asset_tag(li.eq_uw_tag.to_s)
+      kit           = component.kit
+      attendant     = User.find_by_username(li.staff_id)
+      ir            = kit.audit_inventory_records.build(kit: kit, attendant: attendant)
+      ir.created_at = li.date_inventoried
+
+      ir.inventory_details_attributes = [{component_id: component.id, missing: false, created_at: li.date_inventoried }]
 
       if ir.save
         success_count += 1
