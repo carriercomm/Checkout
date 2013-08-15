@@ -34,6 +34,16 @@ class UsersController < ApplicationController
     end
   end
 
+  def search
+    q = params["q"]
+    users  = User.search(q).limit(10).decorate
+    users.map!(&:autocomplete_json
+
+    respond_to do |format|
+      format.json { render json: users }
+    end
+  end
+
   # GET /kits/select2.json
   def select2
     users = User

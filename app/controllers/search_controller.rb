@@ -6,7 +6,7 @@ class SearchController < ApplicationController
     results = []
 
     if can? :read, User
-      users  = User.username_search(q).limit(10).decorate
+      users  = User.search(q).limit(10).decorate
       results.concat(users.map(&:autocomplete_json).concat(results))
     end
 

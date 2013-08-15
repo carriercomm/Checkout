@@ -17,7 +17,7 @@ class UserDecorator < ApplicationDecorator
 
   def autocomplete_json(options={})
     {
-      :label => object.username,
+      :label => username_and_full_name,
       :value => h.url_for(object),
       :category => h.t("user.index.title").html_safe
     }
@@ -50,7 +50,7 @@ class UserDecorator < ApplicationDecorator
   end
 
   def full_name
-    @full_name ||= "#{ h.h(object.first_name) } #{ h.h(object.last_name) }".squish
+    @full_name ||= coalesce("#{ object.first_name } #{ object.last_name }".squish)
   end
 
   def last_name
@@ -119,4 +119,9 @@ class UserDecorator < ApplicationDecorator
   def username
     h.link_to(object.username, h.user_path(object), rel: "tooltip", title: full_name)
   end
+
+  def username_and_full_name
+    "#{ object.username } (#{ full_name })"
+  end
+
 end

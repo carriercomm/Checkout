@@ -1,4 +1,5 @@
 class User < ActiveRecord::Base
+
   ## Macros ##
 
   rolify
@@ -99,7 +100,12 @@ class User < ActiveRecord::Base
   end
 
   def self.username_search(query)
-      self.where("LOWER(users.username) LIKE ?", "%#{ query.downcase }%")
+    where("LOWER(users.username) LIKE ?", "%#{ query.downcase }%")
+      .order("users.username ASC")
+  end
+
+  def self.search(query)
+    where("LOWER(users.username) LIKE ? OR LOWER(users.first_name) LIKE ? OR LOWER(users.last_name) LIKE ?", "%#{ query.downcase }%", "%#{ query.downcase }%", "%#{ query.downcase }%")
       .order("users.username ASC")
   end
 
