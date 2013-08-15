@@ -51,10 +51,10 @@ module ApplicationHelper
     direction = begin
       if column == sort_column
         if sort_direction == "asc"
-          title << ' <i class="icon-arrow-down"></i>'.html_safe
+          title << ' <i class="icon-sort-down"></i>'.html_safe
           "desc"
         else
-          title << ' <i class="icon-arrow-up"></i>'.html_safe
+          title << ' <i class="icon-sort-up"></i>'.html_safe
           "asc"
         end
       else
@@ -91,14 +91,14 @@ module ApplicationHelper
     elsif object.is_a?(Loan)
       link_to(t('helpers.links.checkout'), [:edit, object], a:'checkout')
     else
-      if object.checkoutable? && current_user.attendant?
+      if object.circulating? && current_user.attendant?
         loan_link(t('helpers.links.checkout'), object, a:'checkout')
       end
     end
   end
 
   def checkout_mini_button(object)
-    if object.checkoutable? && current_user.attendant?
+    if object.circulating? && current_user.attendant?
       loan_mini_button(t('helpers.links.checkout'), object, a:'checkout')
     end
   end
@@ -111,19 +111,19 @@ module ApplicationHelper
   end
 
   def reserve_link(object)
-    if object.checkoutable? && object.reservable?(current_user)
+    if object.circulating? && object.reservable?(current_user)
       loan_link(t('helpers.links.reserve'), object)
     end
   end
 
   def reserve_mini_button(object)
-    if object.checkoutable? && object.reservable?(current_user)
-      loan_mini_button(t('helpers.links.reserve'), object)
+    if object.circulating? && object.reservable?(current_user)
+      reservation_mini_button(t('helpers.links.reserve'), object)
     end
   end
 
   def show_link(object, content = t("helpers.links.show"))
-    object = object.model if object.is_a? Draper::Base
+    object = object.model if object.is_a? Draper::Decorator
     if (can?(:show, object) || can?(:read, object))
       link_to(content, object)
     else
@@ -139,8 +139,65 @@ module ApplicationHelper
     link_to(content, [:edit, object]) if can?(:update, object)
   end
 
-  def edit_mini_button(object, content = t("helpers.links.edit"))
-    link_to(content, [:edit, object], class: 'btn btn-mini') if can?(:update, object)
+  # TODO: convert this to accept a block
+  def mini_button(action, object, options = {}, html_options = {})
+    case action
+    when :check_out
+      path = new_loan_path(object)
+      ability = options.delete(:ability) || :create
+      html_options.reverse_merge!({
+          :text   => t("helpers.mini_buttons.check_out").html_safe,
+          :title  => t("helpers.actions.check_out"),
+          :class  => 'btn btn-mini',
+          :method => :get,
+        })
+    # when :edit
+    #   path = [:edit, object]
+    #   ability = options.delete(:ability) || :update
+    #   html_options.reverse_merge!({
+    #       :text   => t("helpers.mini_buttons.edit").html_safe,
+    #       :title  => t("helpers.actions.edit"),
+    #       :class  => 'btn btn-mini',
+    #       :method => :get,
+    #     })
+    when :edit
+      path = [:edit, object]
+      ability = options.delete(:ability) || :update
+      html_options.reverse_merge!({
+          :text   => t("helpers.mini_buttons.edit").html_safe,
+          :title  => t("helpers.actions.edit"),
+          :class  => 'btn btn-mini',
+          :method => :get,
+        })
+    when :show
+      path = object
+      ability = options.delete(:ability) || :read
+      html_options.reverse_merge!({
+          :text   => t("helpers.mini_buttons.show").html_safe,
+          :title  => t("helpers.actions.show"),
+          :class  => 'btn btn-mini',
+          :method => :get
+        })
+    else
+      raise "unknown action"
+    end
+
+    # defaults for all buttons
+    html_options.reverse_merge!({
+        :rel => "tooltip",
+        'data-delay' => 500
+      })
+
+    # authorize the action
+    unless can?(ability, object)
+      html_options.merge!("disabled" => "disabled")
+    end
+
+    text = html_options.delete(:text)
+    #button_to(text, path, options)
+    my_button_to(path, html_options) do
+      text
+    end
   end
 
   def destroy_link(object, content = t("helpers.links.destroy"))
@@ -156,6 +213,42 @@ module ApplicationHelper
 
   private
 
+  def my_button_to(options = {}, html_options = {}, &block)
+    html_options = html_options.stringify_keys
+    #convert_boolean_attributes!(html_options, %( disabled ))
+
+    method_tag = ''
+    if (method = html_options.delete('method')) && %{put delete}.include?(method.to_s)
+      method_tag = tag('input', :type => 'hidden', :name => '_method', :value => method.to_s)
+    end
+
+    form_method = method.to_s == 'get' ? 'get' : 'post'
+    form_options = html_options.delete('form') || {}
+    form_options[:class] ||= html_options.delete('form_class') || 'my_button_to'
+
+    remote = html_options.delete('remote')
+
+    request_token_tag = ''
+    if form_method == 'post' && protect_against_forgery?
+      request_token_tag = tag(:input, :type => "hidden", :name => request_forgery_protection_token.to_s, :value => form_authenticity_token)
+    end
+
+    url = options.is_a?(String) ? options : self.url_for(options)
+    name ||= url
+
+    html_options = convert_options_to_data_attributes(options, html_options)
+
+    html_options.merge!("type" => "submit")
+    html_options.merge!("name" => nil)
+
+    form_options.merge!(:method => form_method, :action => url)
+    form_options.merge!("data-remote" => "true") if remote
+
+    "#{tag(:form, form_options, true)}#{method_tag}#{button_tag(nil, html_options, &block)}#{request_token_tag}</form>".html_safe
+  end
+
+
+
   # TODO: DRY this up
   def loan_mini_button(text, object, options={})
     path = String.new
@@ -164,7 +257,7 @@ module ApplicationHelper
     when "ComponentModel"
       path = new_component_model_loan_path(object, options)
     when "ComponentModelDecorator"
-      path = new_component_model_loan_path(object.model, options)
+      path = new_component_model_reservation_path(object.model, options)
     when "Kit"
       path = new_kit_loan_path(object, options)
     when "KitDecorator"
@@ -193,5 +286,23 @@ module ApplicationHelper
     link_to(text, path)
   end
 
+  # TODO: DRY this up
+  def reservation_mini_button(text, object, options={})
+    path = String.new
+
+    case object.class.to_s
+    when "ComponentModel"
+      path = new_component_model_reservation_path(object, options)
+    when "ComponentModelDecorator"
+      path = new_component_model_reservation_path(object.model, options)
+    when "Kit"
+      path = new_kit_reservation_path(object, options)
+    when "KitDecorator"
+      path = new_kit_reservation_path(object.model, options)
+    else
+      raise "Expected an instance of Kit, KitDecorator, ComponentModel or ComponentModelDecorator, got: #{ object.class }"
+    end
+    link_to(text, path, :class => 'btn btn-mini')
+  end
 
 end

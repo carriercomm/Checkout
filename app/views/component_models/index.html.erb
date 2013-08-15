@@ -29,24 +29,19 @@
       <th>Model</th>
       <th>Description</th>
       <th>Count</th>
-      <th colspan="3" class="skinny-column">Actions</th>
+      <th class="actions">Actions</th>
     </tr>
   </thead>
   <tbody>
-    <% @component_models.each do |cm| %>
+    <% component_models.each do |cm| %>
       <tr>
         <td><%= link_to cm.brand.name, brand_path(cm.brand) %></td>
         <td><%= link_to cm.name, component_model_path(cm) %></td>
         <td><%= cm.description %></td>
         <td><%= cm.kits.count %></td>
-        <td class="action-buttons">
-          <%= reserve_mini_button(cm) %>
-        </td>
-        <td class="action-buttons">
-          <%= checkout_mini_button(cm) %>
-        </td>
-        <td class="action-buttons">
-          <%= edit_mini_button(cm) %>
+        <td>
+          <%= mini_button(:check_out, Loan.new(component_model: cm.object)) %>
+          <%= mini_button(:edit, cm) %>
         </td>
       </tr>
     <% end %>

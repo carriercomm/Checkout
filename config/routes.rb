@@ -85,9 +85,6 @@ Checkout::Application.routes.draw do
         get r, to: "loans#index", filter: r
       end
     end
-    member do
-      get 'checkout'
-    end
   end
   resources :search, only: [:index]
   resource :settings, :only => [:show, :edit, :update]

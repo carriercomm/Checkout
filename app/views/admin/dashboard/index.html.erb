@@ -1,0 +1,42 @@
+<% title t('dashboard.index.title') %>
+
+<% content_for :sidebar do %>
+  <li class="nav-header"><%= t(".menu") %></li>
+  <%= sidebar_link t('settings.show.title'),
+                   settings_path,
+                   '',
+                   can?(:manage, Settings) %>
+  <%= sidebar_link t('user.new.title'),
+                   new_user_path,
+                   t('user.sidebar.add.default_tooltip'),
+                   can?(:manage, User),
+                   t('user.sidebar.add.denied_tooltip') %>
+
+<% end %>
+
+<dl class="dl-horizontal">
+  <dt>Orphaned Components</dt>
+  <dd><%= @orphaned_components.to_s %></dd>
+  <dt>Empty Kits</dt>
+  <dd><%= @empty_kits.to_s %></dd>
+</dl>
+
+<% unless @missing_inventory_records.empty? %>
+  <h2>Missing Components</h2>
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>Kit</th>
+        <th>Brand</th>
+        <th>Model</th>
+        <th>Asset Tag</th>
+        <th>Serial Number</th>
+        <th>Status</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      <%= render partial:'inventory_record', collection: @missing_inventory_records %>
+    </tbody>
+  </table>
+<% end %>

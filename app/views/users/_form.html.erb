@@ -10,40 +10,35 @@
   <%= f.association :roles, :as => :check_boxes %>
 
   <h2>Groups</h2>
-  <table class="table table-striped">
+  <table class="form-table">
     <thead>
       <tr>
         <th>Name</th>
         <th>Expires</th>
         <th>Supervisor</th>
-        <th class="skinny-column">Actions</th>
+        <th class="actions">Actions</th>
       </tr>
     </thead>
-    <tbody>
+    <tbody id="memberships_fields">
       <%= f.fields_for :memberships, @user.model.memberships, wrapper: false %>
-      <tr>
-        <td colspan="4"><%= f.link_to_add raw("<i class='icon-plus-sign'></i> Add another group"), :memberships %></td>
-      </tr>
     <tbody>
   </table>
+  <p><%= f.link_to_add t('user.edit.add_group').html_safe, :memberships, data: { target: "#memberships_fields" } %></p>
+
 
   <h2>Training</h2>
-  <table class="table table-striped">
+  <table class="form-table">
     <thead>
       <tr>
         <th>Model</th>
-        <th class="skinny-column">Actions</th>
+        <th class="actions">Actions</th>
       </tr>
     </thead>
-    <tbody>
+    <tbody id="trainings_fields">
       <%= f.fields_for :trainings, @user.model.trainings, wrapper: false %>
-      <tr>
-        <td colspan="2">
-          <%= f.link_to_add raw("<i class='icon-plus-sign'></i> Add another model"), :trainings %>
-        </td>
-      </tr>
     </tbody>
   </table>
+  <p><%= f.link_to_add t('user.edit.add_training').html_safe, :trainings, data: { target: "#trainings_fields" } %></p>
 
   <div class="form-actions">
     <%= f.button :submit, :class => 'btn-primary' %>

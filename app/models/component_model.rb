@@ -55,6 +55,23 @@ class ComponentModel < ActiveRecord::Base
     joins(:categories).where('categories.id = ?', category_id.to_i)
   end
 
+  def self.circulating_for_user(user)
+    for_user(user).where("kits.tombstoned = ? AND kits.circulating = ?", false, true).uniq
+  end
+
+  def self.for_user(user)
+    joins_sql = <<-END_SQL
+    inner join components on component_models.id = components.id
+    inner join kits on components.kit_id = kits.id
+    inner join permissions on kits.id = permissions.kit_id
+    inner join groups on permissions.group_id = groups.id
+    inner join memberships on groups.id = memberships.group_id
+    inner join users on memberships.user_id = users.id
+    END_SQL
+
+    joins(joins_sql).where("users.id = ?", user.id).uniq
+  end
+
   # HACK HACK: this is just to appease nested_form, but this is a terrible hack.
   #            this is being used by the split_component_model fake model
   def self.klass
@@ -118,15 +135,6 @@ class ComponentModel < ActiveRecord::Base
     return locations
   end
 
-  # callback to populate :autocomplete
-  def generate_autocomplete
-    # we'll martial brand into the autocomplete field since it's
-    # natural to search by brand
-    s = "#{ brand } #{ name }"
-    s = s.truncate(45, omission: "", separator: " ") if s.length > 45
-    self.autocomplete = self.class.normalize(s)
-  end
-
   def requires_client_training?(client)
     return !trainings.include?(user) if training_required
     false
@@ -159,6 +167,17 @@ class ComponentModel < ActiveRecord::Base
     q = circulating_kits.loaned_between(starts_at, ends_at)
     q = q.where("location_id = ?", location.id) if location
     return q
+  end
+
+  private
+
+  # callback to populate :autocomplete
+  def generate_autocomplete
+    # we'll martial brand into the autocomplete field since it's
+    # natural to search by brand
+    s = "#{ brand } #{ name }"
+    s = s.truncate(45, omission: "", separator: " ") if s.length > 45
+    self.autocomplete = self.class.normalize(s)
   end
 
 end

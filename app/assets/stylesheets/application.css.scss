@@ -1,10 +1,21 @@
 @import "bootstrap";
+@import "bootstrap-responsive";
 @import "font-awesome";
 @import "jquery.ui.datepicker";
 @import "jquery.ui.autocomplete";
 @import "select2";
 @import "bootstrap_overrides";
 
+table.form-table {
+  @extend .table;
+  // @extend .table-striped;
+  td {
+    vertical-align:middle;
+  }
+  th.actions {
+    width: 1%;
+  }
+}
 .help-block {
   font-style:italic;
   color: #999;
@@ -22,10 +33,17 @@ a.danger {
 td.action-buttons {
   padding-left:0;
 }
-td.action-buttons,
-th.skinny-column {
-  width: 1%;
+td.mini-action-buttons {
+  white-space: nowrap;
 }
+.my_button_to {
+  display: inline;
+}
+a.delete-link {
+  @extend .btn;
+  @extend .btn-danger;
+}
+
 i.user-disabled {
   color: red;
 }
@@ -33,16 +51,19 @@ i.user-suspended {
   color: orange;
 }
 
- // use this for forms that are table-ized, like the nested users on the group form
-.table-form {
-  div.controls {
-    margin-left:0;
-  }
-}
-.table-form.control-group {
-  margin:0;
-}
+//  // use this for forms that are table-ized, like the nested users on the group form
+// .table-form {
+//   div.controls {
+//     margin-left:0;
+//   }
+// }
+// .table-form.control-group {
+//   margin:0;
+// }
 
+// div.control-group.hidden {
+//   display:none;
+// }
 // datepicker-related styles
 .return-date-ok a {
   border-color: green !important;
@@ -55,4 +76,14 @@ i.user-suspended {
   width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.ui-autocomplete-category {
+  font-weight: bold;
+  padding: .2em .4em;
+  margin: .8em 0 .2em;
+  line-height: 1.5;
+}
+td.ui-datepicker-current-day {
+  background-color: green;
 }

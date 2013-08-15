@@ -2,41 +2,53 @@
 
 <% content_for :sidebar do %>
   <li class="nav-header"><%= t(".menu") %></li>
-  <%= sidebar_link t('app_config.show.title'),
-                   app_config_path,
-                   '',
-                   can?(:manage, AppConfig) %>
-  <%= sidebar_link t('user.new.title'),
-                   new_user_path,
-                   t('user.sidebar.add.default_tooltip'),
-                   can?(:manage, User),
-                   t('user.sidebar.add.denied_tooltip') %>
-
+  <%= sidebar_link t('loan.index.title'),
+                   user_loans_path(current_user),
+                   '' %>
 <% end %>
 
-<dl class="dl-horizontal">
-  <dt>Orphaned Components</dt>
-  <dd><%= @orphaned_components.to_s %></dd>
-  <dt>Empty Kits</dt>
-  <dd><%= @empty_kits.to_s %></dd>
-</dl>
-
-<% unless @missing_inventory_records.empty? %>
-  <h2>Missing Components</h2>
-  <table class="table table-striped">
-    <thead>
+<h2><%= t('loan.index.title') %></h2>
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>Kit</th>
+      <th>Asset Tags</th>
+      <th>Kit Components</th>
+      <th>Pick Up Date</th>
+      <th>Return Date</th>
+      <th>Out Date</th>
+      <th>In Date</th>
+      <th>State</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @loans.each do |loan| %>
       <tr>
-        <th>Kit</th>
-        <th>Brand</th>
-        <th>Model</th>
-        <th>Asset Tag</th>
-        <th>Serial Number</th>
-        <th>Status</th>
-        <th>Action</th>
+        <td><%= loan.kit %></td>
+        <td class="ellipsize"><%= loan.kit.tabular_asset_tags %></td>
+        <td class="ellipsize"><%= loan.kit.tabular_component_list %></td>
+        <td style="white-space: nowrap;"><%= loan.starts_at %></td>
+        <td style="white-space: nowrap;"><%= loan.ends_at %></td>
+        <td style="white-space: nowrap;"><%= loan.out_at %></td>
+        <td style="white-space: nowrap;"><%= loan.in_at %></td>
+        <td><%= loan.state %></td>
+        <td>
+          <div class="btn-group">
+            <button class="btn dropdown-toggle" data-toggle="dropdown">
+              <i class="icon-cog"></i>
+              <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu">
+              <li><%= show_link(loan) %></li>
+              <% if loan.approved? %>
+              <li><%= checkout_link(loan) %></li>
+              <% end %>
+              <li><%= edit_link(loan) %></li>
+            </ul>
+          </div>
+        </td>
       </tr>
-    </thead>
-    <tbody>
-      <%= render partial:'inventory_record', collection: @missing_inventory_records %>
-    </tbody>
-  </table>
-<% end %>
+    <% end %>
+  </tbody>
+</table>

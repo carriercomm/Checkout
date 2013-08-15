@@ -121,9 +121,12 @@ class Location < ActiveRecord::Base
     nexts.sort.first.to_time
   end
 
-  def open_on?(date)
+  # returns true if the location has any hours on the same day as 'time'
+  def open_on?(time)
+    time = time.in_timezone if time.is_a? DateTime
+
     schedules.each do |s|
-      return true if s.occurs_on?(date.to_time.at_beginning_of_day)
+      return true if s.occurs_on?(time.at_beginning_of_day)
     end
     return false
   end

@@ -1,16 +1,15 @@
+body {
+  margin-top: 101px;
+}
+@media (max-width: $navbarCollapseWidth) {
+  body {
+    margin-top: 0px;
+  }
+}
 h2, h3, h4, h5, h6 {
   padding-top: 1em;
 }
 
-body { 
-  padding-top: 63px;
-}
-
-// @media (max-width: 979px) {
-//   body { 
-//     padding-top: 0px;
-//   }
-// }
 .dl-horizontal {
   dt {
     width:170px;
@@ -25,6 +24,11 @@ body {
 }
 textarea {
   height:210px;
+}
+.navbar-search {
+  width:100%;
+  margin:0;
+  padding:0;
 }
 .nav-header {
   font-size:12px;

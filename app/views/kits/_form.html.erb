@@ -1,11 +1,11 @@
-<%= simple_nested_form_for @kit.model, :html => { :class => 'form-horizontal' } do |f| %>
+<%= simple_nested_form_for @kit, :html => { :class => 'form-horizontal' } do |f| %>
   <%= f.association :location, :prompt => 'Select location', :input_html => { :class  => 'location-select' } %>
   <div class="controls control-action">
     <!-- displays the location/new_modal partial -->
     <a data-toggle="modal" href="#location_modal">New Location</a>
   </div>
   <%= f.input :circulating, :as => :radio_buttons %>
-  <%= f.association :budget, :collection => @budgets, :label_method => :to_s, :prompt => 'Select budget' %>
+  <%= f.association :budget, :collection => budgets, :label_method => :to_s, :prompt => 'Select budget' %>
   <div class="controls control-action">
     <!-- displays the budget/new_modal partial -->
     <a data-toggle="modal" href="#budget_modal">New Budget</a>
@@ -14,16 +14,20 @@
   <%= f.input :tombstoned, :as => :radio_buttons %>
 
   <h2>Components</h2>
-  <div class="records row-fluid">
-    <div class="fields field-headers row-fluid">
-      <div class="field field-header span3">Model</div>
-      <div class="field field-header span3">Asset Tag</div>
-      <div class="field field-header span3">Serial Number</div>
-      <div class="field field-header span1">Status</div>
-    </div><!-- // -->
-    <%= f.fields_for :components %>
-    <%= f.link_to_add raw("<i class='icon-plus-sign'></i> Add another component"), :components %>
-  </div>
+  <table class="form-table">
+    <thead>
+      <tr>
+        <th>Model</th>
+        <th>Asset Tag</th>
+        <th>Serial Number</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody id="components_fields">
+      <%= f.fields_for :components, wrapper: false %>
+    </tbody>
+  </table>
+  <p><%= f.link_to_add t('kit.edit.add_component').html_safe, :components, data: { target: "#components_fields" } %></p>
 
   <div class="form-actions">
     <%= f.submit nil, :class => 'btn btn-primary' %>

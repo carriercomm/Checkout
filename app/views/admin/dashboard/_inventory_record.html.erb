@@ -1,0 +1,9 @@
+<tr id="inventory_record_<%= inventory_record.id %>">
+  <td><%= inventory_record.component.kit.to_link %></td>
+  <td><%= inventory_record.component.component_model.brand.to_link %></td>
+  <td><%= inventory_record.component.component_model.to_link %></td>
+  <td><%= inventory_record.component.asset_tag %></td>
+  <td><%= inventory_record.component.serial_number %></td>
+  <td><%= inventory_record.component.current_status %></td>
+  <td><%= link_to "Inventory", new_kit_inventory_record_path(inventory_record.component.kit), class:"btn btn-mini" %></td>
+</tr>

@@ -63,13 +63,9 @@ class Loan < ActiveRecord::Base
   validates :client_id,         :presence   => true
   validates :ends_at,           :presence   => true,    :if     => [:approved?, :checked_out?, :lost?]
   validates :in_at,             :presence   => true,    :if     => :checked_in?
-  # validates :in_attendant,      :associated => true,    :if     => :checked_in?
-  # validates :in_attendant_id,   :presence   => true,    :if     => :checked_in?
   validates :kit,               :associated => true,    :unless => :canceled?
   validates :kit_id,            :presence   => true,    :unless => :canceled?
   validates :out_at,            :presence   => true,    :if     => :checked_out?
-  # validates :out_attendant,     :associated => true,    :if     => :checked_out?
-  # validates :out_attendant_id,  :presence   => true,    :if     => :checked_out?
   validates :starts_at,         :presence   => true,    :unless => [:checked_in?, :canceled?]
   validate  :validate_approver_has_approver_role,       :unless => [:pending?, :declined?, :checked_in?, :canceled?]
   validate  :validate_check_out_components_inventoried, :if     => :checked_out?
@@ -83,13 +79,22 @@ class Loan < ActiveRecord::Base
   validate  :validate_kit_circulating,                  :unless => [:checked_in?, :canceled?]
   validate  :validate_open_on_starts_at,                :if     => :pending?
   validate  :validate_open_on_ends_at,                  :unless => [:pending?, :checked_in?, :canceled?]
+  validate  :validate_start_at_before_ends_at,          :unless => [:pending?, :checked_in?, :canceled?]
+
+  # TODO: move these constraints up into the authorization layer
+  # validates :in_attendant,      :associated => true,    :if     => :checked_in?
+  # validates :in_attendant_id,   :presence   => true,    :if     => :checked_in?
+  # validates :out_attendant,     :associated => true,    :if     => :checked_out?
+  # validates :out_attendant_id,  :presence   => true,    :if     => :checked_out?
   # validate  :validate_in_attendant_has_proper_roles,    :if     => :checked_in?
   # validate  :validate_in_attendant_is_not_client,       :if     => :checked_in?
   # validate  :validate_out_attendant_has_proper_roles,   :if     => :checked_out?
   # validate  :validate_out_attendant_is_not_client,      :if     => :checked_out?
-  validate  :validate_start_at_before_ends_at,          :unless => [:pending?, :checked_in?, :canceled?]
+
 
   ## Virtual Attributes ##
+
+  attr_accessor :component_model
 
   delegate :location, :to => :kit
 

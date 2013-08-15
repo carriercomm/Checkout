@@ -24,10 +24,10 @@ module Autocomplete
       s
     end
 
-    def search(query, limit = 10)
+    def search(query)
       query = normalize(query)
       return [] if query.blank?
-      self.where("autocomplete LIKE ?", "%#{ query }%").order(:name).limit(10)
+      where("autocomplete LIKE ?", "%#{ query }%").order(:name)
     end
   end
 

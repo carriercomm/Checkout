@@ -54,7 +54,7 @@ class ComponentModelDecorator < ApplicationDecorator
   end
 
   def to_s
-    source.name
+    to_branded_s
   end
 
 end

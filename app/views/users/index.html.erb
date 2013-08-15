@@ -32,9 +32,9 @@
       <th><%= sortable('last_name', t('user.last_name')) %></th>
       <th><%= sortable('first_name', t('user.first_name')) %></th>
       <th class="skinny-column"><%= sortable('suspension_count', t('user.suspension_count').html_safe) %></th>
-      <th><%= t '.groups', :default => t("helpers.groups") %></th>
-      <th><%= t '.roles', :default => t("helpers.roles") %></th>
-      <th><%= t '.actions', :default => t("helpers.actions") %></th>
+      <th><%= t '.groups',  :default => t("group.index.title") %></th>
+      <th><%= t '.roles',   :default => t("role.index.title") %></th>
+      <th><%= t '.actions', :default => t("helpers.headers.actions") %></th>
     </tr>
   </thead>
   <tbody>
@@ -48,9 +48,9 @@
       <td><%= user.suspension_count %></td>
       <td><%= user.groups_list %></td>
       <td><%= user.roles_list %></td>
-      <td>
-        <%= link_to t('.edit', :default => t("helpers.links.edit")),
-        edit_user_path(user), :class => 'btn btn-mini' if can? :manage, User %>
+      <td class="mini-action-buttons">
+        <%= mini_button(:show, user) %>
+        <%= mini_button(:edit, user) %>
       </td>
     </tr>
     <% end %>

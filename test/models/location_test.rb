@@ -1,4 +1,4 @@
-require 'minitest_helper'
+require 'test_helper'
 
 describe Location do
 
@@ -34,60 +34,28 @@ describe Location do
 
     # test an hour which falls within the first set of business hours
     query_time = base_time + 12.hours
-    # opens_at   = base_time + 9.hours
-    # closes_at  = base_time + 17.hours
-    # location.first_opening_time_on_date(query_time).must_equal(opens_at)
-    # location.last_closing_time_on_date(query_time).must_equal(closes_at)
-
-    location.open_on?(query_time).must_equal(true)
-    location.closed_on?(query_time).must_equal(false)
+    assert location.open_on?(query_time)
 
     # test an hour which falls before the first set of business hours
     query_time = base_time
-    # location.first_opening_time_on_date(query_time).must_equal(opens_at)
-    # location.last_closing_time_on_date(query_time).must_equal(closes_at)
-    location.open_on?(query_time).must_equal(true)
-    location.closed_on?(query_time).must_equal(false)
+    assert location.open_on?(query_time)
 
     # test an hour which falls after the first set of business hours
     query_time = base_time + 23.hours + 59.minutes + 59.seconds
-    # location.first_opening_time_on_date(query_time).must_equal(opens_at)
-    # location.last_closing_time_on_date(query_time).must_equal(closes_at)
-    location.open_on?(query_time).must_equal(true)
-    location.closed_on?(query_time).must_equal(false)
+    assert location.open_on?(query_time)
 
     # test a day outside regular business hours
     query_time = base_time + 36.hours
-    # location.first_opening_time_on_date(query_time).must_be_nil
-    # location.last_closing_time_on_date(query_time).must_be_nil
-    # puts
-    # puts "open:   " + date_open.to_s
-    # puts "closed: " + closed_at.to_s
-    # puts "base:   " + base_time.to_s
-    # puts "query:  " + query_time.to_s
-    # puts
-    # puts location.hours_on(query_time).inspect
-    # puts
-
     location.open_on?(query_time).must_equal(false)
-    location.closed_on?(query_time).must_equal(true)
 
     # test a business hour exception
     query_time = closed_at + 12.hours
-    # location.first_opening_time_on_date(query_time).must_be_nil
-    # location.last_closing_time_on_date(query_time).must_be_nil
     location.open_on?(query_time).must_equal(false)
-    location.closed_on?(query_time).must_equal(true)
 
     # make sure the exception is only the one day and the same day the
     # next week is open
     query_time = closed_at + 1.week
-    # opens_at   = base_time + 2.days + 1.week + 9.hours
-    # closes_at  = base_time + 2.days + 1.week + 17.hours
-    # location.first_opening_time_on_date(query_time).must_equal(opens_at)
-    # location.last_closing_time_on_date(query_time).must_equal(closes_at)
     location.open_on?(query_time).must_equal(true)
-    location.closed_on?(query_time).must_equal(false)
 
   end
 

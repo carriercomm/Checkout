@@ -3,12 +3,16 @@ class KitsController < ApplicationController
   # use CanCan to authorize this resource
   authorize_resource
 
+  decorates_assigned :budgets
+  decorates_assigned :kit
+  decorates_assigned :kits
+
+
   # GET /kits
   # GET /kits.json
   def index
     @kits = Kit
     apply_scopes_and_pagination
-    @kits = @kits.decorate
 
     respond_to do |format|
       format.html # index.html.erb
@@ -45,7 +49,6 @@ class KitsController < ApplicationController
       .includes([:location, :budget, { :components => :inventory_details}, {:component_models => :brand}])
       .order("components.position ASC")
       .find(params[:id])
-      .decorate
 
     respond_to do |format|
       format.html { render layout: 'sidebar' } # show.html.erb
@@ -58,8 +61,7 @@ class KitsController < ApplicationController
   def new
     @kit = Kit.new
     @kit.components.build
-    @kit = @kit.decorate
-    @budgets = Budget.active.decorate
+    @budgets = Budget.active
 
     respond_to do |format|
       format.html # new.html.erb
@@ -69,8 +71,8 @@ class KitsController < ApplicationController
 
   # GET /kits/1/edit
   def edit
-    @kit = Kit.find(params[:id]).decorate
-    @budgets = Budget.active.decorate
+    @kit = Kit.find(params[:id])
+    @budgets = Budget.active
   end
 
   # POST /kits
@@ -86,7 +88,6 @@ class KitsController < ApplicationController
       end
 
       if kit_saved
-        @kit = @kit.decorate
         format.html { redirect_to @kit, notice: 'Kit was successfully created.' }
         # format.json { render json: @kit, status: :created, location: @kit }
       else
@@ -107,8 +108,6 @@ class KitsController < ApplicationController
       if @kit.forced_not_circulating
         flash[:warning] = "Kit cannot be tombstoned and circulating, so it was forced to be non-circulating."
       end
-
-      @kit = @kit.decorate
 
       if kit_updated
         format.html { redirect_to @kit, notice: 'Kit was successfully updated.' }

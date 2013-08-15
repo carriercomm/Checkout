@@ -4,10 +4,10 @@ class ComponentDecorator < ApplicationDecorator
   decorates_association :kit
   decorates_association :inventory_details
 
-  delegate :asset_tag, :id, :serial_number
+  delegate :asset_tag, :id, :new_record?, :persisted?, :serial_number
 
   def disposition
-    case object.current_inventory_detail.missing
+    case object.current_inventory_detail.try(:missing)
     when true
       return h.t('inventory_detail.missing.true')
     when false

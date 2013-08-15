@@ -1,6 +1,8 @@
 class ComponentModelsController < ApplicationController
 
   decorates_assigned :component_model
+  decorates_assigned :component_models
+  decorates_assigned :trainings
 
   # use CanCan to authorize this resource, we have to do it manually
   # due to some weird routing/resource issue I can't figure out
@@ -14,15 +16,13 @@ class ComponentModelsController < ApplicationController
     apply_scopes
 
     # get a total (used by the select2 widget) before we apply pagination
-    @total  = @component_models.count
+    # @total = @component_models.count
 
     apply_pagination
 
-    @component_models = @component_models.decorate
-
     respond_to do |format|
       format.html
-      format.json { render json: { items: @component_models.map(&:select2_json), total: @total} }
+      # format.json { render json: { items: @component_models.map(&:select2_json), total: @total} }
     end
   end
 
@@ -30,11 +30,11 @@ class ComponentModelsController < ApplicationController
   # GET /component_models/select2.json
   def select2
     # find by name
-    component_models = ComponentModel.search(params["q"]).decorate
+    @component_models = ComponentModel.search(params["q"])
 
     respond_to do |format|
       #format.html # index.html.erb
-      format.json { render json: { items: component_models.map(&:select2_json)} }
+      format.json { render json: { items: component_models.map(&:select2_json) }}
     end
   end
 
@@ -49,7 +49,6 @@ class ComponentModelsController < ApplicationController
       .includes(:user)
       .where("users.disabled = ?", false)
       .order("users.username")
-      .decorate
 
     respond_to do |format|
       format.html { render layout: 'sidebar' } # show.html.erb
@@ -74,7 +73,6 @@ class ComponentModelsController < ApplicationController
       .includes(:user)
       .where("users.disabled = ?", false)
       .order("users.username")
-      .decorate
   end
 
   # POST /models

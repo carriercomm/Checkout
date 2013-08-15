@@ -72,9 +72,23 @@ en:
           '3': &inventory_status_missing 'Missing'
           '4': &inventory_status_deaccessioned 'Deaccessioned'
   helpers:
+    headers:
+      actions: "Actions"
     links:
-      new: "<i class='icon-plus-sign'></i> New"
       all: "All"
+      new: "<i class='icon-plus-sign'></i> New"
+    mini_buttons:
+      check_out: "<i class='icon-signout'></i>"
+      delete: "<i class='icon-trash'></i>"
+      disable: "<i class='icon-ban-circle'></i>"
+      edit: "<i class='icon-edit'></i>"
+      show: "<i class='icon-eye-open'></i>"
+    actions:
+      check_out: "Check Out or Reserve"
+      delete: "Delete"
+      disable: "Disable"
+      edit: "Edit"
+      show: "Show"
     submit:
       component_model:
         update: "Update Model"
@@ -215,6 +229,7 @@ en:
       title: "Kits"
     edit:
       title: "Edit Kit %{name}"
+      add_component: "<i class='icon-plus-sign'></i> Add another component"
     new:
       title: "New Kit"
     sidebar:
@@ -332,6 +347,8 @@ en:
     kit_select:
       title: *kit_select_title
   role:
+    index:
+      title: "Roles"
     admin: "Administrator"
     attendant: "Attendant"
   settings:
@@ -353,6 +370,8 @@ en:
       title: "New User"
     edit:
       title: "Edit User"
+      add_group: "<i class='icon-plus-sign'></i> Add another group"
+      add_training: "<i class='icon-plus-sign'></i> Add another model"
     sidebar:
       filters: "Users Filters"
       add:

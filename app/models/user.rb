@@ -118,6 +118,10 @@ class User < ActiveRecord::Base
     has_role?(:attendant) || admin?
   end
 
+  def can_see_entire_circulating_inventory?
+    Settings.clients_can_see_equipment_outside_their_groups || admin?
+  end
+
   def disabled?
     disabled == true
   end

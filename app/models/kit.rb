@@ -67,6 +67,21 @@ class Kit < ActiveRecord::Base
       .order("components.asset_tag ASC")
   end
 
+  def self.circulating_for_user(user)
+    for_user(user).where("kits.tombstoned = ? AND kits.circulating = ?", false, true).uniq
+  end
+
+  def self.for_user(user)
+    joins_sql = <<-END_SQL
+    inner join permissions on kits.id = permissions.kit_id
+    inner join groups on permissions.group_id = groups.id
+    inner join memberships on groups.id = memberships.group_id
+    inner join users on memberships.user_id = users.id
+    END_SQL
+
+    joins(joins_sql).where("users.id = ?", user.id).uniq
+  end
+
   # finds a specific asset tag
   # not fuzzy like asset_tag_search
   def self.find_by_asset_tag(asset_tag)
@@ -247,7 +262,7 @@ class Kit < ActiveRecord::Base
 
   # TODO: add check for 'hold'
   def permissions_include?(client)
-    client && circulating? && (client.admin? || groups.map(&:users).flatten.uniq.include?(client))
+    client && circulating? && (client.admin? || groups_include?(client))
   end
 
   # equal to location.open_days minus days_reserved returns in format
@@ -343,6 +358,13 @@ class Kit < ActiveRecord::Base
 
   def training_required?
     !component_models.where(training_required: true).empty?
+  end
+
+  private
+
+  # user permissions_include? since it has greater checks
+  def groups_include?(user)
+    !self.class.for_user(user).where("kits.id = ?", self.id).empty?
   end
 
 end

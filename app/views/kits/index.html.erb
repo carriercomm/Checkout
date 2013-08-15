@@ -33,27 +33,21 @@
       <th>Asset Tags</th>
       <th width="50%">Components</th>
       <th width="50%">Groups</th>
-      <th colspan="4">Actions</th>
+      <th>Actions</th>
     </tr>
   </thead>
   <tbody>
-    <% @kits.each do |kit| %>
+    <% kits.each do |kit| %>
       <tr>
         <td><%= kit.to_link %></td>
         <td><%= kit.asset_tags %></td>
         <td><%= kit.linked_component_list %></td>
         <td><%= kit.linked_groups_list %></td>
-        <td class="action-buttons">
+        <td class="mini-action-buttons">
           <%= reserve_mini_button(kit) %>
-        </td>
-        <td class="action-buttons">
           <%= checkout_mini_button(kit) %>
-        </td>
-        <td class="action-buttons">
-          <%= show_mini_button(kit, 'Loans') %>
-        </td>
-        <td class="action-buttons">
-          <%= edit_mini_button(kit) %>
+          <%= mini_button(:show, kit) %>
+          <%= mini_button(:edit, kit) %>
         </td>
       </tr>
     <% end %>

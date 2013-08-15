@@ -17,7 +17,6 @@
 //= require jquery.ui.autocomplete
 //= require jquery.ui.datepicker
 //= require jquery_nested_form
-//= require jquery_nested_form_util
 //= require jquery_ujs
 //= require datepicker
 //= require inventory_records

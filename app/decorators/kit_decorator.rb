@@ -100,7 +100,9 @@ class KitDecorator < ApplicationDecorator
   end
 
   def to_link
-    h.link_to(source.id, h.kit_path(source))
+    text = component_models.map(&:to_branded_s).join(", ")
+    title = "[#{ asset_tags }] #{ text }".squish
+    h.link_to(source.id, h.kit_path(source), rel: "tooltip", title: title)
   end
 
   def to_select2_s
@@ -108,7 +110,7 @@ class KitDecorator < ApplicationDecorator
   end
 
   def to_s
-    h.link_to(source.id, h.kit_path(source))
+    to_link
   end
 
   def tombstoned

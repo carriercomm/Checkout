@@ -1,5 +1,5 @@
 <% title "Kit #{ @kit.id }" %>
-<% subtitle @kit.component_list %>
+<% subtitle kit.component_list %>
 <% content_for :sidebar do %>
   <li class="nav-header"><%= t(".actions") %></li>
   <%= sidebar_link t('kit.sidebar.checkout.text'),
@@ -42,29 +42,29 @@
 
 <dl class="dl-horizontal">
   <dt>Location</dt>
-  <dd><%= @kit.location %></dd>
+  <dd><%= kit.location %></dd>
   <dt>Training Required</dt>
-  <dd><%= @kit.training_required %></dd>
+  <dd><%= kit.training_required %></dd>
   <dt>Circulating</dt>
-  <dd><%= @kit.circulating %></dd>
+  <dd><%= kit.circulating %></dd>
   <dt>Tombstoned</dt>
-  <dd><%= @kit.tombstoned %></dd>
-  <% if can? :manage, @kit %>
+  <dd><%= kit.tombstoned %></dd>
+  <% if can? :manage, kit %>
     <dt>Budget</dt>
-    <dd><%= @kit.budget %></dd>
+    <dd><%= kit.budget %></dd>
     <dt>Cost</dt>
-    <dd><%= @kit.cost %></dd>
+    <dd><%= kit.cost %></dd>
     <dt>Insured</dt>
-    <dd><%= @kit.insured %></dd>
+    <dd><%= kit.insured %></dd>
   <% end %>
 </dl>
 
-<% unless @kit.groups.empty? %>
+<% unless kit.groups.empty? %>
   <h2>Groups</h2>
-  <% @kit.groups.each do |group| %>
+  <% kit.groups.each do |group| %>
     <div><%= link_to group.name, group_path(group) %></div>
   <% end %>
 <% end %>
 
 <h2>Components</h2>
-<%= render partial: 'components/component_list', object: @kit.components %>
+<%= render partial: 'components/component_list', object: kit.components %>
