@@ -3,12 +3,12 @@
 <% content_for :sidebar do %>
   <li class="nav-header"><%= t(".actions") %></li>
   <%= sidebar_link t('kit.sidebar.checkout.text'),
-                   new_kit_loan_path(@kit, state_event: 'checkout'),
+                   new_kit_loan_path(@kit, event: 'checkout'),
                    t('kit.sidebar.checkout.default_tooltip'),
                    @kit.reservable?(current_user),
                    t('kit.sidebar.checkout.denied_tooltip') %>
   <%= sidebar_link t('kit.sidebar.reserve.text'),
-                   new_kit_reservation_path(@kit),
+                   new_kit_loan_path(@kit, event: 'reserve'),
                    t('kit.sidebar.reserve.default_tooltip'),
                    @kit.reservable?(current_user),
                    t('kit.sidebar.reserve.denied_tooltip') %>

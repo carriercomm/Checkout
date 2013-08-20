@@ -37,4 +37,8 @@ Checkout::Application.configure do
 
   # Expands the lines which load the assets
   config.assets.debug = true
+
+  # LiveReload rack middleware
+  config.middleware.insert_after(ActionDispatch::Static, Rack::LiveReload)
+
 end

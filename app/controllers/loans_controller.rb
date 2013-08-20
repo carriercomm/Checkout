@@ -58,22 +58,18 @@ class LoansController < ApplicationController
   # GET /loans/new.json
   def new
     client = (params[:user_id]) ? User.find(params[:user_id]) : current_user
+      @loan = client.loans.build(starts_at: Time.zone.now)
 
     # do we have a specific kit to check out?
     if params[:kit_id].present?
-      @loan = client.loans.build(kit_id: params[:kit_id])
-
-      # is this a reservation or checkout?
-      if params[:state_event] && params[:state_event] == "checkout"
-        @loan.prefill_checkout
-      end
+      @kits = [Kit.find(params[:kit_id])]
 
       # setup javascript data structures to make the date picker work
       gon.locations = @loan.kit.location_and_availability_record_for_datepicker
 
     # do we have a general component_model to check out?
     elsif params[:component_model_id].present?
-      @loan = client.loans.build_from_component_model_id(params[:component_model_id])
+      @kits = ComponentModel.find(params[:component_model_id]).try(:kits)
 
       # setup javascript data structures to make the date picker work
       gon.locations = @loan.component_model.locations_with_dates_circulating_for_datepicker

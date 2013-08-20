@@ -22,7 +22,7 @@ class ComponentModelsController < ApplicationController
 
     respond_to do |format|
       format.html
-      # format.json { render json: { items: @component_models.map(&:select2_json), total: @total} }
+      format.json { render json: { items: component_models.map(&:select2_json), total: @total} }
     end
   end
 

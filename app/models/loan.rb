@@ -67,6 +67,8 @@ class Loan < ActiveRecord::Base
   validates :kit_id,            :presence   => true,    :unless => :canceled?
   validates :out_at,            :presence   => true,    :if     => :checked_out?
   validates :starts_at,         :presence   => true,    :unless => [:checked_in?, :canceled?]
+
+  # TODO: cannot change the client unless the loan is new
   validate  :validate_approver_has_approver_role,       :unless => [:pending?, :declined?, :checked_in?, :canceled?]
   validate  :validate_check_out_components_inventoried, :if     => :checked_out?
   validate  :validate_check_in_components_inventoried,  :if     => [:checked_in?, :lost?]

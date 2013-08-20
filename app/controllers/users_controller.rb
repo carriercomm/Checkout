@@ -37,7 +37,7 @@ class UsersController < ApplicationController
   def search
     q = params["q"]
     users  = User.search(q).limit(10).decorate
-    users.map!(&:autocomplete_json
+    users.map!(&:autocomplete_json)
 
     respond_to do |format|
       format.json { render json: users }
