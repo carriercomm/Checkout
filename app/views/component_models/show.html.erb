@@ -2,17 +2,9 @@
 
 <% content_for :sidebar do %>
   <li class="nav-header"><%= t(".actions") %></li>
-  <li><%= edit_link(@component_model) %></li>
-  <li><%= link_to 'Reserve', new_component_model_loan_path(@component_model) %></li>
-  <%= sidebar_link t('component_model.sidebar.split.text'),
-                   new_split_component_model_path("split_component_model[root_component_model_id]" => @component_model.id),
-                   t('component_model.sidebar.split.default_tooltip'),
-                   can?(:manage, ComponentModel),
-                   t('component_model.sidebar.split.denied_tooltip') %>
-  <li><%#= link_to('Delete', component_model_path(@component_model),
-                :method => 'delete',
-                :confirm => 'Are you sure? This will also delete all the components associated with this model!') if can? :manage, ComponentModel %></li>
-
+  <li><%= sidebar_link(:edit, @component_model) %></li>
+  <%= sidebar_link(:edit, { path: new_split_component_model_path("split_component_model[root_component_model_id]" => @component_model.id) },
+                          { text: t('component_model.sidebar.split.text') }) %>
 <% end %>
 
 <dl class="dl-horizontal">

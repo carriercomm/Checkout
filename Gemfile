@@ -11,6 +11,7 @@ gem 'jquery-rails'                   # jQuery javascript integration
 gem 'kaminari'                       # pagination
 gem 'mysql2'                         # mysql db driver
 gem 'nested_form'                    # dynamic nested form helper
+gem 'nokogiri'
 gem 'pg'                             # postgres db driver
 gem 'rails', '3.2.14'                # rails
 gem 'rolify'                         # role management
@@ -33,9 +34,13 @@ end
 
 group :development do
   gem 'awesome_print'                # pretty object printer
+  gem 'guard'
+  gem 'guard-livereload'
+  gem 'guard-minitest'
   gem 'immigrant'                    # migration generator for foreign keys
   gem 'pry-rails'                    # rails console on steroids
   gem 'quiet_assets'                 # stop the log diarrhea
+  gem 'rack-livereload'
   gem 'thin'                         # web server
 end
 

@@ -8,22 +8,31 @@
 #   watch('test/test_helper.rb') { :minitest }
 # end
 
-guard 'minitest' do
-  # with Minitest::Unit
-  watch(%r|^test/(.*)\/?(.*)_test\.rb$|)
-  watch(%r|^lib/(.*)([^/]+)\.rb$|)      { |m| "test/#{m[1]}test_#{m[2]}.rb" }
-  watch(%r|^test/minitest_helper\.rb$|) { "test" }
-  watch(%r|^test/factories\.rb$|)       { "test" }
-
-  # with Minitest::Spec
-  # watch(%r|^spec/(.*)_spec\.rb|)
-  # watch(%r|^lib/(.*)([^/]+)\.rb|)     { |m| "spec/#{m[1]}#{m[2]}_spec.rb" }
-  # watch(%r|^spec/spec_helper\.rb|)    { "spec" }
-
-  # Rails 3.2
-  watch(%r|^app/controllers/(.*)_controller\.rb$|) { |m| "test/acceptance/#{m[1]}_test.rb" }
-  watch(%r|^app/decorators/(.*)_decorator\.rb$|) { |m| "test/acceptance/#{m[1]}s_test.rb" }
-  watch(%r|^app/helpers/(.*)\.rb$|)     { |m| "test/helpers/#{m[1]}_test.rb" }
-  watch(%r|^app/models/(.*)\.rb$|)      { |m| "test/models/#{m[1]}_test.rb" }
-  watch(%r|^app/views/(.*)\/(.*)\.erb$|) { |m| "test/acceptance/#{m[1]}_test.rb" }
+guard 'livereload' do
+  watch(%r{app/views/.+\.(erb|haml|slim)})
+  watch(%r{app/helpers/.+\.rb})
+  watch(%r{public/.+\.(css|js|html)})
+  watch(%r{config/locales/.+\.yml})
+  # Rails Assets Pipeline
+  watch(%r{(app|vendor)(/assets/\w+/(.+\.(css|js|html))).*}) { |m| "/assets/#{m[3]}" }
 end
+
+# guard 'minitest' do
+#   # with Minitest::Unit
+#   watch(%r|^test/(.*)\/?(.*)_test\.rb$|)
+#   watch(%r|^lib/(.*)([^/]+)\.rb$|)      { |m| "test/#{m[1]}test_#{m[2]}.rb" }
+#   watch(%r|^test/minitest_helper\.rb$|) { "test" }
+#   watch(%r|^test/factories\.rb$|)       { "test" }
+
+#   # with Minitest::Spec
+#   # watch(%r|^spec/(.*)_spec\.rb|)
+#   # watch(%r|^lib/(.*)([^/]+)\.rb|)     { |m| "spec/#{m[1]}#{m[2]}_spec.rb" }
+#   # watch(%r|^spec/spec_helper\.rb|)    { "spec" }
+
+#   # Rails 3.2
+#   watch(%r|^app/controllers/(.*)_controller\.rb$|) { |m| "test/acceptance/#{m[1]}_test.rb" }
+#   watch(%r|^app/decorators/(.*)_decorator\.rb$|) { |m| "test/acceptance/#{m[1]}s_test.rb" }
+#   watch(%r|^app/helpers/(.*)\.rb$|)     { |m| "test/helpers/#{m[1]}_test.rb" }
+#   watch(%r|^app/models/(.*)\.rb$|)      { |m| "test/models/#{m[1]}_test.rb" }
+#   watch(%r|^app/views/(.*)\/(.*)\.erb$|) { |m| "test/acceptance/#{m[1]}_test.rb" }
+# end

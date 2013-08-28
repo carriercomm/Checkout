@@ -22,7 +22,7 @@ class Component < ActiveRecord::Base
 
   ## Validations ##
 
-  validates_presence_of :component_model
+  validates :component_model, :presence => true
   # removing this so there's some mechanism for moving components from
   # one kit to another
   # validates_presence_of :kit

@@ -2,34 +2,23 @@
 
 <% content_for :sidebar do %>
   <li class="nav-header"><%= t(".actions") %></li>
-  <%= sidebar_link(t("helpers.links.new"),
-                   new_component_model_path,
-                   t("component_model.sidebar.add.default_tooltip"),
-                   can?(:manage, ComponentModel),
-                   t("component_model.sidebar.add.denied_tooltip"),
-                   :class=>'btn-new') %>
+  <%= sidebar_link(:new, ComponentModel.new) %>
   <li class="nav-header"><%= t("component_model.sidebar.filters") %></li>
-  <%= sidebar_link t("component_model.sidebar.all.text"),
-                   component_models_path,
-                   t("component_model.sidebar.all.default_tooltip") %>
-  <%= sidebar_link t("component_model.sidebar.circulating.text"),
-                   circulating_component_models_path,
-                   t("component_model.sidebar.circulating.default_tooltip") %>
-  <%#= sidebar_link t("component_model.sidebar.non_circulating.text"),
-                   non_circulating_component_models_path,
-                   t("component_model.sidebar.non_circulating.default_tooltip") %>
+  <%= sidebar_link(:index, nil, { path: component_models_path                 }, { text: t("component_model.sidebar.all.text").html_safe             }) %>
+  <%= sidebar_link(:index, nil, { path: circulating_component_models_path     }, { text: t("component_model.sidebar.circulating.text").html_safe     }) %>
+  <%#= sidebar_link(:index, nil, { path: non_circulating_component_models_path }, { text: t("component_model.sidebar.non_circulating.text").html_safe }) %>
 <% end %>
 
 <%= paginate @component_models %>
 
-<table class="table table-striped">
+<table class="table">
   <thead>
     <tr>
       <th>Brand</th>
       <th>Model</th>
       <th>Description</th>
       <th>Count</th>
-      <th class="actions">Actions</th>
+      <th class="actions"><%= t('.actions', default: t('helpers.headers.actions')) %></th>
     </tr>
   </thead>
   <tbody>
@@ -39,8 +28,8 @@
         <td><%= link_to cm.name, component_model_path(cm) %></td>
         <td><%= cm.description %></td>
         <td><%= cm.kits.count %></td>
-        <td>
-          <%= mini_button(:check_out, Loan.new(component_model: cm.object)) %>
+        <td class="mini-action-buttons">
+          <%= mini_button(:index, nil, { path: component_model_kits_path(cm) }, { text: t('kit.index.title') }) %>
           <%= mini_button(:edit, cm) %>
         </td>
       </tr>

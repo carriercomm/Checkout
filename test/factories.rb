@@ -2,6 +2,10 @@ FactoryGirl.define do
 
   sequence(:id) { |n| n }
 
+  factory :audit_inventory_record do
+    attendant
+  end
+
   factory :brand do
     after(:build) do |b|
       n      = FactoryGirl.generate :id
@@ -44,6 +48,14 @@ FactoryGirl.define do
     description "Things that do stuff"
   end
 
+  factory :check_in_inventory_record do
+    attendant
+  end
+
+  factory :check_out_inventory_record do
+    attendant
+  end
+
   factory :component do
     sequence(:serial_number) { |n| "THX1138-#{n}" }
     sequence(:asset_tag) { |n| "867-5309-#{n}" }
@@ -82,25 +94,33 @@ FactoryGirl.define do
     insured false
     tombstoned false
 
-    trait :circulating do
+    trait :is_circulating do
       circulating true
     end
 
-    trait :insured do
+    trait :is_insured do
       insured true
     end
 
-    trait :location do
+    trait :has_location do
       location
     end
 
-    trait :tombstoned do
+    trait :is_tombstoned do
       tombstoned true
     end
 
-    factory :circulating_kit, :traits => [:circulating]
-    factory :circulating_kit_with_location, :traits => [:circulating, :location]
-    factory :kit_with_location, :traits => [:location]
+    factory :circulating_kit, :traits => [:is_circulating]
+    factory :circulating_kit_with_location, :traits => [:is_circulating, :has_location]
+    factory :kit_with_location, :traits => [:has_location]
+  end
+
+  factory :inventory_detail do
+  end
+
+  factory :loan do
+    starts_at Date.today - 1.day
+    #ends_at   Date.today + 1.day
   end
 
   factory :location do
@@ -117,19 +137,13 @@ FactoryGirl.define do
 
   end
 
-  factory :permission do
-    group
-    kit_with_location
-  end
-
-  factory :loan do
-    starts_at Date.today - 1.day
-    #ends_at   Date.today + 1.day
-  end
+  factory :permission
 
   factory :role do
     name "roley-role"
   end
+
+  factory :training
 
   factory :user do
     sequence(:username) { |n| "user#{n}" }
@@ -152,7 +166,7 @@ FactoryGirl.define do
       end
     end
 
-    factory :attendant_user do
+    factory :attendant_user, aliases: ['attendant'] do
       after(:build) do |u|
         attendant_role = Role.find_by_name("attendant")
         raise "missing attendant role" unless attendant_role

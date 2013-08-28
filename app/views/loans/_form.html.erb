@@ -1,9 +1,20 @@
+<div class="well">
+  <dl class="dl-horizontal">
+    <dt>Kit</dt>
+    <dd><%= loan.kit.to_link %></dd>
+    <dt>Location</dt>
+    <dd><%= loan.kit.location %></dd>
+    <dt>Components</dt>
+    <dd><%= loan.kit.component_list %></dd>
+  </dl>
+</div>
+
 <%= simple_form_for @loan, :html => { :class => 'form-horizontal' } do |f| %>
   <fieldset>
-    <div class="alert alert-info">
-      <button type="button" class="close" data-dismiss="alert">×</button>
-      <strong>Note:</strong> The default length of a checkout is <%= @default_checkout_length %> day(s), not including weekends and holidays. If you select a return date beyond <%= @default_checkout_length %> day(s), your reservation will require approval.
-    </div>
+    <!-- <div class="alert alert-info"> -->
+    <!--   <button type="button" class="close" data-dismiss="alert">×</button> -->
+    <!--   <strong>Note:</strong> The default length of a checkout is <%= @default_checkout_length %> day(s), not including weekends and holidays. If you select a return date beyond <%= @default_checkout_length %> day(s), your reservation will require approval. -->
+    <!-- </div> -->
 
     <% if can? :manage, @loan %>
       <%= f.input :client, :as => :ajax_association, :path => select2_users_path(:format => :json) %>
@@ -12,21 +23,22 @@
       <%= f.input       :client, :readonly => true, :disabled => true %>
     <% end %>
 
-    <% if @loan.kit %>
-      <%= f.association :kit, :as => :hidden %>
-      <%= f.input       :kit, :readonly => true, :disabled => true %>
-    <% else %>
-      <%= f.input :component_model_id, :as => :hidden %>
-      <%= f.input :component_model, :disabled => true %>
-    <% end %>
-
-    <%= f.input :location, :collection => f.object.locations, :prompt => "Select a checkout location" %>
+    <%= f.association :kit, :as => :hidden %>
+    <%#= f.input       :kit, :readonly => true, :disabled => true %>
 
     <% if @loan.out_at %>
       <%= f.input :out_at, :as => :hidden %>
       <%= f.input :out_at, :as => :date_picker, :disabled => true %>
     <% else %>
-      <%= f.input :starts_at, :as => :date_picker %>
+      <%= f.input :starts_at, :as => :hidden, :input_html => { :value => I18n.localize(@loan.starts_at, :format => "%Y/%m/%d") } %>
+      <div class="control-group required">
+        <label class="required control-label" for="loan_starts_at">
+            <abbr title="required">*</abbr> <%= t('simple_form.labels.loan.starts_at') %>
+        </label>
+        <div class="controls">
+          <div id="loan_pickup_calendar"></div>
+        </div>
+      </div>
     <% end %>
 
     <%#= f.input :ends_at, :as => :date_picker %>

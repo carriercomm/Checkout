@@ -1,34 +1,16 @@
 <% title t('loan.index.title') %>
 
 <% content_for :sidebar do %>
-  <li class="nav-header"><%= t(".actions") %></li>
-  <%= sidebar_link t('helpers.links.new'),
-                   new_loan_path,
-                   t('loan.sidebar.add.default_tooltip'),
-                   can?(:manage, Loan),
-                   t('loan.sidebar.add.denied_tooltip') %>
+  <!-- <li class="nav-header"><%= t(".actions") %></li> -->
+  <!-- <%= sidebar_link(:new, Loan.new) %> -->
   <li class="nav-header"><%= t("loan.sidebar.filters") %></li>
-  <%= sidebar_link t("loan.sidebar.all.text"),
-                    loans_path,
-                    t("loan.sidebar.all.default_tooltip") %>
-  <%= sidebar_link t("loan.sidebar.pending.text"),
-                    pending_loans_path(@forward_params),
-                    t("loan.sidebar.pending.default_tooltip") %>
-  <%= sidebar_link t("loan.sidebar.approved.text"),
-                    approved_loans_path(@forward_params),
-                    t("loan.sidebar.approved.default_tooltip") %>
-  <%= sidebar_link t("loan.sidebar.checked_out.text"),
-                    checked_out_loans_path(@forward_params),
-                    t("loan.sidebar.checked_out.default_tooltip") %>
-  <%= sidebar_link t("loan.sidebar.checked_in.text"),
-                    checked_in_loans_path(@forward_params),
-                    t("loan.sidebar.checked_in.default_tooltip") %>
-  <%= sidebar_link t("loan.sidebar.rejected.text"),
-                    rejected_loans_path(@forward_params),
-                    t("loan.sidebar.rejected.default_tooltip") %>
-  <%= sidebar_link t("loan.sidebar.canceled.text"),
-                    canceled_loans_path(@forward_params),
-                    t("loan.sidebar.canceled.default_tooltip") %>
+  <%= sidebar_link(:index, nil, { path: loans_path                              }, { text: t("loan.sidebar.all.text").html_safe         }) %>
+  <%= sidebar_link(:index, nil, { path: pending_loans_path(@forward_params)     }, { text: t("loan.sidebar.pending.text").html_safe     }) %>
+  <%= sidebar_link(:index, nil, { path: approved_loans_path(@forward_params)    }, { text: t("loan.sidebar.approved.text").html_safe    })%>
+  <%= sidebar_link(:index, nil, { path: checked_out_loans_path(@forward_params) }, { text: t("loan.sidebar.checked_out.text").html_safe }) %>
+  <%= sidebar_link(:index, nil, { path: checked_in_loans_path(@forward_params)  }, { text: t("loan.sidebar.checked_in.text").html_safe  }) %>
+  <%#= sidebar_link(:index, nil, { path: rejected_loans_path(@forward_params)    }, { text: t("loan.sidebar.rejected.text").html_safe    }) %>
+  <%= sidebar_link(:index, nil, { path: canceled_loans_path(@forward_params)    }, { text: t("loan.sidebar.canceled.text").html_safe    }) %>
 <% end %>
 
 <%= paginate @loans %>
@@ -60,20 +42,13 @@
         <td style="white-space: nowrap;"><%= loan.out_at %></td>
         <td style="white-space: nowrap;"><%= loan.in_at %></td>
         <td><%= loan.state %></td>
-        <td>
-          <div class="btn-group">
-            <button class="btn dropdown-toggle" data-toggle="dropdown">
-              <i class="icon-cog"></i>
-              <span class="caret"></span>
-            </button>
-            <ul class="dropdown-menu">
-              <li><%= show_link(loan) %></li>
-              <% if loan.approved? %>
-              <li><%= checkout_link(loan) %></li>
-              <% end %>
-              <li><%= edit_link(loan) %></li>
-            </ul>
-          </div>
+        <td class="mini-action-buttons">
+          <% if loan.checked_out? %>
+            <%= mini_button(:check_in, loan) %>
+          <% else %>
+            <%= mini_button(:check_out, loan) %>
+          <% end %>
+          <%= mini_button(:edit, loan) %>
         </td>
       </tr>
     <% end %>

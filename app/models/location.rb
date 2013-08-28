@@ -105,6 +105,7 @@ class Location < ActiveRecord::Base
 
   # finds the closest open date on, or after, the time passed
   def next_time_open(time = Time.zone.now)
+    return nil unless business_hours.count > 0
     nexts = []
 
     time = time.to_time

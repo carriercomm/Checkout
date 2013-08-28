@@ -41,9 +41,9 @@ class User < ActiveRecord::Base
                   :remember_me,
                   :username)
 
-  accepts_nested_attributes_for(:inventory_records,
-                                :reject_if => proc { |attributes| attributes['component_id'].blank? || attributes['inventory_status_id'].blank? },
-                                :allow_destroy=> false)
+  # accepts_nested_attributes_for(:inventory_records,
+  #                               :reject_if => proc { |attributes| attributes['component_id'].blank? || attributes['inventory_status_id'].blank? },
+  #                               :allow_destroy=> false)
 
   accepts_nested_attributes_for(:memberships,
                                 :reject_if => proc { |attributes| attributes['group_id'].blank? },
@@ -134,16 +134,6 @@ class User < ActiveRecord::Base
 
   def downcase_username
     username.downcase!
-  end
-
-  def new_inventory_records(kit)
-    components = kit.is_a?(Draper::Base) ? kit.model.components : kit.components
-    components.map do |c|
-      ir = InventoryRecord.new
-      ir.attendant = self
-      ir.component = c
-      ir
-    end
   end
 
   def signed_all_covenants?

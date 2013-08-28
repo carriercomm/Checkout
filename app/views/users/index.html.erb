@@ -23,7 +23,7 @@
 
 <%= paginate @users %>
 
-<table class="table table-striped">
+<table class="table">
   <thead>
     <tr>
       <th class="skinny-column"><%= t('user.status.title') %></th>
@@ -34,7 +34,7 @@
       <th class="skinny-column"><%= sortable('suspension_count', t('user.suspension_count').html_safe) %></th>
       <th><%= t '.groups',  :default => t("group.index.title") %></th>
       <th><%= t '.roles',   :default => t("role.index.title") %></th>
-      <th><%= t '.actions', :default => t("helpers.headers.actions") %></th>
+      <th class="actions"><%= t '.actions', :default => t("helpers.headers.actions") %></th>
     </tr>
   </thead>
   <tbody>

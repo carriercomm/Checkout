@@ -31,47 +31,50 @@
     <div class="navbar navbar-inverse navbar-fixed-top">
       <div class="navbar-inner">
         <div class="container-fluid">
-          <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
-          <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </button>
+          <div class="row-fluid">
+            <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+            <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
 
-          <!-- Title -->
-          <a class="brand" href="/">Checkout</a>
+            <!-- Title -->
+            <a class="brand" href="/">Checkout</a>
 
-          <div class="nav-collapse collapse">
-            <ul class="nav pull-right">
-              <li class="divider-vertical"></li>
-              <%= dropdown_for(current_user.username, "icon-user icon-white") do %>
-                <li><%= button_to "Sign out", destroy_user_session_path, :method => :delete, :form_class => 'dropdown-menu-item' %></li>
-                <li><%= link_to "Edit", edit_user_registration_path %></li>
-              <% end %>
-            </ul>
-            <ul class="nav">
-              <li><%= link_to "Dashboard", dashboard_path %></li>
-              <li><%= link_to "Brands", circulating_brands_path if can? :read, Brand %></li>
-              <li><%= link_to "Categories", categories_path  if can? :read, Category %></li>
-              <li><%= link_to "Kits", circulating_kits_path if can? :manage, Kit %></li>
-              <li><%= link_to "Loans", loans_path if can? :read, Loan %></li>
-              <li><%= link_to "Locations", locations_path if can? :read, Location %></li>
-              <li><%= link_to "Models", circulating_component_models_path if can? :read, ComponentModel %></li>
-              <%= dropdown_for("Admin") do %>
-                <li><%= link_to "Application Settings", settings_path if can? :read, Settings %></li>
-                <li><%= link_to "Budgets", budgets_path if can? :read, Budget %></li>
-                <li><%= link_to "Covenants", covenants_path  if can? :manage, Covenant %></li>
-                <li><%= link_to "Groups", active_groups_path if can? :manage, Group %></li>
-                <li><%= link_to "Inventory", inventory_records_path if can? :manage, InventoryRecord %></li>
-                <li><%= link_to("Users", active_users_path) if can? :manage, User %></li>
-              <% end %>
-            </ul>
-          </div><!--/.nav-collapse -->
-        </div>
-        <div class="container-fluid">
-          <form class="navbar-search" action="">
-            <input id="q" name="q" placeholder="Search for asset tags, kit numbers, users, models" type="text" class="ui-autocomplete-input" style="width:100%" autocomplete="off"></input>
-          </form>
+            <div class="nav-collapse collapse">
+              <ul class="nav pull-right">
+                <li class="divider-vertical"></li>
+                <%= dropdown_for(current_user.username, "icon-user icon-white") do %>
+                  <li><%= button_to "Sign out", destroy_user_session_path, :method => :delete, :form_class => 'dropdown-menu-item' %></li>
+                  <li><%= link_to "Edit", edit_user_registration_path %></li>
+                <% end %>
+              </ul>
+              <ul class="nav">
+                <li><%= link_to "Dashboard", dashboard_path %></li>
+                <li><%= link_to "Brands", circulating_brands_path if can? :read, Brand %></li>
+                <li><%= link_to "Categories", categories_path  if can? :read, Category %></li>
+                <li><%= link_to "Kits", circulating_kits_path if can? :manage, Kit %></li>
+                <li><%= link_to "Loans", loans_path if can? :read, Loan %></li>
+                <li><%= link_to "Locations", locations_path if can? :read, Location %></li>
+                <li><%= link_to "Models", circulating_component_models_path if can? :read, ComponentModel %></li>
+                <%= dropdown_for("Admin") do %>
+                  <li><%= link_to "Application Settings", settings_path if can? :read, Settings %></li>
+                  <li><%= link_to "Budgets", budgets_path if can? :read, Budget %></li>
+                  <li><%= link_to "Covenants", covenants_path  if can? :manage, Covenant %></li>
+                  <li><%= link_to "Groups", active_groups_path if can? :manage, Group %></li>
+                  <li><%= link_to "Inventory", inventory_records_path if can? :manage, InventoryRecord %></li>
+                  <li><%= link_to("Users", active_users_path) if can? :manage, User %></li>
+                <% end %>
+              </ul>
+            </div>
+          </div>
+          <div class="row-fluid">
+            <form id="omnibox" class="navbar-search" action="">
+              <input id="q" name="q" placeholder="Search for asset tags, kit numbers, users, models" type="text" autocomplete="off"></input>
+              <!-- <input id="k" name="k" placeholder="Asset tag jump" type="text" autocomplete="off"></input> -->
+            </form>
+          </div>
         </div>
       </div>
     </div>
@@ -103,6 +106,24 @@
       </footer>
 
     </div> <!-- /container -->
+
+    <div id="shortcuts_modal" class="modal hide">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h3>Keyboard Shortcuts</h3>
+      </div>
+      <div class="modal-body">
+        <table class="table">
+          <tr>
+            <th>Key</th>
+            <th>Description</th>
+          </tr>
+          <tr>
+            <td>/</td><td>Jump to the Search omnibox</td>
+          </tr>
+        </table>
+      </div>
+    </div>
 
     <!-- Le javascript
     ================================================== -->

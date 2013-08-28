@@ -134,13 +134,28 @@ class KitsController < ApplicationController
   private
 
   def apply_scopes_and_pagination
+    scope_by_user
     scope_by_filter_params
     scope_by_brand
     scope_by_budget
     scope_by_category
+    scope_by_component_model
+
     @kits = @kits.joins(:component_models => :brand)
-      .order("brands.name, component_models.name")
+      .order(:kit_id)
       .page(params[:page])
+  end
+
+  def scope_by_user
+    if current_user.attendant?
+      # no limits
+    elsif current_user.can_see_entire_circulating_inventory?
+      # no non-circulating kits
+      @kits = @kits.circulating
+    else
+      # only circulating kits in the user's group
+      @kits = @kits.circulating_for_user(current_user)
+    end
   end
 
   def scope_by_filter_params
@@ -156,6 +171,10 @@ class KitsController < ApplicationController
   #       work with multiple brands in a kit
   def scope_by_brand
     @kits = @kits.brand(params["brand_id"]) if params["brand_id"].present?
+  end
+
+  def scope_by_component_model
+    @kits = @kits.where("component_models.id = ?", params["component_model_id"].to_i) if params["component_model_id"].present?
   end
 
   def scope_by_budget

@@ -1,11 +1,18 @@
 namespace :dbx do
 
+  desc 'dump a current snapshot of the database on ovid'
+  task :dump => :environment do
+    `ssh dxarts@ovid01.u.washington.edu '/rc00/d32/dxarts/bin/mysqldump_dbx'`
+  end
+
+  desc 'fetch a current snapshot of the database from ovid'
+  task :fetch_new => [:environment, "dbx:dump", "dbx:fetch"]
+
   desc 'fetch a current snapshot of the database from ovid'
   task :fetch => :environment do
-    `ssh dxarts@ovid.u.washington.edu '~/bin/mysqldump_dbx'`
-    file = `ssh dxarts@ovid.u.washington.edu '~/bin/latest_dbx_backup_file_name'`
+    file = `ssh dxarts@ovid01.u.washington.edu '~/bin/latest_dbx_backup_file_name'`
     Dir.chdir("#{Rails.root}/db") do
-      `scp dxarts@ovid.u.washington.edu:#{file.chomp} .`
+      `scp dxarts@ovid01.u.washington.edu:#{file.chomp} .`
     end
   end
 
@@ -224,8 +231,9 @@ namespace :dbx do
     bd = BusinessDay.order("business_days.index").all.collect { |bd| bd.id }
 
     LegacyLocation.all.each do |l|
-      location = Location.find_or_create_by_name(l.loc_name)
-      if location.name == "Raitt"
+      next if l.loc_name.nil?
+      location = Location.where(name: l.loc_name).first_or_initialize
+      if location.name == "Raitt" && location.new_record?
         # M
         attrs = {
           :business_day_ids => [bd[1]],
@@ -234,18 +242,39 @@ namespace :dbx do
           :close_hour  => 13,
           :close_minute => 00
         }
-        location.business_hours.create(attrs)
+        location.business_hours.build(attrs)
 
         # W, F
-        attrs = {
+        attrs2 = {
           :business_day_ids => [bd[3], bd[5]],
           :open_hour   => 12,
           :open_minute => 45,
           :close_hour  => 13,
           :close_minute => 30
         }
-        location.business_hours.create(attrs)
+        location.business_hours.build(attrs2)
+      elsif location.name == "FabLab" && location.new_record?
+        # M
+        attrs = {
+          :business_day_ids => [bd[1]],
+          :open_hour   => 12,
+          :open_minute => 45,
+          :close_hour  => 13,
+          :close_minute => 00
+        }
+        location.business_hours.build(attrs)
+
+        # W, F
+        attrs2 = {
+          :business_day_ids => [bd[3], bd[5]],
+          :open_hour   => 12,
+          :open_minute => 45,
+          :close_hour  => 13,
+          :close_minute => 30
+        }
+        location.business_hours.build(attrs2)
       end
+      location.save!
     end
 
     puts "Successfully migrated #{ Location.count } locations"
@@ -597,8 +626,12 @@ namespace :dbx do
           kit = Kit.find_by_asset_tag(r.eq_uw_tag)
           raise "couldn't find kit: #{ r.eq_uw_tag }" if kit.nil?
 
-          l = Loan.new
+          l = Loan.new(client: client, kit: kit)
           l.starts_at = r.resdate
+          if l.starts_at.nil?
+            raise "starts_at is nil: #{ r.inspect } "
+          end
+
           if r.resdate_end.nil?
             l.ends_at = kit.default_return_date(l.starts_at)
             if l.ends_at.nil?
@@ -615,8 +648,6 @@ namespace :dbx do
           else
             l.ends_at = kit.location.next_time_open(r.resdate_end.to_time)
           end
-          l.client    = client
-          l.kit       = kit
 
           c = r.legacy_checkout
           unless c.nil?
@@ -683,6 +714,11 @@ namespace :dbx do
         rescue StandardError => e
           error_count += 1
           puts "\tError migrating #{r.res_id}: #{ e }"
+          puts
+          puts r.inspect
+          puts
+          puts l.inspect
+          puts
           puts e.backtrace
         end
       end

@@ -2,38 +2,26 @@
 
 <% content_for :sidebar do %>
   <li class="nav-header"><%= t(".actions") %></li>
-  <%= sidebar_link(t("helpers.links.new"),
-                   new_kit_path,
-                   t("kit.sidebar.add.default_tooltip"),
-                   can?(:manage, Kit),
-                   t("kit.sidebar.add.denied_tooltip"),
-                   :class=>'btn-new') %>
+  <%= sidebar_link(:new, Kit.new) %>
   <li class="nav-header"><%= t("kit.sidebar.filters") %></li>
-  <%= sidebar_link t("kit.sidebar.all.text"), kits_path, t("kit.sidebar.all.default_tooltip") %>
-  <%= sidebar_link(t("kit.sidebar.circulating.text"),
-                   circulating_kits_path,
-                   t("kit.sidebar.circulating.default_tooltip")) %>
-  <%= sidebar_link(t("kit.sidebar.non_circulating.text"),
-                   non_circulating_kits_path,
-                   t("kit.sidebar.non_circulating.default_tooltip")) %>
-  <%= sidebar_link(t("kit.sidebar.missing_components.text"),
-                   missing_components_kits_path,
-                   t("kit.sidebar.missing_components.default_tooltip")) %>
-  <%= sidebar_link(t("kit.sidebar.tombstoned.text"),
-                   tombstoned_kits_path,
-                   t("kit.sidebar.tombstoned.default_tooltip")) %>
+  <%= sidebar_link(:index, nil, { path: kits_path                    }, { text: t("kit.sidebar.all.text").html_safe                }) %>
+  <%= sidebar_link(:index, nil, { path: circulating_kits_path        }, { text: t("kit.sidebar.circulating.text").html_safe        }) %>
+  <%= sidebar_link(:index, nil, { path: non_circulating_kits_path    }, { text: t("kit.sidebar.non_circulating.text").html_safe    }) %>
+  <%= sidebar_link(:index, nil, { path: missing_components_kits_path }, { text: t("kit.sidebar.missing_components.text").html_safe }) %>
+  <%= sidebar_link(:index, nil, { path: tombstoned_kits_path         }, { text: t("kit.sidebar.tombstoned.text").html_safe         }) %>
 <% end %>
 
 <%= paginate @kits %>
 
-<table class="table table-striped">
+<table class="table">
   <thead>
     <tr>
-      <th>Kit ID</th>
-      <th>Asset Tags</th>
-      <th width="50%">Components</th>
-      <th width="50%">Groups</th>
-      <th>Actions</th>
+      <th><%= t('kit.id') %></th>
+      <th><%= t('kit.asset_tags') %></th>
+      <th><%= t('kit.location') %></th>
+      <th><%= t('component_model.index.title') %></th>
+      <th><%= t('group.index.title') %></th>
+      <th class="actions"><%= t('helpers.headers.actions') %></th>
     </tr>
   </thead>
   <tbody>
@@ -41,11 +29,12 @@
       <tr>
         <td><%= kit.to_link %></td>
         <td><%= kit.asset_tags %></td>
+        <td><%= kit.location %></td>
         <td><%= kit.linked_component_list %></td>
         <td><%= kit.linked_groups_list %></td>
         <td class="mini-action-buttons">
-          <%= reserve_mini_button(kit) %>
-          <%= checkout_mini_button(kit) %>
+          <%= mini_button(:reserve, kit) %>
+          <%= mini_button(:check_out, kit) %>
           <%= mini_button(:show, kit) %>
           <%= mini_button(:edit, kit) %>
         </td>

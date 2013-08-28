@@ -74,6 +74,7 @@ Checkout::Application.routes.draw do
   resources :locations
   resources :models, as: "component_models", controller: "component_models" do
     collection &component_models_collection_routes
+    resources :kits
     resources :loans, only: [:new]
     resources :reservations, :except => [:index]
   end

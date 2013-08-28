@@ -11,10 +11,10 @@ class InventoryDetail < ActiveRecord::Base
 
   ## Validations ##
 
-  validates :component,           :associated => true
-  validates :component_id,        :presence   => true
-  validates :inventory_record,    :associated => true
-  # validates :inventory_record_id, :presence   => true
+  validates :component,         :presence => true
+  validates :inventory_record,  :presence => true
+  # validates :component,           :associated => true
+  # validates :inventory_record,    :associated => true
 
   ## Mass-assignable attributes ##
 

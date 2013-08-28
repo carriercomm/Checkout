@@ -35,3 +35,18 @@ jQuery ->
       window.location = ui.item.value
       false
   )
+
+  # $("#k").catcomplete(
+  #   delay: 100
+  #   minLength: 2
+  #   source: (request, response) ->
+  #     $.getJSON("/search", { k: request.term }, (result) ->
+  #       response(result)
+  #     )
+  #   autoFocus: true
+  #   focus: (event, ui) ->
+  #     false
+  #   select: (event, ui) ->
+  #     window.location = ui.item.value
+  #     false
+  # )

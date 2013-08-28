@@ -13,8 +13,8 @@ class Training < ActiveRecord::Base
 
   ## Validations ##
 
-  validates_presence_of :component_model
-  validates_presence_of :user
-  validates :user_id, :uniqueness => {:scope => :component_model_id}
+  validates :component_model, :presence => true
+  validates :user,            :presence => true
+  validates :user_id,         :uniqueness => {:scope => :component_model_id}
 
 end

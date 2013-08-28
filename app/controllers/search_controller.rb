@@ -2,17 +2,42 @@ class SearchController < ApplicationController
 
   # GET /search.json
   def index
-    q = params["q"]
     results = []
 
-    if can? :read, User
-      users  = User.search(q).limit(10).decorate
-      results.concat(users.map(&:autocomplete_json).concat(results))
-    end
+    users = get_users(params["q"])
+    results.concat(users.map(&:autocomplete_json))
 
+    component_models = get_component_models(params["q"])
+    results.concat(component_models.map(&:autocomplete_json))
+
+    kits = get_kits(params["q"])
+    results.concat(kits.map(&:autocomplete_json))
+
+    respond_to do |format|
+      format.json { render json: results }
+    end
+  end
+
+  # def kit_jump
+  #   results = []
+  #   get_kits(params["k"])
+
+  #   respond_to do |format|
+  #     format.json { render json: results }
+  #   end
+  # end
+
+  protected
+
+  def get_users(q)
+    if can? :read, User
+      return User.search(q).limit(10).decorate
+    end
+  end
+
+  def get_component_models(q)
     if can? :read, ComponentModel
       component_models = []
-
       if current_user.attendant?
         component_models = ComponentModel.search(q).limit(20).decorate
       elsif current_user.can_see_entire_circulating_inventory?
@@ -20,11 +45,11 @@ class SearchController < ApplicationController
       else
         component_models = ComponentModel.circulating_for_user(current_user).search(q).limit(20).decorate
       end
-
-      results.concat(component_models.map(&:autocomplete_json))
-
+      return component_models
     end
+  end
 
+  def get_kits(q)
     if can? :read, Kit
       kits = []
 
@@ -39,11 +64,7 @@ class SearchController < ApplicationController
         kits.concat(Kit.circulating_for_user(current_user).id_search(q).limit(20).decorate)
       end
       kits.uniq!
-      results.concat(kits.map { |k| k.autocomplete_json(q: q) })
-    end
-
-    respond_to do |format|
-      format.json { render json: results }
+      return kits
     end
   end
 

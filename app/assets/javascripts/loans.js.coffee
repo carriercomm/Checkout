@@ -5,26 +5,22 @@
 
 jQuery ->
   # hide the date pickers and kit field
-  if $("#loan_location").val() == ""
-    $(".control-group.date_picker").addClass("hidden")
-    $("#loan_kit").closest(".control-group").addClass("hidden")
+  # if $("#loan_location").val() == ""
+  #   $(".control-group.date_picker").addClass("hidden")
+  #   $("#loan_kit").closest(".control-group").addClass("hidden")
 
 
   if typeof gon != "undefined"
     # convert the pickup_dates from an array of strings to properties
     # of type date on the object. this makes it simple to do
     # constant-time lookup to see if the date exists
-    if gon.locations
-      for id, location of gon.locations
-        for kit in location.kits
-          # handle pickup_dates
-          pickup_dates = kit.pickup_dates[..]
-          kit.pickup_dates = {}
-          location.pickup_dates = {}
-          for d in pickup_dates
-            day = new Date(Date.parse(d))
-            kit.pickup_dates[day] = true
-            location.pickup_dates[day] = true
+    if gon.pickup_dates
+        # handle pickup_dates
+        pickup_dates = gon.pickup_dates[..]
+        gon.pickup_dates = {}
+        for d in pickup_dates
+          day = new Date(Date.parse(d))
+          gon.pickup_dates[day] = true
 
     # check if we need to snag the suggested return day/month from the form
     if !gon.default_return_date
@@ -99,14 +95,8 @@ jQuery ->
     showOtherMonths: true,
     selectOtherMonths: true,
     beforeShowDay: (date)->
-      # fetch the location_id from the location select box
-      active_location = parseInt($("#loan_location").val())
-
-      # fetch the location's open dates from gon
-      location = if gon && gon.locations && active_location then gon.locations[active_location] else []
-
       # decide whether to activate this day looking it up in the location.pickup_dates array
-      if location.pickup_dates[date]
+      if gon.pickup_dates[date]
         return [true]
       return [false]
     onSelect: (date, inst) ->

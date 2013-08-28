@@ -2,12 +2,7 @@
 
 <% content_for :sidebar do %>
   <li class="nav-header"><%= t(".actions") %></li>
-  <%= sidebar_link(t('helpers.links.new'),
-                   new_category_path,
-                   t('category.sidebar.add.default_tooltip'),
-                   can?(:manage, Category),
-                   t('category.sidebar.add.denied_tooltip'),
-                   :class => 'btn-new') %>
+  <%= sidebar_link(:new, Category.new) %>
 <% end %>
 
 <%= paginate @categories %>
@@ -25,9 +20,9 @@
       <tr>
         <td><%= link_to category.name, category_path(category) %></td>
         <td><%= category.description %></td>
-        <td>
-          <%= link_to 'Show Models', category_component_models_path(category), :class => 'btn btn-mini' %>
-          <%= link_to 'Edit', edit_category_path(category), :class => 'btn btn-mini btn-edit-category' if can? :manage, Category %>
+        <td class="mini-action-buttons">
+          <%= mini_button(:index, nil, { path: category_component_models_path(category) }, { text: t('component_model.index.title') }) %>
+          <%= mini_button(:edit, category) %>
         </td>
       </tr>
     <% end %>

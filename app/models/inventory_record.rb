@@ -1,5 +1,6 @@
 class InventoryRecord < ActiveRecord::Base
-  class MismatchingKitException < Exception; end
+  class MismatchingKitException    < Exception; end
+  class AbstractBaseClassException < Exception; end
 
   ## Associations ##
 
@@ -13,15 +14,14 @@ class InventoryRecord < ActiveRecord::Base
 
   ## Validations ##
 
-  validates :attendant_id, :presence => true
-  validates :kit_id,       :presence => true
-  validates :type,         :presence => true
+  validates :attendant, :presence => true
+  validates :kit,       :presence => true
+  validates :type,      :presence => true
   validate  :validate_attendant_has_proper_roles
 
   ## Mass-assignable Attributes ##
 
   attr_accessible :attendant, :attendant_id, :kit, :kit_id, :loan, :loan_id
-
 
   # scope :current, joins(<<-END_SQL
   #   INNER JOIN (SELECT component_id, MAX(created_at) AS max_created_at
@@ -30,7 +30,13 @@ class InventoryRecord < ActiveRecord::Base
   #   END_SQL
   # )
 
-  # scope :currently_missing, current.where(:inventory_status_id => 3)
+  # this is effetively an abstract base, so don't use it directly
+  def initialize(args=nil)
+    if self.class == InventoryRecord
+      raise AbstractBaseClassException.new("Cannot directly instantiate an InventoryRecord, use AuditInventoryRecord, CheckInInventoryRecord or CheckOutInventoryRecord instead")
+    end
+    super
+  end
 
   def autofill_kit
     return if kit || components.empty?

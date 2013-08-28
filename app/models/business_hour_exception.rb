@@ -7,7 +7,7 @@ class BusinessHourException < ActiveRecord::Base
 
   ## Validations ##
 
-  validates_presence_of :location
+  validates :location,  :presence => true
   validates :closed_at, :presence => true
   validates :closed_at, :uniqueness => { :scope => :location_id }
 

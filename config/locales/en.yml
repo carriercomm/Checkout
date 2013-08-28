@@ -78,16 +78,24 @@ en:
       all: "All"
       new: "<i class='icon-plus-sign'></i> New"
     mini_buttons:
+      check_in: "<i class='icon-signin'></i>"
       check_out: "<i class='icon-signout'></i>"
       delete: "<i class='icon-trash'></i>"
       disable: "<i class='icon-ban-circle'></i>"
       edit: "<i class='icon-edit'></i>"
+      index: "<i class='icon-list'></i>"
+      new: "<i class='icon-plus-sign'></i>"
+      reserve: "<i class='icon-calendar'></i>"
       show: "<i class='icon-eye-open'></i>"
     actions:
-      check_out: "Check Out or Reserve"
+      check_in: "Check In"
+      check_out: "Check Out"
       delete: "Delete"
       disable: "Disable"
       edit: "Edit"
+      index: "List"
+      new: "New"
+      reserve: "Reserve"
       show: "Show"
     submit:
       component_model:
@@ -225,6 +233,9 @@ en:
         default_tooltip: 'Show all inventory records'
         denied_tooltip: "You don't have sufficient permissions to view inventory records"
   kit:
+    id: "Kit ID"
+    asset_tags: "Asset Tags"
+    location: "Location"
     index:
       title: "Kits"
     edit:
@@ -239,43 +250,24 @@ en:
         denied_tooltip: "You don't have sufficient permissions to add a new kit"
       all:
         text: "All"
-        default_tooltip: "Show all kits"
-      checkout:
-        text: 'Check Out'
-        default_tooltip: 'Check out this kit'
-        denied_tooltip: "You don't sufficient permissions to check out this kit"
       circulating:
         text: "Circulating"
-        default_tooltip: "Show all circulating kits"
       edit:
         text: 'Edit'
-        default_tooltip: 'Edit this kit'
-        denied_tooltip: "You don't sufficient permissions to edit this kit"
       inventory_records:
         text: 'History'
-        default_tooltip: 'View inventory records for this kit'
-        denied_tooltip: "You don't sufficient permissions to view inventory records for this kit"
       loans:
         text: 'Loans'
-        default_tooltip: 'View loans for this kit'
-        denied_tooltip: "You don't sufficient permissions to view loans for this kit"
       missing_components:
         text: "Missing Components"
-        default_tooltip: "Show all kits with missing components (excluding tombstoned kits)"
       new_inventory_records:
         text: 'New'
-        default_tooltip: 'Create new inventory records for this kit'
-        denied_tooltip: "You don't sufficient permissions to create inventory records for this kit"
       non_circulating:
         text: "Non Circulating"
-        default_tooltip: "Show all non circulating kits (excluding tombstoned kits)"
       reserve:
         text: 'Reserve'
-        default_tooltip: 'Reserve this kit'
-        denied_tooltip: "You don't sufficient permissions to reserve this kit"
       tombstoned:
         text: "Tombstoned"
-        default_tooltip: "Show all tombstoned kits<br>(e.g. dead, missing, etc)"
     status:
       checked_out: "Checked Out"
       available: "Available"
@@ -287,7 +279,8 @@ en:
     new:
       title: "New Loan"
     kit_select:
-      title: &kit_select_title "Select a Kit"
+      title: &kit_select_title "Kit Selection"
+      prompt: "The %{location_name} location has %{num_kits} kit(s) to choose from:"
     not_checked_out: ''
     not_checked_in: ''
     show:
@@ -300,31 +293,21 @@ en:
       rejected: &loan_rejected '<span class="label label-important">Rejected</span>'
       pending: &loan_pending '<span class="label label-warning">Pending</span>'
     sidebar:
-      filters: "Loans Filters"
-      add:
-        default_tooltip: "Add a new loan"
-        denied_tooltip: "You don't have sufficient permissions to add a new loan"
+      filters: "Loan Filters"
       all:
         text: "All"
-        default_tooltip: "Show all loans"
       approved:
         text: *loan_approved
-        default_tooltip: "Show all approved loans"
       canceled:
         text: *loan_canceled
-        default_tooltip: "Show all canceled loans"
       checked_in:
         text: *loan_checked_in
-        default_tooltip: "Show all checked in loans"
       checked_out:
         text: *loan_checked_out
-        default_tooltip: "Show all checked out loans"
       rejected:
         text: *loan_rejected
-        default_tooltip: "Show all rejected loans"
       pending:
         text: *loan_pending
-        default_tooltip: "Show all pending loans"
   location:
     index:
       title: "Locations"

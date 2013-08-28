@@ -55,18 +55,15 @@ class Loan < ActiveRecord::Base
 
   ## Validations ##
 
-  validates :approver,          :associated => true,    :if => [:approved?, :checked_out?, :lost?]
-  validates :approver_id,       :presence   => true,    :if => [:approved?, :checked_out?, :lost?]
-  validates :check_in_inventory_record,  :associated => true, :if => :checked_in?
-  validates :check_out_inventory_record, :associated => true, :if => :checked_out?
-  validates :client,            :associated => true
-  validates :client_id,         :presence   => true
-  validates :ends_at,           :presence   => true,    :if     => [:approved?, :checked_out?, :lost?]
-  validates :in_at,             :presence   => true,    :if     => :checked_in?
-  validates :kit,               :associated => true,    :unless => :canceled?
-  validates :kit_id,            :presence   => true,    :unless => :canceled?
-  validates :out_at,            :presence   => true,    :if     => :checked_out?
-  validates :starts_at,         :presence   => true,    :unless => [:checked_in?, :canceled?]
+  validates :approver,                   :presence => true, :if     => [:approved?, :checked_out?, :lost?]
+  validates :check_in_inventory_record,  :presence => true, :if     => :checked_in?
+  validates :check_out_inventory_record, :presence => true, :if     => :checked_out?
+  validates :client,                     :presence => true
+  validates :ends_at,                    :presence => true, :if     => [:approved?, :checked_out?, :lost?]
+  validates :in_at,                      :presence => true, :if     => :checked_in?
+  validates :kit,                        :presence => true, :unless => :canceled?
+  validates :out_at,                     :presence => true, :if     => :checked_out?
+  validates :starts_at,                  :presence => true, :unless => [:checked_in?, :canceled?]
 
   # TODO: cannot change the client unless the loan is new
   validate  :validate_approver_has_approver_role,       :unless => [:pending?, :declined?, :checked_in?, :canceled?]
@@ -146,11 +143,16 @@ class Loan < ActiveRecord::Base
   alias_method_chain :build_check_out_inventory_record, :inventory_details
 
   def default_return_date
-    return nil unless kit
+    return nil unless kit && kit.location && kit.location.business_hours.count > 0
     default = Settings.default_check_out_duration
     time    = (self.starts_at + default.days)
     time    = Time.local(time.year, time.month, time.day, time.hour, time.min, time.sec)
-    location.next_time_open(time).to_datetime
+    nto     = location.next_time_open(time)
+    if nto
+      return nto.to_datetime
+    else
+      return time.to_datetime
+    end
   end
 
   def ends_at=(time)

@@ -18,9 +18,9 @@ class ComponentModel < ActiveRecord::Base
 
   ## Validations ##
 
-  validates :name, :presence => true
-  validates :name, :uniqueness => {:scope => :brand_id, :case_sensitive => false}
-  validates_presence_of :brand
+  validates :brand, :presence => true
+  validates :name,  :presence => true
+  validates :name,  :uniqueness => {:scope => :brand_id, :case_sensitive => false}
 
 
   ## Mass-assignable attributes ##

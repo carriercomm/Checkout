@@ -19,19 +19,21 @@ class KitDecorator < ApplicationDecorator
     @asset_tags ||= source.asset_tags.map(&:to_s).join(", ")
   end
 
-  def autocomplete_json(options={})
-    # q     = options.delete(:q)
-    # raise self.inspect if q.nil?
-    # regexp = Regexp.quote(q)
-    # at    = source.asset_tags.select {|at| /#{regexp}/ =~ at }
-    # label = "[#{ at.join(", ") }] #{ component_list }".squish
-
+  def autocomplete_json
     {
       :label => to_autocomplete_s,
       :value => h.url_for(source),
       :category => h.t("kit.index.title").html_safe
     }
   end
+
+  # def kit_jump_autocomplete_json
+  #   {
+  #     :label => to_autocomplete_s,
+  #     :value => h.url_for(source),
+  #     :category => h.t("kit.index.title").html_safe
+  #   }
+  # end
 
   def circulating
     to_yes_no(source.circulating)

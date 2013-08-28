@@ -9,7 +9,7 @@ class LoanDecorator < ApplicationDecorator
   decorates_association :location
   #decorates_association :out_attendant, with: UserDecorator
 
-  delegate :approved?
+  delegate :approved?, :checked_out?, :rejected?, :checked_in?, :pending?, :canceled?, :missing?
 
   def approver
     coalesce(object.approver)

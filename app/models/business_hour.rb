@@ -10,7 +10,7 @@ class BusinessHour < ActiveRecord::Base
 
   # TODO: validate with overlap detection for business hours
 
-  validates_presence_of :location
+  validates :location,     :presence => true
   validates :open_hour,    :presence => true
   validates :open_hour,    :numericality => { :only_integer => true,
                                               :greater_than_or_equal_to => 0,

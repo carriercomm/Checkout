@@ -1,19 +1,7 @@
 <% component = ComponentDecorator.decorate(f.object) unless f.object.new_record? %>
 <tr class="fields">
   <td>
-    <% if f.object.new_record? %>
-      <%= f.input :component_model_id,
-                  :label => false,
-                  :wrapper => :tabular,
-                  :input_html => {
-                      :class => 'select2-json-autocomplete select-model',
-                      :hidden => true,
-                      "data-ajax-url" => component_models_path(:format => :json)
-          } %>
-    <% else %>
-      <%= component.component_model.name %>
-      <%= f.input :component_model_id, :as => :hidden, :wrapper => :tabular %>
-    <% end %>
+      <%= f.input :component_model, :as => :ajax_association, :wrapper => :tabular, :path => component_models_path(:format => :json) %>
   </td>
   <td>
     <%= f.input :asset_tag,

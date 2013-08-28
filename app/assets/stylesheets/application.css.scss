@@ -6,14 +6,35 @@
 @import "select2";
 @import "bootstrap_overrides";
 
+form#omnibox {
+  @extend .span12;
+  white-space: nowrap;
+  input#q {
+    @extend .span12;
+  }
+  // input#k {
+  //   @extend .span3;
+  // }
+}
+
 table.form-table {
   @extend .table;
   // @extend .table-striped;
+}
+table.table {
+  @extend .table;
+  @extend .table-striped;
+}
+table.form-table,
+table.table {
   td {
     vertical-align:middle;
   }
   th.actions {
     width: 1%;
+  }
+  .mini-action-buttons {
+    text-align:right;
   }
 }
 .help-block {

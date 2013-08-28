@@ -30,9 +30,10 @@ class Kit < ActiveRecord::Base
 
   ## Validations ##
 
-  validates_presence_of :location
-  validate :should_have_at_least_one_component
-  validate :tombstoned_should_not_be_circulating
+  validates :location, :presence => true
+  validate  :should_have_at_least_one_component
+  validate  :tombstoned_should_not_be_circulating
+  # TODO: if the kit is circulating, it's location must have business hours
 
 
   ## Mass-assignable attributes ##
@@ -118,6 +119,10 @@ class Kit < ActiveRecord::Base
     circulating? && loans.with_lost_state.empty? && !loaned_between?(start_date, end_date, excluded_loans.flatten)
   end
 
+  #
+  # TODO: implement methods for loan status of this kit
+  #
+
   def checked_out?
     loans.where("loans.out_at < ? AND loans.ends_at > ?", Date.today, Date.today).count > 0
   end
@@ -143,10 +148,16 @@ class Kit < ActiveRecord::Base
   # end
 
   def default_return_date(starts_at)
+    return nil unless starts_at
     default = Settings.default_check_out_duration
     time    = (starts_at + default.days)
     time    = Time.local(time.year, time.month, time.day, time.hour, time.min, time.sec)
-    location.next_time_open(time).to_datetime
+    nto     = location.next_time_open(time)
+    if nto
+      return nto.to_datetime
+    else
+      return time.to_datetime
+    end
   end
 
   def first_available_date
@@ -271,8 +282,7 @@ class Kit < ActiveRecord::Base
   def pickup_times_for_datepicker(days_out = 90, *excluded_loans)
     excluded_loans.flatten!
     times = pickup_times(days_out, excluded_loans)
-    times.map! { |d| d.to_s(:js) }
-    return times
+    return times.map { |d| d.to_s(:js) }
   end
 
   def pickup_times(days_out = 90, *excluded_loans)
@@ -338,21 +348,14 @@ class Kit < ActiveRecord::Base
 
   end
 
-  # custom validator
-  def should_have_at_least_one_component
-    if components.length < 1
-      errors[:base] << "Kit should have at least one component"
-    end
-  end
-
   def to_s
     "#{ id.to_s } | #{asset_tags.join(", ")} | #{ components.map(&:component_model).map(&:to_branded_s).join(", ") }"
   end
 
-  # custom validator
-  def tombstoned_should_not_be_circulating
-    if tombstoned && circulating
-      errors[:base] << "Kit cannot be tombstoned AND circulating"
+  def tombstoned=(is_tombstoned)
+    tombstoned = is_tombstoned
+    if is_tombstoned
+      circulating = false
     end
   end
 
@@ -365,6 +368,20 @@ class Kit < ActiveRecord::Base
   # user permissions_include? since it has greater checks
   def groups_include?(user)
     !self.class.for_user(user).where("kits.id = ?", self.id).empty?
+  end
+
+  # custom validator
+  def should_have_at_least_one_component
+    if components.empty?
+      errors[:base] << "Kit should have at least one component"
+    end
+  end
+
+  # custom validator
+  def tombstoned_should_not_be_circulating
+    if tombstoned && circulating
+      errors[:base] << "Kit cannot be tombstoned AND circulating"
+    end
   end
 
 end

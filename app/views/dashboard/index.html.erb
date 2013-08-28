@@ -2,9 +2,7 @@
 
 <% content_for :sidebar do %>
   <li class="nav-header"><%= t(".menu") %></li>
-  <%= sidebar_link t('loan.index.title'),
-                   user_loans_path(current_user),
-                   '' %>
+  <%= sidebar_link(:index, nil, { path: user_loans_path(current_user) }, { text: t('loan.index.title') }) %>
 <% end %>
 
 <h2><%= t('loan.index.title') %></h2>

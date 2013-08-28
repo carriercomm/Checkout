@@ -35,7 +35,13 @@ class Ability
       can :read, Component
       can :read, ComponentModel
       can [:show, :edit, :update], Group, :memberships => { user_id: user.id, supervisor: true }
-      can :read, Kit
+
+      if Setting.clients_can_see_equipment_outside_their_groups
+        can :read, Kit.circulating
+      else
+        can :read, Kit.circulating_for_user(user)
+      end
+
       can :read, Location
       can :read, Loan, :client_id => user.id
       cannot :read, User
