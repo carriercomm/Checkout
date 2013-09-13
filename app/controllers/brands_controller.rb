@@ -23,22 +23,22 @@ class BrandsController < ApplicationController
   end
 
   # TODO: is this being used? move it to a collection route on the index action
-  def circulating
-    @brands = Brand.order("brands.name ASC")
-      .having_circulating_kits
-      .page(params[:page])
-      .decorate
+  # def circulating
+  #   @brands = Brand.order("brands.name ASC")
+  #     .having_circulating_kits
+  #     .page(params[:page])
+  #     .decorate
 
-    respond_to do |format|
-      format.html { render :action => 'index' }
-      # format.json { render json: @brands }
-    end
-  end
+  #   respond_to do |format|
+  #     format.html { render :action => 'index' }
+  #     # format.json { render json: @brands }
+  #   end
+  # end
 
   # GET /brands/1
   # GET /brands/1.json
   def show
-    @brand = Brand.includes(:component_models)
+    @brand = Brand.includes(:component_models => :components)
       .find(params[:id])
       .decorate
 
@@ -141,7 +141,7 @@ class BrandsController < ApplicationController
   def scope_by_filter_params
     case params[:filter]
     when "circulating"     then @brands = @brands.having_circulating_kits
-    when "non_circulating" then @brands = @brands.not_having_circulating_kits
+    when "non_circulating" then @brands = @brands.having_non_circulating_kits
     end
   end
 

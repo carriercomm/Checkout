@@ -1,12 +1,8 @@
-<% title t('location.index.title') %>
+<% title t('page_titles.index.locations') %>
 
 <% content_for :sidebar do %>
   <li class="nav-header"><%= t(".actions") %></li>
-  <%= sidebar_link(t('helpers.links.new'),
-                   new_location_path,
-                   t('location.sidebar.add.default_tooltip'),
-                   can?(:manage, Location),
-                   t('location.sidebar.add.denied_tooltip')) %>
+  <li><%= auth_link([:new, Location]) %></li>
 <% end %>
 
 <%= paginate @locations %>
@@ -14,19 +10,19 @@
 <table class="table table-striped">
   <thead>
     <tr>
-      <th>Name</th>
-      <th>Business Hours</th>
-      <th>Actions</th>
+      <th><%= t('labels.location.name') %></th>
+      <th><%= t('labels.location.business_hours') %></th>
+      <th><%= t('labels.default.actions') %></th>
     </tr>
   </thead>
   <tbody>
-    <% @locations.each do |location| %>
+    <% locations.each do |location| %>
       <tr>
-        <td><%= link_to location.name, location_path(location) %></td>
-        <td><%= raw(location.hours_to_s.join("<br>")) %></td>
-        <td>
-          <%= link_to 'Edit', edit_location_path(location), :class => 'btn btn-mini' %>
-          <%= link_to 'Destroy', location_path(location), :method => :delete, :confirm => 'Are you sure?', :class => 'btn btn-mini btn-danger' %>
+        <td><%= location.to_link %></td>
+        <td><%= location.hours %></td>
+        <td class="actions">
+          <%= auth_link(location) %>
+          <%= auth_link([:edit, location]) %>
         </td>
       </tr>
     <% end %>

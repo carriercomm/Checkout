@@ -1,3 +1,5 @@
+require 'progress_bar'
+
 namespace :dbx do
 
   desc 'dump a current snapshot of the database on ovid'
@@ -24,9 +26,16 @@ namespace :dbx do
     `gzcat #{files.last} | mysql --user=root -p dbx2`
   end
 
-  desc 'migrate data from dbx'
-  task :migrate  => :environment do
+  task :init => :environment do
     require 'tasks/legacy_classes'
+
+    log_file = File.join(Rails.root, "log", "importer.log")
+    puts "Logging to: #{ log_file }"
+    @logger = Logger.new(log_file)
+  end
+
+  desc 'migrate data from dbx'
+  task :migrate  => :init do
 
     #
     # Clean up the database a bit
@@ -45,9 +54,12 @@ namespace :dbx do
     #
 
     puts "Migrating brands..."
+    @logger.info "==== BRANDS ===="
 
     success_count = 0
     error_count   = 0
+
+    pb = ProgressBar.new(LegacyEquipment.count)
 
     LegacyEquipment.find_in_batches do |batch|
       batch.each do |le|
@@ -62,28 +74,31 @@ namespace :dbx do
               success_count += 1
             else
               error_count += 1
-              puts "\tError saving #{brand.id}:'#{ brand.name }'"
+              @logger.error "Error saving #{brand.id}:'#{ brand.name }'"
             end
           end
         rescue StandardError => e
           error_count += 1
-          puts "\tError migrating #{le.id}: #{ e }"
+          @logger.error "Error migrating #{le.id}: #{ e }"
         end
+        pb.increment!
       end
     end
 
-    puts "Successfully migrated #{ success_count } brands"
-    puts "#{ error_count } errors"
-    puts
+    @logger.info "Successfully migrated #{ success_count } brands"
+    @logger.info "#{ error_count } errors"
 
     #
     # Migrate Categories
     #
 
     puts "Migrating categories..."
+    @logger.info "==== CATEGORIES ===="
 
     success_count = 0
     error_count   = 0
+
+    pb = ProgressBar.new(LegacyCategory.count)
 
     LegacyCategory.all.each do |lc|
       category_name = (lc.category.nil?) ? "Unknown" : lc.category.strip
@@ -96,33 +111,37 @@ namespace :dbx do
             success_count += 1
           else
             error_count += 1
-            puts "\tError saving #{cat.id}:'#{ cat.name }'"
+            @logger.error "Error saving #{cat.id}:'#{ cat.name }'"
           end
         end
       rescue StandardError => e
         error_count += 1
-        puts "\tError migrating #{lc.category}: #{ e }"
+        @logger.error "Error migrating #{lc.category}: #{ e }"
       end
+      pb.increment!
     end
 
-    puts "Successfully migrated #{ success_count } categories"
-    puts "#{ error_count } errors"
-    puts
+    @logger.info "Successfully migrated #{ success_count } categories"
+    @logger.info "#{ error_count } errors"
 
     #
     # Migrate Models
     #
 
     puts "Migrating models..."
+    @logger.info "==== MODELS ===="
 
     success_count = 0
     error_count   = 0
     unknown_count = 0
 
+
+    models_count = LegacyEquipment.includes(:legacy_category).group(['eq_manufacturer', 'eq_model']).all.size
+    pb = ProgressBar.new(models_count)
+
     LegacyEquipment.includes(:legacy_category)
       .group(['eq_manufacturer', 'eq_model'])
-      .order(['eq_manufacturer', 'eq_model'])
-      .each do |le|
+      .order(['eq_manufacturer', 'eq_model']).each do |le|
 
       # puts le.eq_manufacturer.ljust(30) + " | " + le.eq_model.ljust(30) + " | " + (le.category.blank? ? "" : le.category)
 
@@ -152,19 +171,19 @@ namespace :dbx do
             success_count += 1
           else
             error_count += 1
-            puts "\tError saving #{model_obj.id}:'#{ model_obj.name }'"
-            puts model_obj.errors.inspect
+            @logger.error "Error saving #{model_obj.id}:'#{ model_obj.name }'"
+            @logger.error model_obj.errors.inspect
           end
         end
       rescue StandardError => e
         error_count += 1
-        puts "\tError migrating #{le.eq_model}: #{ e }"
+        @logger.error "Error migrating #{le.eq_model}: #{ e }"
       end
+      pb.increment!
     end
 
-    puts "Successfully migrated #{ success_count } models"
-    puts "#{ error_count } errors"
-    puts
+    @logger.info "Successfully migrated #{ success_count } models"
+    @logger.info "#{ error_count } errors"
 
 
     #
@@ -172,14 +191,22 @@ namespace :dbx do
     #
 
     puts "Migrating budgets..."
+    @logger.info "==== BUDGETS ===="
+
     success_count = 0
     error_count   = 0
+
+    budgets_count = LegacyEquipment.select(['budget_number', 'budget_name', 'eq_budget_biennium'])
+      .uniq
+      .joins("INNER JOIN budgets ON equipment.budget_id = budgets.budget_id")
+      .order(['eq_budget_biennium', 'budget_number']).all.size
+
+    pb = ProgressBar.new(budgets_count)
 
     LegacyEquipment.select(['budget_number', 'budget_name', 'eq_budget_biennium'])
       .uniq
       .joins("INNER JOIN budgets ON equipment.budget_id = budgets.budget_id")
-      .order(['eq_budget_biennium', 'budget_number'])
-      .each do |le|
+      .order(['eq_budget_biennium', 'budget_number']).each do |le|
 
       begin
         le.budget_number.strip!       unless le.budget_number.nil?
@@ -207,19 +234,19 @@ namespace :dbx do
             success_count += 1
           else
             error_count += 1
-            puts "\tError saving #{budget.id}:  #{ budget.to_s } #{ budget.errors.inspect.to_s }"
+            @logger.error "Error saving #{budget.id}:  #{ budget.to_s } #{ budget.errors.inspect.to_s }"
           end
         end
       rescue StandardError => e
         error_count += 1
-        puts le.budget_number.ljust(30) + " | " + le.budget_name.ljust(30) + " | " + le.eq_budget_biennium
-        puts "\tError migrating #{le.budget_number}: #{ e }"
+        @logger.error le.budget_number.ljust(30) + " | " + le.budget_name.ljust(30) + " | " + le.eq_budget_biennium
+        @logger.error "Error migrating #{le.budget_number}: #{ e }"
       end
+      pb.increment!
     end
 
-    puts "Successfully migrated #{ success_count } budgets"
-    puts "#{ error_count } errors"
-    puts
+    @logger.info "Successfully migrated #{ success_count } budgets"
+    @logger.info "#{ error_count } errors"
 
 
     #
@@ -227,6 +254,7 @@ namespace :dbx do
     #
 
     puts "Migrating locations and business hours..."
+    @logger.info "==== LOCATIONS AND BUSINESS HOURS ===="
 
     bd = BusinessDay.order("business_days.index").all.collect { |bd| bd.id }
 
@@ -277,8 +305,7 @@ namespace :dbx do
       location.save!
     end
 
-    puts "Successfully migrated #{ Location.count } locations"
-    puts
+    @logger.info "Successfully migrated #{ Location.count } locations"
 
 
     #
@@ -286,8 +313,12 @@ namespace :dbx do
     #
 
     puts "Migrating kits, and components..."
+    @logger.info "==== KITS AND COMPONENTS ===="
+
     success_count = 0
     error_count = 0
+
+    pb = ProgressBar.new(LegacyEquipment.count)
 
     LegacyEquipment.includes(:legacy_budget, :legacy_location).find_in_batches do |batch|
       batch.each do |le|
@@ -328,51 +359,56 @@ namespace :dbx do
             serial_number      = le.eq_serial_num.try(:strip)
             cost               = (le.eq_cost == 0) ? nil : le.eq_cost
             insured            = le.eq_insured
-            circulating       = le.circulating
 
             kit                = Kit.new
-            kit.budget         = budget
-            kit.circulating   = circulating
-            kit.cost           = cost
-            kit.insured        = insured
             kit.location       = Location.find_or_create_by_name(le.legacy_location.loc_name)
-            kit.tombstoned     = le.eq_removed
 
             component.component_model = model_obj
             component.serial_number   = serial_number
             component.accessioned_at  = le.eq_date_entered
+            component.cost            = cost
+            component.budget          = budget
+
+
             if le.eq_removed
               component.deaccessioned_at = Time.local(1900, 1, 1, 0, 0, 0).to_datetime
             end
 
             kit.components << component
 
+            if le.eq_removed
+              kit.deaccession!
+              raise "Kit not deaccessioned: #{ kit.halted_because.to_s }" if kit.halted?
+            elsif le.circulating
+              kit.circulate!
+              raise "Kit not circulated: #{ kit.halted_because.to_s }" if kit.halted?
+            else
+              # default: non-circulating
+            end
+
             if kit.save
               success_count += 1
             else
               error_count += 1
-              puts "Error saving #{ le.eq_uw_tag }:"
-              puts model_name.inspect
-              puts model_obj.inspect
-              puts
-              puts component.errors.inspect
-              puts
-              puts kit.errors.inspect
-              puts "----"
+              @logger.error "Error saving #{ le.eq_uw_tag }:"
+              @logger.error model_name.inspect
+              @logger.error model_obj.inspect
+              @logger.error component.errors.inspect
+              @logger.error kit.errors.inspect
             end
 
           end
         rescue StandardError => e
           error_count += 1
-          puts "\tError migrating #{le.eq_uw_tag}: #{ e }"
-          puts e.backtrace
+          @logger.error "Error migrating #{le.eq_uw_tag}: #{ e }"
+          @logger.error e.backtrace
         end
+        pb.increment!
       end
     end
 
-    puts "Successfully migrated #{ success_count } asset tags, kits, and components"
-    puts "#{ error_count } errors"
-    puts
+    @logger.info "Successfully migrated #{ success_count } asset tags, kits, and components"
+    @logger.info "#{ error_count } errors"
 
 
     #
@@ -380,7 +416,8 @@ namespace :dbx do
     #
 
     puts "Creating covenants..."
-    puts
+    @logger.info "==== COVENANTS ===="
+
     sor = Covenant.create!(name:"Statement of Responsibility", description:'Users have signed and submitted the "Statement of Responsibility"')
 
     #
@@ -388,6 +425,8 @@ namespace :dbx do
     #
 
     puts "Migrating users..."
+    @logger.info "==== USERS ===="
+
     success_count = 0
     error_count   = 0
 
@@ -443,6 +482,8 @@ namespace :dbx do
 
     attendants = ["joelong", "swlcomp", "jarmick", "furr"]
 
+    pb = ProgressBar.new(LegacyUser.count)
+
     LegacyUser.all.each do |lu|
       begin
         username = lu.client_id.gsub(/[^a-z0-9]/, "").strip
@@ -450,12 +491,12 @@ namespace :dbx do
         first_name = String.new
         last_name  = String.new
         if name.size > 1
-          last_name = name.first.strip
-          first_name = name.last.strip
+          last_name = name.first.try(:strip)
+          first_name = name.last.try(:strip)
         else
           name = lu.name.split(" ")
-          last_name = name.pop.strip
-          first_name = name.join(" ").strip
+          last_name = name.pop.try(:strip)
+          first_name = name.join(" ").try(:strip)
         end
         email = username + "@uw.edu"
         password = Devise.friendly_token.first(6)
@@ -479,14 +520,14 @@ namespace :dbx do
         success_count += 1
       rescue StandardError => e
         error_count += 1
-        puts "\tError migrating #{lu.client_id}: #{ e }"
+        @logger.error "Error migrating #{lu.client_id}: #{ e }"
         #puts e.backtrace
       end
+      pb.increment!
     end
 
-    puts "Successfully migrated #{ success_count } users"
-    puts "#{ error_count } errors"
-    puts
+    @logger.info "Successfully migrated #{ success_count } users"
+    @logger.info "#{ error_count } errors"
 
 
     #
@@ -494,10 +535,14 @@ namespace :dbx do
     #
 
     puts "Migrating groups and permissions..."
+    @logger.info "==== GROUPS AND PERMISSIONS ===="
+
     group_success_count = 0
     permissions_success_count = 0
     users_success_count = 0
     error_count = 0
+
+    pb = ProgressBar.new(LegacyGroup.count)
 
     LegacyGroup.includes(:legacy_permissions).all.each do |lg|
       begin
@@ -523,27 +568,27 @@ namespace :dbx do
         g.save
       rescue StandardError => e
         error_count += 1
-        puts "\tError migrating #{lg.group_id}: #{ e }"
-        puts e.backtrace
+        @logger.error "Error migrating #{lg.group_id}: #{ e }"
+        @logger.error e.backtrace
       end
+      pb.increment!
     end
 
-    puts "Successfully migrated #{ group_success_count } groups"
-    puts "\t#{ permissions_success_count } permissions"
-    puts "\t#{ users_success_count } memberships"
-    puts "#{ error_count } errors"
-    puts
-
+    @logger.info "Successfully migrated #{ group_success_count } groups"
+    @logger.info "#{ permissions_success_count } permissions"
+    @logger.info "#{ users_success_count } memberships"
+    @logger.info "#{ error_count } errors"
   end
 
 
-  desc 'migrate data from dbx'
-  task :training  => :environment do
-    require 'tasks/legacy_classes'
+  desc 'migrate training data from dbx'
+  task :training  => :init do
 
     Training.delete_all
 
     puts "Migrating training info..."
+    @logger.info "==== TRAINING ===="
+
     success_count = 0
     error_count = 0
 
@@ -555,25 +600,27 @@ namespace :dbx do
           Training.first_or_create!(user: u, component_model: c.component_model)
         rescue StandardError => e
           error_count += 1
-          puts "\tError migrating #{lt.special_id}: #{ e }"
+          @logger.error "Error migrating #{lt.special_id}: #{ e }"
 #          puts e.backtrace
         end
         success_count += 1
       else
-        puts "\tError migrating #{lt.special_id}: couldn't find component (#{lt.eq_uw_tag.to_s }) or user (#{lt.client_id})"
+        @logger.error "Error migrating #{lt.special_id}: couldn't find component (#{lt.eq_uw_tag.to_s }) or user (#{lt.client_id})"
         error_count += 1
       end
     end
 
-    puts "Successfully migrated #{ success_count } trainings"
-    puts "#{ error_count } errors"
-    puts
-
+    @logger.info "Successfully migrated #{ success_count } trainings"
+    @logger.info "#{ error_count } errors"
   end
 
   desc 'migrate data from dbx'
-  task :res  => :environment do
-    require 'tasks/legacy_classes'
+  task :res  => :init do
+
+    puts "Migrating checkouts and reservations..."
+    checkout_success_count = 0
+    reservation_success_count = 0
+    error_count = 0
 
     puts "Clearing out loans table..."
     InventoryDetail.delete_all
@@ -583,11 +630,6 @@ namespace :dbx do
     #
     # Migrate Checkouts/Reservations
     #
-
-    puts "Migrating checkouts and reservations..."
-    checkout_success_count = 0
-    reservation_success_count = 0
-    error_count = 0
 
     #
     # Clean up the database a bit
@@ -607,15 +649,18 @@ namespace :dbx do
           staff_group.kits << k
         end
       else
-        puts "-- Couldn't find asset tag: #{ tag }"
+        @logger.error "-- Couldn't find asset tag: #{ tag }"
       end
     end
     staff_group.save!
 
     system_approver = User.unscoped.find_by_username("system")
 
-
     puts "Importing reservations..."
+    @logger.info "==== RESERVATIONS ===="
+
+    pb = ProgressBar.new(LegacyReservation.count)
+
     LegacyReservation.includes(:legacy_checkout).find_in_batches do |batch|
       batch.each do |r|
         begin
@@ -627,7 +672,7 @@ namespace :dbx do
           raise "couldn't find kit: #{ r.eq_uw_tag }" if kit.nil?
 
           l = Loan.new(client: client, kit: kit)
-          l.starts_at = r.resdate
+          l.starts_at = r.resdate.to_datetime
           if l.starts_at.nil?
             raise "starts_at is nil: #{ r.inspect } "
           end
@@ -635,18 +680,18 @@ namespace :dbx do
           if r.resdate_end.nil?
             l.ends_at = kit.default_return_date(l.starts_at)
             if l.ends_at.nil?
-              puts "screwed up"
+              @logger.fatal "screwed up"
               d = Settings.default_check_out_duration
-              puts d.to_s
-              puts l.starts_at.inspect
+              @logger.fatal d.to_s
+              @logger.fatal l.starts_at.inspect
               expected_time = (l.starts_at + d.days).to_time
-              puts expected_time
-              puts kit.location.inspect
-              puts kit.location.next_time_open(expected_time).inspect
+              @logger.fatal expected_time
+              @logger.fatal kit.location.inspect
+              @logger.fatal kit.location.next_datetime_open(expected_time).inspect
               exit
             end
           else
-            l.ends_at = kit.location.next_time_open(r.resdate_end.to_time)
+            l.ends_at = kit.location.next_datetime_open(r.resdate_end.to_time)
           end
 
           c = r.legacy_checkout
@@ -657,7 +702,7 @@ namespace :dbx do
             in_attendant    = User.find_by_username(staffin_id)
 
             l.out_at        = c.dateout     unless c.dateout.nil?
-            l.ends_at       = kit.location.next_time_open(c.datedue.to_time) || kit.default_return_date(l.starts_at) if l.ends_at.nil?
+            l.ends_at       = kit.location.next_datetime_open(c.datedue.to_time) || kit.default_return_date(l.starts_at) if l.ends_at.nil?
             l.in_at         = c.datein      unless c.datein.nil?
 
             if out_attendant
@@ -686,7 +731,10 @@ namespace :dbx do
             if l.starts_at >= Date.today
               l.persist_workflow_state "approved"
               l.approver = system_approver
-              l.client.update_attributes!(disabled: false) if l.client.disabled?
+              if l.client.disabled?
+                l.client.disabled = false
+                l.client.save
+              end
             else
               l.persist_workflow_state "canceled"
             end
@@ -698,37 +746,40 @@ namespace :dbx do
               checkout_success_count += 1
             end
           else
-            puts "-- RESERVATION ERROR: #{r.res_id}"
-            puts "\t#{ l.inspect }\n"
+            @logger.error "-- RESERVATION ERROR: #{r.res_id}"
+            @logger.error "#{ l.inspect }"
             if l.check_out_inventory_record
-              puts "\t#{ l.check_out_inventory_record.inspect }\n"
+              @logger.error "#{ l.check_out_inventory_record.inspect }"
             end
             if l.check_in_inventory_record
-              puts "\t#{ l.check_in_inventory_record.inspect }\n"
+              @logger.error "#{ l.check_in_inventory_record.inspect }"
             end
-            puts "\t#{ r.inspect }\n"
-            puts "\t#{ c.inspect }\n"
-            l.errors.messages.each {|k,v| puts "\t#{ k.to_s.titleize } #{ v }" }
+            @logger.error "#{ r.inspect }"
+            @logger.error "#{ c.inspect }"
+            l.errors.messages.each {|k,v| @logger.error "#{ k.to_s.titleize } #{ v }" }
             error_count += 1
           end
         rescue StandardError => e
           error_count += 1
-          puts "\tError migrating #{r.res_id}: #{ e }"
-          puts
-          puts r.inspect
-          puts
-          puts l.inspect
-          puts
-          puts e.backtrace
+          @logger.error "Error migrating #{r.res_id}: #{ e }"
+          @logger.error r.inspect
+          @logger.error l.inspect
+          @logger.error e.backtrace
         end
+        pb.increment!
       end
     end
 
     puts "Importing check outs..."
+    @logger.info "==== CHECK OUTS ===="
 
     # migrate the checkouts that didn't have a reservation
     # some of these have a reservation id, but no corresponding reservation record
     where_clause = "res_id IS NULL OR (checkout.res_id IS NOT NULL AND checkout.res_id NOT IN (select res_id from reservation))"
+    checkouts_count = LegacyCheckout.where(where_clause).count
+
+    pb = ProgressBar.new(checkouts_count)
+
     LegacyCheckout.where(where_clause).find_in_batches do |batch|
       batch.each do |c|
         begin
@@ -752,14 +803,14 @@ namespace :dbx do
               kit.save
             end
           end
-          l.starts_at     = c.dateout
+          l.starts_at     = c.dateout.to_datetime
           if c.datedue.nil?
             l.ends_at = kit.default_return_date(l.starts_at)
           else
-            l.ends_at = kit.location.next_time_open(c.datedue)
+            l.ends_at = kit.location.next_datetime_open(c.datedue.to_datetime)
           end
-          l.out_at        = c.dateout     unless c.dateout.nil?
-          l.in_at         = c.datein      unless c.datein.nil?
+          l.out_at = c.dateout.to_datetime unless c.dateout.nil?
+          l.in_at  = c.datein.to_datetime  unless c.datein.nil?
 
           if out_attendant
             unless out_attendant.attendant?
@@ -795,36 +846,38 @@ namespace :dbx do
           if saved
             checkout_success_count += 1
           else
-            puts "--------"
-            puts "\tError migrating #{c.checkout_id}:"
-            puts "\t\t #{ l.inspect }"
-            puts "\t\t #{ c.inspect }"
-            l.errors.messages.each {|k,v| puts "\t\t#{ k.to_s.titleize } #{ v }" }
+            @logger.error "Error migrating #{c.checkout_id}:"
+            @logger.error "\t #{ l.inspect }"
+            @logger.error "\t #{ c.inspect }"
+            l.errors.messages.each {|k,v| @logger.error "\t#{ k.to_s.titleize } #{ v }" }
             error_count += 1
           end
         rescue StandardError => e
           error_count += 1
-          puts "\tError migrating #{c.checkout_id}: #{ e }"
+          @logger.error "Error migrating #{c.checkout_id}: #{ e }"
         end
+        pb.increment!
       end
     end
 
-    puts "Successfully migrated #{ reservation_success_count } of #{ LegacyReservation.count.to_s } reservations"
-    puts "\t#{ checkout_success_count } of #{ LegacyCheckout.count.to_s } checkouts"
-    puts "#{ error_count } errors"
-    puts
+    @logger.info "Successfully migrated #{ reservation_success_count } of #{ LegacyReservation.count.to_s } reservations"
+    @logger.info "#{ checkout_success_count } of #{ LegacyCheckout.count.to_s } checkouts"
+    @logger.info "#{ error_count } errors"
 
   end
 
   desc 'migrate inventory data from dbx'
-  task :inventory  => :environment do
-    require 'tasks/legacy_classes'
+  task :inventory  => :init do
 
     puts "Migrating inventory records..."
+    @logger.info "==== INVENTORY ===="
+
     success_count = 0
     error_count   = 0
 
     AuditInventoryRecord.destroy_all
+
+    pb = ProgressBar.new(LegacyInventory.count)
 
     LegacyInventory.all.each do |li|
       component     = Component.find_by_asset_tag(li.eq_uw_tag.to_s)
@@ -838,18 +891,17 @@ namespace :dbx do
       if ir.save
         success_count += 1
       else
-        puts "--------"
-        puts "\tError migrating #{li.inventory_id}:"
-        puts "\t\t #{ li.inspect }"
-        puts "\t\t #{ ir.inspect }"
-        ir.errors.messages.each {|k,v| puts "\t\t#{ k.to_s.titleize } #{ v }" }
+        @logger.error "Error migrating #{li.inventory_id}:"
+        @logger.error "#{ li.inspect }"
+        @logger.error "#{ ir.inspect }"
+        ir.errors.messages.each {|k,v| @logger.error "#{ k.to_s.titleize } #{ v }" }
         error_count += 1
       end
+      pb.increment!
     end
 
-    puts "Successfully migrated #{ success_count } of #{ LegacyInventory.count.to_s } inventory records"
-    puts "#{ error_count } errors"
-    puts
+    @logger.info "Successfully migrated #{ success_count } of #{ LegacyInventory.count.to_s } inventory records"
+    @logger.info "#{ error_count } errors"
 
   end
 
@@ -864,7 +916,7 @@ namespace :db do
   task :rebuild => ["db:drop", "db:create", "db:schema:load", "db:migrate", "db:seed"]
 
   desc "drop, create, schema load, dbx:migrate"
-  task :repop => ["db:rebuild", "dbx:migrate", "dbx:training", "dbx:res", "dbx:inventory", "db:seed_dev"]
+  task :repop => ["db:rebuild", "dbx:migrate", "dbx:training", "dbx:res", "dbx:inventory"]
 
   desc "loads some fake data, helpful for development"
   task :seed_dev => :environment do

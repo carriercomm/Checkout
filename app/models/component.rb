@@ -14,6 +14,7 @@ class Component < ActiveRecord::Base
 
   ## Associations ##
 
+  belongs_to :budget,            :inverse_of => :components
   belongs_to :component_model,   :inverse_of => :components
   belongs_to :kit,               :inverse_of => :components
   has_many   :inventory_details, :inverse_of => :component
@@ -22,25 +23,19 @@ class Component < ActiveRecord::Base
 
   ## Validations ##
 
+  validates :asset_tag,       :uniqueness => { :case_sensitive => false }, :allow_nil => true
   validates :component_model, :presence => true
-  # removing this so there's some mechanism for moving components from
-  # one kit to another
-  # validates_presence_of :kit
-  validates :asset_tag,     :uniqueness => { :case_sensitive => false }, :allow_nil => true
-  validates :serial_number, :uniqueness => { :case_sensitive => false }, :allow_nil => true
+  validates :serial_number,   :uniqueness => { :case_sensitive => false }, :allow_nil => true
 
 
   ## Mass-assignable attributes ##
 
   attr_accessible(:asset_tag,
+                  :budget_id,
                   :kit_id,
                   :component_model_id,
                   :position,
                   :serial_number)
-
-  ## Virtual attributes ##
-
-  attr_reader :component_model_name
 
 
   ## Instance Methods ##

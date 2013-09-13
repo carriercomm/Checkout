@@ -1,5 +1,6 @@
 class ComponentDecorator < ApplicationDecorator
   decorates :component
+  decorates_association :budget
   decorates_association :component_model
   decorates_association :kit
   decorates_association :inventory_details

@@ -4,30 +4,25 @@
     <!-- displays the location/new_modal partial -->
     <a data-toggle="modal" href="#location_modal">New Location</a>
   </div>
-  <%= f.input :circulating, :as => :radio_buttons %>
-  <%= f.association :budget, :collection => budgets, :label_method => :to_s, :prompt => 'Select budget' %>
-  <div class="controls control-action">
-    <!-- displays the budget/new_modal partial -->
-    <a data-toggle="modal" href="#budget_modal">New Budget</a>
-  </div>
-  <%= f.input :insured, :as => :radio_buttons %>
-  <%= f.input :tombstoned, :as => :radio_buttons %>
+  <%= f.input :workflow_state, collection: @circulation_types, :include_blank => false  %>
+  <%= f.input :custodian, input_html: { class: "users typeahead", :hidden => true } %>
 
   <h2>Components</h2>
   <table class="form-table">
     <thead>
       <tr>
-        <th>Model</th>
-        <th>Asset Tag</th>
-        <th>Serial Number</th>
-        <th>Status</th>
+        <th><%= t('labels.component.component_model') %></th>
+        <th><%= t('labels.component.asset_tag') %></th>
+        <th><%= t('labels.component.serial_number') %></th>
+        <th><%= t('labels.component.budget') %></th>
+        <th><%= t('.actions') %></th>
       </tr>
     </thead>
     <tbody id="components_fields">
       <%= f.fields_for :components, wrapper: false %>
     </tbody>
   </table>
-  <p><%= f.link_to_add t('kit.edit.add_component').html_safe, :components, data: { target: "#components_fields" } %></p>
+  <p><%= f.link_to_add t('links.kit.add_component').html_safe, :components, data: { target: "#components_fields" } %></p>
 
   <div class="form-actions">
     <%= f.submit nil, :class => 'btn btn-primary' %>
@@ -36,4 +31,3 @@
 <% end %>
 
 <%= render :partial => 'locations/new_modal' %>
-<%= render :partial => 'budgets/new_modal' %>

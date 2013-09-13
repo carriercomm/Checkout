@@ -1,15 +1,17 @@
-<h1>Category</h1>
+<% title t('page_titles.show.category') %>
+<% subtitle category.name %>
 
 <dl class="dl-horizontal">
-  <dt>Name</dt>
-  <dd><%= @category.name %></dd>
-  <dt>Description</dt>
-  <dd><%= @category.description %></dd>
+  <dt><%= t('labels.category.name') %></dt>
+  <dd><%= category.name %></dd>
+  <dt><%= t('labels.category.description') %></dt>
+  <dd><%= category.description %></dd>
 </dl>
 
 <div class="form-actions">
   <%= link_to 'Back', categories_path, :class => 'btn'  %>
-  <%= link_to 'Show Models', category_component_models_path(@category), :class => 'btn' %>
   <%= link_to('Edit', edit_category_path(@category), :class => 'btn btn-edit-category') if can? :manage, Category %>
-  <%= link_to('Delete', category_path(@category), :method => 'delete', :confirm => 'Are you sure?', :class => 'btn btn-danger btn-delete-category') if can? :manage, Category %>
+  <%= link_to('Delete', category_path(@category), :method => 'delete', :confirm => 'Are you sure?', :class => 'btn btn-danger btn-delete-category') if can? :manage, Category
+%>
+  <%= link_to 'Show Models', category_component_models_path(@category), :class => 'btn' %>
 </div>

@@ -1,5 +1,5 @@
 <tr>
-  <td><%= show_link(membership.group, membership.group.name) %></td>
+  <td><%= link_to(membership.group.name, membership.group) %></td>
   <td><%= membership.expires_at %></td>
   <td><%= membership.supervisor %></td>
 </tr>

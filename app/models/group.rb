@@ -6,11 +6,10 @@ class Group < ActiveRecord::Base
 
   ## Associations ##
 
+  has_many :kits,        :through    => :permissions
   has_many :memberships, :inverse_of => :group
-  has_many :permissions, :inverse_of => :group, :dependent => :destroy
-
-  has_many :kits,  :through => :permissions
-  has_many :users, :through => :memberships, :order => "users.username ASC"
+  has_many :permissions, :inverse_of => :group,       :dependent => :destroy
+  has_many :users,       :through    => :memberships, :order => "users.username ASC"
 
 
   ## Mass-assignable Attributes ##

@@ -1,32 +1,18 @@
-<% title t('brand.index.title') %>
+<% title t('page_titles.index.brands') %>
 
 <% content_for :sidebar do %>
   <li class="nav-header"><%= t(".actions") %></li>
-  <%= sidebar_link(t("helpers.links.new"),
-                   new_brand_path,
-                   t("brand.sidebar.add.default_tooltip"),
-                   can?(:manage, Brand),
-                   t("brand.sidebar.add.denied_tooltip"),
-                   :class => 'btn-new')
-      %>
-  <li class="nav-header"><%= t("brand.sidebar.filters") %></li>
-  <%= sidebar_link t("brand.sidebar.all.text"),
-                   brands_path,
-                   t("brand.sidebar.all.default_tooltip") %>
-  <%= sidebar_link t("brand.sidebar.circulating.text"),
-                   circulating_brands_path,
-                   t("brand.sidebar.circulating.default_tooltip") %>
-  <%= sidebar_link t("brand.sidebar.non_circulating.text"),
-                   non_circulating_brands_path,
-                   t("brand.sidebar.non_circulating.default_tooltip") %>
+  <li><%= auth_link([:new, Brand]) %></li>
+  <li class="nav-header"><%= t(".filters") %></li>
+  <li><%= auth_link(Brand) %></li>
+  <li><%= auth_link(Brand, { filter: "circulating"     }) %></li>
+  <li><%= auth_link(Brand, { filter: "non_circulating" }) %></li>
 <% end %>
 
 <% if params[:filter] && params[:filter] == "non_circulating" %>
 <div class="alert alert-info">
   <button type="button" class="close" data-dismiss="alert">×</button>
-  <strong>Note!</strong> This list of "non-circulating" brands only
-  means these brands have kits in them that are not
-  circulating. They may also have kits which <em>are</em> circulating.
+  <%= t('notifications.brand.caveat').html_safe %>
 </div>
 <% end %>
 
@@ -35,9 +21,10 @@
 <table class="table table-striped">
   <thead>
     <tr>
-      <th>Name</th>
-      <th>Model Count</th>
-      <th>Actions</th>
+      <th><%= t('labels.brand.name') %></th>
+      <th><%= t('labels.brand.component_model_count') %></th>
+      <th><%= t('labels.brand.component_count') %></th>
+      <th><%= t('labels.brand.actions', :default => :'labels.default.actions') %></th>
     </tr>
   </thead>
   <tbody>
@@ -45,12 +32,11 @@
       <tr>
         <td><%= link_to brand.name, brand_path(brand) %></td>
         <td><%= brand.component_models.count %></td>
-        <td>
-          <%= link_to 'Show Models',  brand_component_models_path(brand), :class => 'btn btn-mini' %>
-          <%= link_to t('.edit',
-                        :default => t("helpers.links.edit")),
-                        edit_brand_path(brand),
-                        :class => 'btn btn-mini btn-edit-brand' if can? :manage, Brand %>
+        <td><%= brand.component_count %></td>
+        <td class="actions">
+          <%= auth_link([brand, ComponentModel]) %>
+          <%= auth_link(brand) %>
+          <%= auth_link([:edit, brand]) %>
         </td>
       </tr>
     <% end %>

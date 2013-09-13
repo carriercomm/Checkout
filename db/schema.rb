@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130808231957) do
+ActiveRecord::Schema.define(:version => 20130912010306) do
 
   create_table "brands", :force => true do |t|
     t.string   "name",         :null => false
@@ -85,30 +85,36 @@ ActiveRecord::Schema.define(:version => 20130808231957) do
   create_table "component_models", :force => true do |t|
     t.integer  "brand_id",                             :null => false
     t.string   "name",                                 :null => false
-    t.string   "autocomplete",                         :null => false
+    t.string   "model_number"
     t.text     "description"
     t.boolean  "training_required", :default => false
+    t.string   "autocomplete",                         :null => false
     t.datetime "created_at",                           :null => false
     t.datetime "updated_at",                           :null => false
   end
 
   add_index "component_models", ["autocomplete"], :name => "index_component_models_on_autocomplete"
   add_index "component_models", ["brand_id"], :name => "index_models_on_brand_id"
+  add_index "component_models", ["model_number", "brand_id"], :name => "index_component_models_on_model_number_and_brand_id", :unique => true
   add_index "component_models", ["name", "brand_id"], :name => "index_component_models_on_name_and_brand_id", :unique => true
 
   create_table "components", :force => true do |t|
-    t.integer  "kit_id"
     t.integer  "component_model_id", :null => false
+    t.integer  "kit_id"
+    t.integer  "budget_id"
     t.string   "asset_tag"
     t.string   "serial_number"
+    t.decimal  "cost"
+    t.datetime "accessioned_at"
+    t.datetime "deaccessioned_at"
     t.integer  "position",           :null => false
     t.datetime "created_at",         :null => false
     t.datetime "updated_at",         :null => false
-    t.datetime "accessioned_at"
-    t.datetime "deaccessioned_at"
   end
 
   add_index "components", ["asset_tag"], :name => "index_components_on_asset_tag", :unique => true
+  add_index "components", ["budget_id"], :name => "index_components_on_budget_id"
+  add_index "components", ["component_model_id"], :name => "index_components_on_component_model_id"
   add_index "components", ["kit_id"], :name => "index_parts_on_kit_id"
 
   create_table "covenant_signatures", :force => true do |t|
@@ -144,30 +150,27 @@ ActiveRecord::Schema.define(:version => 20130808231957) do
   add_index "inventory_details", ["inventory_record_id"], :name => "index_component_inventory_records_on_inventory_record_id"
 
   create_table "inventory_records", :force => true do |t|
+    t.string   "type",         :null => false
     t.integer  "attendant_id", :null => false
     t.integer  "kit_id",       :null => false
     t.integer  "loan_id"
-    t.string   "type",         :null => false
     t.datetime "created_at",   :null => false
     t.datetime "updated_at",   :null => false
   end
 
   add_index "inventory_records", ["attendant_id"], :name => "index_inventory_records_on_attendant_id"
-  add_index "inventory_records", ["loan_id", "type"], :name => "index_inventory_records_on_loan_id_and_type", :unique => true
+  add_index "inventory_records", ["type", "loan_id"], :name => "index_inventory_records_on_loan_id_and_type", :unique => true
 
   create_table "kits", :force => true do |t|
-    t.integer  "location_id",                    :null => false
-    t.integer  "budget_id"
-    t.boolean  "tombstoned",  :default => false
-    t.boolean  "circulating", :default => false
-    t.decimal  "cost"
-    t.boolean  "insured",     :default => false
-    t.datetime "created_at",                     :null => false
-    t.datetime "updated_at",                     :null => false
+    t.string   "workflow_state", :default => "non_circulating", :null => false
+    t.integer  "location_id",                                   :null => false
+    t.integer  "custodian_id"
+    t.datetime "created_at",                                    :null => false
+    t.datetime "updated_at",                                    :null => false
   end
 
-  add_index "kits", ["circulating"], :name => "index_kits_on_circulating"
   add_index "kits", ["location_id"], :name => "index_kits_on_location_id"
+  add_index "kits", ["workflow_state"], :name => "index_kits_on_workflow_state"
 
   create_table "loans", :force => true do |t|
     t.string   "workflow_state",                        :null => false
@@ -317,7 +320,6 @@ ActiveRecord::Schema.define(:version => 20130808231957) do
   add_foreign_key "inventory_records", "loans", :name => "inventory_records_loan_id_fk"
   add_foreign_key "inventory_records", "users", :name => "inventory_records_attendant_id_fk", :column => "attendant_id"
 
-  add_foreign_key "kits", "budgets", :name => "kits_budget_id_fk"
   add_foreign_key "kits", "locations", :name => "kits_location_id_fk"
 
   add_foreign_key "loans", "kits", :name => "reservations_kit_id_fk"

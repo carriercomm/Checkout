@@ -33,10 +33,6 @@ FactoryGirl.define do
     # Monday 3:20pm
     close_hour 15
     close_minute 20
-
-    factory :business_hour_with_location do
-      location
-    end
   end
 
   factory :business_hour_exception do
@@ -59,6 +55,8 @@ FactoryGirl.define do
   factory :component do
     sequence(:serial_number) { |n| "THX1138-#{n}" }
     sequence(:asset_tag) { |n| "867-5309-#{n}" }
+    budget
+    cost 47
 
     factory :component_with_branded_component_model do
       association :component_model, :factory => :branded_component_model, :strategy => :build
@@ -88,26 +86,18 @@ FactoryGirl.define do
   end
 
   factory :kit do
-    budget
-    circulating false
-    cost 47
-    insured false
-    tombstoned false
+    workflow_state "non_circulating"
 
     trait :is_circulating do
-      circulating true
+      workflow_state "circulating"
     end
 
-    trait :is_insured do
-      insured true
+    trait :is_deaccessioned do
+      workflow_state "deaccessioned"
     end
 
     trait :has_location do
       location
-    end
-
-    trait :is_tombstoned do
-      tombstoned true
     end
 
     factory :circulating_kit, :traits => [:is_circulating]

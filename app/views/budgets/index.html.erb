@@ -1,13 +1,8 @@
-<%= title t('budget.index.title') %>
+<%= title t('page_titles.index.budgets') %>
 
 <% content_for :sidebar do %>
   <li class="nav-header"><%= t(".actions") %></li>
-  <%= sidebar_link(t('helpers.links.new'),
-                   new_budget_path,
-                   t('budget.sidebar.add.default_tooltip'),
-                   can?(:manage, Budget),
-                   t('budget.sidebar.add.denied_tooltip'),
-                   :class=>'btn-new') %>
+  <li><%= auth_link([:new, Budget]) %></li>
 <% end %>
 
 <%= paginate @budgets %>
@@ -15,21 +10,22 @@
 <table class="table table-striped">
   <thead>
     <tr>
-      <th>Number</th>
-      <th>Name</th>
-      <th>Dates</th>
-      <th>Actions</th>
+      <th><%= t('budget.attributes.number') %></th>
+      <th><%= t('budget.attributes.name') %></th>
+      <th><%= t('budget.attributes.dates') %></th>
+      <th><%= t('helpers.headers.actions') %></th>
     </tr>
   </thead>
   <tbody>
-    <% @budgets.each do |budget| %>
+    <% budgets.each do |budget| %>
     <tr>
-      <td><%= link_to budget.number, budget_path(budget) %></td>
+      <td><%= budget.to_link %></td>
       <td><%= budget.name %></td>
       <td><%= budget.display_date %></td>
-      <td>
-        <%= link_to 'Show Kits', budget_kits_path(budget), :class => 'btn btn-mini' %>
-        <%= link_to 'Edit', edit_budget_path(budget), :class => 'btn btn-mini btn-edit-budget' if can? :manage, Budget %>
+      <td class="actions">
+        <%= auth_link([budget, Component]) %>
+        <%= auth_link(budget) %>
+        <%= auth_link([:edit, budget]) %>
       </td>
     </tr>
     <% end %>

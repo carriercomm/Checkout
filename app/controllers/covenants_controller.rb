@@ -3,12 +3,14 @@ class CovenantsController < ApplicationController
   # use CanCan to authorize this resource
   authorize_resource
 
+  decorates_assigned :covenant
+  decorates_assigned :covenants
+
   # GET /covenants
   # GET /covenants.json
   def index
     @covenants = Covenant.page(params[:page])
       .per(params[:page_limit])
-      .decorate
 
     respond_to do |format|
       format.html # index.html.erb
@@ -19,7 +21,7 @@ class CovenantsController < ApplicationController
   # GET /covenants/1
   # GET /covenants/1.json
   def show
-    @covenant = Covenant.find(params[:id]).decorate
+    @covenant = Covenant.find(params[:id])
 
     respond_to do |format|
       format.html # show.html.erb
@@ -30,7 +32,7 @@ class CovenantsController < ApplicationController
   # GET /covenants/new
   # GET /covenants/new.json
   def new
-    @covenant = Covenant.new.decorate
+    @covenant = Covenant.new
 
     respond_to do |format|
       format.html # new.html.erb
@@ -40,7 +42,7 @@ class CovenantsController < ApplicationController
 
   # GET /covenants/1/edit
   def edit
-    @covenant = Covenant.find(params[:id]).decorate
+    @covenant = Covenant.find(params[:id])
   end
 
   # POST /covenants
@@ -50,7 +52,6 @@ class CovenantsController < ApplicationController
 
     respond_to do |format|
       if @covenant.save
-        @covenant = @covenant.decorate
         format.html { redirect_to @covenant, notice: 'Covenant was successfully created.' }
         format.json { render json: @covenant, status: :created, location: @covenant }
       else
@@ -67,11 +68,9 @@ class CovenantsController < ApplicationController
 
     respond_to do |format|
       if @covenant.update_attributes(params[:covenant])
-        @covenant = @covenant.decorate
         format.html { redirect_to @covenant, notice: 'Covenant was successfully updated.' }
         format.json { head :no_content }
       else
-        @covenant = @covenant.decorate
         format.html { render action: "edit" }
         format.json { render json: @covenant.errors, status: :unprocessable_entity }
       end

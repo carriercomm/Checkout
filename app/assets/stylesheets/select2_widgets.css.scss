@@ -1,0 +1,13 @@
+ul.select2-results {
+  li {
+    div.select2-result-label {
+      span {
+        display: block;
+        white-space: nowrap;
+      }
+      span.item-full-name {
+        @extend .muted;
+      }
+    }
+  }
+}

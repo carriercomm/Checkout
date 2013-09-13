@@ -1,31 +1,37 @@
-<% title t('loan.show.title', :id => @loan.id) %>
-<% subtitle loan.kit.component_list %>
+<% title t('page_titles.show.loan') %>
+<% subtitle "##{ loan }" %>
 
 <dl class="dl-horizontal">
-  <dt>Status</dt>
+  <dt><%= t('labels.loan.workflow_state') %></dt>
   <dd><%= loan.state %></dd>
-  <dt>Client</dt>
-  <dd><%= loan.client %></dd>
-  <dt>Check Out Location</dt>
-  <dd><%= loan.location %></dd>
-  <dt>Kit</dt>
-  <dd><%= loan.kit %></dd>
-  <dt>Pick Up Day</dt>
+  <dt><%= t('labels.loan.client') %></dt>
+  <dd><%= loan.client.to_link %></dd>
+  <dt><%= t('labels.loan.location') %></dt>
+  <dd><%= loan.location.to_link %></dd>
+  <dt><%= t('labels.loan.kit') %></dt>
+  <dd><%= loan.kit.to_link %></dd>
+  <dt><%= t('labels.kit.components') %></dt>
+  <dd><%= loan.kit.component_list %></dd>
+  <dt><%= t('labels.loan.starts_at') %></dt>
   <dd><%= loan.starts_at %></dd>
-  <dt>Return Day</dt>
+  <dt><%= t('labels.loan.ends_at') %></dt>
   <dd><%= loan.ends_at %></dd>
-  <dt>Approved By</dt>
+  <dt><%= t('labels.loan.approver') %></dt>
   <dd><%= loan.approver %></dd>
-  <dt>Checked Out</dt>
+  <dt><%= t('labels.loan.out_at') %></dt>
   <dd><%= loan.out_at %></dd>
-  <dt>Checked In</dt>
+  <dt><%= t('labels.loan.in_at') %></dt>
   <dd><%= loan.in_at %></dd>
-  <dt>Late</dt>
+  <dt><%= t('labels.loan.late') %></dt>
   <dd><%= loan.late %></dd>
+  <% if @loan.lost_at %>
+  <dt><%= t('labels.loan.lost_at') %></dt>
+  <dd><%= loan.lost_at %></dd>
+  <% end %>
 </dl>
 
-<%= render partial: 'inventory_records/inventory_record', object: loan.check_out_inventory_record %>
-<%= render partial: 'inventory_records/inventory_record', object: loan.check_in_inventory_record %>
+<%= render partial: 'inventory_records/inventory_record', object: loan.check_out_inventory_record if loan.check_out_inventory_record %>
+<%= render partial: 'inventory_records/inventory_record', object: loan.check_in_inventory_record if loan.check_in_inventory_record %>
 
 <div class="form-actions">
   <%= link_to 'Back', loans_path, :class => 'btn'  %>

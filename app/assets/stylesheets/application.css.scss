@@ -3,8 +3,11 @@
 @import "font-awesome";
 @import "jquery.ui.datepicker";
 @import "jquery.ui.autocomplete";
-@import "select2";
+@import "select2.css";
+@import "select2_widgets";
+//@import "select2-bootstrap";
 @import "bootstrap_overrides";
+@import "users";
 
 form#omnibox {
   @extend .span12;
@@ -30,13 +33,47 @@ table.table {
   td {
     vertical-align:middle;
   }
-  th.actions {
+  td.actions, th.actions {
     width: 1%;
-  }
-  .mini-action-buttons {
     text-align:right;
+    white-space: nowrap;
+    a.auth-link, span.auth-link {
+      @extend .btn;
+      @extend .btn-mini;
+    }
+    span.auth-link {
+      @extend .disabled
+    }
+    a.auth-link.singular, span.auth-link.singular {
+      span.auth-link-text {
+        @extend .hidden;
+      }
+    }
+    a.auth-link.collection, span.auth-link.collection {
+      i {
+        @extend .hidden;
+      }
+    }
+    form {
+      display: inline-block;
+      padding: 0;
+      margin: 0;
+      div {
+        display: inline-block;
+      }
+    }
   }
 }
+div.form-actions {
+  a.auth-link, span.auth-link {
+    @extend .btn;
+    [class^="icon-"] {
+      display: none;
+      @extend .hidden;
+    }
+  }
+}
+
 .help-block {
   font-style:italic;
   color: #999;
@@ -50,15 +87,6 @@ a.disabled {
 }
 a.danger {
   color:#F33;
-}
-td.action-buttons {
-  padding-left:0;
-}
-td.mini-action-buttons {
-  white-space: nowrap;
-}
-.my_button_to {
-  display: inline;
 }
 a.delete-link {
   @extend .btn;

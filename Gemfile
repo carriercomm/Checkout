@@ -29,6 +29,7 @@ group :assets do
   gem 'font-awesome-sass-rails'      # Font Awesome fonts
   gem 'jquery-ui-rails'              # jQuery UI libraries
   gem 'sass-rails', '~> 3.2'         # CSS generator
+  gem 'select2-rails'
   gem 'uglifier', '>= 1.0.3'
 end
 
@@ -38,6 +39,7 @@ group :development do
   gem 'guard-livereload'
   gem 'guard-minitest'
   gem 'immigrant'                    # migration generator for foreign keys
+  gem 'progress_bar'
   gem 'pry-rails'                    # rails console on steroids
   gem 'quiet_assets'                 # stop the log diarrhea
   gem 'rack-livereload'

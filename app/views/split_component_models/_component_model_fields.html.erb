@@ -27,6 +27,7 @@
       <%= f.input :description %>
       <%= f.input :training_required, :as => :radio_buttons %>
       <div id="suggestion_popover" class="popover-anchor"></div>
+      <%# TODO: fix this styling %>
       <%= f.association :categories, :collection => Category.order(:name).all, :input_html => {
             :multiple => true,
             :class    => 'select2-tagged-field categories-select'
@@ -44,6 +45,5 @@
                       :hidden => true,
                       "data-ajax-url" => component_models_path(:format => :json)
           } %>
-      Existing!
     </div>
   </div>

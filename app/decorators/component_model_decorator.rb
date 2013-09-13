@@ -7,7 +7,7 @@ class ComponentModelDecorator < ApplicationDecorator
   decorates_association :trainings
   decorates_association :users
 
-  delegate :id, :name, :circulating?, :reservable?
+  delegate :id, :name, :model_number, :circulating?, :reservable?
 
   def autocomplete_json
     {

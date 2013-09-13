@@ -1,7 +1,9 @@
+<%# TODO: extract this modal out into a partial %>
 <div class="modal fade hide" id="budget_modal">
+  <%# TODO: extract this notification out into a partial %>
   <div class="modal-header">
     <button type="button" class="close" data-dismiss="modal">×</button>
-    <h3>New Budget</h3>
+    <h3><%= t('page_titles.new.budget') %></h3>
   </div>
   <div class="modal-body">
     <div class="hide alert alert-error">

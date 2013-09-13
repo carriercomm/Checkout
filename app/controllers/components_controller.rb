@@ -4,30 +4,37 @@ class ComponentsController < ApplicationController
   authorize_resource
   before_filter :strip_brand, :only => [:create, :update, :destroy]
 
-=begin
+  decorates_assigned :budgets
+  decorates_assigned :component
+  decorates_assigned :components
+  decorates_assigned :inventory_details
+
   # GET /components
   # GET /components.json
   def index
-    if params["kit_id"].present?
-      @components = Kit.find(params["kit_id"].to_i).components.includes(:asset_tags).order("asset_tags.uid").page(params[:page])
-    else
-      @components = Component.includes(:asset_tags).order("asset_tags.uid").page(params[:page])
-    end
+    @components = Component
+
+    apply_scopes_and_pagination
 
     respond_to do |format|
       format.html # index.html.erb
-      format.json { render json: @components }
+#      format.json { render json: @components }
     end
   end
-=end
 
   # GET /components/1
   # GET /components/1.json
   def show
     @component = Component.find(params[:id])
+    @inventory_details = @component
+      .inventory_details
+      .includes(:inventory_record)
+      .joins(:inventory_record)
+      .order("inventory_details.created_at DESC")
+      .limit(10)
 
     respond_to do |format|
-      #format.html # show.html.erb
+      format.html # show.html.erb
       format.js
       #format.json { render json: @component }
     end
@@ -46,12 +53,15 @@ class ComponentsController < ApplicationController
       format.json { render json: @component }
     end
   end
+=end
 
   # GET /admin/components/1/edit
   def edit
     @component = Component.find(params[:id])
+    @budgets   = Budget.active
   end
 
+=begin
   # POST /admin/components
   # POST /admin/components.json
   def create
@@ -78,11 +88,10 @@ class ComponentsController < ApplicationController
 
     respond_to do |format|
       if @component.update_attributes(params[:component])
-        @component = @component.decorate
-        # format.html { redirect_to component_path(@component), notice: 'Component was successfully updated.' }
+        format.html { redirect_to admin_component_path(@component), notice: 'Component was successfully updated.' }
         format.js
       else
-        #format.html { render action: "edit" }
+        format.html { render action: "edit" }
         format.js   { render :template => 'components/error.js.erb' }
       end
     end
@@ -102,7 +111,48 @@ class ComponentsController < ApplicationController
     end
   end
 =end
-  protected
+
+  private
+
+  def apply_scopes_and_pagination
+    scope_by_filter_params
+    scope_by_brand
+    scope_by_budget
+    scope_by_category
+    scope_by_component_model
+
+    @components = @components.includes(:component_model => :brand)
+      .joins(:component_model => :brand)
+      .order(:kit_id)
+      .page(params[:page])
+  end
+
+  def scope_by_filter_params
+    case params["filter"]
+    when "circulating"        then @components = @components.includes(:kits).where("kits.workflow_state = 'circulating'")
+    when "non_circulating"    then @components = @components.includes(:kits).where("kits.workflow_state = 'non_circulating'")
+    when "deaccessioned"      then @components = @components.includes(:kits).where("kits.workflow_state = 'deaccessioned'")
+    when "orphaned"           then @components = @components.where("components.kit_id IS NULL")
+    end
+  end
+
+  # TODO: does this make any sense? this might need to be fixed to
+  #       work with multiple brands in a kit
+  def scope_by_brand
+    @components = @components.brand(params["brand_id"]) if params["brand_id"].present?
+  end
+
+  def scope_by_component_model
+    @components = @components.where("component_model_id = ?", params["component_model_id"].to_i) if params["component_model_id"].present?
+  end
+
+  def scope_by_budget
+    @components = @components.where(budget_id: params["budget_id"]) if params["budget_id"].present?
+  end
+
+  def scope_by_category
+    @components = @components.category(params["category_id"]) if params["category_id"].present?
+  end
 
   def strip_brand
     # throw away the brand, since its information is carried by the model

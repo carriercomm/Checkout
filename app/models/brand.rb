@@ -1,55 +1,39 @@
 class Brand < ActiveRecord::Base
 
-  #
-  # Mixins
-  #
+  ## Mixins ##
 
   include Autocomplete
   strip_attributes
 
 
-  #
-  # Associations
-  #
+  ## Associations ##
 
   has_many :component_models
 
 
-  #
-  # Validations
-  #
+  ## Validations ##
 
   validates :name, :presence   => true
   validates :name, :uniqueness => {:case_sensitive => false}
 
 
-  #
-  # Mass-assignable Attributes
-  #
+  ## Mass-assignable Attributes ##
 
   attr_accessible :name
 
 
-  #
-  # Class Methods
-  #
+  ## Class Methods ##
 
-  def self.having_tombstoned_kits
-    joins(:component_models => :kits).where("kits.tombstoned = ?", true).uniq
-  end
-
-  def self.not_having_circulating_kits
-    joins(:component_models => :kits).where("kits.circulating = ?", false).uniq
+  def self.having_non_circulating_kits
+    joins(:component_models => :kits).where("kits.workflow_state = 'non_circulating'").uniq
   end
 
   def self.having_circulating_kits
-    joins(:component_models => :kits).where("kits.tombstoned = ? AND kits.circulating = ?", false, true).uniq
+    joins(:component_models => :kits).where("kits.workflow_state = 'circulating'").uniq
   end
 
 
-  #
-  # Instance Methods
-  #
+  ## Instance Methods ##
 
   # TODO: move this to a decorator. something specific to select2
   def as_json(options={})

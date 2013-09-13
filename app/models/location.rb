@@ -1,4 +1,5 @@
 class Location < ActiveRecord::Base
+  class InvalidTimeFormatException < Exception; end
 
   ## Macros ##
 
@@ -38,7 +39,7 @@ class Location < ActiveRecord::Base
 
   # # returns an array of dates for each business_hour_exception
   # # at this location
-  # def dates_exception(days_out = 90, date_start = Time.zone.now)
+  # def dates_exception(days_out = 90, date_start = DateTime.current)
   #   date_end   = date_start + days_out.days
 
   #   # find any exceptions that fall on or between these days
@@ -49,18 +50,17 @@ class Location < ActiveRecord::Base
   #   bhe.map(&:closed_at).uniq
   # end
 
-=begin
-  # returns an array of [month, day] pairs for each
-  # business_hour_exception at this location
-  def dates_exception_for_datepicker(days_out = 90)
-    # convert them to an array
-    dates_exception(days_out).to_a
-  end
-=end
+  # # returns an array of [month, day] pairs for each
+  # # business_hour_exception at this location
+  # def dates_exception_for_datepicker(days_out = 90)
+  #   # convert them to an array
+  #   dates_exception(days_out).to_a
+  # end
 
 
 
-  # def dates_regular(days_out = 90, date_start = Time.zone.now)
+
+  # def dates_regular(days_out = 90, date_start = DateTime.current)
   #   dates = []
   #   business_hours.each do |x|
   #     occurrences = x.open_occurrences(days_out, date_start)
@@ -70,45 +70,40 @@ class Location < ActiveRecord::Base
   #   dates.uniq
   # end
 
-  def hours_on(date)
-    # return nothing if we're closed on this day
-    if !business_hour_exceptions.where("closed_at = ?", date.to_date).empty?
-      return []
-    end
+  # def hours_on(date)
+  #   # return nothing if we're closed on this day
+  #   if !business_hour_exceptions.where("closed_at = ?", date.to_date).empty?
+  #     return []
+  #   end
 
-    day   = date.wday
-    hours = business_hours.joins(:business_days).where("business_days.index = ?", day).order("business_hours.open_hour ASC")
+  #   day   = date.wday
+  #   hours = business_hours.joins(:business_days).where("business_days.index = ?", day).order("business_hours.open_hour ASC")
 
-    return hours.all
-  end
+  #   return hours.all
+  # end
 
-  def hours_to_s
-    business_hours.collect { |bh| bh.to_s }
-  end
-
-  def times_open(days_out = 90)
+  def datetimes_open(days_out = 90)
     occurrences = []
 
     schedules.each do |s|
       # should today be included?
-      if s.occurring_between?(Time.zone.now, Time.zone.now.end_of_day)
-        end_time = Time.zone.now.at_beginning_of_day + days_out.days
-      else
-        end_time = Time.zone.now.end_of_day + days_out.days
-      end
+      end_time = if s.occurring_between?(Time.zone.now, Time.zone.now.end_of_day)
+                   Time.zone.now.at_beginning_of_day + days_out.days
+                 else
+                   Time.zone.now.end_of_day + days_out.days
+                 end
+
       occurrences.concat(s.occurrences(end_time))
     end
 
-    occurrences.sort!
-    occurrences
+    occurrences.sort.map(&:to_datetime)
   end
 
   # finds the closest open date on, or after, the time passed
-  def next_time_open(time = Time.zone.now)
+  def next_datetime_open(datetime = DateTime.current)
     return nil unless business_hours.count > 0
     nexts = []
-
-    time = time.to_time
+    time  = convert_to_time(datetime)
 
     schedules.each do |s|
       # should today be included?
@@ -119,12 +114,13 @@ class Location < ActiveRecord::Base
       end
       nexts << s.next_occurrence(ref_time)
     end
-    nexts.sort.first.to_time
+    return nil if nexts.empty?
+    nexts.sort.first.to_datetime
   end
 
   # returns true if the location has any hours on the same day as 'time'
-  def open_on?(time)
-    time = time.in_timezone if time.is_a? DateTime
+  def open_on?(datetime)
+    time = convert_to_time(datetime)
 
     schedules.each do |s|
       return true if s.occurs_on?(time.at_beginning_of_day)
@@ -132,15 +128,43 @@ class Location < ActiveRecord::Base
     return false
   end
 
+  def to_param
+    "#{ id } #{ name }".parameterize
+  end
+
+  def to_s
+    name
+  end
+
+  private
+
+  def convert_to_time(thing)
+    if thing.kind_of? Date
+      return Time.local(thing.year, thing.month, thing.day)
+    elsif thing.kind_of? DateTime
+      return Time.local(thing.year, thing.month, thing.day, thing.hour, thing.min, thing.sec)
+    elsif thing.is_a? Time
+      return thing
+    elsif thing.is_a? String
+      return Time.zone.parse(thing)
+    end
+
+    raise InvalidTimeFormatException.new("Expected a Date, DateTime, Time, or String, got: #{ thing.class }")
+  end
+
+  # TODO: refactor this to store the schedule as a serialized hash?
+  #       consider what this does to time zone offsets, since the hash
+  #       stores the name of the offset instead of getting the offset
+  #       from the local computer. Any way to convert to hash without
+  #       time zone support?
   def schedules
     schedules  = []
-    exceptions = {}
+    exceptions = Hash.new { |h,k| h[k] = [] }
 
     # gather up the exceptions by day of the week
     business_hour_exceptions.each do |bhe|
       day = bhe.closed_at.strftime('%A')
-      exceptions[day] = [] unless exceptions[day]
-      exceptions[day] << bhe.closed_at.to_time.at_beginning_of_day
+      exceptions[day] << bhe.closed_at.to_time_in_current_zone.at_beginning_of_day
     end
 
     business_hours.each do |bh|
@@ -163,17 +187,7 @@ class Location < ActiveRecord::Base
       end
       schedules << schedule
     end
-
     return schedules
-
-  end
-
-  def to_param
-    "#{ id } #{ name }".parameterize
-  end
-
-  def to_s
-    name
   end
 
 end

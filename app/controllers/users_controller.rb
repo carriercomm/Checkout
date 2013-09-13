@@ -6,6 +6,10 @@ class UsersController < ApplicationController
   # make these methods available in the views
   helper_method :sort_column, :sort_direction
 
+  decorates_assigned :trainings
+  decorates_assigned :user
+  decorates_assigned :users
+
   # GET /users
   # GET /users.json
   def index
@@ -14,11 +18,11 @@ class UsersController < ApplicationController
 
     if params[:filter]
       case params[:filter]
-      when "active"     then @users = @users.where(:disabled => false)
-      when "disabled"   then @users = @users.where(:disabled => true)
-      when "suspended"  then @users = @users.where(["users.suspended_until > ?", Date.today])
-      when "admins"     then @users = @users.where("roles.name = 'admin'")
-      when "attendants" then @users = @users.where("roles.name = 'attendant'")
+      when "active"        then @users = @users.where(:disabled => false)
+      when "disabled"      then @users = @users.where(:disabled => true)
+      when "suspended"     then @users = @users.where(["users.suspended_until > ?", Date.today])
+      when "administrator" then @users = @users.where("roles.name = 'admin'")
+      when "attendant"     then @users = @users.where("roles.name = 'attendant'")
       end
     end
 
@@ -26,7 +30,6 @@ class UsersController < ApplicationController
     @total = @users.count
     @users = @users.page(params[:page])
       .per(params[:page_limit])
-      .decorate
 
     respond_to do |format|
       format.html # index.html.erb
@@ -35,16 +38,18 @@ class UsersController < ApplicationController
   end
 
   def search
-    q = params["q"]
-    users  = User.search(q).limit(10).decorate
-    users.map!(&:autocomplete_json)
+    q     = params["q"]
+    total = User.search(q).count
+    users = User.search(q)
+      .page(params[:page])
+      .per(params[:page_limit])
 
     respond_to do |format|
-      format.json { render json: users }
+      format.json { render json: { results: users, total: total } }
     end
   end
 
-  # GET /kits/select2.json
+  # GET /users/select2.json
   def select2
     users = User
 
@@ -70,8 +75,8 @@ class UsersController < ApplicationController
   # GET /users/1
   # GET /users/1.json
   def show
-    @user = UserDecorator.decorate(User.includes(:roles, :component_models, :groups, :memberships).find(params[:id]))
-    @trainings = TrainingDecorator.decorate(@user.trainings)
+    @user = User.includes(:roles, :component_models, :groups, :memberships).find(params[:id])
+    @trainings = @user.trainings
 
     respond_to do |format|
       format.html { render layout: 'sidebar' } # show.html.erb
@@ -83,7 +88,6 @@ class UsersController < ApplicationController
   # GET /users/new.json
   def new
     @user = User.new
-    @user = UserDecorator.decorate(@user)
 
     respond_to do |format|
       format.html # new.html.erb
@@ -94,7 +98,6 @@ class UsersController < ApplicationController
   # GET /users/1/edit
   def edit
     @user = User.includes(:groups, :roles).find(params[:id])
-    @user = UserDecorator.decorate(@user)
   end
 
   # POST /users
@@ -116,8 +119,6 @@ class UsersController < ApplicationController
     # TODO: this is possibly dangerous, is there a more manual way to handle it?
     @user.memberships_attributes = p[:memberships_attributes] if p[:memberships_attributes].present?
     @user.trainings_attributes   = p[:trainings_attributes]   if p[:trainings_attributes].present?
-
-    @user = UserDecorator.decorate(@user)
 
     respond_to do |format|
       if @user.save
@@ -150,8 +151,6 @@ class UsersController < ApplicationController
     # TODO: this is possibly dangerous, is there a more manual way to handle it?
     @user.memberships_attributes = p[:memberships_attributes] if p[:memberships_attributes].present?
     @user.trainings_attributes   = p[:trainings_attributes]   if p[:trainings_attributes].present?
-
-    @user = UserDecorator.decorate(@user)
 
     respond_to do |format|
       if @user.save

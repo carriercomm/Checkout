@@ -81,6 +81,7 @@ GEM
     factory_girl_rails (4.2.1)
       factory_girl (~> 4.2.0)
       railties (>= 3.0.0)
+    fattr (2.2.1)
     ffi (1.3.1)
     font-awesome-sass-rails (3.0.2.2)
       railties (>= 3.1.1)
@@ -103,6 +104,7 @@ GEM
       multi_json (~> 1.7)
     guard-minitest (0.5.0)
       guard (>= 0.4)
+    highline (1.6.19)
     hike (1.2.3)
     http_parser.rb (0.5.3)
     i18n (0.6.4)
@@ -152,9 +154,14 @@ GEM
     nested_form (0.3.2)
     nokogiri (1.6.0)
       mini_portile (~> 0.5.0)
+    options (2.3.0)
+      fattr
     orm_adapter (0.4.0)
     pg (0.16.0)
     polyglot (0.3.3)
+    progress_bar (1.0.0)
+      highline (~> 1.6.1)
+      options (~> 2.3.0)
     pry (0.9.12.2)
       coderay (~> 1.0.5)
       method_source (~> 0.8)
@@ -203,6 +210,9 @@ GEM
       railties (~> 3.2.0)
       sass (>= 3.1.10)
       tilt (~> 1.3)
+    select2-rails (3.4.8)
+      sass-rails
+      thor (~> 0.14)
     simple_form (2.1.0)
       actionpack (~> 3.0)
       activemodel (~> 3.0)
@@ -262,6 +272,7 @@ DEPENDENCIES
   nested_form
   nokogiri
   pg
+  progress_bar
   pry-rails
   quiet_assets
   rack-livereload
@@ -269,6 +280,7 @@ DEPENDENCIES
   rolify
   ruby-graphviz
   sass-rails (~> 3.2)
+  select2-rails
   simple_form
   strip_attributes
   thin

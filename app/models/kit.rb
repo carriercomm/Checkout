@@ -1,24 +1,41 @@
 class Kit < ActiveRecord::Base
 
+  ## Mixins ##
+
+  include Workflow
+
+
   ## Macros ##
 
   strip_attributes
 
+  workflow do
+    state :non_circulating do
+      event :circulate,              :transitions_to => :circulating
+      event :deaccession,            :transitions_to => :deaccessioned
+    end
 
-  ## Callbacks ##
+    state :circulating do
+      event :become_non_circulating, :transitions_to => :non_circulating
+      event :deaccession,            :transitions_to => :deaccessioned
+    end
 
-  before_validation :handle_tombstoned
+    state :deaccessioned do
+      event :circulate,              :transitions_to => :circulating
+      event :become_non_circulating, :transitions_to => :non_circulating
+    end
+  end
 
 
   ## Associations ##
 
   has_many   :audit_inventory_records,     :inverse_of => :kit
-  belongs_to :budget,                      :inverse_of => :kits
   has_many   :check_in_inventory_records,  :inverse_of => :kit
   has_many   :check_out_inventory_records, :inverse_of => :kit
   has_many   :clients,                     :through    => :loans
   has_many   :component_models,            :through    => :components,  :order => "component_models.name ASC"
   has_many   :components,                  :inverse_of => :kit,         :order => "components.position ASC",  :include => [:component_model => :brand]
+  belongs_to :custodian,                   :inverse_of => :kits,        :class_name => "User"
   has_many   :groups,                      :through    => :permissions, :order => "groups.name ASC"
   has_many   :inventory_records,           :inverse_of => :kit
   belongs_to :location,                    :inverse_of => :kits
@@ -30,33 +47,19 @@ class Kit < ActiveRecord::Base
 
   ## Validations ##
 
-  validates :location, :presence => true
+  # TODO: if the kit is circulating, it's location must have business hours? Maybe better to just post a warning back the user
+  validates :location,       :presence => true
+  validates :workflow_state, :presence => true
   validate  :should_have_at_least_one_component
-  validate  :tombstoned_should_not_be_circulating
-  # TODO: if the kit is circulating, it's location must have business hours
 
 
   ## Mass-assignable attributes ##
 
-  attr_accessible(:budget_id,
-                  :circulating,
-                  :components_attributes,
+  attr_accessible(:components_attributes,
                   :cost,
-                  :insured,
+                  :custodian_id,
                   :location_id,
-                  :tombstoned)
-
-  ## Virtual Attributes ##
-
-  attr_reader :forced_not_circulating
-
-
-  ## Named scopes ##
-
-  scope :circulating,       where("kits.tombstoned = ? AND kits.circulating = ?", false, true)
-  scope :missing_components, joins(:components).where("kits.tombstoned = ? AND components.missing = ?", false, true)
-  scope :non_circulating,   where("kits.tombstoned = ? AND kits.circulating = ?", false, false)
-  scope :tombstoned,         where("kits.tombstoned = ?", true)
+                  :workflow_state)
 
 
   ## Class Methods ##
@@ -69,7 +72,7 @@ class Kit < ActiveRecord::Base
   end
 
   def self.circulating_for_user(user)
-    for_user(user).where("kits.tombstoned = ? AND kits.circulating = ?", false, true).uniq
+    for_user(user).with_circulating_state.uniq
   end
 
   def self.for_user(user)
@@ -102,6 +105,19 @@ class Kit < ActiveRecord::Base
       .where("(loans.starts_at BETWEEN ? AND ?) OR (loans.ends_at BETWEEN ? AND ?)", start_range, end_range, start_range, end_range)
   end
 
+  def self.with_missing_components
+    joins_sql = <<-END_SQL
+    INNER JOIN inventory_records ON kits.id = inventory_records.kit_id
+    INNER JOIN (SELECT kit_id, max(created_at) as max_created_at
+                FROM inventory_records
+                GROUP BY kit_id) AS t1 ON (t1.kit_id = inventory_records.kit_id AND t1.max_created_at = inventory_records.created_at)
+    INNER JOIN inventory_details ON inventory_records.id = inventory_details.inventory_record_id
+    END_SQL
+
+    joins(joins_sql).where("inventory_details.missing = ? AND kits.workflow_state <> 'deaccessioned'", true)
+  end
+
+
   ## Instance Methods ##
 
   # adds a component of type component_model to the kit
@@ -127,32 +143,12 @@ class Kit < ActiveRecord::Base
     loans.where("loans.out_at < ? AND loans.ends_at > ?", Date.today, Date.today).count > 0
   end
 
-  def circulating?
-    return circulating && !tombstoned
-  end
-
-  # def components_denormalized
-  #   select_sql = "components.*, inventory_details.missing"
-  #   joins_sql  = <<-END_SQL
-  #   left join inventory_details on components.id = inventory_details.component_id
-  #   inner join (
-  #               select max(id) as max_id
-  #               from inventory_records
-  #               where inventory_records.kit_id = #{ self.id }
-  #               ) AS t1 ON inventory_details.inventory_record_id = t1.max_id
-  #   inner join component_models on components.component_model_id = component_models.id
-  #   inner join brands on component_models.brand_id = brands.id
-  #   END_SQL
-
-  #   components.select(select_sql).joins(joins_sql)
-  # end
-
   def default_return_date(starts_at)
     return nil unless starts_at
     default = Settings.default_check_out_duration
     time    = (starts_at + default.days)
     time    = Time.local(time.year, time.month, time.day, time.hour, time.min, time.sec)
-    nto     = location.next_time_open(time)
+    nto     = location.next_datetime_open(time)
     if nto
       return nto.to_datetime
     else
@@ -173,34 +169,6 @@ class Kit < ActiveRecord::Base
     end
     nexts.sort.first
   end
-
-  # before_validation callback:
-  # ensure that anything tombstoned is not circulating
-  def handle_tombstoned
-    if tombstoned && circulating
-      self.circulating = false
-      @forced_not_circulating = true
-    end
-    return true
-  end
-
-  # returns the start dates for each loan
-  # def hard_return_dates_for_datepicker(days_out = 90, *excluded_loans)
-  #   excluded_loans.flatten!
-  #   dates = []
-
-  #   # build up params for where clause
-  #   start_range = Time.now.at_beginning_of_day
-  #   end_range   = start_range + days_out.days
-
-  #   # iterate over the set of loans in this range
-  #   loans_between(start_range, end_range, excluded_loans).all.each do |r|
-  #     dates << r.starts_at.to_date
-  #   end
-  #   dates.uniq!
-
-  #   return dates.collect { |d| d.to_s(:js) }
-  # end
 
   # returns a record for this kit (without location info), to populate into
   # gon for the datepicker
@@ -276,6 +244,14 @@ class Kit < ActiveRecord::Base
     client && circulating? && (client.admin? || groups_include?(client))
   end
 
+  # Overriding Workflow's default active_record behavior:
+  # We might move through several states in a given controller action,
+  # so avoid the database roundtrip. Call save explicitly to persist.
+  # TODO: make this method private (after import is done)
+  def persist_workflow_state(new_state)
+    write_attribute self.class.workflow_column, new_state.to_s
+  end
+
   # equal to location.open_days minus days_reserved returns in format
   # [[month, day], [month, day], ...] for consumption by the
   # javascript date picker
@@ -310,21 +286,6 @@ class Kit < ActiveRecord::Base
 
   alias_method :reservable?, :permissions_include?
 
-  # def return_dates_for_datepicker(days_out = 90, *excluded_loans)
-  #   excluded_loans.flatten!
-  #   return_dates = []
-  #   next_loan_date = dates_loaned_for_datepicker(days_out, excluded_loans).first
-
-  #   # iterate over the dates, adding them to the return dates, until
-  #   # we get to the next return date
-  #   location.dates_open_for_datepicker(days_out).each do |date|
-  #     return_dates << date
-  #     break if date == next_loan_date
-  #   end
-
-  #   return_dates
-  # end
-
   def schedules_of_availability(*excluded_loans)
     lbd = loan_blackout_dates(365, excluded_loans)
 
@@ -352,18 +313,16 @@ class Kit < ActiveRecord::Base
     "#{ id.to_s } | #{asset_tags.join(", ")} | #{ components.map(&:component_model).map(&:to_branded_s).join(", ") }"
   end
 
-  def tombstoned=(is_tombstoned)
-    tombstoned = is_tombstoned
-    if is_tombstoned
-      circulating = false
-    end
-  end
-
   def training_required?
     !component_models.where(training_required: true).empty?
   end
 
   private
+
+  # this is a callback which is invoked when become_non_circulating! is called
+  def become_non_circulating
+    permissions.delete_all
+  end
 
   # user permissions_include? since it has greater checks
   def groups_include?(user)
@@ -377,11 +336,54 @@ class Kit < ActiveRecord::Base
     end
   end
 
-  # custom validator
-  def tombstoned_should_not_be_circulating
-    if tombstoned && circulating
-      errors[:base] << "Kit cannot be tombstoned AND circulating"
-    end
-  end
-
 end
+
+
+  # def components_denormalized
+  #   select_sql = "components.*, inventory_details.missing"
+  #   joins_sql  = <<-END_SQL
+  #   left join inventory_details on components.id = inventory_details.component_id
+  #   inner join (
+  #               select max(id) as max_id
+  #               from inventory_records
+  #               where inventory_records.kit_id = #{ self.id }
+  #               ) AS t1 ON inventory_details.inventory_record_id = t1.max_id
+  #   inner join component_models on components.component_model_id = component_models.id
+  #   inner join brands on component_models.brand_id = brands.id
+  #   END_SQL
+
+  #   components.select(select_sql).joins(joins_sql)
+  # end
+
+  # returns the start dates for each loan
+  # def hard_return_dates_for_datepicker(days_out = 90, *excluded_loans)
+  #   excluded_loans.flatten!
+  #   dates = []
+
+  #   # build up params for where clause
+  #   start_range = Time.now.at_beginning_of_day
+  #   end_range   = start_range + days_out.days
+
+  #   # iterate over the set of loans in this range
+  #   loans_between(start_range, end_range, excluded_loans).all.each do |r|
+  #     dates << r.starts_at.to_date
+  #   end
+  #   dates.uniq!
+
+  #   return dates.collect { |d| d.to_s(:js) }
+  # end
+
+  # def return_dates_for_datepicker(days_out = 90, *excluded_loans)
+  #   excluded_loans.flatten!
+  #   return_dates = []
+  #   next_loan_date = dates_loaned_for_datepicker(days_out, excluded_loans).first
+
+  #   # iterate over the dates, adding them to the return dates, until
+  #   # we get to the next return date
+  #   location.dates_open_for_datepicker(days_out).each do |date|
+  #     return_dates << date
+  #     break if date == next_loan_date
+  #   end
+
+  #   return_dates
+  # end

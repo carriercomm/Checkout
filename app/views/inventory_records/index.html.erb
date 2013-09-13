@@ -1,12 +1,8 @@
 <% title t('inventory_record.index.title') %>
 
 <% content_for :sidebar do %>
-  <li class="nav-header"><%= t(".actions") %></li>
-  <%= sidebar_link t('helpers.links.all'),
-                   inventory_records_path,
-                   t('inventory_record.sidebar.all.default_tooltip'),
-                   can?(:manage, InventoryRecord),
-                   t('inventory_record.sidebar.all.denied_tooltip') %>
+  <li class="nav-header"><%= t(".filters") %></li>
+  <%= auth_link(InventoryRecord) %>
 <% end %>
 
 <%= paginate @inventory_records %>
@@ -19,6 +15,7 @@
       <th>Attendant</th>
       <th>Kit</th>
       <th>Loan</th>
+      <th><%= t('helpers.headers.actions') %></th>
     </tr>
   </thead>
   <tbody>
@@ -29,6 +26,11 @@
       <td><%= inventory_record.attendant %></td>
       <td><%= inventory_record.kit.to_link %></td>
       <td><%= inventory_record.loan.to_link if inventory_record.loan %></td>
+      <td class="actions">
+        <ul>
+          <%= auth_link(inventory_record) %>
+        </ul>
+      </td>
     </tr>
   <% end %>
   </tbody>

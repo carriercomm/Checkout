@@ -22,6 +22,7 @@ class KitsController < ApplicationController
 
   # TODO: add a group params contraint to this query - a la the
   #       select2 method in users_controller.
+  # TODO: move this logic into a separate model or query object
   # GET /kits/select2.json
   def select2
     # find things by asset tag
@@ -45,8 +46,9 @@ class KitsController < ApplicationController
   # GET /kits/1
   # GET /kits/1.json
   def show
+    # TODO: extract this out into a query object
     @kit = Kit.joins(:location, :components, :component_models => :brand)
-      .includes([:location, :budget, { :components => :inventory_details}, {:component_models => :brand}])
+      .includes([:location, { :components => [ :inventory_details, :budget ]}, {:component_models => :brand}])
       .order("components.position ASC")
       .find(params[:id])
 
@@ -60,8 +62,10 @@ class KitsController < ApplicationController
   # GET /kits/new.json
   def new
     @kit = Kit.new
+    @kit.persist_workflow_state('non_circulating')
     @kit.components.build
     @budgets = Budget.active
+    @circulation_types = Kit.workflow_spec.state_names
 
     respond_to do |format|
       format.html # new.html.erb
@@ -73,21 +77,20 @@ class KitsController < ApplicationController
   def edit
     @kit = Kit.find(params[:id])
     @budgets = Budget.active
+    @circulation_types = Kit.workflow_spec.state_names
   end
 
   # POST /kits
   # POST /kits.json
   def create
+    username = params[:kit].delete(:custodian)
     @kit = Kit.new(params[:kit])
+    if username
+      @kit.custodian = User.find_by_username(username)
+    end
 
     respond_to do |format|
-      kit_saved = @kit.save
-
-      if @kit.forced_not_circulating
-        flash[:warning] = "Kit cannot be tombstoned and circulating, so it was forced to be non-circulating."
-      end
-
-      if kit_saved
+      if @kit.save
         format.html { redirect_to @kit, notice: 'Kit was successfully created.' }
         # format.json { render json: @kit, status: :created, location: @kit }
       else
@@ -101,13 +104,13 @@ class KitsController < ApplicationController
   # PUT /kits/1.json
   def update
     @kit = Kit.find(params[:id])
+    if username = params[:kit].delete(:custodian)
+      # TODO: fix this so it raises an error when no user is found
+      @kit.custodian = User.find_by_username(username)
+    end
 
     respond_to do |format|
       kit_updated = @kit.update_attributes(params[:kit])
-
-      if @kit.forced_not_circulating
-        flash[:warning] = "Kit cannot be tombstoned and circulating, so it was forced to be non-circulating."
-      end
 
       if kit_updated
         format.html { redirect_to @kit, notice: 'Kit was successfully updated.' }
@@ -134,15 +137,15 @@ class KitsController < ApplicationController
   private
 
   def apply_scopes_and_pagination
-    scope_by_user
     scope_by_filter_params
+    scope_by_user
     scope_by_brand
-    scope_by_budget
+    #scope_by_budget
     scope_by_category
     scope_by_component_model
 
     @kits = @kits.joins(:component_models => :brand)
-      .order(:kit_id)
+      .order("kits.id")
       .page(params[:page])
   end
 
@@ -151,7 +154,7 @@ class KitsController < ApplicationController
       # no limits
     elsif current_user.can_see_entire_circulating_inventory?
       # no non-circulating kits
-      @kits = @kits.circulating
+      @kits = @kits.with_circulating_state
     else
       # only circulating kits in the user's group
       @kits = @kits.circulating_for_user(current_user)
@@ -160,10 +163,10 @@ class KitsController < ApplicationController
 
   def scope_by_filter_params
     case params["filter"]
-    when "circulating"       then @kits = @kits.circulating
-    when "missing_components" then @kits = @kits.missing_components
-    when "non_circulating"   then @kits = @kits.non_circulating
-    when "tombstoned"         then @kits = @kits.tombstoned
+    when "circulating"        then @kits = @kits.with_circulating_state
+    when "missing_components" then @kits = @kits.with_missing_components
+    when "non_circulating"    then @kits = @kits.with_non_circulating_state
+    when "deaccessioned"      then @kits = @kits.with_deaccessioned_state
     end
   end
 
@@ -177,9 +180,10 @@ class KitsController < ApplicationController
     @kits = @kits.where("component_models.id = ?", params["component_model_id"].to_i) if params["component_model_id"].present?
   end
 
-  def scope_by_budget
-    @kits = @kits.where(budget_id: params["budget_id"]) if params["budget_id"].present?
-  end
+  # TODO: restore this functionality?
+  # def scope_by_budget
+  #   @kits = @kits.where(budget_id: params["budget_id"]) if params["budget_id"].present?
+  # end
 
   def scope_by_category
     @kits = @kits.category(params["category_id"]) if params["category_id"].present?

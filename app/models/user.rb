@@ -19,6 +19,7 @@ class User < ActiveRecord::Base
   has_many :groups,              :through => :memberships
   has_many :in_assists,          :foreign_key => "in_attendant_id", :class_name => 'Loan', :inverse_of => :in_attendant
   has_many :inventory_records,   :foreign_key => "attendant_id"
+  has_many :kits,                :foreign_key => "custodian_id", :class_name => 'Kit', :inverse_of => :custodian
   has_many :loans,               :foreign_key => "client_id", :inverse_of => :client do
     def build_from_component_model_id(component_model_id)
       component_model = ComponentModel.circulating.includes(:kits => :location).find(component_model_id)
@@ -105,7 +106,7 @@ class User < ActiveRecord::Base
   end
 
   def self.search(query)
-    where("LOWER(users.username) LIKE ? OR LOWER(users.first_name) LIKE ? OR LOWER(users.last_name) LIKE ?", "%#{ query.downcase }%", "%#{ query.downcase }%", "%#{ query.downcase }%")
+    where("LOWER(users.username) LIKE ? OR LOWER(users.first_name) LIKE ? OR LOWER(users.last_name) LIKE ? OR LOWER(users.email) LIKE ?", "%#{ query.downcase }%", "%#{ query.downcase }%", "%#{ query.downcase }%", "%#{ query.downcase }%")
       .order("users.username ASC")
   end
 
@@ -118,6 +119,10 @@ class User < ActiveRecord::Base
 
   def approver?
     has_role?(:approver)
+  end
+
+  def as_json(options={})
+    super(:only => [:id, :username, :first_name, :last_name, :email])
   end
 
   def attendant?

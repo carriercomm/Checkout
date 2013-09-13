@@ -1,70 +1,41 @@
-<% title "Kit #{ @kit.id }" %>
-<% subtitle kit.component_list %>
+<% title t('page_titles.show.kit') %>
+<% subtitle "#" + kit.to_s %>
+
 <% content_for :sidebar do %>
   <li class="nav-header"><%= t(".actions") %></li>
-  <%= sidebar_link t('kit.sidebar.checkout.text'),
-                   new_kit_loan_path(@kit, event: 'checkout'),
-                   t('kit.sidebar.checkout.default_tooltip'),
-                   @kit.reservable?(current_user),
-                   t('kit.sidebar.checkout.denied_tooltip') %>
-  <%= sidebar_link t('kit.sidebar.reserve.text'),
-                   new_kit_loan_path(@kit),
-                   t('kit.sidebar.reserve.default_tooltip'),
-                   @kit.reservable?(current_user),
-                   t('kit.sidebar.reserve.denied_tooltip') %>
-  <%= sidebar_link t('kit.sidebar.loans.text'),
-                   kit_loans_path(@kit),
-                   t('kit.sidebar.loans.default_tooltip'),
-                   @kit.reservable?(current_user),
-                   t('kit.sidebar.loans.denied_tooltip') %>
-  <%= sidebar_link t('kit.sidebar.edit.text'),
-                   edit_kit_path(@kit),
-                   t('kit.sidebar.edit.default_tooltip'),
-                   can?(:manage, @kit),
-                   t('kit.sidebar.edit.denied_tooltip') %>
-
-  <li class="nav-header">Inventory</li>
-  <%= sidebar_link t('kit.sidebar.inventory_records.text'),
-                   kit_inventory_records_path(@kit),
-                   t('kit.sidebar.inventory_records.default_tooltip'),
-                   can?(:read, InventoryRecord),
-                   t('kit.sidebar.inventory_records.denied_tooltip') %>
-  <%= sidebar_link t('kit.sidebar.new_inventory_records.text'),
-                   new_kit_inventory_record_path(@kit),
-                   t('kit.sidebar.new_inventory_records.default_tooltip'),
-                   can?(:manage, InventoryRecord),
-                   t('kit.sidebar.new_inventory_records.denied_tooltip') %>
+  <%# TODO: make the check_in/check_out links visible based on current status %>
+  <li><%= auth_link([:edit, @kit]) %></li>
+  <li><%= auth_link([:new, @kit, Loan], { a: "check_in" }, { text: t('links.loan.check_in') }) %></li>
+  <li><%= auth_link([:new, @kit, Loan], { a: "check_out" }, { text: t('links.loan.check_out') }) %></li>
+  <li><%= auth_link([:new, @kit, Loan], { a: "reserve"   }, { text: t('links.loan.reserve')   }) %></li>
+  <li><a href="https://chart.googleapis.com/chart?chs=150x150&cht=qr&chl=<%= u(kit_url(@kit)) %>&choe=UTF-8" alt="QR code"><i class="icon-qrcode"></i><span>Print QR code</span></a></li>
+  <li class="nav-header"><%= t('titles.inventory_record.index') %></li>
+  <li><%= auth_link([@kit, Loan]) %></li>
+  <li><%= auth_link([@kit, InventoryRecord]) %></li>
+  <%# TODO: implement the audit inventory controller %>
+  <%#= sidebar_link(:new, AuditInventoryRecord.new(kit: @kit)) %>
 <% end %>
 
-<div class="pull-right">
-  <img src="https://chart.googleapis.com/chart?chs=150x150&cht=qr&chl=<%= u(kit_url(@kit)) %>&choe=UTF-8" alt="QR code" class="qrcode">
-</div>
-
 <dl class="dl-horizontal">
-  <dt>Location</dt>
+  <dt><%= t('labels.kit.location') %></dt>
   <dd><%= kit.location %></dd>
-  <dt>Training Required</dt>
+  <dt><%= t('labels.kit.custodian') %></dt>
+  <dd><%= kit.custodian %></dd>
+  <dt><%= t('labels.kit.training_required') %></dt>
   <dd><%= kit.training_required %></dd>
-  <dt>Circulating</dt>
-  <dd><%= kit.circulating %></dd>
-  <dt>Tombstoned</dt>
-  <dd><%= kit.tombstoned %></dd>
-  <% if can? :manage, kit %>
-    <dt>Budget</dt>
-    <dd><%= kit.budget %></dd>
-    <dt>Cost</dt>
-    <dd><%= kit.cost %></dd>
-    <dt>Insured</dt>
-    <dd><%= kit.insured %></dd>
-  <% end %>
+  <dt><%= t('labels.kit.circulation_type') %></dt>
+  <dd><%= kit.circulation_type %></dd>
 </dl>
 
-<% unless kit.groups.empty? %>
-  <h2>Groups</h2>
+<h2>Components</h2>
+<%= render partial: 'components/component_list', object: kit.components %>
+
+
+<h2><%= t('page_titles.index.groups') %></h2>
+<% if kit.groups.empty? %>
+<p><%= t('notifications.no_groups') %></p>
+<% else %>
   <% kit.groups.each do |group| %>
     <div><%= link_to group.name, group_path(group) %></div>
   <% end %>
 <% end %>
-
-<h2>Components</h2>
-<%= render partial: 'components/component_list', object: kit.components %>

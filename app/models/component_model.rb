@@ -8,19 +8,20 @@ class ComponentModel < ActiveRecord::Base
 
   ## Associations ##
 
-  belongs_to :brand,      :inverse_of => :component_models
-  has_and_belongs_to_many :categories
-  has_many   :components, :inverse_of => :component_model, :dependent => :destroy
-  has_many   :kits,       :through => :components
-  has_many   :trainings,  :inverse_of => :component_model, :dependent => :destroy
-  has_many   :users,      :through => :trainings
+  belongs_to                :brand,      :inverse_of => :component_models
+  has_and_belongs_to_many   :categories
+  has_many                  :components, :inverse_of => :component_model, :dependent => :destroy
+  has_many                  :kits,       :through    => :components
+  has_many                  :trainings,  :inverse_of => :component_model, :dependent => :destroy
+  has_many                  :users,      :through    => :trainings
 
 
   ## Validations ##
 
-  validates :brand, :presence => true
-  validates :name,  :presence => true
-  validates :name,  :uniqueness => {:scope => :brand_id, :case_sensitive => false}
+  validates :brand,        :presence => true
+  validates :name,         :presence => true
+  validates :name,         :uniqueness => { scope: :brand_id, case_sensitive: false }
+  validates :model_number, :uniqueness => { scope: :brand_id, case_sensitive: false, allow_nil: true }
 
 
   ## Mass-assignable attributes ##
@@ -39,7 +40,7 @@ class ComponentModel < ActiveRecord::Base
   ## Class Methods ##
 
   def self.circulating
-    joins(:kits).where("kits.tombstoned = ? AND kits.circulating = ?", false, true).uniq
+    joins(:kits).where("kits.workflow_state = 'circulating'").uniq
   end
 
   # TODO: implement this
@@ -56,7 +57,7 @@ class ComponentModel < ActiveRecord::Base
   end
 
   def self.circulating_for_user(user)
-    for_user(user).where("kits.tombstoned = ? AND kits.circulating = ?", false, true).uniq
+    for_user(user).where("kits.workflow_state = 'circulating'")
   end
 
   def self.for_user(user)
@@ -101,11 +102,11 @@ class ComponentModel < ActiveRecord::Base
   end
 
   def circulating?
-    kits.circulating.count > 0
+    kits.with_circulating_state.count > 0
   end
 
   def circulating_kits
-    kits.circulating.uniq
+    kits.with_circulating_state.uniq
   end
 
   # TODO: test this returns a JSON object with the available checkout
@@ -175,7 +176,7 @@ class ComponentModel < ActiveRecord::Base
   def generate_autocomplete
     # we'll martial brand into the autocomplete field since it's
     # natural to search by brand
-    s = "#{ brand } #{ name }"
+    s = "#{ brand } #{ name } #{ model_number }".squish
     s = s.truncate(45, omission: "", separator: " ") if s.length > 45
     self.autocomplete = self.class.normalize(s)
   end

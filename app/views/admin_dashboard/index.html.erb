@@ -2,16 +2,8 @@
 
 <% content_for :sidebar do %>
   <li class="nav-header"><%= t(".menu") %></li>
-  <%= sidebar_link t('settings.show.title'),
-                   settings_path,
-                   '',
-                   can?(:manage, Settings) %>
-  <%= sidebar_link t('user.new.title'),
-                   new_user_path,
-                   t('user.sidebar.add.default_tooltip'),
-                   can?(:manage, User),
-                   t('user.sidebar.add.denied_tooltip') %>
-
+  <li><%= auth_link(Settings) %></li>
+  <li><%= auth_link([:new, User]) %></li>
 <% end %>
 
 <dl class="dl-horizontal">

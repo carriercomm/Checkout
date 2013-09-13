@@ -1,14 +1,14 @@
-<% title t('kit.index.title') %>
+<% title t('page_titles.index.kits') %>
 
 <% content_for :sidebar do %>
   <li class="nav-header"><%= t(".actions") %></li>
-  <%= sidebar_link(:new, Kit.new) %>
-  <li class="nav-header"><%= t("kit.sidebar.filters") %></li>
-  <%= sidebar_link(:index, nil, { path: kits_path                    }, { text: t("kit.sidebar.all.text").html_safe                }) %>
-  <%= sidebar_link(:index, nil, { path: circulating_kits_path        }, { text: t("kit.sidebar.circulating.text").html_safe        }) %>
-  <%= sidebar_link(:index, nil, { path: non_circulating_kits_path    }, { text: t("kit.sidebar.non_circulating.text").html_safe    }) %>
-  <%= sidebar_link(:index, nil, { path: missing_components_kits_path }, { text: t("kit.sidebar.missing_components.text").html_safe }) %>
-  <%= sidebar_link(:index, nil, { path: tombstoned_kits_path         }, { text: t("kit.sidebar.tombstoned.text").html_safe         }) %>
+  <li><%= auth_link([:new, Kit]) %></li>
+  <li class="nav-header"><%= t(".filters") %></li>
+  <li><%= auth_link(Kit) %></li>
+  <li><%= auth_link(Kit, { filter: "circulating"        }) %></li>
+  <li><%= auth_link(Kit, { filter: "non_circulating"    }) %></li>
+  <li><%= auth_link(Kit, { filter: "missing_components" }) %></li>
+  <li><%= auth_link(Kit, { filter: "deaccessioned"      }) %></li>
 <% end %>
 
 <%= paginate @kits %>
@@ -16,11 +16,12 @@
 <table class="table">
   <thead>
     <tr>
-      <th><%= t('kit.id') %></th>
-      <th><%= t('kit.asset_tags') %></th>
-      <th><%= t('kit.location') %></th>
-      <th><%= t('component_model.index.title') %></th>
-      <th><%= t('group.index.title') %></th>
+      <th><%= t('labels.kit.id') %></th>
+      <th><%= t('labels.kit.asset_tags') %></th>
+      <th><%= t('labels.kit.location') %></th>
+      <th><%= t('labels.kit.components') %></th>
+      <th><%= t('labels.kit.groups') %></th>
+      <th><%= t('labels.kit.circulation_type') %></th>
       <th class="actions"><%= t('helpers.headers.actions') %></th>
     </tr>
   </thead>
@@ -32,11 +33,14 @@
         <td><%= kit.location %></td>
         <td><%= kit.linked_component_list %></td>
         <td><%= kit.linked_groups_list %></td>
-        <td class="mini-action-buttons">
-          <%= mini_button(:reserve, kit) %>
-          <%= mini_button(:check_out, kit) %>
-          <%= mini_button(:show, kit) %>
-          <%= mini_button(:edit, kit) %>
+        <td><%= kit.circulation_type %></td>
+        <td class="actions">
+          <% # TODO: make these not suck %>
+          <%= auth_link([:new, kit, Loan], { a: "check_in" }) %>
+          <%= auth_link([:new, kit, Loan], { a: "check_out" }) %>
+          <%= auth_link([:new, kit, Loan], { a: "reserve" }) %>
+          <%= auth_link(kit) %>
+          <%= auth_link([:edit, kit]) %>
         </td>
       </tr>
     <% end %>

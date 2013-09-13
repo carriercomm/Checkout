@@ -6,7 +6,8 @@ class UserDecorator < ApplicationDecorator
   decorates_association :roles
   decorates_association :trainings
 
-  delegate(:disabled?,
+  delegate(:as_json,
+           :disabled?,
            :failed_attempts,
            :map,
            :memberships,
@@ -84,13 +85,13 @@ class UserDecorator < ApplicationDecorator
     }
   end
 
-  def status_icon
+  def status
     if object.disabled
-      h.t("user.status.disabled.icon").html_safe
+      return :disabled
     elsif object.suspended?
-      h.t("user.status.suspended.icon").html_safe
+      return :suspended
     else
-      h.t("user.status.active.icon").html_safe
+      return :active
     end
   end
 
@@ -102,6 +103,10 @@ class UserDecorator < ApplicationDecorator
     h.content_tag("div", title: full_name) do
       full_name
     end
+  end
+
+  def to_link
+    h.link_to(object.username, h.user_path(object), rel: "tooltip", title: full_name, class: "user user-status-#{ status.to_s }")
   end
 
   def to_s
@@ -117,7 +122,7 @@ class UserDecorator < ApplicationDecorator
   end
 
   def username
-    h.link_to(object.username, h.user_path(object), rel: "tooltip", title: full_name)
+    object.username
   end
 
   def username_and_full_name

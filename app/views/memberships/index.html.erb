@@ -1,0 +1,44 @@
+<% title t('page_titles.index.memberships') %>
+<% subtitle group %>
+
+<% content_for :sidebar do %>
+  <li class="nav-header"><%= t(".actions") %></li>
+  <li><%= auth_link([:edit, group]) %></li>
+  <!-- <li class="nav-header"><%= t("user.sidebar.filters") %></li> -->
+  <!-- <li><%= auth_link([group, Membership]) %></li> -->
+  <% # TODO: implement these %>
+  <!-- <li><%#= auth_link([group, Membership], { filter: "active_users" }) %></li> -->
+  <!-- <li><%#= auth_link([group, Membership], { filter: "disabled_users" }) %></li> -->
+<% end %>
+
+<%= paginate @memberships %>
+
+<% # TODO: localize this %>
+<% if @memberships.empty? %>
+  <p>No users</p>
+<% else %>
+  <table class="table table-striped memberships">
+    <thead>
+      <tr>
+        <th>Username</th>
+        <th>Email</th>
+        <th>Membership Expires</th>
+        <th>Group Supervisor</th>
+        <th><%= t('labels.defaults.actions') %></th>
+      </tr>
+    </thead>
+    <tbody>
+      <% memberships.each do |m| %>
+        <tr>
+          <td><%= m.user.to_link %></td>
+          <td><%= m.user.email %></td>
+          <td><%= m.expires_at %></td>
+          <td><%= m.supervisor %></td>
+          <td></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+<% end %>
+
+<%= paginate @memberships %>

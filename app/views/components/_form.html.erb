@@ -1,0 +1,11 @@
+<%= simple_form_for @component, :html => { :class => 'form-horizontal' } do |f| %>
+  <%= f.input :component_model, :as => :ajax_association, :path => component_models_path(:format => :select2) %>
+  <%= f.association :kit, :as => :string %>
+  <%= f.input :asset_tag %>
+  <%= f.input :serial_number %>
+  <%= f.association :budget, :collection => budgets, :label_method => :to_s, :prompt => 'Select budget' %>
+  <div class="form-actions">
+    <%= f.submit nil, :class => 'btn btn-primary' %>
+    <%= link_to 'Cancel', components_path, :class => 'btn' %>
+  </div>
+<% end %>

@@ -1,12 +1,12 @@
-<% title t('component_model.index.title') %>
+<% title t('page_titles.index.component_models') %>
 
 <% content_for :sidebar do %>
   <li class="nav-header"><%= t(".actions") %></li>
-  <%= sidebar_link(:new, ComponentModel.new) %>
-  <li class="nav-header"><%= t("component_model.sidebar.filters") %></li>
-  <%= sidebar_link(:index, nil, { path: component_models_path                 }, { text: t("component_model.sidebar.all.text").html_safe             }) %>
-  <%= sidebar_link(:index, nil, { path: circulating_component_models_path     }, { text: t("component_model.sidebar.circulating.text").html_safe     }) %>
-  <%#= sidebar_link(:index, nil, { path: non_circulating_component_models_path }, { text: t("component_model.sidebar.non_circulating.text").html_safe }) %>
+  <li><%= auth_link([:new, ComponentModel]) %></li>
+  <li class="nav-header"><%= t(".filters") %></li>
+  <li><%= auth_link(ComponentModel) %></li>
+  <li><%= auth_link(ComponentModel, { filter: "circulating" }) %></li>
+  <%#= auth_link(ComponentModel, { filter: "non_circulating" }) %>
 <% end %>
 
 <%= paginate @component_models %>
@@ -14,11 +14,12 @@
 <table class="table">
   <thead>
     <tr>
-      <th>Brand</th>
-      <th>Model</th>
-      <th>Description</th>
-      <th>Count</th>
-      <th class="actions"><%= t('.actions', default: t('helpers.headers.actions')) %></th>
+      <th><%= t('labels.component_model.brand') %></th>
+      <th><%= t('labels.component_model.name') %></th>
+      <th><%= t('labels.component_model.model_number') %></th>
+      <th><%= t('labels.component_model.description') %></th>
+      <th><%= t('labels.component_model.count') %></th>
+      <th><%= t('.actions', default: t('helpers.headers.actions')) %></th>
     </tr>
   </thead>
   <tbody>
@@ -26,11 +27,15 @@
       <tr>
         <td><%= link_to cm.brand.name, brand_path(cm.brand) %></td>
         <td><%= link_to cm.name, component_model_path(cm) %></td>
+        <td><%= link_to cm.model_number, component_model_path(cm) if cm.model_number %></td>
         <td><%= cm.description %></td>
         <td><%= cm.kits.count %></td>
-        <td class="mini-action-buttons">
-          <%= mini_button(:index, nil, { path: component_model_kits_path(cm) }, { text: t('kit.index.title') }) %>
-          <%= mini_button(:edit, cm) %>
+        <td class="actions">
+          <ul>
+            <%= auth_link([cm, Kit]) %>
+            <%= auth_link(cm) %>
+            <%= auth_link([:edit, cm]) %>
+          </ul>
         </td>
       </tr>
     <% end %>

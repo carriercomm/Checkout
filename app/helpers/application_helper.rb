@@ -16,35 +16,6 @@ module ApplicationHelper
     end
   end
 
-  # TODO: ummm, this is clumsy. Like... no, really. It's actually embarrassing me.
-  # def sidebar_link(text, path, default_tooltip = "", condition = true, failure_tooltip = nil, options = {})
-  #   # setup the base options for the tooltip
-  #   link_opts = {
-  #     "rel"            => "tooltip",
-  #     "data-placement" => "right"
-  #   }
-
-  #   li_opts = {}
-
-  #   # if the link is to the current page, then we'll highlight it
-  #   # TODO: make this work for the root url
-  #   li_opts[:class] = "active" if current_page?(path)
-
-  #   if condition
-  #     link_opts['data-title'] = default_tooltip unless default_tooltip.blank?
-  #     content_tag :li, li_opts do
-  #       link_to raw(text), path, link_opts.merge(options)
-  #     end
-  #   else
-  #     link_opts['data-title'] = failure_tooltip unless failure_tooltip.blank?
-  #     link_opts[:class] = "disabled"
-  #     link_opts[:onclick] = "return false;"
-  #     content_tag :li do
-  #       link_to raw(text), "#", link_opts
-  #     end
-  #   end
-  # end
-
   def sortable(column, title)
     title ||= column.titleize
     title = h(title)
@@ -72,240 +43,163 @@ module ApplicationHelper
     content_for(:title, page_title)
   end
 
-  # def admin_link(object, content)
-  #   link_to(content, object) if current_user.admin?
-  # end
+  def auth_link(object, options = {}, html_options = {})
+    params = get_link_params(object, options, html_options)
 
-  # def attendant_link(object, content)
-  #   link_to(content, object) if current_user.attendant?
-  # end
-
-  # def attendant_mini_button(object, content)
-  #   link_to(content, object, class: 'btn btn-mini') if current_user.attendant?
-  # end
-
-  # # TODO: DRY this up
-  # def checkout_link(object)
-  #   if object.is_a?(LoanDecorator)
-  #     link_to(t('helpers.links.checkout'), [:edit, object.model], a:'checkout')
-  #   elsif object.is_a?(Loan)
-  #     link_to(t('helpers.links.checkout'), [:edit, object], a:'checkout')
-  #   else
-  #     if object.circulating? && current_user.attendant?
-  #       loan_link(t('helpers.links.checkout'), object, a:'checkout')
-  #     end
-  #   end
-  # end
-
-  # def checkout_mini_button(object)
-  #   if object.circulating? && current_user.attendant?
-  #     loan_mini_button(t('helpers.links.checkout'), object, a:'checkout')
-  #   end
-  # end
-
-  # def inventory_shortcuts
-  #   links = InventoryStatusDecorator.all.map do |is|
-  #     "<a href='#' class='inventory_record_shortcut' data-value='#{ is.id }'>#{ is.name }</a>"
-  #   end
-  #   links.join(", ").html_safe
-  # end
-
-  # def reserve_link(object)
-  #   if object.circulating? && object.reservable?(current_user)
-  #     loan_link(t('helpers.links.reserve'), object)
-  #   end
-  # end
-
-  # def reserve_mini_button(object)
-  #   if object.circulating? && object.reservable?(current_user)
-  #     reservation_mini_button(t('helpers.links.reserve'), object)
-  #   end
-  # end
-
-  # def show_link(object, content = t("helpers.links.show"))
-  #   object = object.model if object.is_a? Draper::Decorator
-  #   if (can?(:show, object) || can?(:read, object))
-  #     link_to(content, object)
-  #   else
-  #     content
-  #   end
-  # end
-
-  # def show_mini_button(object, content = t("helpers.links.show"))
-  #   link_to(content, object, class: 'btn btn-mini') if can?(:read, object)
-  # end
-
-  # def edit_link(object, content = t("helpers.links.edit"))
-  #   link_to(content, [:edit, object]) if can?(:update, object)
-  # end
-
-  # def destroy_link(object, content = t("helpers.links.destroy"))
-  #   link_to(content, object, :method => :delete, :confirm => "Are you sure?") if can?(:destroy, object)
-  # end
-
-  # def create_link(object, content = t("helpers.links.new"))
-  #   if can?(:create, object)
-  #     object_class = (object.kind_of?(Class) ? object : object.class)
-  #     link_to(content, [:new, object_class.name.underscore.to_sym])
-  #   end
-  # end
-
-  def sidebar_link(action, object, options = {}, html_options = {})
-    path = options.delete(:path)
-
-    case action
-    when :check_out
-      path ||= if object.is_a?(Loan) || object.is_a?(LoanDecorator)
-                 edit_loan_path(object)
-               else
-                 new_loan_path(object)
-               end
-      ability = options.delete(:ability) || :create
-      html_options.reverse_merge!({
-          :text   => "#{ t("helpers.mini_buttons.check_out") } #{ t("helpers.actions.check_out") }".html_safe,
-          :class  => 'btn btn-link',
-          :method => :get,
-        })
-    when :reserve
-      path ||= new_loan_path(object)
-      ability = options.delete(:ability) || :create
-      html_options.reverse_merge!({
-          :text   => "#{ t("helpers.mini_buttons.reserve") } #{ t("helpers.actions.reserve") }".html_safe,
-          :class  => 'btn btn-link',
-          :method => :get,
-        })
-    when :new
-      path ||= url_for(controller: object.class.to_s.tableize, action: :new)
-      ability = options.delete(:ability) || :create
-      html_options.reverse_merge!({
-          :text   => "#{ t("helpers.mini_buttons.new") } #{ t("helpers.actions.new") }".html_safe,
-          :class  => 'btn btn-link',
-          :method => :get,
-        })
-    when :edit
-      path ||= [:edit, object]
-      ability = options.delete(:ability) || :update
-      html_options.reverse_merge!({
-          :text   => "#{ t("helpers.mini_buttons.edit") } #{ t("helpers.actions.edit") }".html_safe,
-          :class  => 'btn btn-link',
-          :method => :get,
-        })
-    when :index
-      raise "Need an expicit path parameter in options when object is a collection" unless path
-      ability = options.delete(:ability) || :read
-      html_options.reverse_merge!({
-          :text   => "#{ t("helpers.mini_buttons.index") } #{ t("helpers.actions.index") }".html_safe,
-          :class  => 'btn btn-link',
-          :method => :get
-        })
-    when :show
-      path = object
-      ability = options.delete(:ability) || :read
-      html_options.reverse_merge!({
-          :text   => "#{ t("helpers.mini_buttons.show") } #{ t("helpers.actions.show") }".html_safe,
-          :class  => 'btn btn-link',
-          :method => :get
-        })
-    else
-      raise "unknown action"
-    end
-
-    # authorize the action
-    unless can?(ability, object)
-      html_options.merge!("disabled" => "disabled")
-    end
-
-    text = html_options.delete(:text)
-    #button_to(text, path, options)
-    content_tag :li do
-      my_button_to(path, html_options) do
-        text
+    if params[:authorized]
+      link_to(params[:path], params[:html_options]) do
+        params[:content]
       end
-    end
-  end
-
-  # TODO: convert this to accept a block
-  def mini_button(action, object, options = {}, html_options = {})
-    path = options.delete(:path)
-
-    case action
-    when :check_in
-      path ||= edit_loan_path(object)
-
-      ability = options.delete(:ability) || :manage
-      unless object.checked_out?
-        html_options.reverse_merge!({ "disabled" => "disabled" })
-      end
-      html_options.reverse_merge!({
-          :text   => t("helpers.mini_buttons.check_in").html_safe,
-          :title  => t("helpers.actions.check_in"),
-        })
-    when :check_out
-      path ||= if object.is_a?(Loan) || object.is_a?(LoanDecorator)
-                 edit_loan_path(object)
-                 if object.approved? || current_user.attendant?
-                   html_options.reverse_merge!({ "disabled" => "disabled" })
-                 end
-               else
-                 new_loan_path(object)
-               end
-      ability = options.delete(:ability) || :manage
-      html_options.reverse_merge!({
-          :text   => t("helpers.mini_buttons.check_out").html_safe,
-          :title  => t("helpers.actions.check_out"),
-        })
-    when :reserve
-      path ||= new_loan_path(object)
-      ability = options.delete(:ability) || :create
-      html_options.reverse_merge!({
-          :text   => t("helpers.mini_buttons.reserve").html_safe,
-          :title  => t("helpers.actions.reserve"),
-        })
-    when :edit
-      path ||= [:edit, object]
-      ability = options.delete(:ability) || :update
-      html_options.reverse_merge!({
-          :text   => t("helpers.mini_buttons.edit").html_safe,
-          :title  => t("helpers.actions.edit"),
-        })
-    when :index
-      raise "Need an expicit path parameter in options when object is a collection" unless path
-      ability = options.delete(:ability) || :read
-      html_options.reverse_merge!({
-          :text   => t("helpers.mini_buttons.index").html_safe,
-          :title  => t("helpers.actions.index"),
-        })
-    when :show
-      path = object
-      ability = options.delete(:ability) || :read
-      html_options.reverse_merge!({
-          :text   => t("helpers.mini_buttons.show").html_safe,
-          :title  => t("helpers.actions.show"),
-        })
     else
-      raise "unknown action"
-    end
-
-    # defaults for all buttons
-    html_options.reverse_merge!({
-        :method      => :get,
-        :class       => 'btn btn-mini',
-        :rel         => "tooltip",
-        'data-delay' => 500
-      })
-
-    # authorize the action
-    unless can?(ability, object)
-      html_options.reverse_merge!("disabled" => "disabled")
-    end
-
-    text = html_options.delete(:text)
-    my_button_to(path, html_options) do
-      text
+      content_tag(:span, params[:html_options]) do
+        params[:content]
+      end
     end
   end
 
   private
+
+  # when :check_out
+  #   path ||= if object.is_a?(Loan) || object.is_a?(LoanDecorator)
+  #              edit_loan_path(object)
+  #            else
+  #              new_loan_path(object)
+  #            end
+  #   ability = options.delete(:ability) || :create
+  #   html_options.reverse_merge!({
+  #       :text   => "#{ t("helpers.mini_buttons.check_out") } #{ t("helpers.actions.check_out") }".html_safe,
+  #       :class  => 'btn btn-link',
+  #       :method => :get,
+  #     })
+  # when :reserve
+  #   path ||= new_loan_path(object)
+  #   ability = options.delete(:ability) || :create
+  #   html_options.reverse_merge!({
+  #       :text   => "#{ t("helpers.mini_buttons.reserve") } #{ t("helpers.actions.reserve") }".html_safe,
+  #       :class  => 'btn btn-link',
+  #       :method => :get,
+  #     })
+
+  def extract_action(params)
+    valid_actions = [:new, :edit]
+
+    if params.is_a?(Array)
+      if valid_actions.include?(params.first)       # [:new, :admin, Budget]
+        return params.first
+      elsif params.last.is_a?(ActiveRecord::Base)
+        return :show                                # [:admin, @budget]
+      else
+        return :index                               # [:admin, Budget]
+      end
+    elsif params.is_a?(ActiveRecord::Base)
+      return :show
+    else
+      return :index                                 # Budget
+    end
+  end
+
+  def extract_class(params)
+    valid_actions = [:check_out, :reserve, :new, :edit]
+    target = nil
+    klass  = nil
+
+    if params.is_a?(Array)
+      target = params.last                          # [:admin, Budget], [:admin, budget],
+                                                    # [:admin, @budget], [:new, :admin, Budget]
+    else
+      target = params                               # component, @component, Component
+    end
+
+    if target.is_a?(ApplicationDecorator)
+      klass = target.object.class                   # decorated instance
+    elsif target.is_a?(ActiveRecord::Base)
+      klass = target.class                          # undecorated instance
+    else
+      klass = target                                # class
+    end
+
+    if klass.ancestors.include?(InventoryRecord)
+      klass = InventoryRecord
+    end
+
+    return klass
+
+  end
+
+  def get_icon(action, options, html_options)
+    icon = html_options.delete(:icon)
+    if icon.nil?
+      # look for an 'a' param in the options which might be workflow
+      # hint to the loan object (e.g. check_in, check_out, etc)
+      if options[:a]
+        icon = t("helpers.icons.#{ options[:a] }")
+      else
+        # just go with the action's default icon
+        icon = t("helpers.icons.#{ action.to_s }")
+      end
+    end
+    icon
+  end
+
+  def get_link_params(object, options = {}, html_options = {})
+    action     = extract_action(object)
+    class_name = extract_class(object).name.underscore
+    ability    = options.delete(:ability)
+    path       = options.delete(:path)
+    icon       = get_icon(action, options, html_options)
+    hint       = html_options.delete(:hint)
+    filter     = options[:filter]
+    default_text = t("links.#{ class_name }.#{ action.to_s }",  default: :"helpers.actions.#{ action.to_s }")
+    if filter
+      default_text = t("filters.#{ class_name }.#{ filter.to_s }",  default: [:"links.#{ class_name }.#{ action.to_s }", :"helpers.actions.#{ action.to_s }"])
+    end
+    text       = html_options.delete(:text) || default_text
+
+    html_options[:class] ||= String.new
+    if action == :index
+      html_options[:class] << " auth-link collection"
+    else
+      html_options[:class] << " auth-link singular"
+    end
+
+    case action
+    when :new
+      options.reverse_merge!(action: object.shift)
+      ability ||= :create
+      hint = t("hints.new_#{ class_name }", default: strip_tags(text)) unless hint
+    when :edit
+      ability ||= :update
+      hint = t("hints.edit_#{ class_name }", default: strip_tags(text)) unless hint
+    when :index
+      ability ||= :read
+      if filter && filter.to_s != "all"
+        hint = t("hints.show_all_#{ filter.to_s }_#{ class_name.pluralize }", default: strip_tags(text)) unless hint
+      else
+        hint = t("hints.show_all_#{ class_name.pluralize }", default: strip_tags(text)) unless hint
+      end
+    when :show
+      ability ||= :read
+      hint = t("hints.show_#{ class_name }", default: strip_tags(text)) unless hint
+    else
+      raise "unknown action: #{ action.inspect }"
+    end
+
+    path    ||= polymorphic_url(object, options)
+    content   = "#{ icon } <span class='auth-link-text'>#{ text }</span>".squish.html_safe
+
+    html_options.reverse_merge!({
+        :rel         => "tooltip",
+        :title       => hint,
+        'data-delay' => 500
+      })
+
+    {
+      :authorized   => can?(ability, object),
+      :path         => path,
+      :html_options => html_options,
+      :content      => content
+    }
+  end
 
   def my_button_to(options = {}, html_options = {}, &block)
     html_options = html_options.stringify_keys
@@ -328,6 +222,7 @@ module ApplicationHelper
     end
 
     url = options.is_a?(String) ? options : self.url_for(options)
+    url = url.slice(0..-2) if url.last == "?"
     name ||= url
 
     html_options = convert_options_to_data_attributes(options, html_options)

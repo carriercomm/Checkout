@@ -1,82 +1,28 @@
-<div class="page-header">
-  <h1>Group <small><%= @group.name %></small></h1>
-</div>
+<% title t('page_titles.show.group') %>
+<% subtitle group %>
 
-<h2>Users</h2>
-
-<div class="row-fluid">
-  <div class="span12">
-    <% if @memberships.empty? %>
-    <p>No users</p>
-    <% else %>
-    <table class="table table-striped">
-      <thead>
-        <tr>
-          <th class="skinny-column">Status</th>
-          <th>Username</th>
-          <th>Email</th>
-          <th>Membership<br>Expires</th>
-          <th>Group<br>Supervisor</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% @memberships.each do |m| %>
-          <tr>
-            <td><%= m.user.status_icon %></td>
-            <td><%= link_to m.user.username, user_path(m.user) %></td>
-            <td><%= m.user.email %></td>
-            <td><%= m.expires_at %></td>
-            <td><%= m.supervisor %></td>
-          </tr>
-        <% end %>
-      </tbody>
-    </table>
-    <% end %>
-  </div>
-</div>
-
-<h2>Kits</h2>
-
-<div class="row-fluid">
-  <div class="span12">
-    <% if @group.kits.empty? %>
-    <p>No kits</p>
-    <% else %>
-    <table class="table table-striped">
-      <thead>
-        <tr>
-          <th>Kit ID</th>
-          <th>Asset Tag</th>
-          <th>Components</th>
-          <th>Group Count</th>
-          <th>Status</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% @group.kits.each do |kit| %>
-        <tr>
-          <td><%= kit.to_link %></td>
-          <td><%= kit.asset_tags %></td>
-          <td><%= kit.linked_component_list %></td>
-          <td><%= kit.groups.count %></td>
-          <td><%= kit.status %></td>
-          <td><%= link_to "Show Loans", kit_loans_path(kit), :class => 'btn btn-small' if can?(:read, Loan) %>
-        </tr>
-        <% end %>
-      </tbody>
-    </table>
-    <% end %>
-  </div>
-</div>
-
-<div class="form-actions">
-  <%= link_to t('.back', :default => t("helpers.links.back")),
-              groups_path, :class => 'btn'  %>
-  <%= link_to t('.edit', :default => t("helpers.links.edit")),
-              edit_group_path(@group), :class => 'btn' if can?(:manage, Group) %>
-  <%= link_to t('.destroy', :default => t("helpers.links.destroy")),
+<% content_for :sidebar do %>
+  <li class="nav-header"><%= t(".actions") %></li>
+  <li><%= auth_link([:edit, @group]) %></li>
+  <li>
+    <% # TODO: wrap this up in the auth_link helper %>
+    <%= link_to "<i class='icon-trash'></i> Delete Group".html_safe,
               group_path(@group),
               :method => 'delete',
               :data => { :confirm => t('.confirm', :default => t("helpers.links.confirm", :default => 'Are you sure?')) },
-              :class => 'btn btn-danger' if can?(:manage, Group) %>
-</div>
+              :class => 'btn btn-danger btn-link' if can?(:manage, Group) %></li>
+
+  <li><%= auth_link([@group, Membership]) %></li>
+  <li><%= auth_link([@group, Permission]) %></li>
+<% end %>
+
+<dl class="dl-horizontal">
+  <dt><%= t('labels.group.name') %></dt>
+  <dd><%= group.name %></dd>
+  <dt><%= t('labels.group.description') %></dt>
+  <dd><%= group.description %></dd>
+  <dt><%= t('labels.group.kit_count') %></dt>
+  <dd><%= group.kits.count %></dd>
+  <dt><%= t('labels.group.membership_count') %></dt>
+  <dd><%= group.memberships.count %></dd>
+</dl>

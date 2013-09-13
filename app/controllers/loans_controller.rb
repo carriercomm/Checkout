@@ -28,13 +28,15 @@ class LoansController < ApplicationController
     end
 
     if params[:filter]
+      @subtitle_key = params[:filter]
+
       case params[:filter]
-      when "pending"     then @loans = @loans.where("loans.state = 'pending'")
-      when "approved"    then @loans = @loans.where("loans.state = 'approved'")
-      when "checked_out" then @loans = @loans.where("loans.state = 'checked_out'")
-      when "checked_in"  then @loans = @loans.where("loans.state = 'checked_in'")
-      when "rejected"    then @loans = @loans.where("loans.state = 'rejected'")
-      when "canceled"    then @loans = @loans.where("loans.state = 'canceled'")
+      when "pending"     then @loans = @loans.where("loans.workflow_state = 'pending'")
+      when "approved"    then @loans = @loans.where("loans.workflow_state = 'approved'")
+      when "checked_out" then @loans = @loans.where("loans.workflow_state = 'checked_out'")
+      when "checked_in"  then @loans = @loans.where("loans.workflow_state = 'checked_in'")
+      when "rejected"    then @loans = @loans.where("loans.workflow_state = 'rejected'")
+      when "canceled"    then @loans = @loans.where("loans.workflow_state = 'canceled'")
 #      when "archived"    then @loans = @loans.where("loans.in_at IS NOT NULL OR ")
       end
     end
@@ -67,8 +69,9 @@ class LoansController < ApplicationController
 
       if params["event"].nil? || params["event"] == "reserve"
         client    = (params[:user_id]) ? User.find(params[:user_id]) : current_user
-        starts_at = kit.location.next_time_open
+        starts_at = kit.location.next_datetime_open
       end
+    end
 
       @loan = Loan.new(kit: kit, starts_at: starts_at, client: client)
 
@@ -83,14 +86,9 @@ class LoansController < ApplicationController
     #   # setup javascript data structures to make the date picker work
     #   gon.locations = @component_model.locations_with_dates_circulating_for_datepicker
     #   format.html { render :kit_select } and return
-    else
-      flash[:error] = "Start by finding something to check out!"
-      redirect_to component_models_path and return
-    end
 
     # stuff the default checkout length into the gon object if it's available
-    @default_checkout_length = Settings.default_checkout_length
-    gon.default_checkout_length = @default_checkout_length
+    gon.default_checkout_length = @default_checkout_length = Settings.default_checkout_length
 
     respond_to do |format|
       format.html # new.html.erb

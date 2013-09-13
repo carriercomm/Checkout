@@ -1,17 +1,13 @@
-<% title t('group.index.title') %>
+<% title t('page_titles.index.groups') %>
 
 <% content_for :sidebar do %>
   <li class="nav-header"><%= t(".actions") %></li>
-  <%= sidebar_link(t('helpers.links.new'),
-                   new_group_path,
-                   t('group.sidebar.add.default_tooltip'),
-                   can?(:manage, Group),
-                   t('group.sidebar.add.denied_tooltip')) %>
+  <li><%= auth_link([:new, Group]) %></li>
   <li class="nav-header"><%= t("user.sidebar.filters") %></li>
-  <%= sidebar_link t("group.sidebar.all.text"),     groups_path,         t("group.sidebar.all.default_tooltip") %>
-  <%= sidebar_link t("group.sidebar.active.text"),  active_groups_path,  t("group.sidebar.active.default_tooltip") %>
-  <%= sidebar_link t("group.sidebar.expired.text"), expired_groups_path, t("group.sidebar.expired.default_tooltip") %>
-  <%= sidebar_link t("group.sidebar.empty.text"),   empty_groups_path,   t("group.sidebar.empty.default_tooltip") %>
+  <li><%= auth_link(Group) %></li>
+  <li><%= auth_link(Group, { filter: 'active'  }) %></li>
+  <li><%= auth_link(Group, { filter: 'expired' }) %></li>
+  <li><%= auth_link(Group, { filter: 'empty'   }) %></li>
 <% end %>
 
 <%= paginate @groups %>
@@ -21,9 +17,9 @@
     <tr>
       <th><%= t('group.name') %></th>
       <th><%= t('group.description') %></th>
-      <th class="skinny-column"><%= t('group.user_count') %></th>
-      <th class="skinny-column"><%= t('group.kit_count') %></th>
-      <th><%= t('.actions') %></th>
+      <th><%= t('group.user_count') %></th>
+      <th><%= t('group.kit_count') %></th>
+      <th><%= t('helpers.headers.actions') %></th>
     </tr>
   </thead>
   <tbody>
@@ -33,17 +29,17 @@
         <td><%= group.description %></td>
         <td><%= group.num_users %></td>
         <td><%= group.num_kits %></td>
-        <td>
-          <%= link_to t('.edit', :default => t("helpers.links.edit")),
-                      edit_group_path(group), :class => 'btn btn-mini' if can? :manage, group %>
-          <%= link_to t('.destroy', :default => t("helpers.links.destroy")),
-                      group_path(group),
-                      :method => :delete,
-                      :data => {
-                        :confirm => t('.confirm',
-                        :default => t("helpers.links.confirm", :default => 'Are you sure?'))
-                      },
-                      :class => 'btn btn-mini btn-danger'  if can? :manage, group %>
+        <td class="actions">
+            <%= auth_link(group) %>
+            <%= auth_link([:edit, group]) %>
+            <%= button_to t('helpers.actions.destroy'),
+                  group_path(group),
+                  :method => :delete,
+                  :data => {
+                    :confirm => t('.confirm',
+                    :default => t("helpers.links.confirm", :default => 'Are you sure?'))
+                  },
+                  :class => 'btn btn-mini btn-danger'  if can? :manage, group %>
         </td>
       </tr>
     <% end %>

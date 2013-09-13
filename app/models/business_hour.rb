@@ -3,7 +3,7 @@ class BusinessHour < ActiveRecord::Base
   ## Associations ##
 
   belongs_to :location, :inverse_of => :business_hours
-  has_and_belongs_to_many :business_days
+  has_and_belongs_to_many :business_days, :order => "index ASC"
 
 
   ## Validations ##
@@ -55,26 +55,6 @@ class BusinessHour < ActiveRecord::Base
 
   ## Instance methods ##
 
-  def localized_hours(ref_time = Time.zone.now)
-    "#{ localized_open_time(ref_time) }-#{ localized_close_time(ref_time) }"
-  end
-
-  def localized_abbr_business_days
-    days = business_days.sort_by { |bd| bd.index }
-    days.collect! { |bd| I18n.t('date.abbr_day_names')[bd.index].titleize }
-    days.join(", ")
-  end
-
-  def localized_close_time(ref_time = Time.zone.now)
-    time = ref_time.at_beginning_of_day + close_hour.hours + close_minute.minutes
-    return I18n.l(time, :format => :business_hour).strip
-  end
-
-  def localized_open_time(ref_time = Time.zone.now)
-    time = ref_time.at_beginning_of_day + open_hour.hours + open_minute.minutes
-    return I18n.l(time, :format => :business_hour)
-  end
-
   # returns an array of dates representing the days with
   # open business hours between now and days_out
   def open_occurrences(days_out = 90, date_start = Time.zone.now)
@@ -98,10 +78,6 @@ class BusinessHour < ActiveRecord::Base
     if business_days.empty?
       errors[:base] << "Should have at least one open day"
     end
-  end
-
-  def to_s(ref_time = Time.zone.now)
-    "#{ localized_abbr_business_days } #{ localized_hours(ref_time) }"
   end
 
 end

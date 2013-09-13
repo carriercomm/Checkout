@@ -1,4 +1,5 @@
 class Loan < ActiveRecord::Base
+  class InvalidDateTimeFormatException < Exception; end
 
   ## Mixins ##
 
@@ -53,6 +54,7 @@ class Loan < ActiveRecord::Base
   has_one    :check_out_inventory_record,  :inverse_of => :loan,      :dependent => :destroy
   has_one    :check_in_inventory_record,   :inverse_of => :loan,      :dependent => :destroy
 
+
   ## Validations ##
 
   validates :approver,                   :presence => true, :if     => [:approved?, :checked_out?, :lost?]
@@ -64,6 +66,7 @@ class Loan < ActiveRecord::Base
   validates :kit,                        :presence => true, :unless => :canceled?
   validates :out_at,                     :presence => true, :if     => :checked_out?
   validates :starts_at,                  :presence => true, :unless => [:checked_in?, :canceled?]
+
 
   # TODO: cannot change the client unless the loan is new
   validate  :validate_approver_has_approver_role,       :unless => [:pending?, :declined?, :checked_in?, :canceled?]
@@ -80,34 +83,25 @@ class Loan < ActiveRecord::Base
   validate  :validate_open_on_ends_at,                  :unless => [:pending?, :checked_in?, :canceled?]
   validate  :validate_start_at_before_ends_at,          :unless => [:pending?, :checked_in?, :canceled?]
 
-  # TODO: move these constraints up into the authorization layer
-  # validates :in_attendant,      :associated => true,    :if     => :checked_in?
-  # validates :in_attendant_id,   :presence   => true,    :if     => :checked_in?
-  # validates :out_attendant,     :associated => true,    :if     => :checked_out?
-  # validates :out_attendant_id,  :presence   => true,    :if     => :checked_out?
-  # validate  :validate_in_attendant_has_proper_roles,    :if     => :checked_in?
-  # validate  :validate_in_attendant_is_not_client,       :if     => :checked_in?
-  # validate  :validate_out_attendant_has_proper_roles,   :if     => :checked_out?
-  # validate  :validate_out_attendant_is_not_client,      :if     => :checked_out?
-
 
   ## Virtual Attributes ##
 
   attr_accessor :component_model
+  delegate      :location, :to => :kit
 
-  delegate :location, :to => :kit
 
   ## Class Methods ##
 
   def self.build(params)
     loan = self.new(params)
     if loan.kit
-      loan.starts_at = loan.location.next_time_open
+      loan.starts_at = loan.location.next_datetime_open
     else
-      loan.starts_at = Date.today
+      loan.starts_at = Date.today.in_time_zone
     end
     loan
   end
+
 
   ## Instance Methods ##
 
@@ -133,7 +127,8 @@ class Loan < ActiveRecord::Base
 
   def build_check_out_inventory_record_with_inventory_details(options = {})
     missing = options.delete(:missing)
-    build_check_out_inventory_record_without_inventory_details(options.merge(loan: self, kit: kit))
+    options.merge!(loan: self, kit: kit)
+    build_check_out_inventory_record_without_inventory_details(options)
     unless kit.nil?
       check_out_inventory_record.initialize_inventory_details(missing)
     end
@@ -144,23 +139,19 @@ class Loan < ActiveRecord::Base
 
   def default_return_date
     return nil unless kit && kit.location && kit.location.business_hours.count > 0
-    default = Settings.default_check_out_duration
-    time    = (self.starts_at + default.days)
-    time    = Time.local(time.year, time.month, time.day, time.hour, time.min, time.sec)
-    nto     = location.next_time_open(time)
+    default  = Settings.default_check_out_duration
+    datetime = self.starts_at + default.days
+    nto      = location.next_datetime_open(datetime)
     if nto
-      return nto.to_datetime
+      return nto
     else
-      return time.to_datetime
+      return datetime
     end
   end
 
-  def ends_at=(time)
-    if time.is_a? String
-      write_attribute(:ends_at, Time.zone.parse(time).to_datetime)
-    else
-      write_attribute(:ends_at, time.to_datetime)
-    end
+  def ends_at=(datetime)
+    datetime = convert_to_datetime(datetime)
+    write_attribute(:ends_at, datetime)
 
     if !pending? && ends_at_changed?
       unapprove!
@@ -187,12 +178,9 @@ class Loan < ActiveRecord::Base
     write_attribute self.class.workflow_column, new_state.to_s
   end
 
-  def starts_at=(time)
-    if time.is_a? String
-      write_attribute(:starts_at, Time.zone.parse(time).to_datetime)
-    else
-      write_attribute(:starts_at, time.to_datetime)
-    end
+  def starts_at=(datetime)
+    datetime = convert_to_datetime(datetime)
+    write_attribute(:starts_at, datetime)
 
     if starts_at_changed?
       if (ends_at.nil? || (ends_at && autofilled_ends_at)) && !ends_at_changed?
@@ -236,7 +224,7 @@ private
 
   # this is a callback which is invoked when check_in! is called
   def check_in
-    self.in_at = Time.zone.now.to_datetime
+    self.in_at = DateTime.current
     halt "All components must be inventoried before check in"     unless check_in_components_inventoried?
 
     # TODO: move this up into the authorization layer
@@ -253,7 +241,7 @@ private
 
   # this is a callback which is invoked when check_out! is called
   def check_out
-    self.out_at = Time.zone.now.to_datetime
+    self.out_at = DateTime.current
     halt "All components must be inventoried before check out"     unless check_out_components_inventoried?
 
     # TODO: move this up into the authorization layer
@@ -271,6 +259,18 @@ private
   def client_is_disabled?
     ensure_presence(client)
     client.disabled?
+  end
+
+  def convert_to_datetime(thing)
+    if thing.is_a? DateTime
+      return thing
+    elsif thing.is_a? String
+      return Time.zone.parse(thing).to_datetime
+    elsif thing.is_a? Time
+      return thing.to_datetime
+    end
+
+    raise InvalidDateTimeFormatException.new("Incompatible class, expected DateTime, Time, or String, but got: #{ thing.class }")
   end
 
   def ensure_presence(attr)
@@ -438,6 +438,25 @@ private
     end
   end
 
+  def validate_start_at_before_ends_at
+    return unless starts_at && ends_at
+    unless starts_at_before_ends_at?
+      errors.add(:starts_at, "must come before the return date")
+    end
+  end
+
+end
+
+  # TODO: move these constraints up into the authorization layer
+  # validates :in_attendant,      :associated => true,    :if     => :checked_in?
+  # validates :in_attendant_id,   :presence   => true,    :if     => :checked_in?
+  # validates :out_attendant,     :associated => true,    :if     => :checked_out?
+  # validates :out_attendant_id,  :presence   => true,    :if     => :checked_out?
+  # validate  :validate_in_attendant_has_proper_roles,    :if     => :checked_in?
+  # validate  :validate_in_attendant_is_not_client,       :if     => :checked_in?
+  # validate  :validate_out_attendant_has_proper_roles,   :if     => :checked_out?
+  # validate  :validate_out_attendant_is_not_client,      :if     => :checked_out?
+
   # TODO: move this up into the authorization layer
   # def validate_in_attendant_has_proper_roles
   #   return unless in_attendant
@@ -461,72 +480,5 @@ private
   #   return unless out_attendant && client
   #   unless out_attendant_is_not_the_client?
   #     errors.add(:out_attendant, "cannot check out items to themselves unless they are an admin")
-  #   end
-  # end
-
-  def validate_start_at_before_ends_at
-    return unless starts_at && ends_at
-    unless starts_at_before_ends_at?
-      errors.add(:starts_at, "must come before the return date")
-    end
-  end
-
-end
-
-
-  # def available_circulating_kits
-  #   if component_model
-  #     return component_model.available_circulating_kits(starts_at, ends_at, location)
-  #   elsif kit
-  #     return kit.component_model.available_circulating_kits(starts_at, ends_at, location)
-  #   else
-  #     return nil
-  #   end
-  # end
-
-  # # this should either be set via the component_model virtual
-  # # attribute, or retrieved from the kit's attributes
-  # def component_model
-  #   return nil unless kit.nil?
-  #   @component_model ||= begin
-  #     ComponentModel.find(component_model_id) if component_model_id
-  #   end
-  # end
-
-  # def component_model_id
-  #   @component_model_id ||= component_model.try(:id)
-  # end
-
-  # this should either be set via the attr_writer :location, or
-  # retrieved from the kit's attributes
-  # def location
-  #   @location ||= self.try(:kit).try(:location)
-  # end
-
-  # def location=(val)
-  #   if val.is_a? String
-  #     @location = Location.find(val.to_i)
-  #   elsif val.is_a? Fixnum
-  #     @location = Location.find(val)
-  #   elsif vali.is_a? Location
-  #     @location = val
-  #   else
-  #     raise "Expected a string, fixnum, or location"
-  #   end
-  # end
-
-  # def location_id
-  #   @location_id ||= @location.try(:id)
-  # end
-
-  # this should be retrieved from the component model's attributes,
-  # which is, in turn, derived from the kit, or the component model
-  # virtual attribute
-  # def locations
-  #   raise "Must "
-  #   if kit
-  #     return [kit.location]
-  #   else
-  #     component_model.checkout_locations
   #   end
   # end

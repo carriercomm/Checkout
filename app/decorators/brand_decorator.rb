@@ -4,7 +4,6 @@ class BrandDecorator < ApplicationDecorator
   delegate :name
 
   def component_count
-    return 1
     component_models.reduce(0) {|sum, cm| sum + cm.component_count }
   end
 

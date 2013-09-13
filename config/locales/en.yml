@@ -30,12 +30,510 @@ en:
  #  #<Proc:0x007fa7eccd5e10@/Users/james/.rvm/gems/ruby-1.9.2-p290@checkout/gems/activesupport-3.2.7/lib/active_support/core_ext/time/conversions.rb:13 (lambda)>,
  # :verbose=>"%A, %B %d, %Y %l:%M%p",
  # :tabular=>"%a %Y-%m-%d"}
+
+  helpers:
+    links:
+      all: "All"
+      new: "<i class='icon-plus-sign'></i> New"
+    icons:
+      check_in:  "<i class='icon-signin'></i>"
+      check_out: "<i class='icon-signout'></i>"
+      destroy:   "<i class='icon-trash'></i>"
+      disable:   "<i class='icon-ban-circle'></i>"
+      edit:      "<i class='icon-edit'></i>"
+      index:     "<i class='icon-list'></i>"
+      new:       "<i class='icon-plus-sign'></i>"
+      reserve:   "<i class='icon-calendar'></i>"
+      show:      "<i class='icon-eye-open'></i>"
+    actions:
+      back:      "Back"
+      cancel:    "Cancel"
+      check_in:  "Check In"
+      check_out: "Check Out"
+      destroy:   "Delete"
+      disable:   "Disable"
+      edit:      &edit "Edit"
+      index:     &index "List"
+      new:       &new "New"
+      reserve:   "Reserve"
+      show:      &show "Show"
+    submit:
+      component_model:
+        update: "Update Model"
+      split_component_model:
+        create: "Split Model"
+      inventory:
+        create: 'Submit'
+  page_subtitles:
+    index:
+      loans:
+        all:         'All'
+        pending:     'Pending'
+        approved:    'Approved'
+        checked_out: 'Checked Out'
+        checked_in:  'Checked In'
+        canceled:    'Canceled'
+        rejected:    'Rejected'
+  page_titles:
+    edit:
+      audit_inventory_record:     &page_titles_edit_audit_inventory_record      'Edit Audit Inventory Record'
+      brand:                      &page_titles_edit_brand                       'Edit Brand'
+      budget:                     &page_titles_edit_budget                      'Edit Budget'
+      business_day:               &page_titles_edit_business_day                'Edit Business Day'
+      business_hour:              &page_titles_edit_business_hour               'Edit Business Hour'
+      business_hour_exception:    &page_titles_edit_business_hour_exception     'Edit Business Hour Exception'
+      category:                   &page_titles_edit_category                    'Edit Category'
+      check_in_inventory_record:  &page_titles_edit_check_in_inventory_record   'Edit Check In Inventory Record'
+      check_out_inventory_record: &page_titles_edit_check_out_inventory_record  'Edit Check Out Inventory Record'
+      component:                  &page_titles_edit_component                   'Edit Component'
+      component_model:            &page_titles_edit_component_model             'Edit Model'
+      covenant:                   &page_titles_edit_covenant                    'Edit Covenant'
+      covenant_signature:         &page_titles_edit_covenant_signature          'Edit Covenant Signature'
+      group:                      &page_titles_edit_group                       'Edit Group'
+      inventory_detail:           &page_titles_edit_inventory_detail            'Edit Inventory Detail'
+      inventory_record:           &page_titles_edit_inventory_record            'Edit Inventory Record'
+      kit:                        &page_titles_edit_kit                         'Edit Kit'
+      loan:                       &page_titles_edit_loan                        'Edit Loan'
+      location:                   &page_titles_edit_location                    'Edit Location'
+      membership:                 &page_titles_edit_membership                  'Edit Membership'
+      permission:                 &page_titles_edit_permission                  'Edit Permission'
+      role:                       &page_titles_edit_role                        'Edit Role'
+      settings:                   &page_titles_edit_settings                    'Edit Application Settings'
+      split_component_model:      &page_titles_edit_split_component_model       'Edit Split Model'
+      training:                   &page_titles_edit_training                    'Edit Training'
+      user:                       &page_titles_edit_user                        'Edit User'
+    index:
+      audit_inventory_records:     &page_titles_index_audit_inventory_records     'Audit Inventory Records'
+      brands:                      &page_titles_index_brands                      'Brands'
+      budgets:                     &page_titles_index_budgets                     'Budgets'
+      business_days:               &page_titles_index_business_days               'Business Days'
+      business_hours:              &page_titles_index_business_hours              'Business Hours'
+      business_hour_exceptions:    &page_titles_index_business_hour_exceptions    'Business Hour Exceptions'
+      categories:                  &page_titles_index_categories                  'Categories'
+      check_in_inventory_records:  &page_titles_index_check_in_inventory_records  'Check In Inventory Records'
+      check_out_inventory_records: &page_titles_index_check_out_inventory_records 'Check Out Inventory Records'
+      components:                  &page_titles_index_components                  'Components'
+      component_models:            &page_titles_index_component_models            'Models'
+      covenants:                   &page_titles_index_covenants                   'Covenants'
+      covenant_signatures:         &page_titles_index_covenant_signatures         'Covenant Signatures'
+      dashboard:                   'Dashboard'
+      groups:                      &page_titles_index_groups                      'Groups'
+      inventory_details:           &page_titles_index_inventory_details           'Inventory Details'
+      inventory_records:           &page_titles_index_inventory_records           'Inventory Records'
+      kits:                        &page_titles_index_kits                        'Kits'
+      loans:                       &page_titles_index_loans                       'Loans'
+      locations:                   &page_titles_index_locations                   'Locations'
+      memberships:                 &page_titles_index_memberships                 'Memberships'
+      permissions:                 &page_titles_index_permissions                 'Permissions'
+      roles:                       &page_titles_index_roles                       'Roles'
+#      settings:                    &page_titles_index_settings                    'Settings'
+      split_component_models:      &page_titles_index_split_component_models      'Split Models'
+      trainings:                   &page_titles_index_trainings                   'Trainings'
+      users:                       &page_titles_index_users                       'Users'
+    new:
+      audit_inventory_record:     &page_titles_new_audit_inventory_record       'New Audit Inventory Record'
+      brand:                      &page_titles_new_brand                        'New Brand'
+      budget:                     &page_titles_new_budget                       'New Budget'
+      business_day:               &page_titles_new_business_day                 'New Business Day'
+      business_hour:              &page_titles_new_business_hour                'New Business Hour'
+      business_hour_exception:    &page_titles_new_business_hour_exception      'New Business Hour Exception'
+      category:                   &page_titles_new_category                     'New Category'
+      check_in_inventory_record:  &page_titles_new_check_in_inventory_record    'New Check In Inventory Record'
+      check_out_inventory_record: &page_titles_new_check_out_inventory_record   'New Check Out Inventory Record'
+      component:                  &page_titles_new_component                    'New Component'
+      component_model:            &page_titles_new_component_model              'New Model'
+      covenant:                   &page_titles_new_covenant                     'New Covenant'
+      covenant_signature:         &page_titles_new_covenant_signature           'New Covenant Signature'
+      group:                      &page_titles_new_group                        'New Group'
+      inventory_detail:           &page_titles_new_inventory_detail             'New Inventory Detail'
+      inventory_record:           &page_titles_new_inventory_record             'New Inventory Record'
+      kit:                        &page_titles_new_kit                          'New Kit'
+      loan:                       &page_titles_new_loan                         'New Loan'
+      location:                   &page_titles_new_location                     'New Location'
+      membership:                 &page_titles_new_membership                   'New Membership'
+      permission:                 &page_titles_new_permission                   'New Permission'
+      role:                       &page_titles_new_role                         'New Role'
+      split_component_model:      &page_titles_new_split_component_model        'New Split Model'
+      training:                   &page_titles_new_training                     'New Training'
+      user:                       &page_titles_new_user                         'New User'
+    show:
+      audit_inventory_record:     &page_titles_show_audit_inventory_record      'Audit Inventory Record'
+      brand:                      &page_titles_show_brand                       'Brand'
+      budget:                     &page_titles_show_budget                      'Budget'
+      business_day:               &page_titles_show_business_day                'Business Day'
+      business_hour:              &page_titles_show_business_hour               'Business Hour'
+      business_hour_exception:    &page_titles_show_business_hour_exception     'Business Hour Exception'
+      category:                   &page_titles_show_category                    'Category'
+      check_in_inventory_record:  &page_titles_show_check_in_inventory_record   'Check In Inventory Record'
+      check_out_inventory_record: &page_titles_show_check_out_inventory_record  'Check Out Inventory Record'
+      component:                  &page_titles_show_component                   'Component'
+      component_model:            &page_titles_show_component_model             'Model'
+      covenant:                   &page_titles_show_covenant                    'Covenant'
+      covenant_signature:         &page_titles_show_covenant_signature          'Covenant Signature'
+      group:                      &page_titles_show_group                       'Group'
+      inventory_detail:           &page_titles_show_inventory_detail            'Inventory Detail'
+      inventory_record:           &page_titles_show_inventory_record            'Inventory Record'
+      kit:                        &page_titles_show_kit                         'Kit'
+      loan:                       &page_titles_show_loan                        'Loan'
+      location:                   &page_titles_show_location                    'Location'
+      membership:                 &page_titles_show_membership                  'Membership'
+      permission:                 &page_titles_show_permission                  'Permission'
+      role:                       &page_titles_show_role                        'Role'
+      settings:                   &page_titles_show_settings                    'Application Settings'
+      split_component_model:      &page_titles_show_split_component_model       'Split Model'
+      training:                   &page_titles_show_training                    'Training'
+      user:                       &page_titles_show_user                        'User'
+  links: &links
+    audit_inventory_record:
+      edit:  *page_titles_edit_audit_inventory_record
+      index: *page_titles_index_audit_inventory_records
+      new:   *page_titles_new_audit_inventory_record
+      show:  *page_titles_show_audit_inventory_record
+    brand:
+      edit:  *page_titles_edit_brand
+      index: *page_titles_index_brands
+      new:   *page_titles_new_brand
+      show:  *page_titles_show_brand
+    budget:
+      edit:  *page_titles_edit_budget
+      index: *page_titles_index_budgets
+      new:   *page_titles_new_budget
+      show:  *page_titles_show_budget
+    business_day:
+      edit:  *page_titles_edit_business_day
+      index: *page_titles_index_business_days
+      new:   *page_titles_new_business_day
+      show:  *page_titles_show_business_day
+    business_hour:
+      edit:  *page_titles_edit_business_hour
+      index: *page_titles_index_business_hours
+      new:   *page_titles_new_business_hour
+      show:  *page_titles_show_business_hour
+    business_hour_exception:
+      edit:  *page_titles_edit_business_hour_exception
+      index: *page_titles_index_business_hour_exceptions
+      new:   *page_titles_new_business_hour_exception
+      show:  *page_titles_show_business_hour_exception
+    category:
+      edit:  *page_titles_edit_category
+      index: *page_titles_index_categories
+      new:   *page_titles_new_category
+      show:  *page_titles_show_category
+    check_in_inventory_record:
+      edit:  *page_titles_edit_check_in_inventory_record
+      index: *page_titles_index_check_in_inventory_records
+      new:   *page_titles_new_check_in_inventory_record
+      show:  *page_titles_show_check_in_inventory_record
+    check_out_inventory_record:
+      edit:  *page_titles_edit_check_out_inventory_record
+      index: *page_titles_index_check_out_inventory_records
+      new:   *page_titles_new_check_out_inventory_record
+      show:  *page_titles_show_check_out_inventory_record
+    component:
+      edit:  *page_titles_edit_component
+      index: *page_titles_index_components
+      new:   *page_titles_new_component
+      show:  *page_titles_show_component
+    component_model:
+      edit:  *page_titles_edit_component_model
+      index: *page_titles_index_component_models
+      new:   *page_titles_new_component_model
+      show:  *page_titles_show_component_model
+    covenant:
+      edit:  *page_titles_edit_covenant
+      index: *page_titles_index_covenants
+      new:   *page_titles_new_covenant
+      show:  *page_titles_show_covenant
+    covenant_signature:
+      edit:  *page_titles_edit_covenant_signature
+      index: *page_titles_index_covenant_signatures
+      new:   *page_titles_new_covenant_signature
+      show:  *page_titles_show_covenant_signature
+    group:
+      edit:  *page_titles_edit_group
+      index: *page_titles_index_groups
+      new:   *page_titles_new_group
+      show:  *page_titles_show_group
+    inventory_detail:
+      edit:  *page_titles_edit_inventory_detail
+      index: *page_titles_index_inventory_details
+      new:   *page_titles_new_inventory_detail
+      show:  *page_titles_show_inventory_detail
+    inventory_record:
+      edit:  *page_titles_edit_inventory_record
+      index: *page_titles_index_inventory_records
+      new:   *page_titles_new_inventory_record
+      show:  *page_titles_show_inventory_record
+    kit:
+      edit:  *page_titles_edit_kit
+      index: *page_titles_index_kits
+      new:   *page_titles_new_kit
+      show:  *page_titles_show_kit
+      add_component: "<i class='icon-plus-sign'></i> Add another component"
+    loan:
+      edit:  *page_titles_edit_loan
+      index: *page_titles_index_loans
+      new:   *page_titles_new_loan
+      show:  *page_titles_show_loan
+    location:
+      edit:  *page_titles_edit_location
+      index: *page_titles_index_locations
+      new:   *page_titles_new_location
+      show:  *page_titles_show_location
+    membership:
+      edit:  *page_titles_edit_membership
+      index: *page_titles_index_memberships
+      new:   *page_titles_new_membership
+      show:  *page_titles_show_membership
+    permission:
+      edit:  *page_titles_edit_permission
+      index: *page_titles_index_permissions
+      new:   *page_titles_new_permission
+      show:  *page_titles_show_permission
+    role:
+      edit:  *page_titles_edit_role
+      index: *page_titles_index_roles
+      new:   *page_titles_new_role
+      show:  *page_titles_show_role
+    settings:
+      edit:  *page_titles_edit_settings
+      # index: *page_titles_index_settings
+      # new:   *page_titles_new_settings
+      show:  *page_titles_show_settings
+    split_component_model:
+      edit:  *page_titles_edit_split_component_model
+      index: *page_titles_index_split_component_models
+      new:   *page_titles_new_split_component_model
+      show:  *page_titles_show_split_component_model
+      add_new_component_model: "<i class='icon-plus-sign'></i> Add another model"
+      remove_component_model: "<i class='icon-minus-sign'></i> Remove this model"
+    training:
+      edit:  *page_titles_edit_training
+      index: *page_titles_index_trainings
+      new:   *page_titles_new_training
+      show:  *page_titles_show_training
+    user:
+      edit:  *page_titles_edit_user
+      index: *page_titles_index_users
+      new:   *page_titles_new_user
+      show:  *page_titles_show_user
+      add_group: "<i class='icon-plus-sign'></i> Add another group"
+      add_training: "<i class='icon-plus-sign'></i> Add another model"
+      bulk_upload: "<i class='icon-upload'></i> Bulk Upload"
+  hints:
+    show_audit_inventory_record:         *page_titles_show_audit_inventory_record
+    show_brand:                          *page_titles_show_brand
+    show_budget:                         *page_titles_show_budget
+    show_business_day:                   *page_titles_show_business_day
+    show_business_hour:                  *page_titles_show_business_hour
+    show_business_hour_exception:        *page_titles_show_business_hour_exception
+    show_category:                       *page_titles_show_category
+    show_check_in_inventory_record:      *page_titles_show_check_in_inventory_record
+    show_check_out_inventory_record:     *page_titles_show_check_out_inventory_record
+    show_component:                      *page_titles_show_component
+    show_component_model:                *page_titles_show_component_model
+    show_covenant:                       *page_titles_show_covenant
+    show_covenant_signature:             *page_titles_show_covenant_signature
+    show_group:                          *page_titles_show_group
+    show_inventory_detail:               *page_titles_show_inventory_detail
+    show_inventory_record:               *page_titles_show_inventory_record
+    show_kit:                            *page_titles_show_kit
+    show_loan:                           *page_titles_show_loan
+    show_location:                       *page_titles_show_location
+    show_membership:                     *page_titles_show_membership
+    show_permission:                     *page_titles_show_permission
+    show_role:                           *page_titles_show_role
+    show_settings:                       *page_titles_show_settings
+    show_split_component_model:          *page_titles_show_split_component_model
+    show_training:                       *page_titles_show_training
+    show_user:                           *page_titles_show_user
+    show_all_audit_inventory_records:          'Show all audit inventory records'
+    show_all_brands:                           'Show all brands'
+    show_all_circulating_brands:               'Show all circulating brands'
+    show_all_non_circulating_brands:           'Show all non-circulating brands'
+    show_all_budgets:                          'Show all budgets'
+    show_all_business_days:                    'Show all business days'
+    show_all_business_hours:                   'Show all business hours'
+    show_all_business_hour_exceptions:         'Show all business hour exceptions'
+    show_all_category:                         'Show all categories'
+    show_all_check_in_inventory_records:       'Show all check in inventory records'
+    show_all_check_out_inventory_records:      'Show all check out inventory records'
+    show_all_components:                       'Show all components'
+    show_all_component_models:                 'Show all models'
+    show_all_circulating_component_models:     'Show all circulating models'
+    show_all_non_circulating_component_models: 'Show all non_circulating models'
+    show_all_covenants:                        'Show all covenants'
+    show_all_covenant_signatures:              'Show all covenant signatures'
+    show_all_groups:                           'Show all groups'
+    show_all_inventory_details:                'Show all inventory details'
+    show_all_inventory_records:                'Show all inventory records'
+    show_all_kits:                             'Show all kits'
+    show_all_kits_circulating:                 'Show all circulating kits'
+    show_all_kits_non_circulating:             'Show all non-circulating kits'
+    show_all_kits_deaccessioned:               'Show all deaccessioned kits'
+    show_all_kits_missing_components:          'Show all kits with missing components'
+    show_all_loans:                            'Show all loans'
+    show_all_locations:                        'Show all locations'
+    show_all_memberships:                      'Show all memberships'
+    show_all_permissions:                      'Show all permissions'
+    show_all_roles:                            'Show all roles'
+    show_all_settings:                         'Show all settings'
+    show_all_split_component_models:           'Show all split models'
+    show_all_trainings:                        'Show all training'
+    show_all_users:                            'Show all users'
+    show_all_administrator_users:              'Show all administrator users'
+    show_all_attendant_users:                  'Show all attendant users'
+    show_all_active_users:                     'Show all active users'
+    show_all_disabled_users:                   'Show all disabled users'
+    show_all_suspended_users:                  'Show all suspended users'
+  link_titles:
+    <<: *links
+  filters:
+    all:                  &filters_all 'All'
+    brand:
+      circulating:        &filters_brand_circulating     'Circulating'
+      deaccessioned:      &filters_brand_deaccessioned   'Deaccessioned'
+      non_circulating:    &filters_brand_non_circulating 'Non-circulating'
+    budget:
+      active:             'Active'
+    inventory_record:
+      audit:              'Audit'
+      check_in:           'Check In'
+      check_out:          'Check Out'
+    component:
+      orphaned:           'Orphaned'
+    component_model:
+      circulating:        *filters_brand_circulating
+    group:
+      active:             'Active'
+      empty:              'Empty'
+      expired:            'Expired'
+    kit:
+      circulating:        *filters_brand_circulating
+      deaccessioned:      *filters_brand_deaccessioned
+      missing_components: 'Missing Components'
+      non_circulating:    *filters_brand_non_circulating
+    loan:
+      approved:           &filters_loan_approved    "<span class='loan-approved'>Approved</span>"
+      canceled:           &filters_loan_canceled    "<span class='loan-canceled'>Canceled</span>"
+      checked_in:         &filters_loan_checked_in  "<span class='loan-checked-in'>Checked In</span>"
+      checked_out:        &filters_loan_checked_out "<span class='loan-checked-out'>Checked Out</span>"
+      pending:            &filters_loan_pending     "<span class='loan-pending'>Pending</span>"
+      rejected:           &filters_loan_rejected    "<span class='loan-rejected'>Rejected</span>"
+    user:
+      all:                *filters_all
+      active:             'Active'
+      suspended:          'Suspended'
+      disabled:           'Disabled'
+      administrator:      'Administrators'
+      attendant:          'Attendants'
+  labels:
+    default:
+      actions:            'Actions'
+      count:              &labels_default_count 'Count'
+      description:        &labels_default_description  'Description'
+      name:               &labels_default_name  'Name'
+    brand:
+      name:               *labels_default_name
+      component_model_count: 'Model Count'
+      component_count:    'Component Count'
+    budget:
+      dates:              'Dates'
+      ends_at:            'Date Ends'
+      name:               *labels_default_name
+      number:             'Number'
+      starts_at:          'Date Starts'
+    category:
+      name:               *labels_default_name
+      description:        *labels_default_description
+    component:
+      asset_tag:          'Asset tag'
+      brand:              *page_titles_show_brand
+      component_model:    'Model'
+      disposition:        'Disposition'
+      kit:                *page_titles_show_kit
+      serial_number:      'Serial Number'
+    component_model:
+      brand:              *page_titles_show_brand
+      name:               *labels_default_name
+      model_number:       'Model Number'
+      description:        'Description'
+      count:              *labels_default_count
+    group:
+      expires_at:         'Expires'
+    inventory_record:
+      attendant:          'Attendant'
+      created_at:         "Date"
+      kit:                &labels_inventory_record_kit 'Kit'
+      loan:               "Loan"
+    kit:
+      asset_tags:         &labels_kit_asset_tags 'Asset Tags'
+      circulation_type:   &labels_kit_circulation_type 'Circulation Type'
+      components:         &labels_kit_components 'Components'
+      custodian:          'Custodian'
+      groups:             'Groups'
+      id:                 *labels_inventory_record_kit
+      location:           &labels_kit_location 'Location'
+      training_required:  'Training Required'
+    loan:
+      asset_tags:      *labels_kit_asset_tags
+      client:          "Client"
+      components:      *labels_kit_components
+      ends_at:         "End"
+      in_at:           "Checked In"
+      kit:             *labels_inventory_record_kit
+      late:            "Late"
+      location:        *labels_kit_location
+      lost_at:         "Lost"
+      out_at:          "Checked Out"
+      starts_at:       "Start"
+      workflow_state:  "Status"
+    location:
+      name:            *labels_default_name
+      business_hours:  "Hours"
+    settings:
+      name:               *labels_default_name
+      value:              'Value'
+  values:
+    inventory_detail:
+      missing:
+        'true':           'Missing'
+        'false':          'Present'
+        unknown:          'Unknown'
+    kit:
+      circulating:       *filters_brand_circulating
+      non_circulating:   *filters_brand_non_circulating
+      deaccessioned:     *filters_brand_deaccessioned
+      checked_out:       'Checked Out'
+      available:         'Available'
+    loan:
+      approved:          *filters_loan_approved
+      canceled:          *filters_loan_canceled
+      checked_in:        *filters_loan_checked_in
+      checked_out:       *filters_loan_checked_out
+      rejected:          *filters_loan_rejected
+      pending:           *filters_loan_pending
+    role:
+      admin:             'Administrator'
+      approver:          'Approver'
+      attendant:         'Attendant'
+  notifications:
+    brand:
+      caveat: "<strong>Note!</strong> This list of 'non-circulating' brands only means these brands have kits in them that are not circulating. They may also have kits which <em>are</em> circulating."
+    loan:
+      no_loans: 'No loans'
+    user:
+      user_is_suspended: "This user is currently suspended."
+      user_is_disabled: "This user is currently disabled."
+
   simple_form:
     labels:
       settings:
         default_check_out_duration: 'Default Check Out Duration'
         attendants_can_self_check_out: 'Attendants May Self-Check-Out'
         clients_can_see_equipment_outside_their_groups: 'Clients May See Equipment Outside Their Groups'
+      kit:
+        workflow_state: *labels_kit_circulation_type
       loan:
         component_model: 'Model'
         starts_at: 'Pick Up Date'
@@ -43,10 +541,10 @@ en:
         out_at: 'Checkout Date'
       split_component_model:
         component_models:
-          id: "Model"
+          id: 'Model'
       user:
         password_confirmation: 'Password Confirmation'
-        suspension_count: "Suspensions"
+        suspension_count: 'Suspensions'
     hints:
       settings:
         default_check_out_duration: 'Standard checkout length (in days).'
@@ -55,14 +553,11 @@ en:
       component_model: &hints_component_model
         name: 'Good model names should include specs, revisions, and model numbers (e.g. Mac Mini, 2.3GHz dual-core i5, 2GB RAM, 500GB HD)'
         description: 'Descriptions are a good place to put extensive technical specifications, and any special notes on usage.'
-      kit:
-        circulating: "'Yes' if you want the kit to be available in the loan system."
-        tombstoned: "'Yes' if this kit is deaccessioned/missing/stolen/destroyed and never coming back."
       split_component_model:
         component_models:
           <<: *hints_component_model
       user:
-        disabled: "Prevent this client from logging in"
+        disabled: 'Prevent this client from logging in'
         suspended_until: "Suspend this client's checkout privileges until a specified date"
     options:
       inventory_records:
@@ -71,324 +566,8 @@ en:
           '2': &inventory_status_inventoried 'Inventoried'
           '3': &inventory_status_missing 'Missing'
           '4': &inventory_status_deaccessioned 'Deaccessioned'
-  helpers:
-    headers:
-      actions: "Actions"
-    links:
-      all: "All"
-      new: "<i class='icon-plus-sign'></i> New"
-    mini_buttons:
-      check_in: "<i class='icon-signin'></i>"
-      check_out: "<i class='icon-signout'></i>"
-      delete: "<i class='icon-trash'></i>"
-      disable: "<i class='icon-ban-circle'></i>"
-      edit: "<i class='icon-edit'></i>"
-      index: "<i class='icon-list'></i>"
-      new: "<i class='icon-plus-sign'></i>"
-      reserve: "<i class='icon-calendar'></i>"
-      show: "<i class='icon-eye-open'></i>"
-    actions:
-      check_in: "Check In"
-      check_out: "Check Out"
-      delete: "Delete"
-      disable: "Disable"
-      edit: "Edit"
-      index: "List"
-      new: "New"
-      reserve: "Reserve"
-      show: "Show"
-    submit:
-      component_model:
-        update: "Update Model"
-      split_component_model:
-        create: "Split Model"
-      inventory:
-        create: 'Submit'
-  brand:
-    index:
-      title: "Brands"
-    new:
-      title: "New Brand"
-    edit:
-      title: "Edit Brand"
-    sidebar:
-      filters: "Brands Filters"
-      add:
-        default_tooltip: "Add a new brand"
-        denied_tooltip: "You don't have sufficient permissions to add a new brand"
-      all:
-        text: "All"
-        default_tooltip: "Show all brands"
-      circulating:
-        text: "Circulating"
-        default_tooltip: "Show brands with circulating kits"
-      non_circulating:
-        text: "Non Circulating"
-        default_tooltip: "Show brands with non circulating kits"
-  budget:
-    index:
-      title: "Budgets"
-    new:
-      title: "New Budget"
-    edit:
-      title: "Edit Budget"
-    sidebar:
-      filters: "Budgets Filters"
-      add:
-        default_tooltip: "Add a new budget"
-        denied_tooltip: "You don't have sufficient permissions to add a new budget"
-  category:
-    index:
-      title: "Categories"
-    new:
-      title: "New Category"
-    edit:
-      title: "Edit Category"
-    sidebar:
-      filters: "Categories Filters"
-      add:
-        default_tooltip: "Add a new category"
-        denied_tooltip: "You don't have sufficient permissions to add a new category"
-  component_model:
-    index:
-      title: "Models"
-    edit:
-      title: "Edit Model"
-    new:
-      title: "New Model"
-    sidebar:
-      add:
-        default_tooltip: "Add a new model"
-        denied_tooltip: "You don't have sufficient permissions to add a new model"
-      filters: "Models Filters"
-      all:
-        text: "All"
-        default_tooltip: "Show all models"
-      circulating:
-        text: "Circulating"
-        default_tooltip: "Show all circulating models"
-      split:
-        text: 'Split'
-        default_tooltip: 'Split this model into two models'
-        denied_tooltip: "You don't have sufficient permission to split a model"
-      # non_circulating:
-      #   text: "Non Circulating"
-      #   default_tooltip: "Show all non circulating models"
-  component_model_splitter:
-    edit:
-      title: "Split Model"
-  covenant:
-    index:
-      title: "Covenants"
-    new:
-      title: "New Covenant"
-    edit:
-      title: "Edit Covenant"
-    sidebar:
-      add:
-        default_tooltip: "Add a new covenant"
-        denied_tooltip: "You don't have sufficient permissions to add a new covenant"
-  dashboard:
-    index:
-      title: "Dashboard"
-  group:
-    index:
-      title: "Groups"
-    new:
-      title: "New Group"
-    edit:
-      title: "Edit Group"
-    expires_at: "Expires"
-    sidebar:
-      filters: "Group Filters"
-      add:
-        default_tooltip: "Add a new group"
-        denied_tooltip: "You don't have sufficient permissions to add a new group"
-      all:
-        text: "All"
-        default_tooltip: "Show all groups"
-      active:
-        text: "Active"
-        default_tooltip: "Show all active groups"
-      expired:
-        text: "Expired"
-        default_tooltip: "Show all expired groups"
-      empty:
-        text: "Empty"
-        default_tooltip: "Show all groups with zero users or zero kits"
-  inventory_detail:
-    missing:
-      'true': "Missing"
-      'false': "Present"
-      unknown: "Unknown"
-  inventory_record:
-    type:
-      check_in: "Check In Inventory"
-      check_out: "Check Out Inventory"
-      audit: "Inventory Audit"
-    index:
-      title: 'Inventory Records'
-    sidebar:
-      all:
-        default_tooltip: 'Show all inventory records'
-        denied_tooltip: "You don't have sufficient permissions to view inventory records"
-  kit:
-    id: "Kit ID"
-    asset_tags: "Asset Tags"
-    location: "Location"
-    index:
-      title: "Kits"
-    edit:
-      title: "Edit Kit %{name}"
-      add_component: "<i class='icon-plus-sign'></i> Add another component"
-    new:
-      title: "New Kit"
-    sidebar:
-      filters: "Kits Filters"
-      add:
-        default_tooltip: "Add a new kit"
-        denied_tooltip: "You don't have sufficient permissions to add a new kit"
-      all:
-        text: "All"
-      circulating:
-        text: "Circulating"
-      edit:
-        text: 'Edit'
-      inventory_records:
-        text: 'History'
-      loans:
-        text: 'Loans'
-      missing_components:
-        text: "Missing Components"
-      new_inventory_records:
-        text: 'New'
-      non_circulating:
-        text: "Non Circulating"
-      reserve:
-        text: 'Reserve'
-      tombstoned:
-        text: "Tombstoned"
-    status:
-      checked_out: "Checked Out"
-      available: "Available"
-  loan:
-    index:
-      title: "Loans"
-    edit:
-      title: "Edit Loan %{id}"
-    new:
-      title: "New Loan"
-    kit_select:
-      title: &kit_select_title "Kit Selection"
-      prompt: "The %{location_name} location has %{num_kits} kit(s) to choose from:"
-    not_checked_out: ''
-    not_checked_in: ''
-    show:
-      title: "Loan #%{id}"
-    state:
-      approved: &loan_approved '<span class="label label-success">Approved</span>'
-      canceled: &loan_canceled '<span class="label">Canceled</span>'
-      checked_in: &loan_checked_in '<span class="label label-inverse">Checked In</span>'
-      checked_out: &loan_checked_out '<span class="label label-info">Checked Out</span>'
-      rejected: &loan_rejected '<span class="label label-important">Rejected</span>'
-      pending: &loan_pending '<span class="label label-warning">Pending</span>'
-    sidebar:
-      filters: "Loan Filters"
-      all:
-        text: "All"
-      approved:
-        text: *loan_approved
-      canceled:
-        text: *loan_canceled
-      checked_in:
-        text: *loan_checked_in
-      checked_out:
-        text: *loan_checked_out
-      rejected:
-        text: *loan_rejected
-      pending:
-        text: *loan_pending
-  location:
-    index:
-      title: "Locations"
-    edit:
-      title: "Edit %{name}"
-    new:
-      title: "New Location"
-    sidebar:
-      filters: "Locations Filters"
-      add:
-        default_tooltip: "Add a new location"
-        denied_tooltip: "You don't have sufficient permissions to add a new location"
-  reservation:
-    edit:
-      title: "Edit Reservation %{id}"
-    new:
-      title: "New Reservation"
-    show:
-      title: "Reservation %{id}"
-    kit_select:
-      title: *kit_select_title
-  role:
-    index:
-      title: "Roles"
-    admin: "Administrator"
-    attendant: "Attendant"
-  settings:
-    show:
-      title: 'Appplication Settings'
-    edit:
-      title: 'Edit Appplication Settings'
-    table:
-      name: 'Name'
-      valud: 'Value'
-  split_component_model:
-    edit:
-      add_new_component_model: "<i class='icon-plus-sign'></i> Add a new model"
-      remove_component_model: "<i class='icon-minus-sign'></i> Remove this model"
-  user:
-    index:
-      title: "Users"
-    new:
-      title: "New User"
-    edit:
-      title: "Edit User"
-      add_group: "<i class='icon-plus-sign'></i> Add another group"
-      add_training: "<i class='icon-plus-sign'></i> Add another model"
-    sidebar:
-      filters: "Users Filters"
-      add:
-        default_tooltip: "Add a new user"
-        denied_tooltip: "You don't have sufficient permissions to add a new user"
-      csv_import:
-        text: '<i class="icon-upload"></i> CSV Import'
-        default_tooltip: "Bulk upload and creation of users defined in a CSV file"
-        denied_tooltip: "You don't have sufficient permissions to create users"
-      all:
-        text: "All"
-        default_tooltip: "Show all users"
-      active:
-        text: "Active"
-        default_tooltip: "Show all active users<br>(includes suspended users)"
-      suspended:
-        text: "Suspended"
-        default_tooltip: "Show all suspended users"
-      disabled:
-        text: "Disabled"
-        default_tooltip: "Show all disabled users"
-      admins:
-        text: "Administrators"
-        default_tooltip: "Show all administrators"
-      attendants:
-        text: "Attendants"
-        default_tooltip: "Show all attendants"
-    status:
-      title: "Status"
-      active:
-        icon: '&nbsp;'
-      disabled:
-        icon: '<a rel="tooltip" title="Disabled"><i class="icon-ban-circle user-disabled"></i></a>'
-        text: '<i class="icon-ban-circle user-disabled"></i> This user is currently disabled'
-      suspended:
-        icon: '<a rel="tooltip" title="Suspended"><i class="icon-bolt user-suspended"></i></a>'
-        text: '<i class="icon-bolt user-suspended"></i> This user is currently suspended'
+      kit:
+        workflow_state:
+          circulating:       *filters_brand_circulating
+          non_circulating:   *filters_brand_non_circulating
+          deaccessioned:     *filters_brand_deaccessioned

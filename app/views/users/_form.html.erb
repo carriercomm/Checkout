@@ -1,4 +1,4 @@
-<%= simple_nested_form_for @user.model, :html => { :class => 'form-horizontal' } do |f| %>
+<%= simple_nested_form_for @user, :html => { :class => 'form-horizontal' } do |f| %>
   <%= f.input :username %>
   <%= f.input :email %>
   <%= f.input :first_name %>
@@ -20,7 +20,7 @@
       </tr>
     </thead>
     <tbody id="memberships_fields">
-      <%= f.fields_for :memberships, @user.model.memberships, wrapper: false %>
+      <%= f.fields_for :memberships, @user.memberships, wrapper: false %>
     <tbody>
   </table>
   <p><%= f.link_to_add t('user.edit.add_group').html_safe, :memberships, data: { target: "#memberships_fields" } %></p>
@@ -35,7 +35,7 @@
       </tr>
     </thead>
     <tbody id="trainings_fields">
-      <%= f.fields_for :trainings, @user.model.trainings, wrapper: false %>
+      <%= f.fields_for :trainings, @user.trainings, wrapper: false %>
     </tbody>
   </table>
   <p><%= f.link_to_add t('user.edit.add_training').html_safe, :trainings, data: { target: "#trainings_fields" } %></p>

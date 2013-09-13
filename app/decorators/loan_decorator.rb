@@ -73,4 +73,8 @@ class LoanDecorator < ApplicationDecorator
     h.link_to(object.id.to_s, h.loan_path(object))
   end
 
+  def to_s
+    object.id.to_s
+  end
+
 end

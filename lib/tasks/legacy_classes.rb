@@ -159,9 +159,7 @@ class LegacyReservation < ActiveRecord::Base
     begin
       connection.execute "CREATE INDEX index_reservation_on_res_id ON reservation (res_id)"
     rescue Exception => e
-      puts e
-      puts "Nothing to worry about!"
-      puts
+      # do nothing
     end
   end
 
@@ -183,9 +181,7 @@ class LegacyCheckout < ActiveRecord::Base
     begin
       connection.execute "CREATE INDEX index_checkout_on_res_id ON checkout (res_id)"
     rescue Exception => e
-      puts e
-      puts "Nothing to worry about!"
-      puts
+      # do nothing
     end
   end
 

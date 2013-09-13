@@ -1,4 +1,4 @@
-<% title t('component_model_splitter.edit.title', :component_model_name => @component_model.to_s) %>
+<% title t('page_titles.new.split_component_model') %>
 
 <div class="alert alert-info">
   <button type="button" class="close" data-dismiss="alert">×</button>
@@ -29,7 +29,7 @@
   <%= f.input :root_component_model_id, :as => :hidden %>
   <%= f.simple_fields_for :component_models %>
   <%= f.link_to_add(:component_models, :model_object => ComponentModel.new) do %>
-  <%= t('split_component_model.edit.add_new_component_model').html_safe %>
+  <%= t('links.split_component_model.add_new_component_model').html_safe %>
   <% end %>
   <div class="form-actions">
     <%= f.submit nil, :class => 'btn btn-primary' %>

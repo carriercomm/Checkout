@@ -1,18 +1,19 @@
-<h1>Budget</h1>
+<% title t('page_titles.show.budget') %>
+<% subtitle budget %>
 
 <dl class="dl-horizontal">
-  <dt>Number</dt>
-  <dd><%= @budget.number %></dd>
-  <dt>Name</dt>
-  <dd><%= @budget.name %></dd>
-  <dt>Date start</dt>
-  <dd><%= @budget.starts_at %></dd>
-  <dt>Date end</dt>
-  <dd><%= @budget.ends_at %></dd>
+  <dt><%= t('labels.budget.number') %></dt>
+  <dd><%= budget.number %></dd>
+  <dt><%= t('labels.budget.name') %></dt>
+  <dd><%= budget.name %></dd>
+  <dt><%= t('labels.budget.starts_at') %></dt>
+  <dd><%= budget.starts_at %></dd>
+  <dt><%= t('labels.budget.ends_at') %></dt>
+  <dd><%= budget.ends_at %></dd>
 </dl>
 
 <div class="form-actions">
-  <%= link_to 'Back', budgets_path, :class => 'btn' %>
-  <%= link_to 'Edit', edit_budget_path(@budget), :class => 'btn btn-edit-budget' if can? :manage, Budget %>
-  <%= link_to 'Show Kits', budget_kits_path(@budget), :class => 'btn' %></p>
+  <%= auth_link(Budget, {}, { text: t('helpers.actions.back') }) %>
+  <%= auth_link([:edit, @budget]) %>
+  <%= auth_link([@budget, Component]) %>
 </div>

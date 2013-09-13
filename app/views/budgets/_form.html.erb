@@ -1,11 +1,11 @@
-<%= simple_form_for @budget.source, :html => { :class => 'form-horizontal' } do |f| %>
+<%= simple_form_for @budget, :html => { :class => 'form-horizontal' } do |f| %>
   <%= f.input :number %>
   <%= f.input :name %>
   <%= f.input :starts_at, :include_blank => true %>
-  <%= f.input :ends_at, :include_blank => true %>
+  <%= f.input :ends_at,   :include_blank => true %>
 
   <div class="form-actions">
     <%= f.submit nil, :class => 'btn btn-primary' %>
-    <%= link_to 'Cancel', budgets_path, :class => 'btn' %>
+    <%= auth_link(Budget, {}, { text: t('helpers.actions.cancel') }) %>
   </div>
 <% end %>

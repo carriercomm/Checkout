@@ -3,27 +3,38 @@ class BudgetDecorator < ApplicationDecorator
   delegate :ends_at, :name, :number, :starts_at
 
   def display_date
-    if !!source.starts_at && !!source.ends_at
-      return "#{ source.starts_at.year }-#{ source.ends_at.year }"
+    if !!object.starts_at && !!object.ends_at
+      return "#{ object.starts_at.year }-#{ object.ends_at.year }"
     else
       return "Unknown"
     end
   end
 
   def ends_at
-    coalesce(source.ends_at)
+    coalesce(object.ends_at)
   end
 
   def starts_at
-    coalesce(source.starts_at)
+    coalesce(object.starts_at)
   end
 
   def name
-    coalesce(source.name)
+    coalesce(object.name)
   end
 
   def number
-    coalesce(source.number)
+    coalesce(object.number)
+  end
+
+  def to_select2_json
+    {
+      :id   => id,
+      :text => to_s
+    }
+  end
+
+  def to_link
+    h.link_to(number, h.budget_path(object))
   end
 
   def to_s

@@ -1,10 +1,10 @@
-<% title component_model %>
+<% title t('page_titles.show.component_model') %>
+<% subtitle component_model %>
 
 <% content_for :sidebar do %>
   <li class="nav-header"><%= t(".actions") %></li>
-  <li><%= sidebar_link(:edit, @component_model) %></li>
-  <%= sidebar_link(:edit, { path: new_split_component_model_path("split_component_model[root_component_model_id]" => @component_model.id) },
-                          { text: t('component_model.sidebar.split.text') }) %>
+  <li><%= auth_link([:edit, @component_model]) %></li>
+  <li><%= auth_link([:new, SplitComponentModel], { "split_component_model[root_component_model_id]" => @component_model.id }) %>
 <% end %>
 
 <dl class="dl-horizontal">

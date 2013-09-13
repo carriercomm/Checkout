@@ -1,4 +1,5 @@
-<%= simple_nested_form_for @group.source, :html => { :class => 'form-horizontal form-table' } do |f| %>
+<%# TODO: localize this %>
+<%= simple_nested_form_for @group, :html => { :class => 'form-horizontal form-table' } do |f| %>
   <%= f.error_notification :message => 'Please review the problems below' %>
   <%= f.input :name %>
   <%= f.input :description %>
@@ -46,6 +47,6 @@
   <div class="form-actions">
     <%= f.button :submit, :class => 'btn-primary' %>
     <%= link_to t('.cancel', :default => t("helpers.links.cancel")),
-                group_path(@group.model), :class => 'btn' %>
+                group_path(@group), :class => 'btn' %>
   </div>
 <% end %>

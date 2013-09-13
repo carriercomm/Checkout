@@ -1,12 +1,12 @@
-<h1><%= @location.name %></h1>
+<% title t('page_titles.show.location') %>
+<% subtitle location.name %>
 
-<p>
-  <b>Business Hours</b><br>
-  <%= raw(@location.hours_to_s.join("<br>")) %>
+<dl class="dl-horizontal">
+  <dt><%= t('labels.location.business_hours') %></dt>
+  <dd><%= location.hours %></dd>
 </p>
 
 <div class="form-actions">
   <%= link_to 'Back', locations_path, :class => 'btn'  %>
-  <%= link_to 'Edit', edit_location_path(@location), :class => 'btn' %>
-  <%= link_to 'Delete', location_path(@location), :method => 'delete', :confirm => 'Are you sure?', :class => 'btn btn-danger' %>
+  <%= auth_link([:edit, location]) %>
 </div>

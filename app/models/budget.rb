@@ -7,7 +7,7 @@ class Budget < ActiveRecord::Base
 
   ## Associations ##
 
-  has_many  :kits, :inverse_of => :budget
+  has_many  :components, :inverse_of => :budget
 
 
   ## Validations ##

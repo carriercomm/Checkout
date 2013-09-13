@@ -1,61 +1,72 @@
-<%= title @user.username %>
-<%= subtitle @user.full_name %>
+<%= title t('page_titles.show.user') %>
+<%= subtitle user.full_name %>
+
 <% content_for :sidebar do %>
   <li class="nav-header"><%= t(".actions") %></li>
-  <li><%= edit_link(@user) %></li>
-  <li><%= link_to 'Loans', user_loans_path(@user) %></li>
+  <li><%= auth_link([:edit, user]) %></li>
+  <li><%= auth_link([user, Loan])  %></li>
 <% end %>
 
 <% if @user.disabled? %>
   <div class="alert alert-warning">
     <a class="close" data-dismiss="alert">×</a>
-    <%= t('user.status.disabled.text').html_safe %>
+    <%= t('notifications.user.user_is_disabled').html_safe %>
   </div>
 <% elsif @user.suspended? %>
   <div class="alert alert-warning">
     <a class="close" data-dismiss="alert">×</a>
-    <%= t('user.status.suspended.text').html_safe %>
+    <%= t('notifications.user.user_is_suspended').html_safe %>
   </div>
 <% end %>
 
 <dl class="dl-horizontal">
   <dt><%= t('simple_form.labels.user.first_name') %></dt>
-  <dd><%= @user.first_name %></dd>
+  <dd><%= user.first_name %></dd>
   <dt><%= t('simple_form.labels.user.last_name') %></dt>
-  <dd><%= @user.last_name %></dd>
+  <dd><%= user.last_name %></dd>
   <dt><%= t('simple_form.labels.user.username') %></dt>
-  <dd><%= @user.username %></dd>
+  <dd><%= user.username %></dd>
   <dt><%= t('simple_form.labels.user.email') %></dt>
-  <dd><%= @user.email %></dd>
+  <dd><%= user.email %></dd>
   <% Covenant.all.each do |c| %>
     <dt title="<%= c.name %>"><%= c.name %></dt>
-    <dd><%= @user.to_yes_no(@user.covenants.include? c) %></dd>
+    <dd><%= user.to_yes_no(user.covenants.include? c) %></dd>
   <% end %>
   <dt title="<%= t('simple_form.labels.user.suspension_count') %>"><%= t('simple_form.labels.user.suspension_count') %></dt>
-  <dd><%= @user.suspension_count %></dd>
+  <dd><%= user.suspension_count %></dd>
   <dt><%= t('simple_form.labels.user.suspended_until') %></dt>
-  <dd><%= @user.suspended_until %></dd>
+  <dd><%= user.suspended_until %></dd>
   <dt><%= t('simple_form.labels.user.disabled') %></dt>
-  <dd><%= @user.disabled %></dd>
+  <dd><%= user.disabled %></dd>
   <dt><%= t('simple_form.labels.user.roles') %></dt>
-  <dd><%= @user.roles_list("<br>") %></dd>
+  <dd><%= user.roles_list("<br>") %></dd>
 </dl>
 
+<% # TODO: localize this %>
+
 <h2><%= t('simple_form.labels.user.groups') %></h2>
-<table class="table table-striped">
-  <tr>
-    <th class="span6">Name</th>
-    <th class="span4">Expires</th>
-    <th class="span2">Supervisor</th>
-  </tr>
-  <%= render partial: 'membership', collection: @user.memberships %>
-</table>
+<% if user.memberships.empty? %>
+  <p>No groups</p>
+<% else %>
+  <table class="table table-striped">
+    <tr>
+      <th class="span6">Name</th>
+      <th class="span4">Expires</th>
+      <th class="span2">Supervisor</th>
+    </tr>
+    <%= render partial: 'membership', collection: user.memberships %>
+  </table>
+<% end %>
 
 <h2>Training</h2>
-<table class="table table-striped">
-  <tr>
-    <th class="span6">Model</th>
-    <th class="span6">Date</th>
-  </tr>
-  <%= render partial: 'trainings', collection: @trainings %>
-</table>
+<% if user.trainings.empty? %>
+  <p>No training</p>
+<% else %>
+  <table class="table table-striped">
+    <tr>
+      <th class="span6">Model</th>
+      <th class="span6">Date</th>
+    </tr>
+    <%= render partial: 'trainings', collection: @trainings %>
+  </table>
+<% end %>

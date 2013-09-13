@@ -17,7 +17,9 @@ class InventoryRecordsController < ApplicationController
       @inventory_records = InventoryRecord
     end
 
-    @inventory_records = @inventory_records.order('inventory_records.created_at DESC').page(params[:page]).per(params[:page_limit])
+    @inventory_records = @inventory_records.order('inventory_records.created_at DESC')
+      .page(params[:page])
+      .per(params[:page_limit])
 
     respond_to do |format|
       format.html # index.html.erb

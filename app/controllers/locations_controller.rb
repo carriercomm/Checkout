@@ -3,6 +3,9 @@ class LocationsController < ApplicationController
   # use CanCan to authorize this resource
   authorize_resource
 
+  decorates_assigned :location
+  decorates_assigned :locations
+
   # GET /locations
   # GET /locations.json
   def index
@@ -76,14 +79,14 @@ class LocationsController < ApplicationController
 
   # DELETE /locations/1
   # DELETE /locations/1.json
-  def destroy
-    @location = Location.find(params[:id])
-    @location.destroy
+  # def destroy
+  #   @location = Location.find(params[:id])
+  #   @location.destroy
 
-    respond_to do |format|
-      format.html { redirect_to locations_url }
-      # format.json { head :no_content }
-    end
-  end
+  #   respond_to do |format|
+  #     format.html { redirect_to locations_url }
+  #     # format.json { head :no_content }
+  #   end
+  # end
 
 end

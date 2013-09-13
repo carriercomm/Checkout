@@ -1,0 +1,43 @@
+<% title t('component.index.title') %>
+
+<% content_for :sidebar do %>
+  <li class="nav-header"><%= t(".actions") %></li>
+  <li><%= auth_link([:new, Component]) %></li>
+  <li class="nav-header"><%= t(".filters") %></li>
+  <li><%= auth_link(Component, {}, { text: t("component.filters.all.text").html_safe }) %></li>
+  <li><%= auth_link(Component, { filter: "orphaned" }, { text: t("component.filters.orphaned.text").html_safe }) %></li>
+<% end %>
+
+<%= paginate @components %>
+
+<table class="table">
+  <thead>
+    <tr>
+      <th><%= t('component.attributes.kit') %></th>
+      <th><%= t('component.attributes.asset_tag') %></th>
+      <th><%= t('component.attributes.serial_number') %></th>
+      <th><%= t('component.attributes.brand') %></th>
+      <th><%= t('component.attributes.model') %></th>
+      <th><%= t('component.attributes.disposition') %></th>
+      <th class="actions"><%= t('helpers.headers.actions') %></th>
+    </tr>
+  </thead>
+  <tbody>
+    <% components.each do |c| %>
+      <tr>
+        <td><%= c.kit.to_link %></td>
+        <td><%= c.asset_tag %></td>
+        <td><%= c.serial_number %></td>
+        <td><%= c.component_model.brand.to_link %></td>
+        <td><%= c.component_model.to_link %></td>
+        <td><%= c.disposition %></td>
+        <td class="actions">
+          <%= auth_link(c) %>
+          <%= auth_link([:edit, c]) %>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<%= paginate @components %>

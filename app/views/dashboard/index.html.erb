@@ -1,11 +1,15 @@
-<% title t('dashboard.index.title') %>
+<% title t('page_titles.index.dashboard') %>
 
 <% content_for :sidebar do %>
   <li class="nav-header"><%= t(".menu") %></li>
-  <%= sidebar_link(:index, nil, { path: user_loans_path(current_user) }, { text: t('loan.index.title') }) %>
+  <li><%= auth_link([current_user, Loan]) %></li>
 <% end %>
 
-<h2><%= t('loan.index.title') %></h2>
+<h2><%= t('page_titles.index.loan') %></h2>
+
+<% if loans.empty? %>
+<p><%= t('notifications.loan.no_loans') %></p>
+<% else %>
 <table class="table table-striped">
   <thead>
     <tr>
@@ -21,7 +25,7 @@
     </tr>
   </thead>
   <tbody>
-    <% @loans.each do |loan| %>
+    <% loans.each do |loan| %>
       <tr>
         <td><%= loan.kit %></td>
         <td class="ellipsize"><%= loan.kit.tabular_asset_tags %></td>
@@ -50,3 +54,4 @@
     <% end %>
   </tbody>
 </table>
+<% end %>

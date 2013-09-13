@@ -1,16 +1,15 @@
-<% title t('loan.index.title') %>
+<% title t('page_titles.index.loans') %>
+<% subtitle t("page_subtitles.index.loans.#{ @subtitle_key || 'all' }") %>
 
 <% content_for :sidebar do %>
-  <!-- <li class="nav-header"><%= t(".actions") %></li> -->
-  <!-- <%= sidebar_link(:new, Loan.new) %> -->
   <li class="nav-header"><%= t("loan.sidebar.filters") %></li>
-  <%= sidebar_link(:index, nil, { path: loans_path                              }, { text: t("loan.sidebar.all.text").html_safe         }) %>
-  <%= sidebar_link(:index, nil, { path: pending_loans_path(@forward_params)     }, { text: t("loan.sidebar.pending.text").html_safe     }) %>
-  <%= sidebar_link(:index, nil, { path: approved_loans_path(@forward_params)    }, { text: t("loan.sidebar.approved.text").html_safe    })%>
-  <%= sidebar_link(:index, nil, { path: checked_out_loans_path(@forward_params) }, { text: t("loan.sidebar.checked_out.text").html_safe }) %>
-  <%= sidebar_link(:index, nil, { path: checked_in_loans_path(@forward_params)  }, { text: t("loan.sidebar.checked_in.text").html_safe  }) %>
-  <%#= sidebar_link(:index, nil, { path: rejected_loans_path(@forward_params)    }, { text: t("loan.sidebar.rejected.text").html_safe    }) %>
-  <%= sidebar_link(:index, nil, { path: canceled_loans_path(@forward_params)    }, { text: t("loan.sidebar.canceled.text").html_safe    }) %>
+  <li><%= auth_link(Loan) %></li>
+  <li><%= auth_link(Loan, { filter: "pending" }) %></li>
+  <li><%= auth_link(Loan, { filter: "approved" }) %></li>
+  <li><%= auth_link(Loan, { filter: "checked_out" }) %></li>
+  <li><%= auth_link(Loan, { filter: "checked_in" }) %></li>
+  <%#= auth_link(Loan, { filter: "rejected" }) %>
+  <li><%= auth_link(Loan, { filter: "canceled" }) %></li>
 <% end %>
 
 <%= paginate @loans %>
@@ -18,23 +17,23 @@
 <table class="table table-striped">
   <thead>
     <tr>
-      <th>Client</th>
-      <th>Kit</th>
-      <th>Asset Tags</th>
-      <th>Kit Components</th>
-      <th>Pick Up Date</th>
-      <th>Return Date</th>
-      <th>Out Date</th>
-      <th>In Date</th>
-      <th>State</th>
-      <th>Actions</th>
+      <th><%= t('labels.loan.kit') %></th>
+      <th><%= t('labels.loan.client') %></th>
+      <th><%= t('labels.loan.asset_tags') %></th>
+      <th><%= t('labels.loan.components') %></th>
+      <th><%= t('labels.loan.starts_at') %></th>
+      <th><%= t('labels.loan.ends_at') %></th>
+      <th><%= t('labels.loan.out_at') %></th>
+      <th><%= t('labels.loan.in_at') %></th>
+      <th><%= t('labels.loan.status') %></th>
+      <th><%= t('labels.default.actions') %></th>
     </tr>
   </thead>
   <tbody>
     <% loans.each do |loan| %>
       <tr>
-        <td><%= loan.client.username %></td>
-        <td><%= loan.kit %></td>
+        <td><%= loan.kit.to_link %></td>
+        <td><%= loan.client.to_link %></td>
         <td class="ellipsize"><%= loan.kit.tabular_asset_tags %></td>
         <td class="ellipsize"><%= loan.kit.tabular_component_list %></td>
         <td style="white-space: nowrap;"><%= loan.starts_at %></td>
@@ -42,13 +41,15 @@
         <td style="white-space: nowrap;"><%= loan.out_at %></td>
         <td style="white-space: nowrap;"><%= loan.in_at %></td>
         <td><%= loan.state %></td>
-        <td class="mini-action-buttons">
+        <td class="actions">
           <% if loan.checked_out? %>
-            <%= mini_button(:check_in, loan) %>
+            <%# TODO: fix these - once you've figured out how this is all going to work %>
+            <%#= auth_link([:edit, kit, Loan], { a: "check_in" }) %>
           <% else %>
-            <%= mini_button(:check_out, loan) %>
+            <%#= auth_link([:new, kit, Loan], { a: "check_out" }) %>
           <% end %>
-          <%= mini_button(:edit, loan) %>
+          <%= auth_link(loan) %>
+          <%= auth_link([:edit, loan]) %>
         </td>
       </tr>
     <% end %>

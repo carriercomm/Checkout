@@ -35,10 +35,13 @@ textarea {
 }
 .sidebar-nav {
   padding: 9px 0;
-  ul li form button {
+  ul li a {
     text-align: left;
     padding: 0;
     margin: 0;
+  }
+  ul li span.disabled {
+    background-color: transparent;
   }
 }
 
@@ -55,11 +58,7 @@ select.date {
   top: -1.5em;
   left: -.75em;
 }
-.select2-choices {
-  width: 222px;
-}
-input[type="date_picker"],
-.select2-choices {
+input[type="date_picker"] {
   display: inline-block;
   min-height: normal;
   height: $baseLineHeight;

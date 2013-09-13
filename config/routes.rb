@@ -5,13 +5,6 @@ Checkout::Application.routes.draw do
   # TODO: trim down these routes
   # TODO: move most of these added collection routes to params, so they can act as facets
 
-  namespace :admin do
-    # Directs /admin/dashboard/* to Admin::DashboardController
-    # (app/controllers/admin/dashboard_controller.rb)
-    match 'dashboard' => 'dashboard#index'
-  end
-
-
   # extra collection routes used on 'component_models' resource
   component_models_collection_routes = Proc.new do
     ['circulating'].each do |r|
@@ -21,6 +14,10 @@ Checkout::Application.routes.draw do
   end
 
   devise_for :user
+
+  resources :audit_inventory_records, :controller => :inventory_records, only: [:index, :new, :create, :show] do
+    resources :inventory_details, only: [:index]
+  end
 
   resources :brands do
     collection do
@@ -32,24 +29,39 @@ Checkout::Application.routes.draw do
       collection &component_models_collection_routes
     end
   end
+
   resources :budgets, except: [:destroy] do
-    resources :kits, only: [:index]
+    resources :components, except: [:destroy]
   end
-#  resources :business_hours
-#  resources :business_hour_exceptions
+
+  # TODO: business_hour_exceptions!
+  #  resources :business_hour_exceptions
   resources :categories do
     collection do
-      get 'select2'
+      get 'select2'       # TODO: move this to a querystring + format on index
       get 'suggestions'
     end
     resources :models, as: "component_models", controller: "component_models" do
       collection &component_models_collection_routes
     end
   end
-  resources :components
+
+  resources :check_in_inventory_records, :controller => :inventory_records, only: [:index, :show] do
+    resources :inventory_details, only: [:index]
+  end
+
+  resources :check_out_inventory_records, :controller => :inventory_records, only: [:index, :show] do
+    resources :inventory_details, only: [:index]
+  end
+
+  resources :components, except: [:destroy]
   resources :covenants
+
   match 'dashboard' => 'dashboard#index'
+
   resources :groups do
+    resources :memberships, only: [:index]
+    resources :permissions, only: [:index]
     collection do
       ['active', 'empty', 'expired'].each do |r|
         get r, to: "groups#index", filter: r
@@ -57,10 +69,14 @@ Checkout::Application.routes.draw do
       get "select2"
     end
   end
-  resources :inventory_records, only: [:index, :new, :create]
+
+  resources :inventory_records, only: [:index, :new, :create, :show] do
+    resources :inventory_details, only: [:index]
+  end
+
   resources :kits do
     collection do
-      ['circulating', 'missing_components', 'non_circulating', 'tombstoned'].each do |r|
+      ['circulating', 'missing_components', 'non_circulating', 'deaccessioned'].each do |r|
         get r, to: "kits#index", filter: r
       end
       get "select2"
@@ -79,7 +95,6 @@ Checkout::Application.routes.draw do
     resources :reservations, :except => [:index]
   end
   resources :reservations, :except => [:index]
-  resources :split_model, as:"split_component_models", controller:"split_component_models", only:[:new, :create]
   resources :loans do
     collection do
       ["pending", "approved", "checked_out", "checked_in", "rejected", "canceled", "archived"].each do |r|
@@ -89,17 +104,18 @@ Checkout::Application.routes.draw do
   end
   resources :search, only: [:index]
   resource :settings, :only => [:show, :edit, :update]
+  resources :split_model, as:"split_component_models", controller:"split_component_models", only:[:new, :create]
   resources :users, except: [:destroy] do
     collection do
       ["active", "disabled", "suspended", "admins", "attendants"].each do |r|
         get r, to: "users#index", filter: r
       end
       get "select2"
+      get "search"
     end
     resources :groups
     resources :loans
   end
-
   # The priority is based upon order of creation:
   # first created -> highest priority.
 

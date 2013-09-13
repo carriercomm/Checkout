@@ -1,0 +1,51 @@
+<% title t('component.show.title') %>
+<% subtitle component.component_model %>
+<% content_for :sidebar do %>
+  <li class="nav-header"><%= t(".actions") %></li>
+  <%= auth_link([:edit, @component]) %>
+<% end %>
+
+<dl class="dl-horizontal">
+  <dt><%= t('component.attributes.brand') %></dt>
+  <dd><%= component.component_model.brand %></dd>
+  <dt><%= t('component.attributes.component_model') %></dt>
+  <dd><%= component.component_model %></dd>
+  <dt><%= t('component.attributes.asset_tag') %></dt>
+  <dd><%= component.asset_tag %></dd>
+  <dt><%= t('component.attributes.serial_number') %></dt>
+  <dd><%= component.serial_number %></dd>
+  <dt><%= t('component.attributes.disposition') %></dt>
+  <dd><%= component.disposition %></dd>
+</dl>
+
+<h2>Inventory Records</h2>
+<% if inventory_details.empty? %>
+  <div>No inventory records for this component</div>
+<% else %>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Attendant</th>
+        <th>Kit</th>
+        <th>Loan</th>
+        <th>Date</th>
+        <th>Missing</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% inventory_details.each do |id| %>
+      <tr>
+        <td><%= id.inventory_record.type %></td>
+        <td><%= id.inventory_record.attendant %></td>
+        <td><%= id.inventory_record.kit %></td>
+        <td><%= id.inventory_record.loan %></td>
+        <td><%= id.created_at %></td>
+        <td><%= id.missing %></td>
+      </tr>
+      <% end %>
+    </tbody>
+  </table>
+  <%# TODO: implement this %>
+  <%#= auth_link([component, InventoryDetail]) %>
+<% end %>

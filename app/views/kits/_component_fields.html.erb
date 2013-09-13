@@ -1,7 +1,8 @@
-<% component = ComponentDecorator.decorate(f.object) unless f.object.new_record? %>
+<%# component = ComponentDecorator.decorate(f.object) unless f.object.new_record? %>
 <tr class="fields">
   <td>
-      <%= f.input :component_model, :as => :ajax_association, :wrapper => :tabular, :path => component_models_path(:format => :json) %>
+    <%# TODO: move this to the new simpler, less-magic, select2 method %>
+    <%= f.input :component_model, :as => :ajax_association, :wrapper => :tabular, :path => component_models_path(:format => :json) %>
   </td>
   <td>
     <%= f.input :asset_tag,
@@ -14,9 +15,7 @@
                 :wrapper => :tabular %>
   </td>
   <td>
-    <% unless f.object.new_record? %>
-      <%= component.disposition %>
-    <% end %>
+    <%= f.association :budget, :collection => budgets, :label_method => :to_s, :wrapper => :tabular, :prompt => 'Select budget' %>
   </td>
-  <td><%= f.link_to_remove t('helpers.actions.delete'), :class => "delete-link" %></td>
+  <td><%= f.link_to_remove(t('helpers.actions.delete'), :class => "delete-link") if f.object.new_record? %></td>
 </tr>

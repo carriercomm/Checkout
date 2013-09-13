@@ -2,6 +2,7 @@ class GroupsController < ApplicationController
 
   decorates_assigned :group
   decorates_assigned :groups
+  decorates_assigned :memberships
 
   # GET /groups
   # GET /groups.json
@@ -26,7 +27,7 @@ class GroupsController < ApplicationController
     @memberships = @group.memberships.sort_by {|m| m.username}
 
     respond_to do |format|
-      format.html # show.html.erb
+      format.html { render layout: 'sidebar' }# show.html.erb
       # format.json { render json: @group }
     end
   end

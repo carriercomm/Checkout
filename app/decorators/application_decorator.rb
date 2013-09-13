@@ -1,5 +1,7 @@
 class ApplicationDecorator < Draper::Decorator
 
+  delegate :to_param
+
   def localize_unless_nil(*args)
     #Avoid I18n::ArgumentError for nil values
     (args.first.nil?) ? "&nbsp;".html_safe : I18n.localize(*args)

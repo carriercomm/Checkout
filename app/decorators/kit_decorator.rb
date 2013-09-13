@@ -1,6 +1,5 @@
 class KitDecorator < ApplicationDecorator
   decorates :kit
-  decorates_association :budget
   decorates_association :component_models
   decorates_association :components
   decorates_association :groups
@@ -23,8 +22,12 @@ class KitDecorator < ApplicationDecorator
     {
       :label => to_autocomplete_s,
       :value => h.url_for(source),
-      :category => h.t("kit.index.title").html_safe
+      :category => h.t("titles.kit.index").html_safe
     }
+  end
+
+  def circulation_type
+    h.t("values.kit.#{ object.workflow_state }")
   end
 
   # def kit_jump_autocomplete_json
@@ -34,10 +37,6 @@ class KitDecorator < ApplicationDecorator
   #     :category => h.t("kit.index.title").html_safe
   #   }
   # end
-
-  def circulating
-    to_yes_no(source.circulating)
-  end
 
   # returns a string of comma delimited model names
   def component_list
@@ -49,6 +48,14 @@ class KitDecorator < ApplicationDecorator
 
   def cost
     coalesce(h.number_to_currency(source.cost))
+  end
+
+  def custodian
+    if object.custodian
+      return UserDecorator.decorate(object.custodian).to_link
+    else
+      "&nbsp;".html_safe
+    end
   end
 
   def description
@@ -81,7 +88,7 @@ class KitDecorator < ApplicationDecorator
   end
 
   def status
-    (source.checked_out?) ? h.t('kit.status.checked_out') : h.t('kit.status.available')
+    (source.checked_out?) ? h.t('values.kit.checked_out') : h.t('values.kit.available')
   end
 
   def tabular_asset_tags
@@ -112,11 +119,8 @@ class KitDecorator < ApplicationDecorator
   end
 
   def to_s
-    to_link
-  end
-
-  def tombstoned
-    to_yes_no(source.tombstoned)
+    # TODO: this should be a string, not HTML
+    id.to_s
   end
 
   def training_required

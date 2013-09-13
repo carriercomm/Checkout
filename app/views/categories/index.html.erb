@@ -1,8 +1,8 @@
-<% title t('category.index.title') %>
+<% title t('page_titles.index.categories') %>
 
 <% content_for :sidebar do %>
   <li class="nav-header"><%= t(".actions") %></li>
-  <%= sidebar_link(:new, Category.new) %>
+  <li><%= auth_link([:new, Category]) %></li>
 <% end %>
 
 <%= paginate @categories %>
@@ -10,9 +10,9 @@
 <table class="table table-striped">
   <thead>
     <tr>
-      <th>Name</th>
-      <th>Description</th>
-      <th>Actions</th>
+      <th><%= t('labels.category.name') %></th>
+      <th><%= t('labels.category.description') %></th>
+      <th><%= t('labels.category.actions', :default => :'labels.default.actions') %></th>
     </tr>
   </thead>
   <tbody>
@@ -20,9 +20,10 @@
       <tr>
         <td><%= link_to category.name, category_path(category) %></td>
         <td><%= category.description %></td>
-        <td class="mini-action-buttons">
-          <%= mini_button(:index, nil, { path: category_component_models_path(category) }, { text: t('component_model.index.title') }) %>
-          <%= mini_button(:edit, category) %>
+        <td class="actions">
+          <%= auth_link([category, ComponentModel]) %>
+          <%= auth_link(category) %>
+          <%= auth_link([:edit, category]) %>
         </td>
       </tr>
     <% end %>

@@ -1,0 +1,43 @@
+<% title t('page_titles.index.permissions') %>
+<% subtitle group %>
+
+<% content_for :sidebar do %>
+  <li class="nav-header"><%= t(".actions") %></li>
+  <li><%= auth_link([:edit, group]) %></li>
+<% end %>
+
+<%= paginate @permissions %>
+
+<% # TODO: localize this %>
+
+<% if permissions.empty? %>
+  <p>No kits</p>
+<% else %>
+  <table class="table table-striped permissions">
+    <thead>
+      <tr>
+        <th>Kit ID</th>
+        <th>Asset Tag</th>
+        <th>Components</th>
+        <th>Group Count</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% permissions.each do |p| %>
+        <tr>
+          <td><%= p.kit.to_link %></td>
+          <td><%= p.kit.asset_tags %></td>
+          <td><%= p.kit.linked_component_list %></td>
+          <td><%= p.kit.groups.count %></td>
+          <td><%= p.kit.status %></td>
+          <td class="actions">
+            <%= auth_link([p.kit, Loan]) %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+<% end %>
+
+<%= paginate @permissions %>
