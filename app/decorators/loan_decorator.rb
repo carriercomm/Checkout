@@ -9,10 +9,14 @@ class LoanDecorator < ApplicationDecorator
   decorates_association :location
   #decorates_association :out_attendant, with: UserDecorator
 
-  delegate :approved?, :checked_out?, :rejected?, :checked_in?, :pending?, :canceled?, :missing?
+  delegate :canceled?, :checked_out?, :checked_in?, :missing?, :pending?, :rejected?, :requested?
 
   def approver
-    coalesce(object.approver)
+    user = object.approver
+    if user == User.system_user
+      user = h.t("values.loan.system_approval")
+    end
+    coalesce(user)
   end
 
   def cancel_path
@@ -41,7 +45,9 @@ class LoanDecorator < ApplicationDecorator
     if object.in_at
       h.l(object.in_at, :format => :tabular)
     else
-      coalesce(h.t('loan.not_checked_in'))
+      h.content_tag "span", class: "loan not_checked_in" do
+        coalesce(h.t('loan.not_checked_in'))
+      end
     end
   end
 
@@ -57,8 +63,14 @@ class LoanDecorator < ApplicationDecorator
     if object.out_at
       h.l(object.out_at, :format => :tabular)
     else
-      coalesce(h.t('loan.not_checked_out'))
+      h.content_tag "span", class: "loan not_checked_out" do
+        coalesce(h.t('loan.not_checked_out'))
+      end
     end
+  end
+
+  def renewals
+    object.renewals.to_s
   end
 
   def starts_at
@@ -66,7 +78,9 @@ class LoanDecorator < ApplicationDecorator
   end
 
   def state
-    h.t("loan.state.#{ object.current_state }").html_safe
+    h.content_tag "span", class: "loan_state #{object.current_state}"  do
+      h.t("loan.state.#{ object.current_state }").html_safe
+    end
   end
 
   def to_link

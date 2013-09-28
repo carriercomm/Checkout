@@ -11,17 +11,17 @@
       </thead>
       <tbody>
         <tr>
-          <td><%= label(:default_check_out_duration, t("simple_form.labels.settings.default_check_out_duration")) %></td>
-          <td><%= text_field_tag(:default_check_out_duration, @default_check_out_duration, class:"input-small")  %></td>
-          <td><span class="help-block"><%= raw(t('simple_form.hints.settings.default_check_out_duration')) %></span></td>
+          <td><%= label(:default_loan_duration, t("simple_form.labels.settings.default_loan_duration")).html_safe %></td>
+          <td><%= text_field_tag(:default_loan_duration, @default_loan_duration, class:"input-small")  %></td>
+          <td><span class="help-block"><%= raw(t('simple_form.hints.settings.default_loan_duration')) %></span></td>
         </tr>
         <tr>
-          <td><%= label(:clients_can_see_equipment_outside_their_groups, t("simple_form.labels.settings.clients_can_see_equipment_outside_their_groups")) %></td>
+          <td><%= label(:clients_can_see_equipment_outside_their_groups, t("simple_form.labels.settings.clients_can_see_equipment_outside_their_groups")).html_safe %></td>
           <td><%= check_box_tag(:clients_can_see_equipment_outside_their_groups, true, @clients_can_see_equipment_outside_their_groups)  %></td>
           <td><span class="help-block"><%= raw(t('simple_form.hints.settings.clients_can_see_equipment_outside_their_groups')) %></span></td>
         </tr>
         <tr>
-          <td><%= label(:attendants_can_self_check_out, t("simple_form.labels.settings.attendants_can_self_check_out")) %></td>
+          <td><%= label(:attendants_can_self_check_out, t("simple_form.labels.settings.attendants_can_self_check_out")).html_safe %></td>
           <td><%= check_box_tag(:attendants_can_self_check_out, true, @attendants_can_self_check_out)  %></td>
           <td><span class="help-block"><%= raw(t('simple_form.hints.settings.attendants_can_self_check_out')) %></span></td>
         </tr>

@@ -132,20 +132,25 @@ class Kit < ActiveRecord::Base
   end
 
   def available?(start_date, end_date, *excluded_loans)
-    circulating? && loans.with_lost_state.empty? && !loaned_between?(start_date, end_date, excluded_loans.flatten)
+    loans.with_lost_state.empty? && !loaned_between?(start_date, end_date, excluded_loans.flatten)
   end
 
   #
   # TODO: implement methods for loan status of this kit
   #
-
   def checked_out?
-    loans.where("loans.out_at < ? AND loans.ends_at > ?", Date.today, Date.today).count > 0
+    now = DateTime.current
+    !loans.where("loans.workflow_state = \'checked_out\' AND loans.out_at <= ? AND loans.ends_at >= ?", now, now).empty?
+  end
+
+  def currently_checked_out_loan
+    now = DateTime.current
+    loans.where("loans.workflow_state = \'checked_out\' AND loans.out_at <= ? AND loans.ends_at >= ?", now, now).first
   end
 
   def default_return_date(starts_at)
     return nil unless starts_at
-    default = Settings.default_check_out_duration
+    default = Settings.default_loan_duration
     time    = (starts_at + default.days)
     time    = Time.local(time.year, time.month, time.day, time.hour, time.min, time.sec)
     nto     = location.next_datetime_open(time)
@@ -252,7 +257,7 @@ class Kit < ActiveRecord::Base
     write_attribute self.class.workflow_column, new_state.to_s
   end
 
-  # equal to location.open_days minus days_reserved returns in format
+  # equal to location.open_days minus days_requested returns in format
   # [[month, day], [month, day], ...] for consumption by the
   # javascript date picker
   def pickup_times_for_datepicker(days_out = 90, *excluded_loans)
@@ -284,7 +289,7 @@ class Kit < ActiveRecord::Base
     false
   end
 
-  alias_method :reservable?, :permissions_include?
+  alias_method :requestable?, :permissions_include?
 
   def schedules_of_availability(*excluded_loans)
     lbd = loan_blackout_dates(365, excluded_loans)

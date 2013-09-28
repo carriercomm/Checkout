@@ -1,0 +1,46 @@
+<%# TODO: localize this %>
+
+<h2>Component Inventory</h2>
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>Component<br>ID</th>
+      <th>Asset Tag</th>
+      <th>Brand</th>
+      <th>Model</th>
+      <th>Disposition</th>
+    </tr>
+  </thead>
+  <tbody>
+    <%= f.simple_fields_for :check_out_inventory_record, wrapper: false do |ir_form| %>
+      <%= ir_form.simple_fields_for :inventory_details, wrapper: false do |id_form| %>
+        <% component = ComponentDecorator.decorate(id_form.object.component) %>
+        <tr class="fields">
+          <td>
+            <%= component.id %>
+            <%= id_form.input :component_id, :as => :hidden, :wrapper => :tabular %>
+          </td>
+          <td>
+            <%= component.asset_tag %>
+          </td>
+          <td>
+            <%= component.component_model.brand %>
+          </td>
+          <td>
+            <%= component.component_model %>
+          </td>
+          <td>
+            <%= id_form.input(:missing, :as => :radio_buttons,
+                                        :collection => [
+                                            [t('values.inventory_detail.missing.false'), false],
+                                            [t('values.inventory_detail.missing.true'), true]
+                                        ],
+                                        :wrapper => :tabular,
+                                        :item_wrapper_class => "inline"
+                                        ) %>
+          </td>
+        </tr>
+      <% end %>
+    <% end %>
+  </tbody>
+</table>

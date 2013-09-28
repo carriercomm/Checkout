@@ -8,6 +8,7 @@
 //@import "select2-bootstrap";
 @import "bootstrap_overrides";
 @import "users";
+@import "loans";
 
 form#omnibox {
   @extend .span12;
@@ -61,6 +62,21 @@ table.table {
       div {
         display: inline-block;
       }
+    }
+  }
+}
+li form.my_button_to {
+  padding: 0;
+  margin: 0;
+
+  button {
+    padding: 0;
+    margin: 0;
+    @extend .btn;
+    @extend .btn-link;
+
+    [class^="icon-"] {
+      display: inline-block;
     }
   }
 }

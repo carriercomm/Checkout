@@ -8,8 +8,9 @@ class InventoryDetail < ActiveRecord::Base
 
   ## Validations ##
 
-  validates :component,         :presence => true
-  validates :inventory_record,  :presence => true
+  validates :component,           :presence  => true
+  validates :inventory_record,    :presence  => true
+  validates :missing,             :inclusion => { :in => [true, false], :message => "must be marked as present or missing" }
   # validates :component,           :associated => true
   # validates :inventory_record,    :associated => true
 

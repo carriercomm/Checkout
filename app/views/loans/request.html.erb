@@ -1,0 +1,50 @@
+<% title(t('page_titles.request.loan')) %>
+
+<div class="well">
+  <dl class="dl-horizontal">
+    <dt>Kit</dt>
+    <dd><%= loan.kit.to_link %></dd>
+    <dt>Location</dt>
+    <dd><%= loan.kit.location %></dd>
+    <dt>Components</dt>
+    <dd><%= loan.kit.component_list %></dd>
+  </dl>
+</div>
+
+<%= simple_form_for @loan, :html => { :class => 'form-horizontal' } do |f| %>
+  <fieldset>
+    <!-- <div class="alert alert-info"> -->
+    <!--   <button type="button" class="close" data-dismiss="alert">×</button> -->
+    <!--   <strong>Note:</strong> The default length of a checkout is <%= @default_checkout_length %> day(s), not including weekends and holidays. If you select a return date beyond <%= @default_checkout_length %> day(s), your reservation will require approval. -->
+    <!-- </div> -->
+
+    <input type="hidden" id="a" name="a" value="request" />
+
+    <% if can? :manage, @loan %>
+      <%= f.input :client, :as => :ajax_association, :path => select2_users_path(:format => :json) %>
+    <% else %>
+      <%= f.association :client, :as => :hidden %>
+      <%= f.input       :client, :readonly => true, :disabled => true %>
+    <% end %>
+
+    <%= f.association :kit, :as => :hidden %>
+    <%#= f.input       :kit, :readonly => true, :disabled => true %>
+
+    <%= f.input :starts_at, :as => :hidden, :input_html => { :value => I18n.localize(@loan.starts_at, :format => "%Y/%m/%d") } %>
+    <div class="control-group required">
+      <label class="required control-label" for="loan_starts_at">
+        <abbr title="required">*</abbr> <%= t('simple_form.labels.loan.starts_at') %>
+      </label>
+      <div class="controls">
+        <div id="loan_pickup_calendar" data-value="<%= I18n.localize(@loan.starts_at, :format => '%Y/%m/%d') %>" ></div>
+      </div>
+    </div>
+
+    <%#= f.input :ends_at, :as => :date_picker %>
+
+    <div class="form-actions">
+      <%= f.submit nil, :class => 'btn btn-primary' %>
+      <%= link_to 'Cancel', loans_path, :class => 'btn' %>
+    </div>
+  </fieldset>
+<% end %>

@@ -51,7 +51,7 @@ class Component < ActiveRecord::Base
   private
 
   def autofill_accessioned_at
-    accessioned_at = Time.zone.now.to_datetime unless accessioned_at
+    accessioned_at = DateTime.current unless accessioned_at
   end
 
   def upcase_serial_number

@@ -1,0 +1,40 @@
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th><%= t('labels.loan.kit') %></th>
+      <th><%= t('labels.loan.client') %></th>
+      <th><%= t('labels.loan.asset_tags') %></th>
+      <th><%= t('labels.loan.components') %></th>
+      <th><%= t('labels.loan.starts_at') %></th>
+      <th><%= t('labels.loan.ends_at') %></th>
+      <th><%= t('labels.loan.out_at') %></th>
+      <th><%= t('labels.loan.in_at') %></th>
+      <th><%= t('labels.loan.status') %></th>
+      <th><%= t('labels.default.actions') %></th>
+    </tr>
+  </thead>
+  <tbody>
+    <% loans_table.each do |loan| %>
+      <tr>
+        <td><%= loan.kit.to_link %></td>
+        <td><%= loan.client.to_link %></td>
+        <td class="ellipsize"><%= loan.kit.tabular_asset_tags %></td>
+        <td class="ellipsize"><%= loan.kit.tabular_component_list %></td>
+        <td style="white-space: nowrap;"><%= loan.starts_at %></td>
+        <td style="white-space: nowrap;"><%= loan.ends_at %></td>
+        <td style="white-space: nowrap;"><%= loan.out_at %></td>
+        <td style="white-space: nowrap;"><%= loan.in_at %></td>
+        <td><%= loan.state %></td>
+        <td class="actions">
+          <% if loan.checked_out? %>
+            <%= auth_link([:edit, loan], { a: "check_in" }) %>
+          <% elsif loan.requested? %>
+            <%= auth_link([:edit, loan], { a: "check_out" }) %>
+          <% end %>
+          <%= auth_link(loan) %>
+          <%= auth_link([:edit, loan]) %>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

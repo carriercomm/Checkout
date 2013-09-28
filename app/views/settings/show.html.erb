@@ -9,16 +9,16 @@
   </thead>
   <tbody>
     <tr>
-      <td><%= t("simple_form.labels.settings.default_check_out_duration") %></td>
-      <td><%= @default_check_out_duration %></td>
+      <td><%= t("simple_form.labels.settings.default_loan_duration") %></td>
+      <td><%= @default_loan_duration %></td>
     </tr>
     <tr>
       <td><%= t("simple_form.labels.settings.clients_can_see_equipment_outside_their_groups") %></td>
-      <td><%= @clients_can_see_equipment_outside_their_groups %></td>
+      <td><%= @clients_can_see_equipment_outside_their_groups.to_s %></td>
     </tr>
     <tr>
       <td><%= t("simple_form.labels.settings.attendants_can_self_check_out") %></td>
-      <td><%= @attendants_can_self_check_out %></td>
+      <td><%= @attendants_can_self_check_out.to_s %></td>
     </tr>
   </tbody>
 </table>

@@ -99,7 +99,7 @@ module ApplicationHelper
   end
 
   def extract_class(params)
-    valid_actions = [:check_out, :reserve, :new, :edit]
+    valid_actions = [:new, :edit]
     target = nil
     klass  = nil
 
@@ -142,18 +142,22 @@ module ApplicationHelper
   end
 
   def get_link_params(object, options = {}, html_options = {})
-    action     = extract_action(object)
-    class_name = extract_class(object).name.underscore
-    ability    = options.delete(:ability)
-    path       = options.delete(:path)
-    icon       = get_icon(action, options, html_options)
-    hint       = html_options.delete(:hint)
-    filter     = options[:filter]
+    action       = extract_action(object)
+    class_name   = extract_class(object).name.underscore
+    ability      = options.delete(:ability)
+    path         = options.delete(:path)
+    icon         = get_icon(action, options, html_options)
+    hint         = html_options.delete(:hint)
+    filter       = options[:filter]
     default_text = t("links.#{ class_name }.#{ action.to_s }",  default: :"helpers.actions.#{ action.to_s }")
+
     if filter
       default_text = t("filters.#{ class_name }.#{ filter.to_s }",  default: [:"links.#{ class_name }.#{ action.to_s }", :"helpers.actions.#{ action.to_s }"])
+    elsif options[:a]
+      default_text = t("links.#{ class_name }.#{ options[:a].to_s }", default: [:"links.#{ class_name }.#{ action.to_s }", :"helpers.actions.#{ action.to_s }"])
     end
-    text       = html_options.delete(:text) || default_text
+
+    text = html_options.delete(:text) || default_text
 
     html_options[:class] ||= String.new
     if action == :index

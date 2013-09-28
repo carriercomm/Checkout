@@ -1,8 +1,8 @@
-<% title t('inventory_record.index.title') %>
+<% title t('page_titles.index.inventory_records') %>
 
 <% content_for :sidebar do %>
   <li class="nav-header"><%= t(".filters") %></li>
-  <%= auth_link(InventoryRecord) %>
+  <li><%= auth_link(InventoryRecord) %></li>
 <% end %>
 
 <%= paginate @inventory_records %>
@@ -23,13 +23,13 @@
     <tr>
       <td><%= inventory_record.type %></td>
       <td><%= inventory_record.created_at %></td>
-      <td><%= inventory_record.attendant %></td>
+      <td><%= inventory_record.attendant.to_link %></td>
       <td><%= inventory_record.kit.to_link %></td>
       <td><%= inventory_record.loan.to_link if inventory_record.loan %></td>
       <td class="actions">
-        <ul>
-          <%= auth_link(inventory_record) %>
-        </ul>
+        <!-- <ul> -->
+        <!--   <li><%#= auth_link(inventory_record) %></li> -->
+        <!-- </ul> -->
       </td>
     </tr>
   <% end %>

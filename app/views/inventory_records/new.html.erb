@@ -1,4 +1,5 @@
-<% title "New Kit #{ @kit.model.id } Inventory" %>
+<% title t('page_titles.new.inventory_record') %>
+<% subtitle kit.to_s %>
 
 <%= simple_nested_form_for(@attendant.model,
                             :url => kit_inventory_records_path(@kit),
@@ -27,6 +28,3 @@
     <%= link_to 'Cancel', kit_path(@kit), :class => 'btn' %>
   </div>
 <% end %>
-
-
-

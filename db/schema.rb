@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130912010306) do
+ActiveRecord::Schema.define(:version => 20130927003708) do
 
   create_table "brands", :force => true do |t|
     t.string   "name",         :null => false
@@ -139,11 +139,11 @@ ActiveRecord::Schema.define(:version => 20130912010306) do
   end
 
   create_table "inventory_details", :force => true do |t|
-    t.integer  "component_id",                           :null => false
-    t.integer  "inventory_record_id",                    :null => false
-    t.datetime "created_at",                             :null => false
-    t.datetime "updated_at",                             :null => false
-    t.boolean  "missing",             :default => false, :null => false
+    t.integer  "component_id",        :null => false
+    t.integer  "inventory_record_id", :null => false
+    t.datetime "created_at",          :null => false
+    t.datetime "updated_at",          :null => false
+    t.boolean  "missing",             :null => false
   end
 
   add_index "inventory_details", ["component_id", "inventory_record_id"], :name => "index_comp_inv_rec_on_component_id_and_inventory_record_id", :unique => true
@@ -188,6 +188,7 @@ ActiveRecord::Schema.define(:version => 20130912010306) do
     t.text     "approval_note"
     t.datetime "created_at",                            :null => false
     t.datetime "updated_at",                            :null => false
+    t.integer  "renewals",           :default => 0,     :null => false
   end
 
   add_index "loans", ["approver_id"], :name => "index_reservations_on_approver_id"

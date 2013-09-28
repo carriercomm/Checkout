@@ -1,6 +1,25 @@
 <% title t('page_titles.show.loan') %>
 <% subtitle "##{ loan }" %>
 
+<% content_for :sidebar do %>
+  <li class="nav-header"><%= t(".actions") %></li>
+  <% if @loan.checked_out? %>
+    <li><%= auth_link([:edit, @loan], { a: "check_in"  }, { text: t('links.loan.check_in') })  %></li>
+    <% if can?(:manage, @loan) %>
+      <li>
+        <%= my_button_to loan_path(@loan, a: "renew"), :method => :put, :confirm => t('labels.loan.are_you_sure_you_want_to_renew') do %>
+          <%= t('helpers.icons.renew').html_safe %> <%= t('links.loan.renew').html_safe %>
+        <% end %>
+      </li>
+    <% end %>
+  <% elsif @loan.requested? %>
+    <li><%= auth_link([:edit, @loan], { a: "check_out" }, { text: t('links.loan.check_out') }) %></li>
+  <% end %>
+  <%# TODO: implement these %>
+  <!-- <li><%#= auth_link([:edit, @loan.check_out_inventory_record]) if @loan.check_out_inventory_record %></li> -->
+  <!-- <li><%#= auth_link([:edit, @loan.check_in_inventory_record])  if @loan.check_in_inventory_record %></li> -->
+<% end %>
+
 <dl class="dl-horizontal">
   <dt><%= t('labels.loan.workflow_state') %></dt>
   <dd><%= loan.state %></dd>
@@ -24,6 +43,8 @@
   <dd><%= loan.in_at %></dd>
   <dt><%= t('labels.loan.late') %></dt>
   <dd><%= loan.late %></dd>
+  <dt><%= t('labels.loan.renewals') %></dt>
+  <dd><%= loan.renewals %></dd>
   <% if @loan.lost_at %>
   <dt><%= t('labels.loan.lost_at') %></dt>
   <dd><%= loan.lost_at %></dd>
@@ -32,9 +53,3 @@
 
 <%= render partial: 'inventory_records/inventory_record', object: loan.check_out_inventory_record if loan.check_out_inventory_record %>
 <%= render partial: 'inventory_records/inventory_record', object: loan.check_in_inventory_record if loan.check_in_inventory_record %>
-
-<div class="form-actions">
-  <%= link_to 'Back', loans_path, :class => 'btn'  %>
-  <%= link_to 'Edit', edit_loan_path(@loan), :class => 'btn' %>
-  <%#= link_to 'Delete', loan_path(@loan), :method => 'delete', :confirm => 'Are you sure?', :class => 'btn btn-danger' %>
-</div>

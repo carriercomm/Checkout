@@ -22,8 +22,15 @@ class InventoryRecord < ActiveRecord::Base
 
   ## Mass-assignable Attributes ##
 
-  attr_accessible :attendant, :attendant_id, :kit, :kit_id, :loan, :loan_id
+  accepts_nested_attributes_for :inventory_details
 
+  attr_accessible(:attendant,
+                  :attendant_id,
+                  :inventory_details_attributes,
+                  :kit,
+                  :kit_id,
+                  :loan,
+                  :loan_id)
 
   ## Callbacks ##
 

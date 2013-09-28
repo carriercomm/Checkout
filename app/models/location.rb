@@ -128,35 +128,13 @@ class Location < ActiveRecord::Base
     return false
   end
 
-  def to_param
-    "#{ id } #{ name }".parameterize
-  end
-
-  def to_s
-    name
-  end
-
-  private
-
-  def convert_to_time(thing)
-    if thing.kind_of? Date
-      return Time.local(thing.year, thing.month, thing.day)
-    elsif thing.kind_of? DateTime
-      return Time.local(thing.year, thing.month, thing.day, thing.hour, thing.min, thing.sec)
-    elsif thing.is_a? Time
-      return thing
-    elsif thing.is_a? String
-      return Time.zone.parse(thing)
-    end
-
-    raise InvalidTimeFormatException.new("Expected a Date, DateTime, Time, or String, got: #{ thing.class }")
-  end
-
   # TODO: refactor this to store the schedule as a serialized hash?
   #       consider what this does to time zone offsets, since the hash
   #       stores the name of the offset instead of getting the offset
   #       from the local computer. Any way to convert to hash without
   #       time zone support?
+  # TODO: make this private? The kit model may need it to calculate
+  #       kit availabilty
   def schedules
     schedules  = []
     exceptions = Hash.new { |h,k| h[k] = [] }
@@ -188,6 +166,30 @@ class Location < ActiveRecord::Base
       schedules << schedule
     end
     return schedules
+  end
+
+  def to_param
+    "#{ id } #{ name }".parameterize
+  end
+
+  def to_s
+    name
+  end
+
+  private
+
+  def convert_to_time(thing)
+    if thing.kind_of? Date
+      return Time.local(thing.year, thing.month, thing.day)
+    elsif thing.kind_of? DateTime
+      return Time.local(thing.year, thing.month, thing.day, thing.hour, thing.min, thing.sec)
+    elsif thing.is_a? Time
+      return thing
+    elsif thing.is_a? String
+      return Time.zone.parse(thing)
+    end
+
+    raise InvalidTimeFormatException.new("Expected a Date, DateTime, Time, or String, got: #{ thing.class }")
   end
 
 end

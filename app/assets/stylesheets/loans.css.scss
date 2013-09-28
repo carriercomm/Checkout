@@ -1,0 +1,29 @@
+span.loan_state:before {
+  font-family: 'FontAwesome';
+  content: '\f111';
+  padding: 0 .4em;
+}
+span.loan_state.canceled {
+  @extend .muted;
+}
+span.loan_state.checked_out {
+  @extend .text-info;
+}
+span.loan_state.checked_in {
+  @extend .text-info;
+}
+span.loan_state.pending {
+  @extend .text-warning;
+}
+span.loan_state.rejected {
+  @extend .text-error;
+}
+span.loan_state.requested {
+  @extend .text-success;
+}
+div.date_picker.inline.disabled a:hover {
+  cursor: default;
+}
+span.loan.not_checked_out, span.loan.not_checked_in {
+  @extend .muted;
+}

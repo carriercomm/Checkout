@@ -10,11 +10,11 @@ class ComponentDecorator < ApplicationDecorator
   def disposition
     case object.current_inventory_detail.try(:missing)
     when true
-      return h.t('inventory_detail.missing.true')
+      return h.t('values.inventory_detail.missing.true')
     when false
-      return h.t('inventory_detail.missing.false')
+      return h.t('values.inventory_detail.missing.false')
     else
-      return h.t('inventory_detail.missing.unknown')
+      return h.t('values.inventory_detail.missing.unknown')
     end
   end
 

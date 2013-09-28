@@ -1,0 +1,75 @@
+<% title(t('page_titles.check_in.loan')) %>
+<% subtitle "##{ loan }" %>
+
+<%# TODO: localize this %>
+<div class="well">
+  <dl class="dl-horizontal">
+    <dt>Kit</dt>
+    <dd><%= loan.kit.to_link %></dd>
+    <dt>Location</dt>
+    <dd><%= loan.kit.location %></dd>
+    <dt>Components</dt>
+    <dd><%= loan.kit.component_list %></dd>
+    <dt>Client</dt>
+    <dd><%= loan.client %></dd>
+  </dl>
+</div>
+
+<%= simple_nested_form_for @loan, :html => { :class => 'form-horizontal' } do |f| %>
+  <fieldset>
+    <input type="hidden" id="a" name="a" value="check_in" />
+    <%= f.input       :ends_at, :as => :string, readonly: true, disabled: true, :input_html => { :value => loan.ends_at } %>
+    <%= f.input       :in_at,   :as => :string, readonly: true, disabled: true, :input_html => { :value => loan.in_at } %>
+    <%= f.input :late if @loan.late %>
+
+    <h2>Check In Inventory</h2>
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th><%= t('labels.component.id') %></th>
+          <th><%= t('labels.component.asset_tag') %></th>
+          <th><%= t('labels.component.brand') %></th>
+          <th><%= t('labels.component.component_model') %></th>
+          <th><%= t('labels.component.disposition') %></th>
+        </tr>
+      </thead>
+      <tbody>
+        <%= f.simple_fields_for :check_in_inventory_record, wrapper: false do |ir_form| %>
+          <%= ir_form.simple_fields_for :inventory_details, wrapper: false do |id_form| %>
+            <% component = ComponentDecorator.decorate(id_form.object.component) %>
+            <tr class="fields">
+              <td>
+                <%= component.id %>
+                <%= id_form.input :component_id, :as => :hidden, :wrapper => :tabular %>
+              </td>
+              <td>
+                <%= component.asset_tag %>
+              </td>
+              <td>
+                <%= component.component_model.brand %>
+              </td>
+              <td>
+                <%= component.component_model %>
+              </td>
+              <td>
+                <%= id_form.input(:missing, :as => :radio_buttons,
+                                            :collection => [
+                                                [t('values.inventory_detail.missing.false'), false],
+                                                [t('values.inventory_detail.missing.true'), true]
+                                            ],
+                                            :wrapper => :tabular,
+                                            :item_wrapper_class => "inline"
+                                            ) %>
+              </td>
+            </tr>
+          <% end %>
+        <% end %>
+      </tbody>
+    </table>
+
+    <div class="form-actions">
+      <%= f.submit nil, :class => 'btn btn-primary' %>
+      <%= link_to 'Cancel', loans_path, :class => 'btn' %>
+    </div>
+  </fieldset>
+<% end %>

@@ -36,9 +36,12 @@
         <td><%= kit.circulation_type %></td>
         <td class="actions">
           <% # TODO: make these not suck %>
-          <%= auth_link([:new, kit, Loan], { a: "check_in" }) %>
-          <%= auth_link([:new, kit, Loan], { a: "check_out" }) %>
-          <%= auth_link([:new, kit, Loan], { a: "reserve" }) %>
+          <% if kit.checked_out? %>
+            <%= auth_link([:edit, kit, Loan], { a: "check_in" }) %>
+          <% else %>
+            <%= auth_link([:new, kit, Loan], { a: "check_out" }) %>
+          <% end %>
+          <%= auth_link([:new, kit, Loan], { a: "request" }) %>
           <%= auth_link(kit) %>
           <%= auth_link([:edit, kit]) %>
         </td>

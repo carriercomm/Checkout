@@ -1,13 +1,18 @@
 <% title t('page_titles.show.kit') %>
-<% subtitle "#" + kit.to_s %>
+<% subtitle "##{ kit }" %>
 
 <% content_for :sidebar do %>
   <li class="nav-header"><%= t(".actions") %></li>
-  <%# TODO: make the check_in/check_out links visible based on current status %>
   <li><%= auth_link([:edit, @kit]) %></li>
-  <li><%= auth_link([:new, @kit, Loan], { a: "check_in" }, { text: t('links.loan.check_in') }) %></li>
-  <li><%= auth_link([:new, @kit, Loan], { a: "check_out" }, { text: t('links.loan.check_out') }) %></li>
-  <li><%= auth_link([:new, @kit, Loan], { a: "reserve"   }, { text: t('links.loan.reserve')   }) %></li>
+  <%# TODO: wrap this up in a helper method %>
+  <% if kit.circulating? %>
+    <% if @kit.checked_out? %>
+      <li><%= auth_link([:edit, @kit.currently_checked_out_loan], { a: "check_in" },  { text: t('links.loan.check_in') }) %></li>
+    <% else %>
+      <li><%= auth_link([:new, @kit, Loan], { a: "check_out" }, { text: t('links.loan.check_out') }) %></li>
+    <% end %>
+    <li><%= auth_link([:new, @kit, Loan], { a: "request"   }, { text: t('links.loan.request')   }) %></li>
+  <% end %>
   <li><a href="https://chart.googleapis.com/chart?chs=150x150&cht=qr&chl=<%= u(kit_url(@kit)) %>&choe=UTF-8" alt="QR code"><i class="icon-qrcode"></i><span>Print QR code</span></a></li>
   <li class="nav-header"><%= t('titles.inventory_record.index') %></li>
   <li><%= auth_link([@kit, Loan]) %></li>

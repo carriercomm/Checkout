@@ -102,3 +102,14 @@ jQuery ->
     onSelect: (date, inst) ->
       $("input#loan_starts_at").val(date)
   ).datepicker("setDate", $("input#loan_starts_at").val())
+
+  $('div.date_picker.inline.disabled').each (i, e) ->
+    obj = $(e)
+    date = obj.data("value")
+    obj
+      .datepicker(
+        altFormat: "yy/mm/dd",
+        dateFormat: "yy/mm/dd",
+        disabled: true
+      )
+      .datepicker("setDate", date)

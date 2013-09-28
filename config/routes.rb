@@ -46,11 +46,11 @@ Checkout::Application.routes.draw do
     end
   end
 
-  resources :check_in_inventory_records, :controller => :inventory_records, only: [:index, :show] do
+  resources :check_in_inventory_records, :controller => :inventory_records, only: [:index] do
     resources :inventory_details, only: [:index]
   end
 
-  resources :check_out_inventory_records, :controller => :inventory_records, only: [:index, :show] do
+  resources :check_out_inventory_records, :controller => :inventory_records, only: [:index] do
     resources :inventory_details, only: [:index]
   end
 
@@ -85,16 +85,13 @@ Checkout::Application.routes.draw do
     get "inventory/create"
     resources :inventory_records
     resources :loans, only: [:index, :new]
-    resources :reservations
   end
   resources :locations
   resources :models, as: "component_models", controller: "component_models" do
     collection &component_models_collection_routes
     resources :kits
     resources :loans, only: [:new]
-    resources :reservations, :except => [:index]
   end
-  resources :reservations, :except => [:index]
   resources :loans do
     collection do
       ["pending", "approved", "checked_out", "checked_in", "rejected", "canceled", "archived"].each do |r|

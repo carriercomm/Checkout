@@ -43,19 +43,18 @@ en:
       edit:      "<i class='icon-edit'></i>"
       index:     "<i class='icon-list'></i>"
       new:       "<i class='icon-plus-sign'></i>"
-      reserve:   "<i class='icon-calendar'></i>"
+      renew:     "<i class='icon-refresh'></i>"
+      request:   "<i class='icon-calendar'></i>"
       show:      "<i class='icon-eye-open'></i>"
     actions:
       back:      "Back"
       cancel:    "Cancel"
-      check_in:  "Check In"
-      check_out: "Check Out"
       destroy:   "Delete"
       disable:   "Disable"
       edit:      &edit "Edit"
       index:     &index "List"
       new:       &new "New"
-      reserve:   "Reserve"
+      request:   "Request"
       show:      &show "Show"
     submit:
       component_model:
@@ -75,6 +74,10 @@ en:
         canceled:    'Canceled'
         rejected:    'Rejected'
   page_titles:
+    check_in:
+      loan: 'Check In'
+    check_out:
+      loan: 'Check Out'
     edit:
       audit_inventory_record:     &page_titles_edit_audit_inventory_record      'Edit Audit Inventory Record'
       brand:                      &page_titles_edit_brand                       'Edit Brand'
@@ -156,6 +159,8 @@ en:
       split_component_model:      &page_titles_new_split_component_model        'New Split Model'
       training:                   &page_titles_new_training                     'New Training'
       user:                       &page_titles_new_user                         'New User'
+    request:
+      loan: 'New Request'
     show:
       audit_inventory_record:     &page_titles_show_audit_inventory_record      'Audit Inventory Record'
       brand:                      &page_titles_show_brand                       'Brand'
@@ -271,9 +276,12 @@ en:
       show:  *page_titles_show_kit
       add_component: "<i class='icon-plus-sign'></i> Add another component"
     loan:
+      check_in:  "Check In"
+      check_out: "Check Out"
       edit:  *page_titles_edit_loan
       index: *page_titles_index_loans
       new:   *page_titles_new_loan
+      renew: "Renew"
       show:  *page_titles_show_loan
     location:
       edit:  *page_titles_edit_location
@@ -450,7 +458,8 @@ en:
       asset_tag:          'Asset tag'
       brand:              *page_titles_show_brand
       component_model:    'Model'
-      disposition:        'Disposition'
+      disposition:        'Status'
+      id:                 'Component ID'
       kit:                *page_titles_show_kit
       serial_number:      'Serial Number'
     component_model:
@@ -476,6 +485,7 @@ en:
       location:           &labels_kit_location 'Location'
       training_required:  'Training Required'
     loan:
+      are_you_sure_you_want_to_renew: "Are you sure you want to renew this loan?"
       asset_tags:      *labels_kit_asset_tags
       client:          "Client"
       components:      *labels_kit_components
@@ -507,6 +517,7 @@ en:
       checked_out:       'Checked Out'
       available:         'Available'
     loan:
+      system_approval:   'Automatic'
       approved:          *filters_loan_approved
       canceled:          *filters_loan_canceled
       checked_in:        *filters_loan_checked_in
@@ -517,6 +528,8 @@ en:
       admin:             'Administrator'
       approver:          'Approver'
       attendant:         'Attendant'
+    user:
+
   notifications:
     brand:
       caveat: "<strong>Note!</strong> This list of 'non-circulating' brands only means these brands have kits in them that are not circulating. They may also have kits which <em>are</em> circulating."
@@ -529,7 +542,7 @@ en:
   simple_form:
     labels:
       settings:
-        default_check_out_duration: 'Default Check Out Duration'
+        default_loan_duration: 'Default Loan Duration'
         attendants_can_self_check_out: 'Attendants May Self-Check-Out'
         clients_can_see_equipment_outside_their_groups: 'Clients May See Equipment Outside Their Groups'
       kit:

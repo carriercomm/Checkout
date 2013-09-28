@@ -106,6 +106,7 @@ FactoryGirl.define do
   end
 
   factory :inventory_detail do
+    missing false
   end
 
   factory :loan do

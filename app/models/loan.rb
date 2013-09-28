@@ -12,15 +12,9 @@ class Loan < ActiveRecord::Base
   workflow do
     # pending has to come first so it will be the starting state by convention
     state :pending do
-      event :approve,   :transitions_to => :approved
-      event :cancel,    :transitions_to => :canceled
+      event :approve,    :transitions_to => :requested
+      event :cancel,     :transitions_to => :canceled
       event :decline,    :transitions_to => :declined
-    end
-
-    state :approved do
-      event :cancel,    :transitions_to => :canceled
-      event :check_out, :transitions_to => :checked_out
-      event :unapprove, :transitions_to => :pending
     end
 
     state :canceled
@@ -29,6 +23,7 @@ class Loan < ActiveRecord::Base
     state :checked_out do
       event :check_in,  :transitions_to => :checked_in
       event :mark_lost, :transitions_to => :lost
+      event :renew,     :transitions_to => :checked_out
     end
 
     state :declined do
@@ -38,6 +33,13 @@ class Loan < ActiveRecord::Base
     state :lost do
       event :check_in,  :transitions_to => :checked_in
     end
+
+    state :requested do
+      event :cancel,    :transitions_to => :canceled
+      event :check_out, :transitions_to => :checked_out
+      event :unapprove, :transitions_to => :pending
+    end
+
   end
 
   ## Associations ##
@@ -57,11 +59,11 @@ class Loan < ActiveRecord::Base
 
   ## Validations ##
 
-  validates :approver,                   :presence => true, :if     => [:approved?, :checked_out?, :lost?]
+  validates :approver,                   :presence => true, :if     => [:requested?, :checked_out?, :lost?]
   validates :check_in_inventory_record,  :presence => true, :if     => :checked_in?
   validates :check_out_inventory_record, :presence => true, :if     => :checked_out?
   validates :client,                     :presence => true
-  validates :ends_at,                    :presence => true, :if     => [:approved?, :checked_out?, :lost?]
+  validates :ends_at,                    :presence => true, :unless => [:checked_in?, :canceled?]
   validates :in_at,                      :presence => true, :if     => :checked_in?
   validates :kit,                        :presence => true, :unless => :canceled?
   validates :out_at,                     :presence => true, :if     => :checked_out?
@@ -69,7 +71,7 @@ class Loan < ActiveRecord::Base
 
 
   # TODO: cannot change the client unless the loan is new
-  validate  :validate_approver_has_approver_role,       :unless => [:pending?, :declined?, :checked_in?, :canceled?]
+  # validate  :validate_approver_has_approver_role,       :unless => [:pending?, :declined?, :checked_in?, :canceled?]
   validate  :validate_check_out_components_inventoried, :if     => :checked_out?
   validate  :validate_check_in_components_inventoried,  :if     => [:checked_in?, :lost?]
   validate  :validate_client_has_permission,            :unless => [:checked_in?, :canceled?]
@@ -88,87 +90,86 @@ class Loan < ActiveRecord::Base
 
   attr_accessor :component_model
   delegate      :location, :to => :kit
+  accepts_nested_attributes_for :check_in_inventory_record
+  accepts_nested_attributes_for :check_out_inventory_record
 
 
   ## Class Methods ##
 
-  def self.build(params)
-    loan = self.new(params)
-    if loan.kit
-      loan.starts_at = loan.location.next_datetime_open
-    else
-      loan.starts_at = Date.today.in_time_zone
-    end
-    loan
-  end
+  # def self.build(params)
+  #   loan = self.new(params)
+  #   if loan.kit
+  #     loan.starts_at = loan.location.next_datetime_open
+  #   else
+  #     loan.starts_at = DateTime.current
+  #   end
+  #   loan
+  # end
 
 
   ## Instance Methods ##
 
   def autofill_ends_at!
-    write_attribute(:ends_at, default_return_date)
     write_attribute(:autofilled_ends_at, true)
+    write_attribute(:ends_at, default_return_date)
   end
 
   def autofilled_ends_at?
     autofilled_ends_at
   end
 
-  def build_check_in_inventory_record_with_inventory_details(options = {})
-    missing = options.delete(:missing)
-    build_check_in_inventory_record_without_inventory_details(options.merge(loan: self, kit: kit))
-    unless kit.nil?
-      check_in_inventory_record.initialize_inventory_details(missing)
-    end
-    check_in_inventory_record
-  end
-
-  alias_method_chain :build_check_in_inventory_record, :inventory_details
-
-  def build_check_out_inventory_record_with_inventory_details(options = {})
-    missing = options.delete(:missing)
-    options.merge!(loan: self, kit: kit)
-    build_check_out_inventory_record_without_inventory_details(options)
-    unless kit.nil?
-      check_out_inventory_record.initialize_inventory_details(missing)
-    end
-    check_out_inventory_record
-  end
-
-  alias_method_chain :build_check_out_inventory_record, :inventory_details
-
   def default_return_date
     return nil unless kit && kit.location && kit.location.business_hours.count > 0
-    default  = Settings.default_check_out_duration
-    datetime = self.starts_at + default.days
-    nto      = location.next_datetime_open(datetime)
-    if nto
+    default  = Settings.default_loan_duration
+    datetime = if self.out_at && self.out_at < self.starts_at
+                 self.out_at + default.days
+               else
+                 self.starts_at + default.days
+               end
+
+    if nto = location.next_datetime_open(datetime)
       return nto
     else
       return datetime
     end
   end
 
-  def ends_at=(datetime)
-    datetime = convert_to_datetime(datetime)
-    write_attribute(:ends_at, datetime)
-
-    if !pending? && ends_at_changed?
-      unapprove!
+  # initializes a CheckOutInventoryRecord with an InventoryDetail for each component
+  def new_check_out_inventory_record(attrs = {})
+    build_check_out_inventory_record(attrs.merge(kit: kit))
+    if kit
+      # we need to allow for the possibility that attrs includes
+      # nested attributes for some (or all) of the inventory details
+      component_ids = check_out_inventory_record.inventory_details.map(&:component_ids)
+      kit.components.each do |c|
+        unless component_ids.include?(c.id)
+          check_out_inventory_record.inventory_details << InventoryDetail.new(component: c, missing: nil)
+        end
+      end
     end
-
-    ends_at
+    check_out_inventory_record
   end
 
-  def on_pending_entry(state, event, args=nil)
-    if autofilled_ends_at
-      write_attribute(:ends_at, nil)
-      write_attribute(:autofilled_ends_at, false)
+  # initializes a CheckInInventoryRecord with an InventoryDetail for each component
+  def new_check_in_inventory_record(attrs = {})
+    build_check_in_inventory_record(attrs.merge(kit: kit))
+    if kit
+      # we need to allow for the possibility that attrs includes
+      # nested attributes for some (or all) of the inventory details
+      component_ids = check_in_inventory_record.inventory_details.map(&:component_ids)
+      kit.components.each do |c|
+        unless component_ids.include?(c.id)
+          check_in_inventory_record.inventory_details << InventoryDetail.new(component: c, missing: nil)
+        end
+      end
     end
-
-    # clear the approver
-    write_attribute(:approver_id, nil)
+    check_in_inventory_record
   end
+
+  # def on_pending_entry(state, event, args=nil)
+  #   write_attribute(:ends_at, nil)
+  #   # write_attribute(:approver_id, nil)
+  # end
 
   # Overriding Workflow's default active_record behavior:
   # We might move through several states in a given controller action,
@@ -181,27 +182,8 @@ class Loan < ActiveRecord::Base
   def starts_at=(datetime)
     datetime = convert_to_datetime(datetime)
     write_attribute(:starts_at, datetime)
-
-    if starts_at_changed?
-      if (ends_at.nil? || (ends_at && autofilled_ends_at)) && !ends_at_changed?
-        ends_at = default_return_date
-      end
-
-      if !pending? && starts_at_changed?
-        unapprove!
-      end
-    end
-
+    # unapprove! if requested? && starts_at_changed?
     starts_at
-  end
-
-  def try_automatic_approval
-    autofill_ends_at! if ends_at.nil? || (ends_at && autofilled_ends_at)
-
-    if approver.nil? && within_default_length?
-      write_attribute(:approver_id, User.system_user.id)
-    end
-    self
   end
 
   def within_default_length?
@@ -211,10 +193,23 @@ class Loan < ActiveRecord::Base
 
 private
 
-  # this is a callback which is invoked when approved! is called
+  # def ends_at=(datetime)
+  #   return unless datetime
+  #   datetime = convert_to_datetime(datetime)
+  #   write_attribute(:ends_at, datetime)
+  #   # if requested? && ends_at_changed?
+  #   #   unapprove!
+  #   # end
+  #   # ends_at
+  # end
+
+  # this is a callback which is invoked when requested! is called
   def approve
-    try_automatic_approval
-    halt "Loan not ready for approval" unless valid? && ready_for_approval?
+    # if approver.nil? && within_default_length?
+    write_attribute(:approver_id, User.system_user.id)
+    # end
+
+    halt "Loan not ready for approval" unless valid? # && ready_for_approval?
   end
 
   def approver_has_approval_role?
@@ -227,7 +222,7 @@ private
     self.in_at = DateTime.current
     halt "All components must be inventoried before check in"     unless check_in_components_inventoried?
 
-    # TODO: move this up into the authorization layer
+    # TODO: move these up into the authorization layer:
     #halt "In attendant must have the 'attendant' role"            unless in_attendant_has_proper_roles?
     #halt "In attendant can not check in equipment to themselves"  unless in_attendant_is_not_the_client?
   end
@@ -241,10 +236,16 @@ private
 
   # this is a callback which is invoked when check_out! is called
   def check_out
-    self.out_at = DateTime.current
     halt "All components must be inventoried before check out"     unless check_out_components_inventoried?
 
-    # TODO: move this up into the authorization layer
+    self.out_at = DateTime.current
+
+    # are we checking out early?
+    if self.starts_at > self.out_at
+      write_attribute(:starts_at, self.out_at)
+    end
+
+    # TODO: move these up into the authorization layer:
     # halt "Out attendant must have the 'attendant' role"            unless out_attendant_has_proper_roles?
     # halt "Out attendant can not check out equipment to themselves" unless out_attendant_is_not_the_client?
   end
@@ -344,8 +345,20 @@ private
   #   (out_attendant != client) || out_attendant.admin?
   # end
 
-  def ready_for_approval?
-    approver && (((approver == User.system_user) && within_default_length?) || (approver.approver? && ends_at && client && kit && starts_at))
+  # def ready_for_approval?
+  #   approver && (((approver == User.system_user) && within_default_length?) || (approver.approver? && ends_at && client && kit && starts_at))
+  # end
+
+  # this is a callback which is invoked when renew! is called
+  # TODO: throttle renewals, so you can't just keep ratcheting up the due date
+  def renew
+    new_ends_at = self.ends_at + Settings.default_loan_duration.days
+    if kit.available?(self.starts_at, new_ends_at, self)
+      write_attribute(:ends_at, new_ends_at)
+      increment!(:renewals)
+    else
+      halt "Kit is not available for renewal"
+    end
   end
 
   def starts_at_before_ends_at?
@@ -432,7 +445,7 @@ private
   end
 
   def validate_open_on_starts_at
-    return unless kit && starts_at
+    return unless kit && starts_at && out_at.nil?
     unless kit_location_open_on_starts_at?
       errors.add(:starts_at, "must be on a day with valid checkout hours")
     end
