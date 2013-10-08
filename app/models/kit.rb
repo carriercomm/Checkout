@@ -76,14 +76,7 @@ class Kit < ActiveRecord::Base
   end
 
   def self.for_user(user)
-    joins_sql = <<-END_SQL
-    inner join permissions on kits.id = permissions.kit_id
-    inner join groups on permissions.group_id = groups.id
-    inner join memberships on groups.id = memberships.group_id
-    inner join users on memberships.user_id = users.id
-    END_SQL
-
-    joins(joins_sql).where("users.id = ?", user.id).uniq
+    joins(:groups => :users).where("users.id = ?", user.id).uniq
   end
 
   # finds a specific asset tag

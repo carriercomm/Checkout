@@ -29,14 +29,17 @@ class InventoryRecordsController < ApplicationController
 
   # GET /inventory_records/1
   # GET /inventory_records/1.json
-  # def show
-  #   @inventory_record = InventoryRecordDecorator.find(params[:id])
+  def show
+    @inventory_record = InventoryRecord
+      .joins(:inventory_details)
+      .includes(:inventory_details)
+      .find(params[:id])
 
-  #   respond_to do |format|
-  #     format.html # show.html.erb
-  #     # format.json { render json: @inventory_record }
-  #   end
-  # end
+    respond_to do |format|
+      format.html # show.html.erb
+      # format.json { render json: @inventory_record }
+    end
+  end
 
   # GET /inventory_records/new
   # GET /inventory_records/new.json

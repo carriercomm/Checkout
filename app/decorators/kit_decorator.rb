@@ -6,8 +6,10 @@ class KitDecorator < ApplicationDecorator
   decorates_association :loans
 
   delegate(:budget_id,
+           :checked_out?,
            :circulating?,
            :count,
+           :currently_checked_out_loan,
            :id,
            :location_id,
            :primary_component,

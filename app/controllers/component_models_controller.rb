@@ -12,7 +12,12 @@ class ComponentModelsController < ApplicationController
   # GET /models
   # GET /models.json
   def index
-    @component_models = ComponentModel
+    if Settings.clients_can_see_equipment_outside_their_groups
+      @component_models = ComponentModel
+    else
+      @component_models = ComponentModel.for_user(current_user)
+    end
+
     apply_scopes
 
     # get a total (used by the select2 widget) before we apply pagination

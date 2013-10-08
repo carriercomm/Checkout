@@ -22,19 +22,6 @@ class BrandsController < ApplicationController
     end
   end
 
-  # TODO: is this being used? move it to a collection route on the index action
-  # def circulating
-  #   @brands = Brand.order("brands.name ASC")
-  #     .having_circulating_kits
-  #     .page(params[:page])
-  #     .decorate
-
-  #   respond_to do |format|
-  #     format.html { render :action => 'index' }
-  #     # format.json { render json: @brands }
-  #   end
-  # end
-
   # GET /brands/1
   # GET /brands/1.json
   def show
@@ -114,7 +101,9 @@ class BrandsController < ApplicationController
   private
 
   def apply_scopes
-    @brands = @brands.includes(:component_models).order("brands.name ASC")
+    @brands = @brands.for_user(current_user)
+      .includes(:component_models)
+      .order("brands.name ASC")
     scope_by_brand
     scope_by_category
     scope_by_search_params

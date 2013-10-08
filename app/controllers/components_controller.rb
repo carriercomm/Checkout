@@ -121,17 +121,18 @@ class ComponentsController < ApplicationController
     scope_by_category
     scope_by_component_model
 
-    @components = @components.includes(:component_model => :brand)
-      .joins(:component_model => :brand)
-      .order(:kit_id)
+    @components = @components.includes(:kit, :component_model => :brand)
+      .joins(:kit, :component_model => :brand)
+      .order("components.kit_id DESC")
       .page(params[:page])
   end
 
   def scope_by_filter_params
     case params["filter"]
     when "circulating"        then @components = @components.includes(:kits).where("kits.workflow_state = 'circulating'")
-    when "non_circulating"    then @components = @components.includes(:kits).where("kits.workflow_state = 'non_circulating'")
     when "deaccessioned"      then @components = @components.includes(:kits).where("kits.workflow_state = 'deaccessioned'")
+    when "missing"            then @components = @components.missing
+    when "non_circulating"    then @components = @components.includes(:kits).where("kits.workflow_state = 'non_circulating'")
     when "orphaned"           then @components = @components.where("components.kit_id IS NULL")
     end
   end

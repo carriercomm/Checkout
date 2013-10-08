@@ -52,7 +52,7 @@
               </ul>
               <ul class="nav">
                 <% # TODO: convert these all to auth_link %>
-                <li><%= link_to "Dashboard", dashboard_path %></li>
+                <li><%= link_to "Account", account_path %></li>
                 <li><%= link_to "Brands", brands_path(filter: "circulating") if can? :read, Brand %></li>
                 <li><%= link_to "Categories", categories_path  if can? :read, Category %></li>
                 <li><%= link_to "Kits", kits_path(filter: "circulating") if can? :read, Kit %></li>
@@ -60,9 +60,10 @@
                 <li><%= link_to "Locations", locations_path if can? :read, Location %></li>
                 <li><%= link_to "Models", circulating_component_models_path if can? :read, ComponentModel %></li>
                 <%= dropdown_for("Admin") do %>
-                  <li><%= link_to "Application Settings", settings_path if can? :read, Settings %></li>
+                  <li><%= link_to "Application Settings", settings_path if current_user.admin? %></li>
                   <li><%= link_to "Budgets", budgets_path if can? :read, Budget %></li>
                   <li><%= link_to "Covenants", covenants_path  if can? :read, Covenant %></li>
+                  <li><%= link_to "Dashboard", dashboard_path  if can? :read, Covenant %></li>
                   <li><%= link_to "Groups", active_groups_path if can? :read, Group %></li>
                   <li><%= link_to "Inventory", inventory_records_path if can? :read, InventoryRecord %></li>
                   <li><%= link_to("Users", active_users_path) if can? :read, User %></li>

@@ -1,25 +1,24 @@
-<p id="notice"><%= notice %></p>
+<% title t('page_titles.show.inventory_record') %>
+<% subtitle "##{inventory_record}" %>
 
-<p>
-  <b>Disposition:</b>
-  <%= @inventory_record.disposition %>
-</p>
+<div class="dl-horizontal">
+  <dl>
+    <dt>Type</dt>
+    <dd><%= inventory_record.type %></dd>
+    <dt>Date</dt>
+    <dd><%= inventory_record.created_at %></dd>
+    <dt>Attendant</dt>
+    <dd><%= inventory_record.attendant.to_link %></dd>
+    <dt>Kit</dt>
+    <dd><%= inventory_record.kit.to_link %></dd>
+    <dt>Loan</dt>
+    <dd><%= inventory_record.loan.to_link if inventory_record.loan %></dd>
+  </dl>
+</div>
 
-<p>
-  <b>Component:</b>
-  <%= @inventory_record.component %>
-</p>
-
-<p>
-  <b>Loan:</b>
-  <%= @inventory_record.loan %>
-</p>
-
-<p>
-  <b>User:</b>
-  <%= @inventory_record.user %>
-</p>
+<h2>Components</h2>
+<%= render partial: 'components/component_list', object: inventory_record.kit.components %>
 
 
-<%= link_to 'Edit', edit_inventory_record_path(@inventory_record) %> |
-<%= link_to 'Back', inventory_records_path %>
+<%#= link_to 'Edit', edit_inventory_record_path(@inventory_record) %>
+<%#= link_to 'Back', inventory_records_path %>

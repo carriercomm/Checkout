@@ -33,6 +33,16 @@ class Brand < ActiveRecord::Base
   end
 
 
+  def self.for_user(user)
+    if Settings.clients_can_see_equipment_outside_their_groups || user.attendant? || user.admin?
+      return scoped
+    else
+      return joins(:component_models => { :kits => { :groups => :memberships }})
+                     .where("memberships.user_id = ?", user.id).uniq
+    end
+  end
+
+
   ## Instance Methods ##
 
   # TODO: move this to a decorator. something specific to select2

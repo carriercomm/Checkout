@@ -1,11 +1,12 @@
-<% title t('component.index.title') %>
+<% title t('page_titles.index.components') %>
 
 <% content_for :sidebar do %>
   <li class="nav-header"><%= t(".actions") %></li>
   <li><%= auth_link([:new, Component]) %></li>
   <li class="nav-header"><%= t(".filters") %></li>
-  <li><%= auth_link(Component, {}, { text: t("component.filters.all.text").html_safe }) %></li>
-  <li><%= auth_link(Component, { filter: "orphaned" }, { text: t("component.filters.orphaned.text").html_safe }) %></li>
+  <li><%= auth_link(Component)                         %></li>
+  <li><%= auth_link(Component, { filter: "missing" })  %></li>
+  <li><%= auth_link(Component, { filter: "orphaned" }) %></li>
 <% end %>
 
 <%= paginate @components %>

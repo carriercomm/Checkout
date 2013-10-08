@@ -37,10 +37,16 @@
           <td><%= kit.asset_tags %></td>
           <td><%= kit.component_list %></td>
           <td><%= kit.location %></td>
-          <td>
+          <td class="actions">
+            <%# TODO: wrap this up in a helper method %>
             <% if kit.circulating? %>
-            <%= link_to 'Reserve', new_kit_reservation_path(kit), :class => 'btn btn-mini' %>
-            <%= link_to 'Loans', kit_loans_path(kit), :class => 'btn btn-mini' %>
+              <% if kit.checked_out? %>
+                <%= auth_link([:edit, kit.currently_checked_out_loan], { a: "check_in" },  { text: t('links.loan.check_in') }) %>
+              <% else %>
+                <%= auth_link([:new, kit, Loan], { a: "check_out" }, { text: t('links.loan.check_out') }) %>
+              <% end %>
+              <%= auth_link([:new, kit, Loan], { a: "request"   }, { text: t('links.loan.request')   }) %>
+              <%= auth_link([kit, Loan]) %>
             <% end %>
           </td>
         </tr>

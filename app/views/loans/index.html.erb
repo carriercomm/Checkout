@@ -5,7 +5,7 @@
   <li class="nav-header"><%= t("loan.sidebar.filters") %></li>
   <li><%= auth_link(Loan) %></li>
   <li><%= auth_link(Loan, { filter: "pending" }) %></li>
-  <li><%= auth_link(Loan, { filter: "approved" }) %></li>
+  <li><%= auth_link(Loan, { filter: "requested" }) %></li>
   <li><%= auth_link(Loan, { filter: "checked_out" }) %></li>
   <li><%= auth_link(Loan, { filter: "checked_in" }) %></li>
   <%#= auth_link(Loan, { filter: "rejected" }) %>

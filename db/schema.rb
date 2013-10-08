@@ -11,13 +11,14 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130927003708) do
+ActiveRecord::Schema.define(:version => 20131008012314) do
 
   create_table "brands", :force => true do |t|
-    t.string   "name",         :null => false
-    t.string   "autocomplete", :null => false
-    t.datetime "created_at",   :null => false
-    t.datetime "updated_at",   :null => false
+    t.string   "name",                                  :null => false
+    t.string   "autocomplete",                          :null => false
+    t.datetime "created_at",                            :null => false
+    t.datetime "updated_at",                            :null => false
+    t.integer  "component_models_count", :default => 0
   end
 
   add_index "brands", ["autocomplete"], :name => "index_brands_on_autocomplete"
@@ -91,6 +92,7 @@ ActiveRecord::Schema.define(:version => 20130927003708) do
     t.string   "autocomplete",                         :null => false
     t.datetime "created_at",                           :null => false
     t.datetime "updated_at",                           :null => false
+    t.integer  "components_count",  :default => 0
   end
 
   add_index "component_models", ["autocomplete"], :name => "index_component_models_on_autocomplete"

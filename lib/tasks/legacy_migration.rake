@@ -7,8 +7,8 @@ namespace :dbx do
     `ssh dxarts@ovid01.u.washington.edu '/rc00/d32/dxarts/bin/mysqldump_dbx'`
   end
 
-  desc 'fetch a current snapshot of the database from ovid'
-  task :fetch_new => [:environment, "dbx:dump", "dbx:fetch"]
+  desc 'dump and fetch a current snapshot of the database from ovid'
+  task :dump_and_fetch => [:environment, "dbx:dump", "dbx:fetch"]
 
   desc 'fetch a current snapshot of the database from ovid'
   task :fetch => :environment do
@@ -614,12 +614,11 @@ namespace :dbx do
     @logger.info "#{ error_count } errors"
   end
 
-  desc 'migrate data from dbx'
-  task :res  => :init do
+  desc 'migrate check out and reservation data from dbx'
+  task :loans  => :init do
 
     puts "Migrating checkouts and reservations..."
-    checkout_success_count = 0
-    reservation_success_count = 0
+    success_count = 0
     error_count = 0
 
     puts "Clearing out loans table..."
@@ -636,13 +635,11 @@ namespace :dbx do
     #
 
     puts "Cleaning up dirty data..."
-    LegacyCheckout.nullify_bogus_values!
-    LegacyCheckout.create_indexes!
-    LegacyReservation.nullify_bogus_values!
-    LegacyReservation.create_indexes!
+    LegacyLoan.nullify_bogus_values!
 
-    staff_group = Group.find_by_name("DX-STAFF")
-    LegacyReservation.includes(:legacy_checkout).pluck(:eq_uw_tag).uniq.each do |tag|
+    staff_group = Group.where(name: "DX-STAFF").first_or_create!
+
+    LegacyLoan.pluck(:asset_tag).uniq.each do |tag|
       k = Kit.find_by_asset_tag(tag)
       if k
         unless k.groups.include?(staff_group)
@@ -656,80 +653,78 @@ namespace :dbx do
 
     system_approver = User.unscoped.find_by_username("system")
 
-    puts "Importing reservations..."
-    @logger.info "==== RESERVATIONS ===="
+    puts "Importing loans..."
+    @logger.info "==== LOANS ===="
 
-    pb = ProgressBar.new(LegacyReservation.count)
+    pb      = ProgressBar.new(LegacyLoan.count)
+    default = Settings.default_loan_duration
 
-    LegacyReservation.includes(:legacy_checkout).find_in_batches do |batch|
-      batch.each do |r|
+    importer_group = Group.where(name: "importer group").first_or_create!
+
+    LegacyLoan.find_in_batches do |batch|
+      batch.each do |ll|
         begin
-          client_id = r.client_id.downcase.gsub(/[^a-z0-9]/, "").strip
+          client_id = ll.client_id.downcase.gsub(/[^a-z0-9]/, "").strip
           client = User.find_by_username(client_id)
           raise "couldn't find reservation client: #{ client_id }" if client.nil?
 
-          kit = Kit.find_by_asset_tag(r.eq_uw_tag)
-          raise "couldn't find kit: #{ r.eq_uw_tag }" if kit.nil?
+          kit = Kit.find_by_asset_tag(ll.asset_tag)
+          raise "couldn't find kit: #{ ll.asset_tag }" if kit.nil?
+
+          unless kit.permissions_include? client
+            importer_group.kits << kit unless importer_group.kits.include? kit
+            importer_group.users << client unless importer_group.users.include? client
+            importer_group.save!
+          end
 
           l = Loan.new(client: client, kit: kit)
-          l.starts_at = r.resdate.to_datetime
-          if l.starts_at.nil?
-            raise "starts_at is nil: #{ r.inspect } "
-          end
 
-          if r.resdate_end.nil?
-            l.ends_at = kit.default_return_date(l.starts_at)
-            if l.ends_at.nil?
-              @logger.fatal "screwed up"
-              d = Settings.default_check_out_duration
-              @logger.fatal d.to_s
-              @logger.fatal l.starts_at.inspect
-              expected_time = (l.starts_at + d.days).to_time
-              @logger.fatal expected_time
-              @logger.fatal kit.location.inspect
-              @logger.fatal kit.location.next_datetime_open(expected_time).inspect
-              exit
-            end
+          l.starts_at = ll.starts_at.try(:to_datetime) || ll.out_at.try(:to_datetime)
+
+          if l.starts_at > DateTime.current
+            l.autofill_ends_at!
           else
-            l.ends_at = kit.location.next_datetime_open(r.resdate_end.to_time)
+            l.ends_at   = ll.ends_at.try(:to_datetime) || l.starts_at + default.days
           end
 
-          c = r.legacy_checkout
-          unless c.nil?
-            staffout_id     = c.staffout_id.downcase.gsub(/[^a-z0-9]/, "").strip
-            staffin_id      = c.staffin_id.downcase.gsub(/[^a-z0-9]/, "").strip
-            out_attendant   = User.find_by_username(staffout_id)
-            in_attendant    = User.find_by_username(staffin_id)
+          if ll.check_out_attendant_id
+            staffout_id   = ll.check_out_attendant_id.downcase.gsub(/[^a-z0-9]/, "").strip
+            out_attendant = User.find_by_username(staffout_id)
+          end
 
-            l.out_at        = c.dateout     unless c.dateout.nil?
-            l.ends_at       = kit.location.next_datetime_open(c.datedue.to_time) || kit.default_return_date(l.starts_at) if l.ends_at.nil?
-            l.in_at         = c.datein      unless c.datein.nil?
+          if ll.check_in_attendant_id
+            staffin_id    = ll.check_in_attendant_id.downcase.gsub(/[^a-z0-9]/, "").strip
+            in_attendant  = User.find_by_username(staffin_id)
+          end
 
-            if out_attendant
-              unless out_attendant.attendant?
-                out_attendant.add_role(:attendant)
-              end
-              l.build_check_out_inventory_record(attendant: out_attendant, missing: false)
-              l.check_out_inventory_record.created_at = l.out_at
-            end
+          l.out_at      = ll.out_at.try(:to_datetime)
+          l.in_at       = ll.in_at.try(:to_datetime)
 
-            if in_attendant
-              unless in_attendant.attendant?
-                in_attendant.add_role(:attendant)
-              end
-              l.build_check_in_inventory_record(attendant: in_attendant, missing: false)
-              l.check_in_inventory_record.created_at = l.in_at
-            end
+          if out_attendant
+            out_attendant.add_role(:attendant) unless out_attendant.attendant?
+            l.new_check_out_inventory_record(attendant: out_attendant, kit: kit)
+            l.check_out_inventory_record.inventory_details.each {|id| id.missing = false}
+            l.check_out_inventory_record.created_at = l.out_at
+          end
+
+          if in_attendant
+            in_attendant.add_role(:attendant) unless in_attendant.attendant?
+            l.new_check_in_inventory_record(attendant: in_attendant, kit: kit)
+            l.check_in_inventory_record.inventory_details.each {|id| id.missing = false}
+            l.check_in_inventory_record.created_at = l.in_at
           end
 
           if in_attendant
             l.persist_workflow_state "checked_in"
           elsif out_attendant
             l.persist_workflow_state "checked_out"
-            l.client.update_attributes!(disabled: false) if l.client.disabled?
+            if l.client.disabled?
+              l.client.disabled = false
+              l.client.save
+            end
           elsif l.starts_at
             if l.starts_at >= Date.today
-              l.persist_workflow_state "approved"
+              l.persist_workflow_state "requested"
               l.approver = system_approver
               if l.client.disabled?
                 l.client.disabled = false
@@ -741,12 +736,9 @@ namespace :dbx do
           end
 
           if l.save
-            reservation_success_count += 1
-            if r.legacy_checkout
-              checkout_success_count += 1
-            end
+            success_count += 1
           else
-            @logger.error "-- RESERVATION ERROR: #{r.res_id}"
+            @logger.error "\n-- LOAN ERROR: #{ll.id}"
             @logger.error "#{ l.inspect }"
             if l.check_out_inventory_record
               @logger.error "#{ l.check_out_inventory_record.inspect }"
@@ -754,15 +746,14 @@ namespace :dbx do
             if l.check_in_inventory_record
               @logger.error "#{ l.check_in_inventory_record.inspect }"
             end
-            @logger.error "#{ r.inspect }"
-            @logger.error "#{ c.inspect }"
+            @logger.error "#{ ll.inspect }"
             l.errors.messages.each {|k,v| @logger.error "#{ k.to_s.titleize } #{ v }" }
             error_count += 1
           end
         rescue StandardError => e
           error_count += 1
-          @logger.error "Error migrating #{r.res_id}: #{ e }"
-          @logger.error r.inspect
+          @logger.error "\n-- LOAN ERROR: #{ll.id}: #{ e }"
+          @logger.error ll.inspect
           @logger.error l.inspect
           @logger.error e.backtrace
         end
@@ -770,98 +761,7 @@ namespace :dbx do
       end
     end
 
-    puts "Importing check outs..."
-    @logger.info "==== CHECK OUTS ===="
-
-    # migrate the checkouts that didn't have a reservation
-    # some of these have a reservation id, but no corresponding reservation record
-    where_clause = "res_id IS NULL OR (checkout.res_id IS NOT NULL AND checkout.res_id NOT IN (select res_id from reservation))"
-    checkouts_count = LegacyCheckout.where(where_clause).count
-
-    pb = ProgressBar.new(checkouts_count)
-
-    LegacyCheckout.where(where_clause).find_in_batches do |batch|
-      batch.each do |c|
-        begin
-          client_id = c.client_id.downcase.gsub(/[^a-z0-9]/, "").strip
-          client = User.find_by_username(client_id)
-          raise "couldn't find checkout client: #{ client_id }" if client.nil?
-
-          kit = Kit.find_by_asset_tag(c.eq_uw_tag)
-          raise "couldn't find kit: #{ c.eq_uw_tag }" if kit.nil?
-
-          out_attendant = User.find_by_username(c.staffout_id)
-          in_attendant  = User.find_by_username(c.staffin_id)
-
-          l = Loan.new
-          l.client        = client
-          l.kit           = kit
-          unless kit.permissions_include?(client)
-            dxstaff = Group.find(2)
-            if client.groups.include?(dxstaff) && !kit.groups.include?(dxstaff)
-              kit.groups << dxstaff
-              kit.save
-            end
-          end
-          l.starts_at     = c.dateout.to_datetime
-          if c.datedue.nil?
-            l.ends_at = kit.default_return_date(l.starts_at)
-          else
-            l.ends_at = kit.location.next_datetime_open(c.datedue.to_datetime)
-          end
-          l.out_at = c.dateout.to_datetime unless c.dateout.nil?
-          l.in_at  = c.datein.to_datetime  unless c.datein.nil?
-
-          if out_attendant
-            unless out_attendant.attendant?
-              out_attendant.add_role(:attendant)
-            end
-            l.build_check_out_inventory_record(attendant: out_attendant, missing: false)
-            l.check_out_inventory_record.created_at = l.out_at
-          end
-
-          if in_attendant
-            unless in_attendant.attendant?
-              in_attendant.add_role(:attendant)
-            end
-            l.build_check_in_inventory_record(attendant: in_attendant, missing: false)
-            l.check_in_inventory_record.created_at = l.in_at
-          end
-
-          if in_attendant
-            l.persist_workflow_state "checked_in"
-          elsif out_attendant
-            l.persist_workflow_state "checked_out"
-          else
-            raise "Couldn't determine what state this checkout should be in: #{ c.checkout_id }"
-          end
-
-          saved = false
-          if l.in_at
-            saved = l.save(validate: false)
-          else
-            saved = l.save
-          end
-
-          if saved
-            checkout_success_count += 1
-          else
-            @logger.error "Error migrating #{c.checkout_id}:"
-            @logger.error "\t #{ l.inspect }"
-            @logger.error "\t #{ c.inspect }"
-            l.errors.messages.each {|k,v| @logger.error "\t#{ k.to_s.titleize } #{ v }" }
-            error_count += 1
-          end
-        rescue StandardError => e
-          error_count += 1
-          @logger.error "Error migrating #{c.checkout_id}: #{ e }"
-        end
-        pb.increment!
-      end
-    end
-
-    @logger.info "Successfully migrated #{ reservation_success_count } of #{ LegacyReservation.count.to_s } reservations"
-    @logger.info "#{ checkout_success_count } of #{ LegacyCheckout.count.to_s } checkouts"
+    @logger.info "Successfully migrated #{ success_count } of #{ LegacyLoan.count.to_s } loan"
     @logger.info "#{ error_count } errors"
 
   end

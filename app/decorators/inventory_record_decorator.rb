@@ -6,10 +6,14 @@ class InventoryRecordDecorator < ApplicationDecorator
   decorates_association :kit
   decorates_association :loan
 
-  delegate :type
+  delegate :id, :type
 
   def created_at
-    h.l(source.created_at, :format => :tabular)
+    h.l(object.created_at, :format => :tabular)
+  end
+
+  def to_s
+    id.to_s
   end
 
 end

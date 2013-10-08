@@ -14,7 +14,7 @@ class CategoriesController < ApplicationController
         .page(params[:page])
         .per(params[:page_limit])
     else
-      @categories = Category.with_loanable_equipment_for(current_user)
+      @categories = Category.for_user(current_user)
         .page(params[:page])
         .per(params[:page_limit])
     end

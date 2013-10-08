@@ -2,13 +2,19 @@
 
 <% content_for :sidebar do %>
   <li class="nav-header"><%= t(".menu") %></li>
-  <li><%= auth_link([current_user, Loan]) %></li>
+  <li><%= link_to "#{ t('helpers.icons.settings') } Application Settings".html_safe, settings_path if current_user.admin? %></li>
+  <li><%= auth_link([:new, User]) %></li>
 <% end %>
 
-<h2><%= t('page_titles.index.loans') %></h2>
+<!-- <dl class="dl-horizontal"> -->
+<!--   <dt>Orphaned Components</dt> -->
+<!--   <dd><%= @orphaned_components.to_s %></dd> -->
+<!--   <dt>Empty Kits</dt> -->
+<!--   <dd><%= @empty_kits.to_s %></dd> -->
+<!-- </dl> -->
 
-<% if loans.empty? %>
-<p><%= t('notifications.loan.no_loans') %></p>
-<% else %>
-<%= render partial: 'loans/loans_table', object: loans %>
-<% end %>
+<h2>Incoming Loans</h2>
+<%= render partial: 'loans/loans_table', object: incoming_loans %>
+
+<h2>Outgoing Loans</h2>
+<%= render partial: 'loans/loans_table', object: outgoing_loans %>

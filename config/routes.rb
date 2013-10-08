@@ -15,6 +15,9 @@ Checkout::Application.routes.draw do
 
   devise_for :user
 
+  match 'account'   => 'account#index'
+  match 'dashboard' => 'dashboard#index'
+
   resources :audit_inventory_records, :controller => :inventory_records, only: [:index, :new, :create, :show] do
     resources :inventory_details, only: [:index]
   end
@@ -56,9 +59,6 @@ Checkout::Application.routes.draw do
 
   resources :components, except: [:destroy]
   resources :covenants
-
-  match 'dashboard' => 'dashboard#index'
-
   resources :groups do
     resources :memberships, only: [:index]
     resources :permissions, only: [:index]
@@ -70,9 +70,7 @@ Checkout::Application.routes.draw do
     end
   end
 
-  resources :inventory_records, only: [:index, :new, :create, :show] do
-    resources :inventory_details, only: [:index]
-  end
+  resources :inventory_records, only: [:index, :new, :create, :show]
 
   resources :kits do
     collection do

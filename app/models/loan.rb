@@ -81,8 +81,9 @@ class Loan < ActiveRecord::Base
   validate  :validate_client_signed_all_covenants,      :if     => [:checked_out?, :canceled?]
   validate  :validate_kit_available,                    :unless => [:checked_in?, :canceled?]
   validate  :validate_kit_circulating,                  :unless => [:checked_in?, :canceled?]
-  validate  :validate_open_on_starts_at,                :if     => :pending?
-  validate  :validate_open_on_ends_at,                  :unless => [:pending?, :checked_in?, :canceled?]
+  # TODO: fix this validation so it works with ad-hock check out outside business hours
+#  validate  :validate_open_on_starts_at,                :if     => :pending?
+#  validate  :validate_open_on_ends_at,                  :unless => [:pending?, :checked_in?, :canceled?]
   validate  :validate_start_at_before_ends_at,          :unless => [:pending?, :checked_in?, :canceled?]
 
 
@@ -95,6 +96,28 @@ class Loan < ActiveRecord::Base
 
 
   ## Class Methods ##
+
+  def self.incoming
+    beginning_of_today = DateTime.current.at_beginning_of_day
+    end_of_today       = beginning_of_today + 48.hours
+
+    self
+      .where("loans.ends_at > ? AND loans.ends_at < ? AND loans.workflow_state = 'checked_out'", beginning_of_today, end_of_today)
+      .includes(:kit)
+      .joins(:kit)
+      .order("loans.ends_at ASC")
+  end
+
+  def self.outgoing
+    beginning_of_today = DateTime.current.at_beginning_of_day
+    end_of_today       = beginning_of_today + 48.hours
+
+    self
+      .where("loans.starts_at > ? AND loans.starts_at < ? AND loans.workflow_state = 'requested'", beginning_of_today, end_of_today)
+      .includes(:kit)
+      .joins(:kit)
+      .order("loans.ends_at ASC")
+  end
 
   # def self.build(params)
   #   loan = self.new(params)

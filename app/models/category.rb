@@ -22,19 +22,8 @@ class Category < ActiveRecord::Base
 
   ## Class methods ##
 
-  def self.with_loanable_equipment_for(client)
-    join_sql = <<-END_SQL
-      INNER JOIN categories_component_models ON categories.id = categories_component_models.category_id
-      INNER JOIN component_models            ON categories_component_models.component_model_id = component_models.id
-      INNER JOIN components                  ON components.component_model_id = component_models.id
-      INNER JOIN kits                        ON components.kit_id = kits.id
-      INNER JOIN permissions                 ON kits.id = permissions.kit_id
-      INNER JOIN groups                      ON permissions.group_id = groups.id
-      INNER JOIN memberships                 ON groups.id = memberships.group_id
-      INNER JOIN users                       ON memberships.user_id = users.id
-    END_SQL
-
-    self.joins(join_sql).where("users.username = ?", client.username).uniq
+  def self.for_user(client)
+    joins(:component_models => { :kits => { :groups => :users }}).where("users.username = ?", client.username).uniq
   end
 
 

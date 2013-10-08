@@ -194,6 +194,25 @@ class LegacyCheckout < ActiveRecord::Base
 
 end
 
+class LegacyLoan < ActiveRecord::Base
+  establish_connection :legacy
+  set_table_name 'loans'
+  set_primary_key :id
+  belongs_to :legacy_equipment, foreign_key: 'asset_tag'
+  belongs_to :legacy_user, foreign_key: 'client_id'
+
+  def self.nullify_bogus_values!
+    connection.execute "UPDATE loans SET reservation_id = NULL WHERE reservation_id = 0"
+    connection.execute "UPDATE loans SET checkout_id = NULL WHERE checkout_id = 0"
+    connection.execute "UPDATE loans SET starts_at = NULL WHERE starts_at = 0000-00-00"
+    connection.execute "UPDATE loans SET ends_at = NULL WHERE ends_at = 0000-00-00"
+    connection.execute "UPDATE loans SET out_at = NULL WHERE out_at = 0000-00-00"
+    connection.execute "UPDATE loans SET in_at = NULL WHERE in_at = 0000-00-00"
+    connection.execute("UPDATE loans SET client_id = 'choffa' WHERE client_id = 'choffel'")
+  end
+
+end
+
 class LegacyTraining < ActiveRecord::Base
   establish_connection :legacy
   set_table_name 'special_items'

@@ -27,9 +27,7 @@
       <td><%= inventory_record.kit.to_link %></td>
       <td><%= inventory_record.loan.to_link if inventory_record.loan %></td>
       <td class="actions">
-        <!-- <ul> -->
-        <!--   <li><%#= auth_link(inventory_record) %></li> -->
-        <!-- </ul> -->
+        <%= auth_link(inventory_record) %>
       </td>
     </tr>
   <% end %>

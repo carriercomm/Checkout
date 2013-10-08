@@ -191,18 +191,41 @@ module ApplicationHelper
     path    ||= polymorphic_url(object, options)
     content   = "#{ icon } <span class='auth-link-text'>#{ text }</span>".squish.html_safe
 
+    resource, args = get_ability_resource(object)
+
     html_options.reverse_merge!({
-        :rel         => "tooltip",
-        :title       => hint,
-        'data-delay' => 500
+        :rel            => "tooltip",
+        :title          => hint,
+        'data-delay'    => 500,
+        'data-ability'  => ability,
+        'data-resource' => resource
       })
 
+
     {
-      :authorized   => can?(ability, object),
+      :authorized   => can?(ability, resource, args),
       :path         => path,
       :html_options => html_options,
       :content      => content
     }
+  end
+
+  def get_ability_resource(object)
+    target = nil
+    args   = {}
+
+    if object.is_a? Array
+      target = object.pop
+      args   = {}
+    else
+      target = object
+    end
+
+    if target.is_a? ApplicationDecorator
+      target = target.object
+    end
+
+    return [target, args]
   end
 
   def my_button_to(options = {}, html_options = {}, &block)

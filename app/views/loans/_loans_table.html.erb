@@ -1,3 +1,6 @@
+<% if loans_table.empty? %>
+<%= t('notifications.loan.no_loans') %>
+<% else %>
 <table class="table table-striped">
   <thead>
     <tr>
@@ -32,9 +35,10 @@
             <%= auth_link([:edit, loan], { a: "check_out" }) %>
           <% end %>
           <%= auth_link(loan) %>
-          <%= auth_link([:edit, loan]) %>
+          <%#= auth_link([:edit, loan]) %>
         </td>
       </tr>
     <% end %>
   </tbody>
 </table>
+<% end %>

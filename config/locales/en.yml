@@ -45,6 +45,7 @@ en:
       new:       "<i class='icon-plus-sign'></i>"
       renew:     "<i class='icon-refresh'></i>"
       request:   "<i class='icon-calendar'></i>"
+      settings:  "<i class='icon-cog'></i>"
       show:      "<i class='icon-eye-open'></i>"
     actions:
       back:      "Back"
@@ -68,11 +69,11 @@ en:
       loans:
         all:         'All'
         pending:     'Pending'
-        approved:    'Approved'
         checked_out: 'Checked Out'
         checked_in:  'Checked In'
         canceled:    'Canceled'
         rejected:    'Rejected'
+        requested:   'Requested'
   page_titles:
     check_in:
       loan: 'Check In'
@@ -367,6 +368,8 @@ en:
     show_all_check_in_inventory_records:       'Show all check in inventory records'
     show_all_check_out_inventory_records:      'Show all check out inventory records'
     show_all_components:                       'Show all components'
+    show_all_missing_components:               'Show all missing components'
+    show_all_orphaned_components:              'Show all orphaned components'
     show_all_component_models:                 'Show all models'
     show_all_circulating_component_models:     'Show all circulating models'
     show_all_non_circulating_component_models: 'Show all non_circulating models'
@@ -409,6 +412,7 @@ en:
       check_in:           'Check In'
       check_out:          'Check Out'
     component:
+      missing:            'Missing'
       orphaned:           'Orphaned'
     component_model:
       circulating:        *filters_brand_circulating
@@ -422,12 +426,12 @@ en:
       missing_components: 'Missing Components'
       non_circulating:    *filters_brand_non_circulating
     loan:
-      approved:           &filters_loan_approved    "<span class='loan-approved'>Approved</span>"
       canceled:           &filters_loan_canceled    "<span class='loan-canceled'>Canceled</span>"
       checked_in:         &filters_loan_checked_in  "<span class='loan-checked-in'>Checked In</span>"
       checked_out:        &filters_loan_checked_out "<span class='loan-checked-out'>Checked Out</span>"
       pending:            &filters_loan_pending     "<span class='loan-pending'>Pending</span>"
       rejected:           &filters_loan_rejected    "<span class='loan-rejected'>Rejected</span>"
+      requested:           &filters_loan_requested    "<span class='loan-requested'>Requested</span>"
     user:
       all:                *filters_all
       active:             'Active'
@@ -510,6 +514,11 @@ en:
         'true':           'Missing'
         'false':          'Present'
         unknown:          'Unknown'
+    inventory_record:
+      type:
+        audit_inventory_record:     'Audit'
+        check_out_inventory_record: 'Check Out'
+        check_in_inventory_record:  'Check In'
     kit:
       circulating:       *filters_brand_circulating
       non_circulating:   *filters_brand_non_circulating
@@ -518,12 +527,12 @@ en:
       available:         'Available'
     loan:
       system_approval:   'Automatic'
-      approved:          *filters_loan_approved
       canceled:          *filters_loan_canceled
       checked_in:        *filters_loan_checked_in
       checked_out:       *filters_loan_checked_out
-      rejected:          *filters_loan_rejected
       pending:           *filters_loan_pending
+      rejected:          *filters_loan_rejected
+      requested:          *filters_loan_requested
     role:
       admin:             'Administrator'
       approver:          'Approver'

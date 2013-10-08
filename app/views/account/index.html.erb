@@ -1,0 +1,14 @@
+<% title t('page_titles.index.dashboard') %>
+
+<% content_for :sidebar do %>
+  <li class="nav-header"><%= t(".menu") %></li>
+  <li><%= auth_link([current_user, Loan]) %></li>
+<% end %>
+
+<h2><%= t('page_titles.index.loans') %></h2>
+
+<% if loans.empty? %>
+<p><%= t('notifications.loan.no_loans') %></p>
+<% else %>
+<%= render partial: 'loans/loans_table', object: loans %>
+<% end %>

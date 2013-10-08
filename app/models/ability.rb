@@ -36,16 +36,16 @@ class Ability
       can :read, ComponentModel
       can [:show, :edit, :update], Group, :memberships => { user_id: user.id, supervisor: true }
 
-      if Setting.clients_can_see_equipment_outside_their_groups
+      if Settings.clients_can_see_equipment_outside_their_groups
         can :read, Kit.circulating
       else
         can :read, Kit.circulating_for_user(user)
       end
 
       can :read, Location
-      can :read, Loan, :client_id => user.id
+      can :read, user.loans
       cannot :read, User
-      can :read, User, :id => user.id
+      can :read, user
       # https://github.com/ryanb/cancan/wiki/Defining-Abilities-with-Blocks
       # can :update, Project, ["priority < ?", 3] do |project|
       #   project.priority < 3

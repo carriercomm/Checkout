@@ -8,7 +8,7 @@ class ComponentModel < ActiveRecord::Base
 
   ## Associations ##
 
-  belongs_to                :brand,      :inverse_of => :component_models
+  belongs_to                :brand,      :inverse_of => :component_models, :counter_cache => true
   has_and_belongs_to_many   :categories
   has_many                  :components, :inverse_of => :component_model, :dependent => :destroy
   has_many                  :kits,       :through    => :components
@@ -61,16 +61,7 @@ class ComponentModel < ActiveRecord::Base
   end
 
   def self.for_user(user)
-    joins_sql = <<-END_SQL
-    inner join components on component_models.id = components.id
-    inner join kits on components.kit_id = kits.id
-    inner join permissions on kits.id = permissions.kit_id
-    inner join groups on permissions.group_id = groups.id
-    inner join memberships on groups.id = memberships.group_id
-    inner join users on memberships.user_id = users.id
-    END_SQL
-
-    joins(joins_sql).where("users.id = ?", user.id).uniq
+    joins(:kits => { :groups => :users }).where("users.id = ?", user.id).uniq
   end
 
   # HACK HACK: this is just to appease nested_form, but this is a terrible hack.

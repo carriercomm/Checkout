@@ -8,7 +8,6 @@ class InventoryRecord < ActiveRecord::Base
   has_many   :inventory_details, :inverse_of => :inventory_record,  :dependent  => :destroy
   has_many   :components,        :through    => :inventory_details, :before_add => [:check_component_belongs_to_kit]
   belongs_to :kit,               :inverse_of => :inventory_records
-  belongs_to :loan,              :inverse_of => :inventory_records
 
   accepts_nested_attributes_for :inventory_details, :reject_if => proc { |attributes| attributes['component_id'].blank? }, :allow_destroy=> true
 
