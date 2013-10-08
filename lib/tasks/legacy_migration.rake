@@ -430,58 +430,6 @@ namespace :dbx do
     success_count = 0
     error_count   = 0
 
-    current_user = [
-      "abocci92",
-      "annabelc",
-      "bgrace",
-      "blake",
-      "chesnd",
-      "coupe",
-      "chjr12",
-      "dennshah",
-      "ganter",
-      "hana21",
-      "hbbenard",
-      "hhodge",
-      "hraikes",
-      "hugosg",
-      "jakel",
-      "jarmick",
-      "jehughes",
-      "jimified",
-      "joelong",
-      "joshp",
-      "karpen",
-      "laxxx",
-      "maja08",
-      "marcinp",
-      "masseyjw",
-      "mem5",
-      "mones",
-      "mtm5",
-      "mtrainor",
-      "mwatras",
-      "ozubko",
-      "pampin",
-      "peberger",
-      "pragyakc",
-      "rtwomey",
-      "sjp89",
-      "steliosm",
-      "swlcomp",
-      "tivon",
-      "trebacze",
-      "varchaus",
-      "vine",
-      "xddingyi",
-      "wub",
-      "zweberc"
-    ]
-
-    admins     = ["jehughes", "bgrace", "mtm5", "coupe", "karpen", "pampin", "trebacze"]
-
-    attendants = ["joelong", "swlcomp", "jarmick", "furr"]
-
     pb = ProgressBar.new(LegacyUser.count)
 
     LegacyUser.all.each do |lu|
@@ -509,14 +457,8 @@ namespace :dbx do
         if lu.stat_of_responsibility.downcase.strip == "yes"
           u.covenants = [sor]
         end
-        u.disabled = (current_user.include? username) ? false : true
+        u.disabled = true
         u.save!
-        if admins.include?(username)
-          u.add_role "admin"
-        end
-        if attendants.include?(username)
-          u.add_role "attendant"
-        end
         success_count += 1
       rescue StandardError => e
         error_count += 1
