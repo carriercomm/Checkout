@@ -1,4 +1,4 @@
-This project is still in alpha development stages. Don't expect everything to work. In particular, reservations/loans are very broken.
+This project is moving into beta. Most things work now. Functionality is a little sparse and awkward in spots. File feature reqeusts if there's something you'd like added/changed/removed.
 
 # Installation
 
@@ -7,11 +7,11 @@ This project is still in alpha development stages. Don't expect everything to wo
 * Ruby 1.9.2 (or higher)
 * Ruby Gems
   * rake
-  * bundler 
+  * bundler
 * A Rails-compatible SQL database
   * PostgreSQL (recommended)
   * MySql (works ok, too)
-  
+
 
 ## Quick Start
 Get the code either by downloading a [zip file of the latest code](https://github.com/jamezilla/Checkout/zipball/master), or cloning the git repository using [git](http://git-scm.com/).
