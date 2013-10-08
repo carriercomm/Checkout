@@ -1,10 +1,11 @@
 <% title t('page_titles.index.brands') %>
+<% subtitle t("filters.brand.#{ @filter }").html_safe %>
 
 <% content_for :sidebar do %>
   <li class="nav-header"><%= t(".actions") %></li>
   <li><%= auth_link([:new, Brand]) %></li>
   <li class="nav-header"><%= t(".filters") %></li>
-  <li><%= auth_link(Brand) %></li>
+  <li><%= auth_link(Brand, { filter: "all"             }) %></li>
   <li><%= auth_link(Brand, { filter: "circulating"     }) %></li>
   <li><%= auth_link(Brand, { filter: "non_circulating" }) %></li>
 <% end %>

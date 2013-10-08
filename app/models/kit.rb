@@ -76,7 +76,11 @@ class Kit < ActiveRecord::Base
   end
 
   def self.for_user(user)
-    joins(:groups => :users).where("users.id = ?", user.id).uniq
+    if Settings.clients_can_see_equipment_outside_their_groups || user.attendant? || user.admin?
+      return scoped
+    else
+      return joins(:groups => :users).where("users.id = ?", user.id).uniq
+    end
   end
 
   # finds a specific asset tag

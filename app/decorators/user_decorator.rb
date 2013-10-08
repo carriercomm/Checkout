@@ -20,7 +20,7 @@ class UserDecorator < ApplicationDecorator
     {
       :label => username_and_full_name,
       :value => h.url_for(object),
-      :category => h.t("user.index.title").html_safe
+      :category => h.t("page_titles.index.users").html_safe
     }
   end
 

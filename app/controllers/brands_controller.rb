@@ -128,7 +128,9 @@ class BrandsController < ApplicationController
   end
 
   def scope_by_filter_params
-    case params[:filter]
+    @filter = params[:filter] || "all"
+
+    case @filter
     when "circulating"     then @brands = @brands.having_circulating_kits
     when "non_circulating" then @brands = @brands.having_non_circulating_kits
     end

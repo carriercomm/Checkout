@@ -162,7 +162,8 @@ class KitsController < ApplicationController
   end
 
   def scope_by_filter_params
-    case params["filter"]
+    @filter = params["filter"] || "all"
+    case @filter
     when "circulating"        then @kits = @kits.with_circulating_state
     when "missing_components" then @kits = @kits.with_missing_components
     when "non_circulating"    then @kits = @kits.with_non_circulating_state

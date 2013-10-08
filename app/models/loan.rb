@@ -263,6 +263,8 @@ private
 
     self.out_at = DateTime.current
 
+    # TODO: martial some representation of applicable group membership(s) in here for paper trail purposes
+
     # are we checking out early?
     if self.starts_at > self.out_at
       write_attribute(:starts_at, self.out_at)

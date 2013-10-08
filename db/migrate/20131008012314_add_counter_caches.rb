@@ -1,5 +1,8 @@
 class AddCounterCaches < ActiveRecord::Migration
   def up
+    Brand.reset_column_information
+    ComponentModel.reset_column_information
+
     add_column :brands, :component_models_count, :integer, :default => 0
     add_column :component_models, :components_count, :integer, :default => 0
 

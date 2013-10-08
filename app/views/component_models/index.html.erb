@@ -1,10 +1,11 @@
 <% title t('page_titles.index.component_models') %>
+<% subtitle t("filters.component_model.#{ @filter }").html_safe %>
 
 <% content_for :sidebar do %>
   <li class="nav-header"><%= t(".actions") %></li>
   <li><%= auth_link([:new, ComponentModel]) %></li>
   <li class="nav-header"><%= t(".filters") %></li>
-  <li><%= auth_link(ComponentModel) %></li>
+  <li><%= auth_link(ComponentModel, { filter: "all"         }) %></li>
   <li><%= auth_link(ComponentModel, { filter: "circulating" }) %></li>
   <%#= auth_link(ComponentModel, { filter: "non_circulating" }) %>
 <% end %>

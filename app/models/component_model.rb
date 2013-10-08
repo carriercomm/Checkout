@@ -61,7 +61,11 @@ class ComponentModel < ActiveRecord::Base
   end
 
   def self.for_user(user)
-    joins(:kits => { :groups => :users }).where("users.id = ?", user.id).uniq
+    if Settings.clients_can_see_equipment_outside_their_groups || user.attendant? || user.admin?
+      return scoped
+    else
+      return joins(:kits => { :groups => :users }).where("users.id = ?", user.id).uniq
+    end
   end
 
   # HACK HACK: this is just to appease nested_form, but this is a terrible hack.

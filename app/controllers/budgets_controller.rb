@@ -9,6 +9,7 @@ class BudgetsController < ApplicationController
   # GET /budgets
   # GET /budgets.json
   def index
+    # TODO: implement filters
     @budgets = Budget.order("budgets.starts_at DESC, budgets.number ASC")
       .page(params[:page])
 

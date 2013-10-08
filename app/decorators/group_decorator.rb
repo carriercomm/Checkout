@@ -4,22 +4,26 @@ class GroupDecorator < ApplicationDecorator
   decorates_association :kits
   decorates_association :users
 
-  delegate :description, :id, :name
+  delegate :id, :name
+
+  def description
+    coalesce(object.description)
+  end
 
   def num_kits
-    coalesce(source.attributes["num_kits"], "0")
+    coalesce(object.attributes["num_kits"], "0")
   end
 
   def num_users
-    coalesce(source.attributes["num_users"], "0")
+    coalesce(object.attributes["num_users"], "0")
   end
 
   def to_link
-    h.link_to(source.name, h.group_path(model))
+    h.link_to(object.name, h.group_path(object))
   end
 
   def to_s
-    source.name
+    object.name
   end
 
 end

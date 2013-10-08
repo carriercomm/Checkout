@@ -1,11 +1,12 @@
 <% title t('page_titles.index.components') %>
+<% subtitle t("filters.component.#{ @filter }").html_safe %>
 
 <% content_for :sidebar do %>
   <li class="nav-header"><%= t(".actions") %></li>
   <li><%= auth_link([:new, Component]) %></li>
   <li class="nav-header"><%= t(".filters") %></li>
-  <li><%= auth_link(Component)                         %></li>
-  <li><%= auth_link(Component, { filter: "missing" })  %></li>
+  <li><%= auth_link(Component, { filter: "all"      }) %></li>
+  <li><%= auth_link(Component, { filter: "missing"  }) %></li>
   <li><%= auth_link(Component, { filter: "orphaned" }) %></li>
 <% end %>
 

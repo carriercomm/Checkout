@@ -17,6 +17,7 @@ class UsersController < ApplicationController
       .order(sort_column + " " + sort_direction)
 
     if params[:filter]
+      @filter = params[:filter]
       case params[:filter]
       when "active"        then @users = @users.where(:disabled => false)
       when "disabled"      then @users = @users.where(:disabled => true)
@@ -24,6 +25,8 @@ class UsersController < ApplicationController
       when "administrator" then @users = @users.where("roles.name = 'admin'")
       when "attendant"     then @users = @users.where("roles.name = 'attendant'")
       end
+    else
+      @filter = "all"
     end
 
     # get a total (used by the select2 widget) before we apply pagination

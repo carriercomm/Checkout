@@ -488,7 +488,9 @@ namespace :dbx do
 
     LegacyGroup.includes(:legacy_permissions).all.each do |lg|
       begin
-        g = Group.create!(name: lg.group_name, description: lg.group_description)
+        g = Group.where(name: lg.group_name).first_or_initialize
+        g.description = lg.group_description
+        g.save!
         group_success_count += 1
 
         lg.legacy_permissions.each do |lp|

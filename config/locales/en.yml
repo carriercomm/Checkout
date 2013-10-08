@@ -402,36 +402,44 @@ en:
   filters:
     all:                  &filters_all 'All'
     brand:
+      all:                *filters_all
       circulating:        &filters_brand_circulating     'Circulating'
       deaccessioned:      &filters_brand_deaccessioned   'Deaccessioned'
       non_circulating:    &filters_brand_non_circulating 'Non-circulating'
     budget:
+      all:                *filters_all
       active:             'Active'
     inventory_record:
+      all:                *filters_all
       audit:              'Audit'
       check_in:           'Check In'
       check_out:          'Check Out'
     component:
+      all:                *filters_all
       missing:            'Missing'
       orphaned:           'Orphaned'
     component_model:
+      all:                *filters_all
       circulating:        *filters_brand_circulating
     group:
+      all:                *filters_all
       active:             'Active'
       empty:              'Empty'
       expired:            'Expired'
     kit:
+      all:                *filters_all
       circulating:        *filters_brand_circulating
       deaccessioned:      *filters_brand_deaccessioned
       missing_components: 'Missing Components'
       non_circulating:    *filters_brand_non_circulating
     loan:
+      all:                *filters_all
       canceled:           &filters_loan_canceled    "<span class='loan-canceled'>Canceled</span>"
       checked_in:         &filters_loan_checked_in  "<span class='loan-checked-in'>Checked In</span>"
       checked_out:        &filters_loan_checked_out "<span class='loan-checked-out'>Checked Out</span>"
       pending:            &filters_loan_pending     "<span class='loan-pending'>Pending</span>"
       rejected:           &filters_loan_rejected    "<span class='loan-rejected'>Rejected</span>"
-      requested:           &filters_loan_requested    "<span class='loan-requested'>Requested</span>"
+      requested:          &filters_loan_requested   "<span class='loan-requested'>Requested</span>"
     user:
       all:                *filters_all
       active:             'Active'

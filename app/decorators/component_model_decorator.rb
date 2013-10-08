@@ -13,7 +13,7 @@ class ComponentModelDecorator < ApplicationDecorator
     {
       :label => to_s,
       :value => h.url_for(source),
-      :category => h.t("component_model.index.title").html_safe
+      :category => h.t("page_titles.index.component_models").html_safe
     }
   end
 

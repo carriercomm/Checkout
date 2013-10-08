@@ -24,7 +24,7 @@ class KitDecorator < ApplicationDecorator
     {
       :label => to_autocomplete_s,
       :value => h.url_for(source),
-      :category => h.t("titles.kit.index").html_safe
+      :category => h.t("page_titles.index.kits").html_safe
     }
   end
 

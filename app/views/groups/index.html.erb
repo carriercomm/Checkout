@@ -1,10 +1,11 @@
 <% title t('page_titles.index.groups') %>
+<% subtitle t("filters.group.#{ @filter }").html_safe %>
 
 <% content_for :sidebar do %>
   <li class="nav-header"><%= t(".actions") %></li>
   <li><%= auth_link([:new, Group]) %></li>
   <li class="nav-header"><%= t("user.sidebar.filters") %></li>
-  <li><%= auth_link(Group) %></li>
+  <li><%= auth_link(Group, { filter: 'all'     }) %></li>
   <li><%= auth_link(Group, { filter: 'active'  }) %></li>
   <li><%= auth_link(Group, { filter: 'expired' }) %></li>
   <li><%= auth_link(Group, { filter: 'empty'   }) %></li>

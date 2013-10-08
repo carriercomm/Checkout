@@ -113,6 +113,10 @@ class User < ActiveRecord::Base
 
   ## Instance Methods ##
 
+  def active_loans
+    loans.where("(loans.workflow_state IN (?) OR loans.starts_at > ?)", ['pending', 'requested', 'checked_out'], DateTime.current - 2.days)
+  end
+
   def admin?
     has_role?(:admin)
   end

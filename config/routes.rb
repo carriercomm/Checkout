@@ -49,11 +49,11 @@ Checkout::Application.routes.draw do
     end
   end
 
-  resources :check_in_inventory_records, :controller => :inventory_records, only: [:index] do
+  resources :check_in_inventory_records, :controller => :inventory_records, only: [:index, :show] do
     resources :inventory_details, only: [:index]
   end
 
-  resources :check_out_inventory_records, :controller => :inventory_records, only: [:index] do
+  resources :check_out_inventory_records, :controller => :inventory_records, only: [:index, :show] do
     resources :inventory_details, only: [:index]
   end
 

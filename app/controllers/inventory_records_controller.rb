@@ -11,6 +11,8 @@ class InventoryRecordsController < ApplicationController
   # GET /inventory_records
   # GET /inventory_records.json
   def index
+    # TODO: implement filters
+
     if params[:kit_id]
       @inventory_records = Kit.find(params[:kit_id].to_i).inventory_records
     else
@@ -36,24 +38,26 @@ class InventoryRecordsController < ApplicationController
       .find(params[:id])
 
     respond_to do |format|
-      format.html # show.html.erb
+      format.html  { render layout: 'sidebar' } # show.html.erb
       # format.json { render json: @inventory_record }
     end
   end
+
+  # TODO: implement audit inventory record creation
 
   # GET /inventory_records/new
   # GET /inventory_records/new.json
-  def new
-    @kit = Kit.find(params[:kit_id])
-    @attendant = current_user
-    @inventory_record = @kit.build_inventory_record(kit: @kit, attendant: @attendant)
-    @inventory_record.initialize_inventory_details
+  # def new
+  #   @kit = Kit.find(params[:kit_id])
+  #   @attendant = current_user
+  #   @inventory_record = @kit.build_inventory_record(kit: @kit, attendant: @attendant)
+  #   @inventory_record.initialize_inventory_details
 
-    respond_to do |format|
-      format.html # new.html.erb
-      # format.json { render json: @inventory_record }
-    end
-  end
+  #   respond_to do |format|
+  #     format.html # new.html.erb
+  #     # format.json { render json: @inventory_record }
+  #   end
+  # end
 
   # GET /inventory_records/1/edit
   # def edit
@@ -62,32 +66,32 @@ class InventoryRecordsController < ApplicationController
 
   # POST /inventory_records
   # POST /inventory_records.json
-  def create
-    @kit = Kit.find(params[:kit_id])
-    @attendant = current_user
-    raise params.inspect
-    @inventory_records = []
-    success = true
+  # def create
+  #   @kit = Kit.find(params[:kit_id])
+  #   @attendant = current_user
+  #   raise params.inspect
+  #   @inventory_records = []
+  #   success = true
 
-    params[:user][:inventory_records_attributes].each do |k,attrs|
-      ir = InventoryRecord.new
-      ir.attendant           = current_user
-      ir.inventory_status_id = attrs[:inventory_status_id].to_i
-      ir.component_id        = attrs[:component_id].to_i
-      @inventory_records << ir
-      success &&= ir.save
-    end
+  #   params[:user][:inventory_records_attributes].each do |k,attrs|
+  #     ir = InventoryRecord.new
+  #     ir.attendant           = current_user
+  #     ir.inventory_status_id = attrs[:inventory_status_id].to_i
+  #     ir.component_id        = attrs[:component_id].to_i
+  #     @inventory_records << ir
+  #     success &&= ir.save
+  #   end
 
-    respond_to do |format|
-      if success
-        format.html { redirect_to @kit, notice: 'Inventory records were successfully created.' }
-        # format.json { render json: @inventory_record, status: :created, location: @inventory_record }
-      else
-        format.html { render action: "new" }
-        # format.json { render json: @inventory_record.errors, status: :unprocessable_entity }
-      end
-    end
-  end
+  #   respond_to do |format|
+  #     if success
+  #       format.html { redirect_to @kit, notice: 'Inventory records were successfully created.' }
+  #       # format.json { render json: @inventory_record, status: :created, location: @inventory_record }
+  #     else
+  #       format.html { render action: "new" }
+  #       # format.json { render json: @inventory_record.errors, status: :unprocessable_entity }
+  #     end
+  #   end
+  # end
 
   # PUT /inventory_records/1
   # PUT /inventory_records/1.json

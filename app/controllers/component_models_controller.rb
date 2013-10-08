@@ -152,6 +152,7 @@ class ComponentModelsController < ApplicationController
   end
 
   def scope_by_filter_params
+    @filter = params[:filter] || "all"
     case params[:filter]
     when "circulating"     then @component_models = @component_models.circulating
     end

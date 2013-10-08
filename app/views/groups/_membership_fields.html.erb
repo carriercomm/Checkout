@@ -5,7 +5,7 @@
       <%= f.input :user, :as => :ajax_association, :wrapper => :tabular, :path => select2_users_path(:format => :json, :group_id =>  @group.id) %>
     <% else %>
       <%= f.association :user, :as => :hidden, :wrapper => :tabular %>
-      <%= f.object.user.username %>
+      <%= UserDecorator.new(f.object.user).to_link %>
     <% end %>
   </td>
   <td>

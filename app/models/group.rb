@@ -7,10 +7,14 @@ class Group < ActiveRecord::Base
   ## Associations ##
 
   has_many :kits,        :through    => :permissions
-  has_many :memberships, :inverse_of => :group
+  has_many :memberships, :inverse_of => :group,       :dependent => :destroy
   has_many :permissions, :inverse_of => :group,       :dependent => :destroy
   has_many :users,       :through    => :memberships, :order => "users.username ASC"
 
+
+  ## Validations ##
+
+  validates :name, :uniqueness => true
 
   ## Mass-assignable Attributes ##
 

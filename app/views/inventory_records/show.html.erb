@@ -1,6 +1,10 @@
 <% title t('page_titles.show.inventory_record') %>
 <% subtitle "##{inventory_record}" %>
 
+<% content_for :sidebar do %>
+  <li class="nav-header"><%= t(".actions") %></li>
+<% end %>
+
 <div class="dl-horizontal">
   <dl>
     <dt>Type</dt>

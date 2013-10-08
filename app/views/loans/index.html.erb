@@ -1,15 +1,15 @@
 <% title t('page_titles.index.loans') %>
-<% subtitle t("page_subtitles.index.loans.#{ @subtitle_key || 'all' }") %>
+<% subtitle t("filters.loan.#{ @filter }").html_safe %>
 
 <% content_for :sidebar do %>
   <li class="nav-header"><%= t("loan.sidebar.filters") %></li>
-  <li><%= auth_link(Loan) %></li>
-  <li><%= auth_link(Loan, { filter: "pending" }) %></li>
-  <li><%= auth_link(Loan, { filter: "requested" }) %></li>
+  <li><%= auth_link(Loan, { filter: "all"         }) %></li>
+  <li><%= auth_link(Loan, { filter: "pending"     }) %></li>
+  <li><%= auth_link(Loan, { filter: "requested"   }) %></li>
   <li><%= auth_link(Loan, { filter: "checked_out" }) %></li>
-  <li><%= auth_link(Loan, { filter: "checked_in" }) %></li>
-  <%#= auth_link(Loan, { filter: "rejected" }) %>
-  <li><%= auth_link(Loan, { filter: "canceled" }) %></li>
+  <li><%= auth_link(Loan, { filter: "checked_in"  }) %></li>
+  <%#= auth_link(Loan, { filter: "rejected"       }) %>
+  <li><%= auth_link(Loan, { filter: "canceled"    }) %></li>
 <% end %>
 
 <%= paginate @loans %>

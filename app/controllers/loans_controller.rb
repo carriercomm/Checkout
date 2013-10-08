@@ -29,18 +29,16 @@ class LoansController < ApplicationController
       @loans = Loan
     end
 
-    if params[:filter]
-      @subtitle_key = params[:filter]
+    @filter = params[:filter] || "all"
 
-      case params[:filter]
-      when "pending"     then @loans = @loans.where("loans.workflow_state = 'pending'")
-      when "approved"    then @loans = @loans.where("loans.workflow_state = 'approved'")
-      when "checked_out" then @loans = @loans.where("loans.workflow_state = 'checked_out'")
-      when "checked_in"  then @loans = @loans.where("loans.workflow_state = 'checked_in'")
-      when "rejected"    then @loans = @loans.where("loans.workflow_state = 'rejected'")
-      when "canceled"    then @loans = @loans.where("loans.workflow_state = 'canceled'")
-#      when "archived"    then @loans = @loans.where("loans.in_at IS NOT NULL OR ")
-      end
+    case @filter
+    when "pending"     then @loans = @loans.where("loans.workflow_state = 'pending'")
+    when "approved"    then @loans = @loans.where("loans.workflow_state = 'approved'")
+    when "checked_out" then @loans = @loans.where("loans.workflow_state = 'checked_out'")
+    when "checked_in"  then @loans = @loans.where("loans.workflow_state = 'checked_in'")
+    when "rejected"    then @loans = @loans.where("loans.workflow_state = 'rejected'")
+    when "canceled"    then @loans = @loans.where("loans.workflow_state = 'canceled'")
+      #      when "archived"    then @loans = @loans.where("loans.in_at IS NOT NULL OR ")
     end
 
     @loans = @loans.order("loans.starts_at DESC").page(params[:page])

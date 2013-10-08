@@ -59,14 +59,17 @@
                 <li><%= link_to "Loans", loans_path if can? :read, Loan %></li>
                 <li><%= link_to "Locations", locations_path if can? :read, Location %></li>
                 <li><%= link_to "Models", circulating_component_models_path if can? :read, ComponentModel %></li>
-                <%= dropdown_for("Admin") do %>
-                  <li><%= link_to "Application Settings", settings_path if current_user.admin? %></li>
-                  <li><%= link_to "Budgets", budgets_path if can? :read, Budget %></li>
-                  <li><%= link_to "Covenants", covenants_path  if can? :read, Covenant %></li>
-                  <li><%= link_to "Dashboard", dashboard_path  if can? :read, Covenant %></li>
-                  <li><%= link_to "Groups", active_groups_path if can? :read, Group %></li>
-                  <li><%= link_to "Inventory", inventory_records_path if can? :read, InventoryRecord %></li>
-                  <li><%= link_to("Users", active_users_path) if can? :read, User %></li>
+                <% if current_user.attendant? %>
+                  <%= dropdown_for("Admin") do %>
+                    <li><%= link_to "Application Settings", settings_path if current_user.admin? %></li>
+                    <li><%= link_to "Budgets", budgets_path if can? :read, Budget %></li>
+                    <li><%= link_to "Components", components_path  if can? :read, Component %></li>
+                    <li><%= link_to "Covenants", covenants_path  if can? :read, Covenant %></li>
+                    <li><%= link_to "Dashboard", dashboard_path  if current_user.attendant? %></li>
+                    <li><%= link_to "Groups", groups_path if can? :read, Group %></li>
+                    <li><%= link_to "Inventory", inventory_records_path if can? :read, InventoryRecord %></li>
+                    <li><%= link_to("Users", active_users_path) if can? :read, User %></li>
+                  <% end %>
                 <% end %>
               </ul>
             </div>

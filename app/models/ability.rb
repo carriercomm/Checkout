@@ -34,12 +34,14 @@ class Ability
       can :read, Category
       can :read, Component
       can :read, ComponentModel
-      can [:show, :edit, :update], Group, :memberships => { user_id: user.id, supervisor: true }
+
+      # TODO: implement the ability for supervisors to edit groups?
+      # can [:show, :edit, :update], Group, :memberships => { user_id: user.id, supervisor: true }
 
       if Settings.clients_can_see_equipment_outside_their_groups
-        can :read, Kit.circulating
+        can :read, Kit, :worflow_state => 'circulating'
       else
-        can :read, Kit.circulating_for_user(user)
+        can :read, Kit, :groups => { :id => user.group_ids }
       end
 
       can :read, Location

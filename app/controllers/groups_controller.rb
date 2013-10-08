@@ -117,15 +117,13 @@ class GroupsController < ApplicationController
   end
 
   def apply_filters
-    case params["filter"]
-    when "active"
-      @groups = @groups.active_with_kit_and_user_counts
-    when "empty"
-      @groups = @groups.empty_with_kit_and_user_counts
-    when "expired"
-      @groups = @groups.expired_with_kit_and_user_counts
-    else
-      @groups = @groups.all_with_kit_and_user_counts
+    @filter = params["filter"] || "all"
+
+    case @filter
+    when "active"  then @groups = @groups.active_with_kit_and_user_counts
+    when "empty"   then @groups = @groups.empty_with_kit_and_user_counts
+    when "expired" then @groups = @groups.expired_with_kit_and_user_counts
+    else @groups = @groups.all_with_kit_and_user_counts
     end
   end
 

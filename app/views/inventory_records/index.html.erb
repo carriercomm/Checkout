@@ -27,7 +27,13 @@
       <td><%= inventory_record.kit.to_link %></td>
       <td><%= inventory_record.loan.to_link if inventory_record.loan %></td>
       <td class="actions">
-        <%= auth_link(inventory_record) %>
+        <%#= case inventory_record.object.type
+        when "CheckOutInventoryRecord" then check_out_inventory_record_path(inventory_record)
+        when "CheckInInventoryRecord"  then check_in_inventory_record_path(inventory_record)
+        when "AuditInventoryRecord"    then audit_inventory_record_path(inventory_record)
+        end %>
+
+        <%= auth_link(inventory_record.object) %>
       </td>
     </tr>
   <% end %>
