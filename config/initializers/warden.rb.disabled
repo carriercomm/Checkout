@@ -1,0 +1,27 @@
+Warden::Strategies.add(:pubcookie) do
+
+  def authenticate!
+    if !request.env['HTTP_AUTHORIZATION'].nil?
+      # parse the HTTP_AUTHORIZATION env to get the username
+      username = request.env['HTTP_AUTHORIZATION'].split(' ')[1].unpack("m")[0].split(':')[0]
+
+      # grab the user from the database
+      u = User.find_by_username(username)
+
+      if !u.nil?
+        # we have a user, now check if it should be able to log in
+        if u.disabled?
+          fail!("Your account is permanently disabled. Please contact an administrator for more information.")
+        else
+          success!(u)
+        end
+      else
+        # this is a valid user, but doesn't have an account in the system
+        fail!("You don't have an account with this system. Please contact an administrator for more information.")
+      end
+    end
+  end
+
+end
+
+

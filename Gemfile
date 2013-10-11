@@ -20,7 +20,7 @@ gem 'simple_form'                    # form builder
 gem 'strip_attributes'               # strips model attributes, and converts blanks to nil
 #gem 'strong_parameters'              # rails 4.0 type mass-assignment protection
 #gem 'workflow'                       # state machine library
-gem 'workflow', git: "http://github.com/jamezilla/workflow.git", ref: 'dbdfa22ca83772a260701f42b3f8e431f7ad6c8b'
+gem 'workflow', git: "https://github.com/jamezilla/workflow.git", ref: 'dbdfa22ca83772a260701f42b3f8e431f7ad6c8b'
 
 # Gems used only for assets and not required
 # in production environments by default.
